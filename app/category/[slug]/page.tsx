@@ -17,6 +17,7 @@ import {
   listCommerceCategories,
   listCommerceProducts,
 } from '@/lib/strapi';
+import { SITE } from '@/lib/site';
 import { pageOpenGraph } from '@/lib/seo';
 
 export const revalidate = 300;
@@ -95,23 +96,83 @@ export default async function ProductCategoryPage({
 
   return (
     <main data-testid={`product-category-${category.slug}`}>
-      <section className="bg-paper">
-        <div className="mx-auto max-w-[1366px] px-4 pb-8 pt-12 sm:px-6 sm:pb-10 sm:pt-16">
-          <nav className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ink/45" aria-label="Breadcrumb">
-            <Link href="/category" className="hover:text-primary">Categories</Link>
-            <span>/</span>
-            <span className="text-primary">{category.name}</span>
+      <section
+        className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white"
+        data-testid="product-category-header"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-80"
+          style={{
+            background:
+              'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
+          }}
+        />
+        <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
+          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45" aria-label="Breadcrumb">
+            <Link href="/" className="transition hover:text-white">Home</Link>
+            <span aria-hidden>/</span>
+            <Link href="/category" className="transition hover:text-white">Categories</Link>
+            <span aria-hidden>/</span>
+            <span className="text-[#ffe000]">{category.name}</span>
           </nav>
-          <h1 className="mt-4 max-w-4xl font-display font-bold leading-[1.08] text-ink" style={{ fontSize: '1.75rem' }}>
-            {category.name}
-          </h1>
-          <p className="mt-6 text-base leading-8 text-ink/65 sm:text-lg">
-            {categoryPageDescription(category)}
-          </p>
+
+          <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">{SITE.name} catalog</p>
+              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
+                {category.name}
+              </h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
+                {categoryPageDescription(category)}
+              </p>
+
+              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
+                <li className="flex gap-3">
+                  <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                  <span>Side-by-side prices from Amazon, eBay, Walmart, Newegg, and Best Buy.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                  <span>Filter by brand, store, availability, condition, and price range.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                  <span>See the lowest current offer before you leave {SITE.name}.</span>
+                </li>
+              </ul>
+
+              <div className="mt-10 flex flex-wrap gap-3">
+                <a href="#catalog" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
+                  Browse {category.name.toLowerCase()}
+                </a>
+                <Link href="/products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
+                  All products
+                </Link>
+                <Link href="/best-deals" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
+                  Best deals
+                </Link>
+              </div>
+            </div>
+
+            <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label={`${category.name} statistics`}>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
+              <p className="mt-3 text-sm leading-6 text-white/70">
+                A live snapshot of {category.name} on {SITE.name} — compare prices and current merchant
+                offers side by side before you buy.
+              </p>
+              <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
+                <Stat label="Products" value={String(allProducts.length)} />
+                <Stat label="Showing" value={String(total)} />
+                <Stat label="Brands" value={String(filterOptions.brands.length)} />
+                <Stat label="Stores" value={String(filterOptions.merchants.length)} />
+              </div>
+            </aside>
+          </div>
         </div>
       </section>
 
-      <section className="bg-white pb-12 pt-6 sm:pb-16 sm:pt-8">
+      <section id="catalog" className="bg-[#f0f2f4] pb-12 pt-10 sm:pb-16 sm:pt-12">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[minmax(220px,25%)_minmax(0,75%)] lg:items-start">
             <ProductFiltersSidebar
@@ -172,6 +233,15 @@ export default async function ProductCategoryPage({
         </div>
       </section>
     </main>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="font-display text-2xl font-bold text-white">{value}</p>
+      <p className="mt-1 text-sm text-white/55">{label}</p>
+    </div>
   );
 }
 

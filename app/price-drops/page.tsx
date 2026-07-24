@@ -334,7 +334,7 @@ function PriceDropCard({ drop, featured = false }: { drop: PriceDrop; featured?:
         </div>
 
         <Link href={href} className="mt-4 block">
-          <h4 className="line-clamp-2 font-display text-[1rem] font-bold leading-tight text-ink transition group-hover:text-primary">
+          <h4 className="line-clamp-2 font-display !text-[1rem] font-bold leading-tight text-ink transition group-hover:text-primary">
             {product.name}
           </h4>
         </Link>
