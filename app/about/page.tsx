@@ -60,7 +60,7 @@ export default function AboutPage() {
             <span className="text-[#ffe000]">About</span>
           </nav>
 
-          <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
+          <div className="mt-8 w-full">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">About {SITE.name}</p>
               <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
@@ -93,27 +93,6 @@ export default function AboutPage() {
                 </Link>
               </div>
             </div>
-
-            <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="At a glance">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
-              <p className="mt-3 text-sm leading-6 text-white/70">
-                What {SITE.name} brings together — every price for a product in one place, tracked over time, with
-                honest guidance alongside it.
-              </p>
-              <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
-                <Stat label="Marketplaces" value="8+" />
-                <Stat label="Categories" value={String(coverage.length)} />
-                <Stat label="Price checks" value="Daily" />
-                <Stat label="To use" value="Free" />
-              </div>
-              <div className="mt-5 border-t border-white/10 pt-4 text-xs text-white/55">
-                No account required —{' '}
-                <Link href="/products" className="font-semibold text-[#ffe000] underline-offset-2 hover:underline">
-                  start comparing
-                </Link>
-                .
-              </div>
-            </aside>
           </div>
         </div>
       </section>
@@ -222,15 +201,6 @@ export default function AboutPage() {
         </section>
       </div>
     </main>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="font-display text-2xl font-bold text-white">{value}</p>
-      <p className="mt-1 text-sm text-white/55">{label}</p>
-    </div>
   );
 }
 

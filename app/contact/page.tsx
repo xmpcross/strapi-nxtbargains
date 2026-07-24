@@ -49,7 +49,7 @@ export default function ContactPage() {
             <span className="text-[#ffe000]">Contact</span>
           </nav>
 
-          <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
+          <div className="mt-8 w-full">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">Contact</p>
               <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
@@ -81,29 +81,6 @@ export default function ContactPage() {
                 </Link>
               </div>
             </div>
-
-            <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="Ways to reach us">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
-              <p className="mt-3 text-sm leading-6 text-white/70">
-                The fastest ways to reach the team. We keep an eye on all of them and usually reply within one to two
-                business days.
-              </p>
-              <div className="mt-5 space-y-1 border-t border-white/10 pt-4">
-                {channels.map((c) => (
-                  <a
-                    key={c.t}
-                    href={c.href}
-                    className="flex items-center gap-3.5 rounded-lg px-2 py-2.5 transition hover:bg-white/5"
-                  >
-                    <span className="grid h-10 w-10 flex-none place-items-center rounded-[11px] bg-white/10 font-display text-[#ffe000]" aria-hidden>{c.ic}</span>
-                    <span>
-                      <span className="block font-display text-[0.92rem] font-semibold text-white">{c.t}</span>
-                      <span className="block text-[0.82rem] text-white/55">{c.s}</span>
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </aside>
           </div>
         </div>
       </section>
