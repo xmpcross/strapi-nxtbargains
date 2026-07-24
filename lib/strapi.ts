@@ -100,6 +100,7 @@ export type NxtPost = {
   ogImage?: StrapiImage;
   gallery?: NonNullable<StrapiImage>[];
   categories?: NxtCategory[];
+  faqs?: { question: string; answer: string }[];
 };
 
 export type CommerceBrand = {
@@ -223,7 +224,7 @@ export function mediaUrl(img: StrapiImage): string | null {
   return img.url.startsWith('http') ? img.url : `${PUBLIC_BASE}${img.url}`;
 }
 
-const POST_POPULATE = ['coverImage', 'ogImage', 'categories', 'gallery'];
+const POST_POPULATE = ['coverImage', 'ogImage', 'categories', 'gallery', 'faqs'];
 const COMMERCE_PRODUCT_POPULATE = {
   primaryImage: true,
   gallery: true,

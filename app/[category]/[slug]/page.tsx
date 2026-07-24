@@ -7,7 +7,7 @@ import { getPost, listPostComments, listPosts, mediaUrl, type NxtPost } from '@/
 import { SECTIONS, SITE } from '@/lib/site';
 import { breadcrumbJsonLd } from '@/lib/jsonld';
 import { enrichPostCarouselHtml } from '@/lib/enrich-post-carousel';
-import { clampDescription, firstImageUrl, fmtDate, primaryCategorySlug, postPath, warnSeoLength } from '@/lib/format';
+import { clampDescription, firstImageUrl, fmtDate, primaryCategorySlug, postPath, stripHtml, warnSeoLength } from '@/lib/format';
 import PostContent from '@/components/PostContent';
 import PostPriceComparison from '@/components/PostPriceComparison';
 import CommentForm from '@/components/CommentForm';
@@ -170,6 +170,24 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     { name: post.title, url: `${SITE.url}/${category}/${post.slug}` },
   ]);
 
+  // FAQs — drop any empty/placeholder Q&A. Visible block renders when there is
+  // at least one; FAQPage schema is only emitted with two or more.
+  const faqs = (post.faqs ?? [])
+    .map((f) => ({ question: (f.question ?? '').trim(), answer: (f.answer ?? '').trim() }))
+    .filter((f) => f.question && f.answer);
+  const faqLd =
+    faqs.length >= 2
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqs.map((f) => ({
+            '@type': 'Question',
+            name: f.question,
+            acceptedAnswer: { '@type': 'Answer', text: stripHtml(f.answer) },
+          })),
+        }
+      : null;
+
   const postContent = await enrichPostCarouselHtml(post.content);
 
   return (
@@ -191,6 +209,12 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
+      {faqLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      ) : null}
 
       <section className="article-breadcrumb-section bg-[#f8f8f8] py-4">
         <div className="mx-auto max-w-7xl px-6">
@@ -247,6 +271,22 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                 </div>
               </div>
             </div>
+
+            {faqs.length > 0 ? (
+              <section className="mt-10" data-testid="faq-section" aria-labelledby="faq-heading">
+                <h2 id="faq-heading" className="font-display text-2xl font-bold tracking-tight text-ink">
+                  Frequently asked questions
+                </h2>
+                <div className="mt-5 divide-y divide-ink/10 border-y border-ink/10">
+                  {faqs.map((faq, i) => (
+                    <div key={i} className="py-5" data-testid="faq-item">
+                      <h3 className="font-display text-lg font-semibold text-ink">{faq.question}</h3>
+                      <p className="mt-2 text-[0.95rem] leading-7 text-ink/70">{faq.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             <section className="mt-10" data-testid="post-comments">
               <h3 className="font-display text-2xl font-bold tracking-tight text-ink">Comments</h3>

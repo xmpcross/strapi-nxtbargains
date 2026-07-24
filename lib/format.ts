@@ -64,3 +64,17 @@ export function warnSeoLength(
     console.warn(`[seo] ${ref}: title is ${heading.length} chars (>60) — consider shortening for SERPs`);
   }
 }
+
+/** Strip HTML tags, decode common entities, and collapse whitespace — for
+ *  plain-text schema fields (e.g. FAQPage answer text). */
+export function stripHtml(input?: string | null): string {
+  if (!input) return '';
+  const entities: Record<string, string> = {
+    amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", apos: "'", nbsp: ' ',
+  };
+  return input
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&(amp|lt|gt|quot|#39|apos|nbsp);/g, (_, e) => entities[e] ?? ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
