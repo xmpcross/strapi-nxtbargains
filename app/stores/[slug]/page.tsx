@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { listStoreProducts } from '@/lib/strapi';
 import { bestOffer, collectOfferRows, offerPrice, productImageUrl } from '@/lib/commerce';
 import { productCanonicalPath } from '@/lib/product-url';
+import { clampDescription } from '@/lib/format';
 import { breadcrumbJsonLd, itemListJsonLd } from '@/lib/jsonld';
 import { SITE } from '@/lib/site';
 import CommerceProductCard from '@/components/CommerceProductCard';
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const name = store?.name ?? 'Store';
   return {
     title: `${name} — Prices & Products`,
-    description: `Products available at ${name}, price-compared across marketplaces on ${SITE.name}.`,
+    description: clampDescription(`Products available at ${name}, price-compared across marketplaces on ${SITE.name}.`),
     alternates: { canonical: `/stores/${slug}` },
   };
 }

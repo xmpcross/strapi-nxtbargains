@@ -7,6 +7,7 @@ import { CookieConsentProvider } from '@/components/CookieConsentProvider';
 import GeniuslinkScripts from '@/components/GeniuslinkScripts';
 import { SITE } from '@/lib/site';
 import { cmsOrigin, siteGraphJsonLd } from '@/lib/seo';
+import { clampDescription } from '@/lib/format';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
     default: `${SITE.name} — Compare Prices, Deals & Honest Reviews`,
     template: `%s · ${SITE.name}`,
   },
-  description: SITE.description,
+  description: clampDescription(SITE.description),
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   openGraph: { type: 'website', siteName: SITE.name, locale: 'en_US' },
   twitter: { card: 'summary_large_image', site: '@nxtbargains' },

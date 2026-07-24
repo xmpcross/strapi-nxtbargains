@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
+import { clampDescription } from '@/lib/format';
 import ValueStrip from '@/components/ValueStrip';
 import ContactForm from '@/components/ContactForm';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
-  description: `Get in touch with the ${SITE.name} team — story tips, partnership questions, corrections, or a product you'd like us to track.`,
+  description: clampDescription(`Get in touch with the ${SITE.name} team — story tips, partnership questions, corrections, or a product you'd like us to track.`),
   alternates: { canonical: '/contact' },
 };
 

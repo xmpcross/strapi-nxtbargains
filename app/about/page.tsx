@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
+import { clampDescription } from '@/lib/format';
 
 export const metadata: Metadata = {
   title: 'About Us',
-  description:
+  description: clampDescription(
     'NXT.Bargains is an independent price-comparison platform — compare smart-electronics prices across 8+ marketplaces, track price history, and read honest reviews and guides. Free, no signup.',
+  ),
   alternates: { canonical: '/about' },
 };
 

@@ -7,7 +7,7 @@ import { getPost, listPostComments, listPosts, mediaUrl, type NxtPost } from '@/
 import { SECTIONS, SITE } from '@/lib/site';
 import { breadcrumbJsonLd } from '@/lib/jsonld';
 import { enrichPostCarouselHtml } from '@/lib/enrich-post-carousel';
-import { firstImageUrl, fmtDate, primaryCategorySlug, postPath } from '@/lib/format';
+import { clampDescription, firstImageUrl, fmtDate, primaryCategorySlug, postPath, warnSeoLength } from '@/lib/format';
 import PostContent from '@/components/PostContent';
 import PostPriceComparison from '@/components/PostPriceComparison';
 import CommentForm from '@/components/CommentForm';
@@ -90,7 +90,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!post) return { title: 'Not found' };
 
   const cover = mediaUrl(post.coverImage ?? null) || mediaUrl(post.ogImage ?? null);
-  const description = post.seoDescription || post.excerpt || SITE.description;
+  warnSeoLength(post.slug, {
+    description: post.seoDescription || post.excerpt,
+    title: post.seoTitle || post.title,
+  });
+  const description = clampDescription(post.seoDescription || post.excerpt || SITE.description);
 
   return {
     title: post.seoTitle || post.title,

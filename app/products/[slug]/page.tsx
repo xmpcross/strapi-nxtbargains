@@ -36,7 +36,7 @@ import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
 import StoreLinkTile from '@/components/StoreLinkTile';
 import { productCanonicalPath, primaryCategorySlug } from '@/lib/product-url';
-import { fmtDate } from '@/lib/format';
+import { clampDescription, fmtDate } from '@/lib/format';
 import { SITE } from '@/lib/site';
 import { pageOpenGraph } from '@/lib/seo';
 import { breadcrumbJsonLd } from '@/lib/jsonld';
@@ -106,9 +106,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!product) return { title: 'Product not found' };
 
   const image = productImageUrl(product);
-  const description =
+  const description = clampDescription(
     product.shortDescription ||
-    `Compare current merchant prices for ${product.name} on ${SITE.name}.`;
+      `Compare current merchant prices for ${product.name} on ${SITE.name}.`,
+  );
   const canonicalPath = productCanonicalPath(product);
 
   return {

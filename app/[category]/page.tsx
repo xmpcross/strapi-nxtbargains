@@ -13,7 +13,7 @@ import {
 import { getEditorialCategoryConfig } from '@/lib/editorial-category-config';
 import { getCategory, listPosts, mediaUrl } from '@/lib/strapi';
 import { ARTICLE_SIDEBAR_CATEGORIES, resolveArticleCategoryBlurb, SECTIONS, SITE } from '@/lib/site';
-import { firstImageUrl } from '@/lib/format';
+import { clampDescription, firstImageUrl } from '@/lib/format';
 import { pageOpenGraph } from '@/lib/seo';
 import { breadcrumbJsonLd, itemListJsonLd } from '@/lib/jsonld';
 
@@ -53,8 +53,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return { title: 'Page not found', robots: { index: false, follow: false } };
   }
   const name = await resolveCategoryName(category, cmsCategory?.name);
-  const description =
-    resolveArticleCategoryBlurb(category, cmsCategory?.description) ?? `${name} from ${SITE.name} — ${SITE.tagline}`;
+  const description = clampDescription(
+    resolveArticleCategoryBlurb(category, cmsCategory?.description) ?? `${name} from ${SITE.name} — ${SITE.tagline}`,
+  );
   return {
     title: name,
     description,
