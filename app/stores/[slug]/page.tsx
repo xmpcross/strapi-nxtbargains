@@ -2,7 +2,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { listStoreProducts } from '@/lib/strapi';
-import { bestOffer, collectOfferRows, offerPrice } from '@/lib/commerce';
+import { bestOffer, collectOfferRows, offerPrice, productImageUrl } from '@/lib/commerce';
+import { productCanonicalPath } from '@/lib/product-url';
+import { breadcrumbJsonLd, itemListJsonLd } from '@/lib/jsonld';
 import { SITE } from '@/lib/site';
 import CommerceProductCard from '@/components/CommerceProductCard';
 import StoreFilter, { type StoreFilterItem } from '@/components/StoreFilter';
@@ -39,8 +41,34 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
     };
   });
 
+  // Listing structured data — breadcrumb trail + an ItemList of the store's products.
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: 'Home', url: '/' },
+    { name: 'Stores', url: '/stores' },
+    { name: store.name, url: `/stores/${store.slug}` },
+  ]);
+  const storeListItems = products
+    .filter((p) => p.slug)
+    .map((p, index) => ({
+      name: p.name,
+      url: productCanonicalPath(p),
+      image: productImageUrl(p) ?? undefined,
+      position: index + 1,
+    }));
+  const itemListLd = storeListItems.length > 0 ? itemListJsonLd(storeListItems) : null;
+
   return (
     <main className="bg-white" data-testid={`store-${store.slug}`}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      {itemListLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+        />
+      ) : null}
       <section className="border-b border-ink/10 bg-paper">
         <div className="mx-auto max-w-[1366px] px-4 py-8 sm:px-6">
           <Link href="/stores" className="text-xs font-bold uppercase tracking-wider text-primary">← All stores</Link>

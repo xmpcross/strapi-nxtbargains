@@ -11,9 +11,11 @@ import {
   isValidPostType,
 } from '@/lib/article-filters';
 import { getEditorialCategoryConfig } from '@/lib/editorial-category-config';
-import { getCategory, listPosts } from '@/lib/strapi';
+import { getCategory, listPosts, mediaUrl } from '@/lib/strapi';
 import { ARTICLE_SIDEBAR_CATEGORIES, resolveArticleCategoryBlurb, SECTIONS, SITE } from '@/lib/site';
+import { firstImageUrl } from '@/lib/format';
 import { pageOpenGraph } from '@/lib/seo';
+import { breadcrumbJsonLd, itemListJsonLd } from '@/lib/jsonld';
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -113,25 +115,58 @@ export default async function CategoryPage({
 
   const heroBlurb = categoryBlurb ?? sectionMeta?.blurb;
 
+  // Listing structured data — breadcrumb trail + an ItemList of this page's posts.
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: 'Home', url: '/' },
+    { name, url: `/${category}` },
+  ]);
+  const postListItems = posts
+    .filter((post) => post.slug)
+    .map((post, index) => ({
+      name: post.title,
+      url: `/${category}/${post.slug}`,
+      image: mediaUrl(post.coverImage ?? null) ?? firstImageUrl(post.content) ?? undefined,
+      position: (page - 1) * PAGE_SIZE + index + 1,
+    }));
+  const itemListLd = postListItems.length > 0 ? itemListJsonLd(postListItems) : null;
+  const listingJsonLd = (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      {itemListLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+        />
+      ) : null}
+    </>
+  );
+
   if (editorialConfig) {
     return (
-      <EditorialCategoryLayout
-        config={editorialConfig}
-        posts={posts}
-        total={total}
-        page={page}
-        pageCount={pageCount}
-        filters={filters}
-        activeFilterCount={activeFilterCount}
-        categorySlug={category}
-        categoryName={name}
-        categoryBlurb={categoryBlurb ?? heroBlurb}
-      />
+      <>
+        {listingJsonLd}
+        <EditorialCategoryLayout
+          config={editorialConfig}
+          posts={posts}
+          total={total}
+          page={page}
+          pageCount={pageCount}
+          filters={filters}
+          activeFilterCount={activeFilterCount}
+          categorySlug={category}
+          categoryName={name}
+          categoryBlurb={categoryBlurb ?? heroBlurb}
+        />
+      </>
     );
   }
 
   return (
     <main className="article-category-page" data-testid={`category-${category}`}>
+      {listingJsonLd}
       <section className="bg-paper">
         <div className="mx-auto max-w-[1366px] px-4 pb-8 pt-12 sm:px-6 sm:pb-10 sm:pt-16">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Category</p>

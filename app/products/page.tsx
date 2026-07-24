@@ -16,6 +16,9 @@ import {
   type ProductFilters,
 } from '@/lib/product-filters';
 import { listCommerceCategories, listCommerceProducts } from '@/lib/strapi';
+import { productCanonicalPath } from '@/lib/product-url';
+import { productImageUrl } from '@/lib/commerce';
+import { breadcrumbJsonLd, itemListJsonLd } from '@/lib/jsonld';
 
 export const revalidate = 60;
 
@@ -75,12 +78,36 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     numberOfItems: total,
   };
 
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: 'Home', url: SITE.url },
+    { name: 'Products', url: `${SITE.url}/products` },
+  ]);
+  const productListItems = products
+    .filter((product) => product.slug)
+    .map((product, index) => ({
+      name: product.name,
+      url: productCanonicalPath(product),
+      image: productImageUrl(product) ?? undefined,
+      position: (page - 1) * PAGE_SIZE + index + 1,
+    }));
+  const itemListLd = productListItems.length > 0 ? itemListJsonLd(productListItems) : null;
+
   return (
     <main data-testid="products-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      {itemListLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+        />
+      ) : null}
 
       <ProductsHero
         totalProducts={allProducts.length}

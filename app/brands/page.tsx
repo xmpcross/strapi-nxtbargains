@@ -10,6 +10,7 @@ import {
   type CouponStore,
 } from '@/lib/coupon-stores';
 import { SITE } from '@/lib/site';
+import { breadcrumbJsonLd, itemListJsonLd } from '@/lib/jsonld';
 
 export const revalidate = 86400;
 
@@ -142,12 +143,34 @@ export default async function BrandsPage({
     numberOfItems: allBrands.length,
   };
 
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: 'Home', url: '/' },
+    { name: 'Brands', url: '/brands' },
+  ]);
+  const brandListItems = filtered.map((row, index) => ({
+    name: row.displayName,
+    url: brandCouponHref(row.slug),
+    image: storeLogoUrl(row.store) ?? undefined,
+    position: index + 1,
+  }));
+  const itemListLd = brandListItems.length > 0 ? itemListJsonLd(brandListItems) : null;
+
   return (
     <div data-testid="brands-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      {itemListLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+        />
+      ) : null}
 
       <Hero brandCount={allBrands.length} featuredCount={featuredBrands.length} />
 

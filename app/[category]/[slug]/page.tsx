@@ -5,7 +5,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getPost, listPostComments, listPosts, mediaUrl, type NxtPost } from '@/lib/strapi';
 import { SECTIONS, SITE } from '@/lib/site';
-import { breadcrumbJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd } from '@/lib/jsonld';
 import { enrichPostCarouselHtml } from '@/lib/enrich-post-carousel';
 import { firstImageUrl, fmtDate, primaryCategorySlug, postPath } from '@/lib/format';
 import PostContent from '@/components/PostContent';
