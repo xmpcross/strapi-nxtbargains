@@ -164,7 +164,7 @@ export default function EditorialCategoryLayout({
         </div>
       </section>
 
-      <section className="bg-[#f7fafc] pb-12 pt-8 sm:pb-16 sm:pt-10">
+      <section className="bg-[#f0f2f4] pb-12 pt-8 sm:pb-16 sm:pt-10">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[minmax(220px,24%)_minmax(0,76%)] lg:items-start">
             <ArticleFiltersSidebar

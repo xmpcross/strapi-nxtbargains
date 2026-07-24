@@ -50,8 +50,8 @@ export default {
         bob: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
         halo: { '0%': { r: '7', opacity: '0.35' }, '70%': { r: '18', opacity: '0' }, '100%': { opacity: '0' } },
         pulseDot: {
-          '0%,100%': { boxShadow: '0 0 0 0 rgba(21,86,238,0.35)' },
-          '50%': { boxShadow: '0 0 0 6px rgba(21,86,238,0)' },
+          '0%,100%': { boxShadow: '0 0 0 0 rgba(0,70,190,0.35)' },
+          '50%': { boxShadow: '0 0 0 6px rgba(0,70,190,0)' },
         },
       },
       animation: {

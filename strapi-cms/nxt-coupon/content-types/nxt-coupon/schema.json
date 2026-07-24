@@ -1,0 +1,73 @@
+{
+  "kind": "collectionType",
+  "collectionName": "nxt_coupons",
+  "info": {
+    "singularName": "nxt-coupon",
+    "pluralName": "nxt-coupons",
+    "displayName": "NXT Coupon",
+    "description": "CMS-curated coupons / deals shown on NXT.Bargains. Editors control what appears independently of any external coupon API."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "store": {
+      "type": "string",
+      "required": true
+    },
+    "storeSlug": {
+      "type": "string",
+      "regex": "^[a-z0-9-]+$"
+    },
+    "code": {
+      "type": "string"
+    },
+    "discount": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "couponType": {
+      "type": "enumeration",
+      "enum": ["Coupon", "Promo code", "Sale"],
+      "default": "Coupon"
+    },
+    "destinationUrl": {
+      "type": "string"
+    },
+    "affiliateUrl": {
+      "type": "string"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "isBrand": {
+      "type": "boolean",
+      "default": false
+    },
+    "verifiedLabel": {
+      "type": "string",
+      "default": "Verified"
+    },
+    "expiresAt": {
+      "type": "datetime"
+    },
+    "displayOrder": {
+      "type": "integer",
+      "default": 0
+    },
+    "externalId": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    }
+  }
+}

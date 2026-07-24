@@ -11,9 +11,9 @@ type ProductCatalogPaginationProps = {
 const PAGE_BTN =
   'inline-flex h-10 w-10 shrink-0 items-center justify-center border text-sm font-medium tabular-nums transition';
 const PAGE_BTN_IDLE =
-  'border-[#d8dee6] bg-white text-ink/80 hover:border-[#b8c0cc] hover:bg-[#f7fafc]';
+  'border-[#d8dee6] bg-white text-ink/80 hover:border-[#b8c0cc] hover:bg-[#f0f2f4]';
 const PAGE_BTN_ACTIVE = 'border-primary bg-primary text-white';
-const PAGE_BTN_DISABLED = 'cursor-not-allowed border-[#e4e8ee] bg-[#f7fafc] text-ink/30';
+const PAGE_BTN_DISABLED = 'cursor-not-allowed border-[#e4e8ee] bg-[#f0f2f4] text-ink/30';
 
 function visiblePages(page: number, pageCount: number, maxVisible: number) {
   if (pageCount <= maxVisible) {

@@ -22,7 +22,7 @@ export default function AboutPage() {
   return (
     <div data-testid="about-page">
       <section className="relative overflow-hidden pb-5 pt-16 sm:pt-[72px]">
-        <div aria-hidden className="pointer-events-none absolute -top-40 -right-[150px] z-0 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,rgba(21,86,238,0.13),transparent_62%)]" />
+        <div aria-hidden className="pointer-events-none absolute -top-40 -right-[150px] z-0 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,rgba(0,70,190,0.13),transparent_62%)]" />
         <div className="relative z-[2] mx-auto max-w-[1366px] px-6">
           <span className={EYEBROW}>About</span>
           <h1 className="mt-3.5 font-display font-extrabold leading-[1.04] tracking-[-0.03em] text-ink">
@@ -102,7 +102,7 @@ export default function AboutPage() {
       {/* thank you CTA */}
       <section className="mx-auto max-w-[1366px] px-6 pb-[54px]">
         <div className="relative overflow-hidden rounded-3xl bg-ink px-6 py-14 text-center text-white sm:px-14">
-          <div aria-hidden className="pointer-events-none absolute left-1/2 -top-[100px] h-[300px] w-[420px] -translate-x-1/2 bg-[radial-gradient(circle,rgba(21,86,238,0.28),transparent_60%)]" />
+          <div aria-hidden className="pointer-events-none absolute left-1/2 -top-[100px] h-[300px] w-[420px] -translate-x-1/2 bg-[radial-gradient(circle,rgba(0,70,190,0.28),transparent_60%)]" />
           <span className="relative text-[0.74rem] font-bold uppercase tracking-[0.16em] text-primary">Thank you</span>
           <h2 className="relative mt-2.5 font-display font-extrabold tracking-[-0.02em]">Let&apos;s get smart together.</h2>
           <div className="relative mt-7 flex flex-wrap justify-center gap-3.5">

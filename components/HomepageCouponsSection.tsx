@@ -51,7 +51,7 @@ export default function HomepageCouponsSection({ retailers, brandGroups }: Props
   if (storeLinks.length === 0) return null;
 
   return (
-    <section className="border-y border-ink/10 bg-[#f7fafc] py-14 sm:pb-[72px] sm:pt-12" data-testid="home-coupons">
+    <section className="border-y border-ink/10 bg-[#f0f2f4] py-14 sm:pb-[72px] sm:pt-12" data-testid="home-coupons">
       <div className="mx-auto max-w-[1366px] px-6">
         <SectionHead
           eyebrow="Shop by store"

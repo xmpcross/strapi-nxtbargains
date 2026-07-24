@@ -116,6 +116,48 @@ export function highIntentStoreAliases() {
   }
 }
 
+const STORE_COUPON_CACHE_FILE = join(process.cwd(), 'data', 'coupon-store-coupons.json');
+
+let indexableCouponStoreIdCache: Set<number> | null = null;
+
+/**
+ * Store IDs whose coupon page carries real, indexable content: the curated
+ * high-intent stores, plus any store whose cached feed currently has at least
+ * one coupon. Across ~18k auto-imported stores the vast majority have no
+ * coupons, so their pages are thin/boilerplate — we keep those out of the
+ * sitemap and mark them noindex so they don't dilute crawl budget or Google's
+ * quality signals. A store re-enters the index automatically once it has coupons.
+ */
+export function indexableCouponStoreIds(): Set<number> {
+  if (indexableCouponStoreIdCache) return indexableCouponStoreIdCache;
+
+  const ids = new Set<number>();
+  for (const alias of highIntentStoreAliases()) ids.add(alias.storeId);
+
+  if (existsSync(STORE_COUPON_CACHE_FILE)) {
+    try {
+      const parsed = JSON.parse(readFileSync(STORE_COUPON_CACHE_FILE, 'utf8')) as {
+        stores?: Record<string, { storeId?: number; coupons?: unknown[] }>;
+      };
+      for (const entry of Object.values(parsed.stores ?? {})) {
+        if (entry?.storeId != null && Array.isArray(entry.coupons) && entry.coupons.length > 0) {
+          ids.add(Number(entry.storeId));
+        }
+      }
+    } catch {
+      // fall back to high-intent only
+    }
+  }
+
+  indexableCouponStoreIdCache = ids;
+  return ids;
+}
+
+/** Whether a coupon store page should be indexable / included in the sitemap. */
+export function couponStoreIsIndexable(store: Pick<CouponStore, 'id'>): boolean {
+  return indexableCouponStoreIds().has(store.id);
+}
+
 export function relatedCouponStores(store: CouponStore, limit = 6) {
   const category = storeCategory(store);
   return listCouponStores().stores

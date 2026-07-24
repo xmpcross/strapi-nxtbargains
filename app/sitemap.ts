@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { couponStoreCanonicalSlug, listCouponStores } from '@/lib/coupon-stores';
+import { couponStoreCanonicalSlug, indexableCouponStoreIds, listCouponStores } from '@/lib/coupon-stores';
 import { listAllCommerceProductSlugs, listAllPostSlugs, listCategories, listCommerceCategories } from '@/lib/strapi';
 import { productCanonicalPath } from '@/lib/product-url';
 import { SECTIONS, SITE } from '@/lib/site';
@@ -13,7 +13,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     listCategories().catch(() => []),
     listCommerceCategories().catch(() => []),
   ]);
-  const couponStores = listCouponStores().stores;
+  // Only include coupon stores that actually have coupon content. The store
+  // pool is ~18k auto-imported records; the vast majority render thin/empty
+  // pages, so listing them all buries real content and wastes crawl budget.
+  const indexableStoreIds = indexableCouponStoreIds();
+  const couponStores = listCouponStores().stores.filter((store) => indexableStoreIds.has(store.id));
 
   const cmsCatSlugs = new Set(cmsCategories.map((c) => c.slug));
   const sectionCatSlugs = SECTIONS.map((s) => s.slug);

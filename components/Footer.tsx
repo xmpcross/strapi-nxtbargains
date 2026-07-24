@@ -4,24 +4,41 @@ import type { ReactNode } from 'react';
 import CookieSettingsButton from '@/components/CookieSettingsButton';
 import { FOOTER_ARTICLE_NAV_LINKS, SITE } from '@/lib/site';
 
-const shopLinks = [
+type FooterLink = { href: string; label: string };
+type FooterItem = FooterLink | { heading: string; children: FooterLink[] };
+
+// Mirrors the top-nav "All Products" menu, incl. the nested "Smart Home" group.
+const shopLinks: FooterItem[] = [
   { href: '/products', label: 'All Products' },
-  { href: '/best-deals', label: 'Best Deals' },
-  { href: '/coupons', label: 'Coupons' },
-  { href: '/price-drops', label: 'Price Drops' },
   { href: '/category/smart-phones', label: 'Smart Phones' },
   { href: '/category/smartwatches', label: 'Smartwatches' },
-  { href: '/category/headphones', label: 'Headphones' },
-  { href: '/category/laptops', label: 'Laptops' },
   { href: '/category/tablets', label: 'Tablets' },
+  { href: '/category/laptops', label: 'Laptops' },
+  { href: '/category/smart-tvs', label: 'Smart TVs' },
+  { href: '/category/smart-cameras', label: 'Smart Cameras' },
+  { href: '/category/smart-speakers', label: 'Smart Speakers' },
+  {
+    heading: 'Smart Home',
+    children: [
+      { href: '/category/smart-light-bulbs', label: 'Smart Light Bulbs' },
+      { href: '/category/smart-door-locks', label: 'Smart Door Locks' },
+      { href: '/category/smart-plugs', label: 'Smart Plugs' },
+      { href: '/category/video-doorbells', label: 'Smart Doorbells' },
+    ],
+  },
+  { href: '/category/headphones', label: 'Headphones' },
+  { href: '/category/raspberry-pi', label: 'Raspberry PI' },
 ];
 
 const aboutLinks = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About Us' },
-  { href: '/sitemap', label: 'Sitemap' },
+  { href: '/coupons', label: 'Coupons' },
+  { href: '/price-drops', label: 'Price Drops' },
+  { href: '/best-deals', label: 'Best Deals' },
+  { href: '/sitemap', label: 'Site Map' },
   { href: '/feed.xml', label: 'RSS feed' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/contact', label: 'Contact Us' },
 ];
 
 const MARKETPLACES = ['Amazon', 'eBay', 'Walmart', 'AliExpress', 'Best Buy', 'Target', 'Newegg'];
@@ -36,7 +53,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#232323] pt-[50px] text-sm text-white/70" data-testid="site-footer">
+    <footer className="bg-[#1d252c] pt-[50px] text-sm text-white/70" data-testid="site-footer">
       <div className="mx-auto max-w-7xl px-6">
         {/* top: brand + columns */}
         <div className="footer-top-grid gap-8 border-b border-white/[0.13] pb-8 sm:grid-cols-2">
@@ -79,7 +96,7 @@ export default function Footer() {
 
           <FooterColumn title="About" links={aboutLinks} className="footer-about-column" />
           <FooterColumn title="All Articles" links={FOOTER_ARTICLE_NAV_LINKS} className="footer-articles-column" />
-          <FooterColumn title="Shop" links={shopLinks} className="footer-shop-column" />
+          <FooterColumn title="Product Categories" links={shopLinks} className="footer-shop-column" />
         </div>
 
         {/* comparing prices across */}
@@ -115,17 +132,55 @@ function FooterColumn({
   className,
 }: {
   title: string;
-  links: Array<{ href: string; label: string }>;
+  links: FooterItem[];
   className?: string;
 }) {
   return (
     <div className={className}>
       <h5 className="mb-4 font-display text-[14px] font-semibold uppercase tracking-wide text-white">{title}</h5>
-      {links.map((l) => (
-        <Link key={l.href + l.label} href={l.href} className="mb-2.5 block text-sm text-white/70 transition hover:pl-1 hover:text-white">
-          {l.label}
-        </Link>
-      ))}
+      {links.map((item) =>
+        'heading' in item ? (
+          <div key={item.heading} className="group/sub mb-2.5">
+            <p className="mb-1.5 flex cursor-default items-center gap-1.5 text-sm text-white/70 transition hover:text-white">
+              {item.heading}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-3.5 w-3.5 text-white/40 transition-transform duration-200 group-hover/sub:rotate-180"
+                aria-hidden
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </p>
+            <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-200 group-hover/sub:grid-rows-[1fr] group-hover/sub:opacity-100">
+              <div className="overflow-hidden">
+                {item.children.map((l) => (
+                  <Link
+                    key={l.href + l.label}
+                    href={l.href}
+                    className="mb-2.5 block pl-3 text-sm text-white/70 transition hover:pl-4 hover:text-white"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <Link
+            key={item.href + item.label}
+            href={item.href}
+            className="mb-2.5 block text-sm text-white/70 transition hover:pl-1 hover:text-white"
+          >
+            {item.label}
+          </Link>
+        ),
+      )}
     </div>
   );
 }

@@ -340,6 +340,58 @@ export async function getCommerceCategory(slug: string): Promise<CommerceCategor
   return res.data?.[0] ?? null;
 }
 
+// ---------------------------------------------------------------------------
+// Coupons (nxt-coupons) — CMS-curated coupon source. When the collection does
+// not exist yet (or Strapi errors), these return [] so callers fall back to the
+// legacy RapidAPI/JSON-cache coupon data. See strapi-cms/nxt-coupon/.
+// ---------------------------------------------------------------------------
+export type NxtCoupon = {
+  id: number;
+  documentId?: string;
+  title: string;
+  store: string;
+  storeSlug?: string | null;
+  code?: string | null;
+  discount?: string | null;
+  category?: string | null;
+  couponType?: 'Coupon' | 'Promo code' | 'Sale';
+  destinationUrl?: string | null;
+  affiliateUrl?: string | null;
+  featured?: boolean;
+  isBrand?: boolean;
+  verifiedLabel?: string | null;
+  expiresAt?: string | null;
+  displayOrder?: number | null;
+  externalId?: string | null;
+  source?: string | null;
+  publishedAt?: string;
+  updatedAt?: string;
+};
+
+export async function listNxtCoupons(
+  opts: { store?: string; storeSlug?: string; pageSize?: number } = {},
+): Promise<NxtCoupon[]> {
+  const filters: Record<string, unknown> = {};
+  if (opts.storeSlug?.trim()) filters.storeSlug = { $eqi: opts.storeSlug.trim() };
+  if (opts.store?.trim()) filters.store = { $containsi: opts.store.trim() };
+
+  try {
+    const res = await strapiFetch<ListResponse<NxtCoupon>>(
+      'nxt-coupons',
+      {
+        sort: ['featured:desc', 'displayOrder:asc', 'updatedAt:desc'],
+        pagination: { pageSize: opts.pageSize ?? 200 },
+        filters,
+      },
+      300,
+    );
+    return res.data ?? [];
+  } catch {
+    // Collection missing / Strapi unreachable → let the caller fall back.
+    return [];
+  }
+}
+
 export async function getCommerceProduct(slug: string): Promise<CommerceProduct | null> {
   const res = await strapiFetch<ListResponse<CommerceProduct>>('commerce-products', {
     filters: { slug: { $eq: slug }, productStatus: { $eq: 'active' }, tags: { $containsi: SITE_PRODUCT_TAG } },
@@ -536,7 +588,10 @@ export async function listAllCommerceProductSlugs(): Promise<
     const res = await strapiFetch<ListResponse<CommerceProduct>>('commerce-products', {
       fields: ['slug', 'updatedAt', 'category'],
       populate: { categories: { fields: ['slug', 'name'] } },
-      filters: { status: { $eq: 'active' } },
+      // Match the field/tag used everywhere else (listCommerceProducts). The old
+      // `status` filter didn't match the `productStatus` field, so products were
+      // silently excluded from the sitemap.
+      filters: { productStatus: { $eq: 'active' }, tags: { $containsi: SITE_PRODUCT_TAG } },
       sort: ['updatedAt:desc'],
       pagination: { page, pageSize: 100 },
     });

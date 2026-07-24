@@ -5,6 +5,7 @@ import path from 'node:path';
 import DealProductCard from '@/components/DealProductCard';
 import { SITE } from '@/lib/site';
 import { bestOffer, collectOfferRows, numericValue, offerPrice, type CommerceOfferRow } from '@/lib/commerce';
+import { flushGeniusCache, monetizeUrl } from '@/lib/coupon-data';
 import { listCommerceProductsForDeals, type CommerceProduct } from '@/lib/strapi';
 
 export const revalidate = 120;
@@ -116,7 +117,7 @@ export default async function BestDealsPage() {
       />
 
       {dealCount > 0 ? (
-        <section className="border-b border-ink/10 bg-[#f7fafc] py-10 sm:py-12" data-testid="featured-deals">
+        <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="featured-deals">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Top picks"
@@ -160,7 +161,7 @@ export default async function BestDealsPage() {
               {queries.map((query) => (
                 <span
                   key={query}
-                  className="border border-ink/10 bg-[#f7fafc] px-3 py-1.5 text-xs font-bold text-ink/60"
+                  className="border border-ink/10 bg-[#f0f2f4] px-3 py-1.5 text-xs font-bold text-ink/60"
                 >
                   {query}
                 </span>
@@ -196,7 +197,7 @@ export default async function BestDealsPage() {
         </div>
       </section>
 
-      <section className="border-t border-ink/10 bg-[#f7fafc] py-10">
+      <section className="border-t border-ink/10 bg-[#f0f2f4] py-10">
         <div className="mx-auto max-w-[1366px] px-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <BrowseCard href="/price-drops" title="Price drops" subtitle="Recently tracked price movements" />
@@ -228,25 +229,25 @@ function Hero({
   sourceLabel: string;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#0c1222] text-white">
+    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-80"
         style={{
           background:
-            'radial-gradient(at 80% 20%, rgba(21,86,238,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(16,185,129,0.12) 0%, transparent 50%)',
+            'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
         }}
       />
       <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
         <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
           <Link href="/" className="transition hover:text-white">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-[#67b7ff]">Best deals</span>
+          <span className="text-[#ffe000]">Best deals</span>
         </nav>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#67b7ff]">NXT.Bargains deals</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">NXT.Bargains deals</p>
             <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
               Best deals across live merchant offers
             </h1>
@@ -257,15 +258,15 @@ function Hero({
 
             <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#67b7ff]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
                 <span>Ranked by real discount — the biggest savings surface first.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#67b7ff]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
                 <span>Live offers from Amazon, eBay, Walmart, Newegg, and Best Buy.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#67b7ff]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
                 <span>Final price, shipping, and condition confirmed on the merchant site.</span>
               </li>
             </ul>
@@ -284,7 +285,7 @@ function Hero({
           </div>
 
           <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="Best deals statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#67b7ff]">At a glance</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
             <p className="mt-3 text-sm leading-6 text-white/70">
               {dealCount > 0
                 ? `A live snapshot of the ${dealCount} strongest deals we're tracking right now, ranked by discount across major marketplaces.`
@@ -298,7 +299,7 @@ function Hero({
             </div>
             <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-4 text-xs text-white/55">
               <span>Updated {updatedLabel}</span>
-              <span className="font-semibold text-[#67b7ff]">{sourceLabel}</span>
+              <span className="font-semibold text-[#ffe000]">{sourceLabel}</span>
             </div>
           </aside>
         </div>
@@ -347,8 +348,18 @@ async function loadRealTimeBestDeals() {
       .filter((item) => item.title && item.image && item.url && item.priceValue !== null)
       .sort((a, b) => b.discountPercent - a.discountPercent || b.savingsValue - a.savingsValue)
       .slice(0, 36);
+    // The source feed links to Google Shopping. Route each outbound link through
+    // the affiliate wrapper (Impact deep-link when the domain qualifies, else a
+    // GeniusLink short URL) so clicks resolve to the merchant with our affiliate
+    // ID embedded instead of dropping the user on a Google Shopping page.
+    // Sequential (not Promise.all) to avoid the geni.us API rate-limiting bursts.
+    const monetized: RealTimeBestDeal[] = [];
+    for (const item of items) {
+      monetized.push({ ...item, url: await monetizeUrl(item.url) });
+    }
+    flushGeniusCache();
     return {
-      items,
+      items: monetized,
       capturedAt: cache.capturedAt,
       queries: cache.queries ?? [],
     };
@@ -377,9 +388,44 @@ function formatPlainMoney(value: number, currency: string) {
   }).format(value);
 }
 
+// Known merchants → local brand wordmark. Anything else falls back to the
+// deal's favicon, then a favicon derived from the product URL's domain.
+const REALTIME_STORE_LOGOS: Array<[RegExp, string]> = [
+  [/amazon/, '/logos/amazon-logo.svg'],
+  [/\bebay\b/, '/logos/ebay-logo.svg'],
+  [/wal-?mart/, '/logos/walmart-logo.svg'],
+  [/newegg/, '/logos/newegg-logo.svg'],
+  [/target/, '/logos/target-logo.svg'],
+  [/\bdell\b/, '/logos/dell-logo.svg'],
+  [/\bhp\b/, '/logos/hp-logo.svg'],
+  [/lenovo/, '/logos/lenovo-logo.svg'],
+  [/samsung/, '/logos/samsung-logo.svg'],
+  [/apple/, '/logos/apple-logo.svg'],
+  [/argos/, '/logos/argos-logo.svg'],
+  [/nike/, '/logos/nike-logo.svg'],
+];
+
+function domainFromUrl(url: string): string | null {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return null;
+  }
+}
+
+function realtimeStoreLogo(deal: RealTimeBestDeal): string | null {
+  const name = deal.store.toLowerCase();
+  const local = REALTIME_STORE_LOGOS.find(([pattern]) => pattern.test(name))?.[1];
+  if (local) return local;
+  if (deal.favicon) return deal.favicon;
+  const domain = domainFromUrl(deal.url);
+  return domain ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128` : null;
+}
+
 function RealTimeDealCard({ deal, featured = false }: { deal: RealTimeBestDeal; featured?: boolean }) {
   const discount = Math.max(0, Math.round(deal.discountPercent || 0));
   const savings = deal.savingsValue > 0 ? formatPlainMoney(deal.savingsValue, 'USD') : null;
+  const storeLogo = realtimeStoreLogo(deal);
   const meta = [deal.shipping, deal.condition, deal.rating ? `Rated ${deal.rating}` : null]
     .filter(Boolean)
     .join(' · ');
@@ -387,7 +433,7 @@ function RealTimeDealCard({ deal, featured = false }: { deal: RealTimeBestDeal; 
   return (
     <article
       className={`group grid gap-0 border bg-white transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-20px_rgba(13,27,42,0.35)] sm:grid-cols-[160px_minmax(0,1fr)] ${
-        featured ? 'border-primary/25 shadow-[0_12px_24px_-18px_rgba(21,86,238,0.2)]' : 'border-ink/10 hover:border-primary/30'
+        featured ? 'border-primary/25 shadow-[0_12px_24px_-18px_rgba(0,70,190,0.2)]' : 'border-ink/10 hover:border-primary/30'
       }`}
     >
       <a
@@ -410,13 +456,18 @@ function RealTimeDealCard({ deal, featured = false }: { deal: RealTimeBestDeal; 
           <span className="rounded bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
             Save {discount}%
           </span>
-          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-primary">
-            {deal.favicon ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={deal.favicon} alt="" referrerPolicy="no-referrer" className="h-4 w-4 object-contain" />
-            ) : null}
-            {deal.store}
-          </span>
+          {storeLogo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={storeLogo}
+              alt={deal.store}
+              title={deal.store}
+              referrerPolicy="no-referrer"
+              className="h-6 max-w-[112px] object-contain object-right"
+            />
+          ) : (
+            <span className="text-xs font-bold uppercase tracking-[0.12em] text-primary">{deal.store}</span>
+          )}
           {featured ? (
             <span className="w-full rounded bg-primary/10 px-2 py-1 text-center text-[0.6rem] font-bold uppercase tracking-wider text-primary sm:ml-auto sm:w-auto">
               Top pick
@@ -460,7 +511,7 @@ function RealTimeDealCard({ deal, featured = false }: { deal: RealTimeBestDeal; 
 
 function EmptyState({ title, body }: { title: string; body: string }) {
   return (
-    <div className="mt-8 border border-dashed border-ink/15 bg-[#f7fafc] p-10 text-center">
+    <div className="mt-8 border border-dashed border-ink/15 bg-[#f0f2f4] p-10 text-center">
       <h2 className="font-display text-lg font-bold text-ink">{title}</h2>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/60">{body}</p>
     </div>

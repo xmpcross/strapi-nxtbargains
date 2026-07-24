@@ -29,7 +29,7 @@ export default function Hero() {
   return (
     <section id="home-hero" data-testid="home-hero" className="relative overflow-hidden py-16 lg:py-[86px]">
       {/* soft glow top-right */}
-      <div className="pointer-events-none absolute -top-44 -right-40 z-0 h-[560px] w-[560px] rounded-full bg-[radial-gradient(circle,rgba(21,86,238,0.14),transparent_62%)]" />
+      <div className="pointer-events-none absolute -top-44 -right-40 z-0 h-[560px] w-[560px] rounded-full bg-[radial-gradient(circle,rgba(0,70,190,0.14),transparent_62%)]" />
 
       <div className="relative z-10 mx-auto grid max-w-[1366px] grid-cols-1 items-center gap-12 px-7 lg:grid-cols-[1.02fr_1fr] lg:gap-[54px]">
 

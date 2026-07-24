@@ -102,7 +102,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                   className={`inline-flex border px-3 py-1.5 text-xs font-bold transition ${
                     filters.category === category.value
                       ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-ink/10 bg-[#f7fafc] text-ink/65 hover:border-primary hover:text-primary'
+                      : 'border-ink/10 bg-[#f0f2f4] text-ink/65 hover:border-primary hover:text-primary'
                   }`}
                 >
                   {category.label}
@@ -119,7 +119,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         </section>
       ) : null}
 
-      <section className="bg-[#f7fafc] py-10 sm:py-12" id="catalog">
+      <section className="bg-[#f0f2f4] py-10 sm:py-12" id="catalog">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[minmax(240px,24%)_minmax(0,76%)] lg:items-start">
             <ProductFiltersSidebar
@@ -250,25 +250,25 @@ function ProductsHero({
   activeCategory?: string;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#0c1222] text-white" data-testid="products-page-header">
+    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white" data-testid="products-page-header">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-80"
         style={{
           background:
-            'radial-gradient(at 80% 20%, rgba(21,86,238,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(16,185,129,0.12) 0%, transparent 50%)',
+            'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
         }}
       />
       <div className="products-page-header-inner relative mx-auto px-4 py-10 sm:px-6 sm:py-14">
         <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
           <Link href="/" className="transition hover:text-white">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-[#67b7ff]">All products</span>
+          <span className="text-[#ffe000]">All products</span>
         </nav>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#67b7ff]">NXT.Bargains catalog</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">NXT.Bargains catalog</p>
             <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
               Every product. Every marketplace. One place to compare.
             </h1>
@@ -279,19 +279,19 @@ function ProductsHero({
 
             <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#67b7ff]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
                 <span>Side-by-side prices from Amazon, eBay, Walmart, Newegg, and Best Buy.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#67b7ff]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
                 <span>Filter by category, brand, store, availability, condition, and price range.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#67b7ff]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
                 <span>See the lowest current offer before you leave NXT.Bargains.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#67b7ff]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
                 <span>Free to browse — no signup required.</span>
               </li>
             </ul>
@@ -310,7 +310,7 @@ function ProductsHero({
           </div>
 
           <aside className="products-hero-panel border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="Product catalog statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#67b7ff]">At a glance</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
             <p className="mt-3 text-sm leading-6 text-white/70">
               A live snapshot of the NXT.Bargains product catalog — updated as new products and merchant offers are added across major marketplaces.
             </p>
@@ -347,7 +347,7 @@ function BrowseCard({ href, title, subtitle }: { href: string; title: string; su
   return (
     <Link
       href={href}
-      className="group border border-ink/10 bg-[#f7fafc] p-5 transition hover:-translate-y-0.5 hover:border-primary"
+      className="group border border-ink/10 bg-[#f0f2f4] p-5 transition hover:-translate-y-0.5 hover:border-primary"
     >
       <h3 className="font-display text-lg font-bold text-ink transition group-hover:text-primary">{title}</h3>
       <p className="mt-2 text-sm leading-6 text-ink/55">{subtitle}</p>

@@ -458,7 +458,7 @@ function HowItWorks() {
     <section className="py-14 sm:py-[72px]" data-testid="home-how">
       <div className="mx-auto max-w-[1366px] px-6">
         <div className="relative overflow-hidden rounded-[28px] bg-ink px-8 py-14 text-white sm:px-14 sm:py-16">
-          <div aria-hidden className="pointer-events-none absolute -bottom-32 -right-32 h-[380px] w-[380px] rounded-full bg-[radial-gradient(circle,rgba(21,86,238,0.3),transparent_64%)]" />
+          <div aria-hidden className="pointer-events-none absolute -bottom-32 -right-32 h-[380px] w-[380px] rounded-full bg-[radial-gradient(circle,rgba(0,70,190,0.3),transparent_64%)]" />
           <p className="relative text-[0.74rem] font-bold uppercase tracking-[0.16em] text-primary">How NXT.Bargains works</p>
           <h2 className="relative mt-2.5 max-w-[20ch] font-display text-[clamp(1.8rem,3.4vw,2.6rem)] font-extrabold leading-tight tracking-[-0.02em]">
             From “is this a good price?” to “bought it for less.”

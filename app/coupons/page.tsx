@@ -217,7 +217,7 @@ export default async function CouponsPage() {
         topStores={topStoreLinks.slice(0, 6)}
       />
 
-      <section className="border-b border-ink/10 bg-[#f7fafc] py-10 sm:py-12" data-testid="coupon-store-links" id="stores">
+      <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="coupon-store-links" id="stores">
         <div className="mx-auto max-w-[1366px] px-6">
           <SectionHead
             eyebrow="Shop by store"
@@ -284,7 +284,7 @@ export default async function CouponsPage() {
       </section>
 
       {brandGroups.length > 0 ? (
-        <section className="border-t border-ink/10 bg-[#f7fafc] py-10 sm:py-12" data-testid="brand-feeds">
+        <section className="border-t border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="brand-feeds">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Brand feeds"
@@ -333,26 +333,26 @@ function Hero({
   topStores: StoreLink[];
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#0c1222] text-white">
+    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-80"
         style={{
           background:
-            'radial-gradient(at 80% 20%, rgba(21,86,238,0.22) 0%, transparent 50%), radial-gradient(at 20% 80%, rgba(6,182,212,0.12) 0%, transparent 50%)',
+            'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 20% 80%, rgba(6,182,212,0.12) 0%, transparent 50%)',
         }}
       />
       <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
         <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
           <Link href="/" className="transition hover:text-white">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-[#67b7ff]">Coupons</span>
+          <span className="text-[#ffe000]">Coupons</span>
         </nav>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
           <div>
-            <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#67b7ff]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#67b7ff]" aria-hidden />
+            <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#ffe000]" aria-hidden />
               Coupons &amp; promo codes
             </p>
             <h1 className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
@@ -405,7 +405,7 @@ function Hero({
           </div>
 
           <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="Coupon statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#67b7ff]">At a glance</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
             <p className="mt-3 text-sm leading-6 text-white/70">
               A live snapshot of the coupon feed — {couponCount} current offers across {storeCount}+ retailer
               coupon pages, refreshed daily from verified sources.

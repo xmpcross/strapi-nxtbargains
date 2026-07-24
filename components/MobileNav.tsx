@@ -113,7 +113,7 @@ export default function MobileNav({ items }: { items: NavItem[] }) {
               action="/search"
               method="get"
               role="search"
-              className="flex items-center gap-2 rounded-2xl border border-ink/15 bg-white px-4 py-3 focus-within:border-primary focus-within:shadow-[0_0_0_4px_rgba(21,86,238,0.12)]"
+              className="flex items-center gap-2 rounded-2xl border border-ink/15 bg-white px-4 py-3 focus-within:border-primary focus-within:shadow-[0_0_0_4px_rgba(0,70,190,0.12)]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

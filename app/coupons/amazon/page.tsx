@@ -183,7 +183,7 @@ export default async function AmazonCouponsPage() {
       />
 
       {highlightCoupons.length > 0 ? (
-        <section className="border-b border-ink/10 bg-[#f7fafc] py-10 sm:py-12" data-testid="featured-store-coupons">
+        <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="featured-store-coupons">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Top picks"
@@ -219,7 +219,7 @@ export default async function AmazonCouponsPage() {
                 ))}
               </div>
             ) : (
-              <div className="mt-6 border border-dashed border-ink/15 bg-[#f7fafc] p-8 text-center">
+              <div className="mt-6 border border-dashed border-ink/15 bg-[#f0f2f4] p-8 text-center">
                 <p className="font-display text-lg font-bold text-ink">No Amazon coupons right now</p>
                 <p className="mt-2 text-sm leading-6 text-ink/60">
                   No matching Amazon deals are available. The page refreshes daily on the next API update.
@@ -291,7 +291,7 @@ export default async function AmazonCouponsPage() {
                     <Link
                       key={related.id}
                       href={`/coupons/${couponStorePublicSlug(related)}`}
-                      className="group flex items-center gap-3 rounded-lg border border-transparent p-1 transition hover:border-ink/10 hover:bg-[#f7fafc]"
+                      className="group flex items-center gap-3 rounded-lg border border-transparent p-1 transition hover:border-ink/10 hover:bg-[#f0f2f4]"
                     >
                       <StoreLogo name={related.name} logo={storeLogoUrl(related)} className="h-9 w-11" />
                       <span className="min-w-0">
@@ -349,13 +349,13 @@ function Hero({
   couponCount: number;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#0c1222] text-white">
+    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-80"
         style={{
           background:
-            'radial-gradient(at 80% 20%, rgba(21,86,238,0.2) 0%, transparent 50%), radial-gradient(at 20% 80%, rgba(255,153,0,0.08) 0%, transparent 50%)',
+            'radial-gradient(at 80% 20%, rgba(0,70,190,0.2) 0%, transparent 50%), radial-gradient(at 20% 80%, rgba(255,153,0,0.08) 0%, transparent 50%)',
         }}
       />
       <div className="relative mx-auto max-w-[1366px] px-6 py-10 sm:py-14">
@@ -365,13 +365,13 @@ function Hero({
             <span aria-hidden>/</span>
             <Link href="/coupons" className="transition hover:text-white">Coupons</Link>
             <span aria-hidden>/</span>
-            <span className="text-[#67b7ff]">Amazon</span>
+            <span className="text-[#ffe000]">Amazon</span>
           </nav>
 
           <div className="flex flex-wrap items-start gap-5">
             <StoreLogo name="Amazon" logo={logo} className="h-20 w-24" dark />
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#67b7ff]">Marketplace coupons</p>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">Marketplace coupons</p>
               <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
                 Amazon coupon codes &amp; deals
               </h1>
@@ -446,7 +446,7 @@ function NavLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <Link
       href={href}
-      className="flex items-center justify-between border border-ink/8 bg-[#f7fafc] px-3 py-2.5 text-sm font-semibold text-ink/75 transition hover:border-primary/30 hover:text-primary"
+      className="flex items-center justify-between border border-ink/8 bg-[#f0f2f4] px-3 py-2.5 text-sm font-semibold text-ink/75 transition hover:border-primary/30 hover:text-primary"
     >
       {children}
       <span aria-hidden className="text-primary">→</span>
@@ -489,7 +489,7 @@ function AmazonCouponCard({ coupon, featured = false }: { coupon: AmazonCoupon; 
   return (
     <article
       className={`grid gap-4 border bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-20px_rgba(13,27,42,0.35)] sm:grid-cols-[120px_minmax(0,1fr)] ${
-        featured ? 'border-primary/25 shadow-[0_12px_24px_-18px_rgba(21,86,238,0.25)]' : 'border-ink/10 hover:border-primary/30'
+        featured ? 'border-primary/25 shadow-[0_12px_24px_-18px_rgba(0,70,190,0.25)]' : 'border-ink/10 hover:border-primary/30'
       }`}
     >
       <a

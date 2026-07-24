@@ -2,6 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { wrapImpactAffiliate } from './impact-links';
 import { couponStoreSlug } from './coupon-stores';
+import { listNxtCoupons, type NxtCoupon } from './strapi';
 
 const COUPON_REVALIDATE_SECONDS = 86400;
 const GENIUSLINK_CACHE_FILE = join(process.cwd(), 'data', 'geniuslink-cache.json');
@@ -126,7 +127,13 @@ const POPULAR_BRANDS = (process.env.RAPIDAPI_POPULAR_COUPON_BRANDS || 'amazon,eb
   .map((brand) => brand.trim())
   .filter(Boolean);
 
+// Kill-switch for live coupon API traffic. When COUPONS_API_PAUSED=true, all
+// RapidAPI coupon/store/brand fetches are skipped and pages fall back to the
+// cached/local coupon data (data/*.json). Set to false (or remove) to resume.
+const COUPONS_API_PAUSED = process.env.COUPONS_API_PAUSED === 'true';
+
 async function fetchRapidApi(host: string, path: string): Promise<unknown | null> {
+  if (COUPONS_API_PAUSED) return null;
   const key = process.env.RAPIDAPI_KEY;
   if (!key) return null;
 
@@ -164,7 +171,7 @@ function loadGeniusCache() {
   return geniusCache;
 }
 
-function flushGeniusCache() {
+export function flushGeniusCache() {
   if (!geniusDirty || !geniusCache) return;
   writeFileSync(GENIUSLINK_CACHE_FILE, JSON.stringify(geniusCache, null, 2));
   geniusDirty = false;
@@ -224,7 +231,7 @@ async function geniusWrap(url: string) {
   }
 }
 
-async function monetizeUrl(url: string) {
+export async function monetizeUrl(url: string) {
   const impactUrl = wrapImpactAffiliate({ id: 0, productUrl: url });
   if (impactUrl) return impactUrl;
   return geniusWrap(url);
@@ -518,7 +525,114 @@ async function fetchCouponApiData(): Promise<{ coupons: Coupon[]; retailers: Ret
   return { coupons: await geniusWrapCoupons(coupons), retailers, brandGroups };
 }
 
+// Map a CMS coupon record to the frontend Coupon shape.
+function couponFromStrapi(c: NxtCoupon): Coupon {
+  return {
+    store: c.store,
+    title: c.title,
+    code: c.code ?? undefined,
+    discount: c.discount ?? '',
+    category: c.category ?? `${c.store} coupons`,
+    href:
+      c.affiliateUrl?.trim() ||
+      c.destinationUrl?.trim() ||
+      `/coupons/${c.storeSlug?.trim() || couponStoreSlug(c.store)}`,
+    type: c.couponType ?? (c.code ? 'Promo code' : 'Sale'),
+    verified: c.verifiedLabel ?? 'Verified',
+    featured: Boolean(c.featured),
+  };
+}
+
+function couponStoreHref(c: NxtCoupon): string {
+  return `/coupons/${c.storeSlug?.trim() || couponStoreSlug(c.store)}`;
+}
+
+// Local coupon-feed caches (written by the sync scripts). Read even before the
+// Strapi collection exists so synced coupons show immediately.
+//   COUPON_FEED_SOURCE=couponapi  → read only CouponAPI.org (Feedico off)
+//   COUPON_FEED_SOURCE=feedico    → read only Feedico
+//   (unset / auto)                → CouponAPI.org preferred, Feedico fallback
+const COUPON_FEED_FILES: Record<string, string> = {
+  couponapi: join(process.cwd(), 'data', 'coupons-couponapi.json'),
+  feedico: join(process.cwd(), 'data', 'coupons-feedico.json'),
+};
+
+function couponFeedOrder(): string[] {
+  const forced = (process.env.COUPON_FEED_SOURCE || '').trim().toLowerCase();
+  if (forced && COUPON_FEED_FILES[forced]) return [forced];
+  return ['couponapi', 'feedico']; // priority: CouponAPI.org first
+}
+
+function readCouponFeedCache(): NxtCoupon[] {
+  // Merge sources in priority order (couponapi first), deduped — so each store
+  // keeps its coupons (e.g. Walmart from CouponAPI, AliExpress from Feedico).
+  const seen = new Set<string>();
+  const merged: NxtCoupon[] = [];
+  for (const source of couponFeedOrder()) {
+    const file = COUPON_FEED_FILES[source];
+    try {
+      if (!file || !existsSync(file)) continue;
+      const parsed = JSON.parse(readFileSync(file, 'utf8')) as { coupons?: NxtCoupon[]; items?: NxtCoupon[] };
+      const rows = Array.isArray(parsed.coupons) ? parsed.coupons : Array.isArray(parsed.items) ? parsed.items : [];
+      for (const row of rows) {
+        const key = row.externalId || `${row.store}|${row.code ?? ''}|${row.title}`.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        merged.push(row);
+      }
+    } catch {
+      // try next source
+    }
+  }
+  return merged;
+}
+
+// Build coupon page data from a set of NxtCoupon rows (Strapi or Feedico cache).
+// `wrap` = affiliate-wrap the links via GeniusLink; skip for already-tracked
+// feed links (e.g. Feedico/Admitad offerUrl).
+async function buildCouponPageData(
+  rows: NxtCoupon[],
+  wrap: boolean,
+): Promise<{ coupons: Coupon[]; retailers: Retailer[]; brandGroups: CouponBrandGroup[] } | null> {
+  if (rows.length === 0) return null;
+
+  const coupons = rows.map(couponFromStrapi);
+
+  const retailerSeen = new Set<string>();
+  const retailers: Retailer[] = [];
+  for (const row of rows) {
+    const key = row.store.toLowerCase();
+    if (retailerSeen.has(key)) continue;
+    retailerSeen.add(key);
+    retailers.push({ name: row.store, label: `${row.store} coupons`, href: couponStoreHref(row) });
+  }
+
+  const byStore = new Map<string, Coupon[]>();
+  for (const row of rows.filter((r) => r.isBrand)) {
+    const list = byStore.get(row.store) ?? [];
+    list.push(couponFromStrapi(row));
+    byStore.set(row.store, list);
+  }
+  const brandGroups: CouponBrandGroup[] = [...byStore.entries()].slice(0, 8).map(([store, cps]) => ({
+    store: retailers.find((r) => r.name === store) ?? {
+      name: store,
+      label: `${store} coupons`,
+      href: `/coupons/${couponStoreSlug(store)}`,
+    },
+    coupons: cps,
+  }));
+
+  return { coupons: wrap ? await geniusWrapCoupons(coupons) : coupons, retailers: retailers.slice(0, 12), brandGroups };
+}
+
 export async function listCouponPageData(): Promise<{ coupons: Coupon[]; retailers: Retailer[]; brandGroups: CouponBrandGroup[] }> {
+  // Prefer CMS-curated coupons, then the local Feedico cache, then legacy source.
+  const strapi = await buildCouponPageData(await listNxtCoupons({ pageSize: 200 }), true);
+  if (strapi) return strapi;
+
+  const feedico = await buildCouponPageData(readCouponFeedCache(), false);
+  if (feedico) return feedico;
+
   const { coupons, retailers, brandGroups } = await fetchCouponApiData();
 
   return {
@@ -528,7 +642,25 @@ export async function listCouponPageData(): Promise<{ coupons: Coupon[]; retaile
   };
 }
 
-export async function listCouponsForStore(storeId: number | string, storeName?: string): Promise<Coupon[]> {
+export async function listCouponsForStore(
+  storeId: number | string,
+  storeName?: string,
+  storeSlug?: string,
+): Promise<Coupon[]> {
+  // Prefer CMS-curated coupons for this store; then the local Feedico cache
+  // (already affiliate-tracked → no wrap); then the legacy cache/API.
+  const strapiRows = await listNxtCoupons({ store: storeName, storeSlug, pageSize: 48 });
+  if (strapiRows.length > 0) return geniusWrapCoupons(strapiRows.map(couponFromStrapi));
+
+  const slugLc = (storeSlug || '').toLowerCase();
+  const nameLc = (storeName || '').toLowerCase();
+  const feedicoRows = readCouponFeedCache().filter(
+    (c) =>
+      (slugLc && (c.storeSlug || '').toLowerCase() === slugLc) ||
+      (nameLc && c.store.toLowerCase() === nameLc),
+  );
+  if (feedicoRows.length > 0) return feedicoRows.map(couponFromStrapi);
+
   const cached = readStoreCouponCache(storeId);
   if (cached) return geniusWrapCoupons(cached);
 

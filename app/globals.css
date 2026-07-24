@@ -77,32 +77,93 @@
   color-scheme: light;
   --font-body: 'Outfit';
   --font-heading: 'Urbanist';
-  --colorBgDefaultHover: #f6f6f7;
-  --colorBgDefaultPressed: #e4e5e8;
-  --colorBgDefaultMuted: #f7f7f7;
-  --colorBgDefaultMutedHover: #f3f4f6;
-  --colorBgDefaultMutedPressed: #e4e5e8;
-  --colorBgPrimary: #eef8ff;
+
+  /* ------------------------------------------------------------------ */
+  /* Brand palette (Best Buy scheme). Semantic tokens below map onto     */
+  /* these values; Tailwind theme tokens read from the --colorBg* vars.  */
+  /* ------------------------------------------------------------------ */
+  --border-solid: solid;
+  --border-dashed: dashed;
+  --border-style: solid;
+  --border-base: 1px solid #c5cbd5;
+  --color-bg-white: #fff;
+  --color-bg-light: #f0f2f4;
+  --color-bg-light-gray: #c5cbd5;
+  --color-bg-neutral: #90959e;
+  --color-bg-dark-gray: #55555a;
+  --color-bg-dark: #1d252c;
+  --color-bg-black: #000;
+  --color-bg-base: #fff;
+  --color-bg-form-base: #fff;
+  --color-bg-form-disabled-base: #e0e6ef;
+  --color-bg-form-disabled-emphasis: #c5cbd5;
+  --color-bg-form-btn-checked-base: #0046be;
+  --color-bg-form-btn-checked-focused: #000;
+  --color-bg-form-btn-checked-pressed: #001e73;
+  --color-unstable-pure-white: #fff;
+  --color-unstable-background-white: #f0f2f4;
+  --color-unstable-tech-white: #e0e6ef;
+  --color-unstable-light-gray: #c5cbd5;
+  --color-unstable-tech-gray: #90959e;
+  --color-unstable-hint-gray: #70757d;
+  --color-unstable-dark-gray: #55555a;
+  --color-unstable-tech-black: #1d252c;
+  --color-unstable-black-text: #040c13;
+  --color-unstable-pure-black: #000;
+  --color-unstable-success-green: #318000;
+  --color-unstable-value-red: #bb0628;
+  --color-unstable-promo-red: #e81e25;
+  --color-unstable-tech-yellow: #fff200;
+  --color-unstable-button-yellow: #ffe000;
+  --color-unstable-dark-yellow: #ffce00;
+  --color-unstable-highlight-blue: #f1f8ff;
+  --color-unstable-light-blue: #2b5df5;
+  --color-unstable-link-blue: #0457c8;
+  --color-unstable-human-blue: #0046be;
+  --color-unstable-dark-blue: #001e73;
+  --color-sentiment-primary: #0046be;
+  --color-sentiment-secondary: #fff200;
+  --color-sentiment-success: #318000;
+  --color-sentiment-info: #1d252c;
+  --color-sentiment-warning: #ffce00;
+  --color-sentiment-error: #bb0628;
+  --color-border-unstable-light: #fff;
+  --color-border-unstable-dark: #000;
+  --color-border-neutral: #c5cbd5;
+  --color-border-base: #c5cbd5;
+  --color-border-form-base: #90959e;
+
+  /* Legacy component-style fallbacks now resolve to the brand blue. */
+  --color-primary: #0046be;
+  --color-primary-emphasis: #001e73;
+
+  /* Tailwind theme tokens (primary/ink/paper/muted/success/...). */
+  --colorBgDefaultHover: #f0f2f4;
+  --colorBgDefaultPressed: #e0e6ef;
+  --colorBgDefaultMuted: #f0f2f4;
+  --colorBgDefaultMutedHover: #e0e6ef;
+  --colorBgDefaultMutedPressed: #c5cbd5;
+  --colorBgPrimary: #f1f8ff;
   --colorBgPrimaryHover: #cfe9fe;
   --colorBgPrimaryPressed: #9bcffc;
-  --colorBgPrimaryEmphasis: #014fd3;
-  --colorBgPrimaryEmphasisHover: #0072de;
-  --colorBgPrimaryEmphasisPressed: #0046be;
+  --colorBgPrimaryEmphasis: #0046be;
+  --colorBgPrimaryEmphasisHover: #0457c8;
+  --colorBgPrimaryEmphasisPressed: #001e73;
   --colorBgPrimaryHighlight: #0046be;
-  --colorBgPrimaryHighlightHover: #025ccc;
-  --colorBgPrimaryHighlightPressed: #014fd3;
+  --colorBgPrimaryHighlightHover: #0457c8;
+  --colorBgPrimaryHighlightPressed: #001e73;
   --colorBgSecondary: #fff6d1;
   --colorBgSecondaryEmphasis: #914600;
   --colorBgSecondaryHover: #fff200;
   --colorBgSecondaryPressed: #ffce00;
   --colorBgSuccess: #e5fde5;
-  --colorBgSuccessEmphasis: #03721e;
+  --colorBgSuccessEmphasis: #318000;
   --colorBgSurface: #fff;
-  --colorBgSurfaceMuted: #e4e5e8;
-  --colorBgSurfaceInverse: #030303;
-  --colorBgSurfaceSecondary: #ffe200;
-  --colorBgSurfaceHover: #f6f6f7;
-  --colorBgSurfacePressed: #e4e5e8;
+  --colorBgSurfaceMuted: #e0e6ef;
+  --colorBgSurfaceInverse: #1d252c;
+  --colorBgSurfaceSecondary: #ffe000;
+  --colorBgSurfaceHover: #f0f2f4;
+  --colorBgSurfacePressed: #e0e6ef;
 }
 
 html {

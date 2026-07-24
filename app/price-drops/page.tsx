@@ -99,7 +99,7 @@ export default async function PriceDropsPage() {
       />
 
       {dropCount > 0 ? (
-        <section className="border-b border-ink/10 bg-[#f7fafc] py-10 sm:py-12" data-testid="featured-drops">
+        <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="featured-drops">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Largest movement"
@@ -149,7 +149,7 @@ export default async function PriceDropsPage() {
         </div>
       </section>
 
-      <section className="border-t border-ink/10 bg-[#f7fafc] py-10">
+      <section className="border-t border-ink/10 bg-[#f0f2f4] py-10">
         <div className="mx-auto max-w-[1366px] px-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <BrowseCard href="/best-deals" title="Best deals" subtitle="Highest current merchant discounts" />
@@ -183,25 +183,25 @@ function Hero({
   totalSavings: string | null;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#0c1222] text-white">
+    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-80"
         style={{
           background:
-            'radial-gradient(at 80% 20%, rgba(21,86,238,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(16,185,129,0.12) 0%, transparent 50%)',
+            'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
         }}
       />
       <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
         <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
           <Link href="/" className="transition hover:text-white">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-[#67b7ff]">Price drops</span>
+          <span className="text-[#ffe000]">Price drops</span>
         </nav>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#67b7ff]">Tracked price history</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">Tracked price history</p>
             <h1 className="mt-3 max-w-4xl font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
               Price drops worth checking before they move again
             </h1>
@@ -212,15 +212,15 @@ function Hero({
 
             <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#67b7ff]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
                 <span>Latest tracked price compared against its highest earlier snapshot.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#67b7ff]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
                 <span>Every card links to live merchant offers so you can compare before buying.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#67b7ff]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
                 <span>Sorted by drop size — the sharpest recent moves surface first.</span>
               </li>
             </ul>
@@ -239,7 +239,7 @@ function Hero({
           </div>
 
           <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="Price drop statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#67b7ff]">At a glance</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
             <p className="mt-3 text-sm leading-6 text-white/70">
               {dropCount > 0
                 ? `Tracking ${dropCount} recent price drops across ${productsTracked} products, ranked by how far each price has fallen.`
@@ -253,7 +253,7 @@ function Hero({
             </div>
             <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-4 text-xs text-white/55">
               <span>{snapshotsCount} snapshots · updated {updatedLabel}</span>
-              {totalSavings ? <span className="font-semibold text-[#67b7ff]">{totalSavings} tracked savings</span> : null}
+              {totalSavings ? <span className="font-semibold text-[#ffe000]">{totalSavings} tracked savings</span> : null}
             </div>
           </aside>
         </div>
@@ -309,7 +309,7 @@ function PriceDropCard({ drop, featured = false }: { drop: PriceDrop; featured?:
   const href = productHref(product);
 
   return (
-    <article className={`group flex h-full flex-col border bg-white transition hover:-translate-y-0.5 hover:shadow-[0_18px_32px_-24px_rgba(3,3,3,0.4)] ${featured ? 'border-primary/25 shadow-[0_12px_24px_-18px_rgba(21,86,238,0.2)]' : 'border-ink/10 hover:border-primary/30'}`}>
+    <article className={`group flex h-full flex-col border bg-white transition hover:-translate-y-0.5 hover:shadow-[0_18px_32px_-24px_rgba(3,3,3,0.4)] ${featured ? 'border-primary/25 shadow-[0_12px_24px_-18px_rgba(0,70,190,0.2)]' : 'border-ink/10 hover:border-primary/30'}`}>
       <Link href={href} className="grid aspect-[4/3] place-items-center border-b border-ink/10 bg-white p-5">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
