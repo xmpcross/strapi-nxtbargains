@@ -78,3 +78,23 @@ export function stripHtml(input?: string | null): string {
     .replace(/\s+/g, ' ')
     .trim();
 }
+
+/**
+ * Confidently parse ordered how-to steps from post-body HTML. Only headings
+ * that clearly read as steps — "Step 1…", or a leading number ("1.", "2)",
+ * "3:") — followed by body text are captured. Returns [] unless at least two
+ * such steps are found, so ambiguous guides safely keep Article schema.
+ */
+export function parseHowToSteps(html?: string | null): { name: string; text: string }[] {
+  if (!html) return [];
+  const steps: { name: string; text: string }[] = [];
+  const re = /<h[23][^>]*>([\s\S]*?)<\/h[23]>([\s\S]*?)(?=<h[23][^>]*>|$)/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html)) !== null) {
+    const name = stripHtml(m[1]);
+    if (!/^(step\s*\d+\b|\d+\s*[.):])/i.test(name)) continue;
+    const text = stripHtml(m[2]).slice(0, 600).trim();
+    if (name && text) steps.push({ name, text });
+  }
+  return steps.length >= 2 ? steps : [];
+}

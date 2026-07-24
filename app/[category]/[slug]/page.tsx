@@ -7,7 +7,7 @@ import { getPost, listPostComments, listPosts, mediaUrl, type NxtPost } from '@/
 import { SECTIONS, SITE } from '@/lib/site';
 import { breadcrumbJsonLd } from '@/lib/jsonld';
 import { enrichPostCarouselHtml } from '@/lib/enrich-post-carousel';
-import { clampDescription, firstImageUrl, fmtDate, primaryCategorySlug, postPath, stripHtml, warnSeoLength } from '@/lib/format';
+import { clampDescription, firstImageUrl, fmtDate, parseHowToSteps, primaryCategorySlug, postPath, stripHtml, warnSeoLength } from '@/lib/format';
 import PostContent from '@/components/PostContent';
 import PostPriceComparison from '@/components/PostPriceComparison';
 import CommentForm from '@/components/CommentForm';
@@ -148,21 +148,59 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   const cover = mediaUrl(post.coverImage ?? null) || mediaUrl(post.ogImage ?? null);
   const cat = post.categories?.[0];
 
-  const articleJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': post.postType === 'product-review' ? 'Review' : 'Article',
-    headline: post.title,
-    description: post.seoDescription || post.excerpt,
-    image: cover ? [cover] : undefined,
-    datePublished: post.publishedAt,
-    dateModified: post.updatedAt,
-    publisher: {
-      '@type': 'Organization',
-      name: SITE.name,
-      url: SITE.url,
-    },
-    mainEntityOfPage: `${SITE.url}/${category}/${post.slug}`,
-  };
+  const pageUrl = `${SITE.url}/${category}/${post.slug}`;
+
+  // HowTo detection + steps. Authored Strapi `steps` are preferred; otherwise
+  // fall back to confidently parsing step-like headings from the body. Emit HowTo
+  // (instead of Article) only for how-to guides that have >=2 usable steps.
+  const isHowTo =
+    category === 'how-to-guides' || cat?.slug === 'how-to-guides' || post.postType === 'how-to-guide';
+  const authoredSteps = (post.steps ?? [])
+    .map((s) => ({ name: (s.name ?? '').trim(), text: (s.text ?? '').trim(), image: mediaUrl(s.image ?? null) }))
+    .filter((s) => s.name && s.text);
+  const stepsAreAuthored = authoredSteps.length >= 2;
+  const howToSteps: { name: string; text: string; image?: string | null }[] = stepsAreAuthored
+    ? authoredSteps
+    : isHowTo
+      ? parseHowToSteps(post.content)
+      : [];
+  const useHowTo = isHowTo && howToSteps.length >= 2;
+
+  const articleJsonLd = useHowTo
+    ? null
+    : {
+        '@context': 'https://schema.org',
+        '@type': post.postType === 'product-review' ? 'Review' : 'Article',
+        headline: post.title,
+        description: post.seoDescription || post.excerpt,
+        image: cover ? [cover] : undefined,
+        datePublished: post.publishedAt,
+        dateModified: post.updatedAt,
+        publisher: {
+          '@type': 'Organization',
+          name: SITE.name,
+          url: SITE.url,
+        },
+        mainEntityOfPage: pageUrl,
+      };
+
+  const howToLd = useHowTo
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'HowTo',
+        name: post.seoTitle || post.title,
+        description: clampDescription(stripHtml(post.seoDescription || post.excerpt || post.title)),
+        ...(cover ? { image: [cover] } : {}),
+        step: howToSteps.map((s, i) => ({
+          '@type': 'HowToStep',
+          position: i + 1,
+          name: s.name,
+          text: stripHtml(s.text),
+          url: stepsAreAuthored ? `${pageUrl}#step-${i + 1}` : pageUrl,
+          ...(s.image ? { image: s.image } : {}),
+        })),
+      }
+    : null;
 
   const breadcrumbLd = breadcrumbJsonLd([
     { name: 'Home', url: `${SITE.url}/` },
@@ -201,10 +239,18 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           (Content Egg + scoped Bootstrap). Only loaded on post pages. */}
       <link rel="stylesheet" href="/vendor/cegg-bootstrap.min.css" />
       <link rel="stylesheet" href="/vendor/cegg-products.min.css" />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-      />
+      {articleJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        />
+      ) : null}
+      {howToLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
+        />
+      ) : null}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
@@ -240,6 +286,32 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
         <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
           <div className="w-full" data-testid="post-body">
             <PostContent html={postContent} />
+
+            {stepsAreAuthored && useHowTo ? (
+              <section className="mt-10" data-testid="howto-steps" aria-labelledby="howto-heading">
+                <h2 id="howto-heading" className="font-display text-2xl font-bold tracking-tight text-ink">
+                  Step-by-step
+                </h2>
+                <ol className="mt-6 space-y-6">
+                  {howToSteps.map((s, i) => (
+                    <li key={i} id={`step-${i + 1}`} className="flex scroll-mt-24 gap-4" data-testid="howto-step">
+                      <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-primary font-display text-sm font-bold text-white">
+                        {i + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <h3 className="font-display text-lg font-semibold text-ink">{s.name}</h3>
+                        <p className="mt-1 text-[0.95rem] leading-7 text-ink/70">{s.text}</p>
+                        {s.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={s.image} alt={s.name} referrerPolicy="no-referrer" className="mt-3 max-w-full rounded-lg border border-ink/10" />
+                        ) : null}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ) : null}
+
             <PostPriceComparison post={post} />
 
             <div className="mt-14 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-ink/10 pt-8 text-xs font-semibold uppercase tracking-[0.12em] text-ink/45">
