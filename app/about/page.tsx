@@ -29,149 +29,207 @@ const coverage = [
   'Headphones', 'Smart lights', 'Smart locks', 'Video doorbells', 'Smart plugs', 'Raspberry Pi', 'Maker gear',
 ];
 
-const SHELL = 'mx-auto max-w-[1366px] px-6';
+const checklist = [
+  'Compare one product across 8+ marketplaces, side by side.',
+  'Track its price history and get an alert when it drops.',
+  'Honest reviews and buying guides — free, and no signup.',
+];
+
+const SHELL = 'mx-auto max-w-[1366px] px-4 sm:px-6';
 const EYEBROW = 'text-[0.74rem] font-bold uppercase tracking-[0.16em] text-primary';
 const H2 = 'font-display font-extrabold tracking-[-0.02em] text-ink !text-[clamp(1.7rem,3.2vw,2rem)] leading-[1.12]';
 const BODY = 'text-[1.02rem] leading-[1.7] text-ink/60';
 
 export default function AboutPage() {
   return (
-    <div data-testid="about-page" className="bg-white">
-      {/* hero / title section */}
-      <section className="bg-[#f0f2f4] py-16 sm:py-20">
-        <div className={SHELL}>
-          <div className="grid items-center gap-12 lg:grid-cols-2">
+    <main data-testid="about-page">
+      {/* Hero — dark "At a glance" layout (matches /sitemap) */}
+      <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white" data-testid="about-page-header">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-80"
+          style={{
+            background:
+              'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
+          }}
+        />
+        <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
+          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45" aria-label="Breadcrumb">
+            <Link href="/" className="transition hover:text-white">Home</Link>
+            <span aria-hidden>/</span>
+            <span className="text-[#ffe000]">About</span>
+          </nav>
+
+          <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
             <div>
-              <span className={EYEBROW}>About {SITE.name}</span>
-              <h1 className="mt-4 font-display font-extrabold tracking-[-0.03em] text-ink !text-[clamp(2.2rem,5vw,3.25rem)] leading-[1.04]">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">About {SITE.name}</p>
+              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
                 Never pay full price again.
               </h1>
-              <p className="mt-6 text-[1.12rem] leading-[1.6] text-ink/60">
+              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
                 {SITE.name} is an independent price-comparison platform built on a single, simple idea: you
                 shouldn&apos;t have to open a dozen tabs to find out where a gadget is actually cheapest. We do the
                 comparing so you can skip straight to the buying.
               </p>
-              <p className={`mt-4 ${BODY}`}>
-                We track smart electronics across the major marketplaces &mdash; Amazon, eBay, Walmart, Newegg, Best
-                Buy, Target, AliExpress and more &mdash; and put every price for a product in one place.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3.5">
-                <Link href="/best-deals" className="rounded-[11px] bg-primary px-6 py-3.5 font-display text-[0.9rem] font-bold text-white transition hover:-translate-y-0.5 hover:bg-primary-emphasis">
-                  See today&apos;s best deals
+
+              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
+                {checklist.map((item) => (
+                  <li key={item} className="flex gap-3">
+                    <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-10 flex flex-wrap gap-3">
+                <a href="#about-content" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
+                  Our story
+                </a>
+                <Link href="/best-deals" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
+                  Today&apos;s best deals
                 </Link>
-                <Link href="/products" className="rounded-[11px] border border-ink/15 px-6 py-3.5 font-display text-[0.9rem] font-bold text-ink transition hover:border-primary hover:text-primary">
+                <Link href="/products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
                   Browse products
                 </Link>
               </div>
             </div>
-            <ImagePlaceholder label="Hero image" ratio="aspect-[4/3]" />
-          </div>
-        </div>
-      </section>
 
-      {/* what we do */}
-      <section className="border-t border-ink/10 py-16 sm:py-20">
-        <div className={SHELL}>
-          <span className={EYEBROW}>What we do</span>
-          <h2 className={`mt-2 ${H2}`}>Compare, track, and cut through the noise.</h2>
-          <p className={`mt-3 max-w-[70ch] ${BODY}`}>
-            We bring three things together so you don&apos;t have to hunt for them separately.
-          </p>
-          <div className="mt-9 grid gap-6 md:grid-cols-3">
-            {pillars.map((p) => (
-              <div key={p.t} className="flex flex-col rounded-2xl border border-ink/10 bg-white p-6">
-                <ImagePlaceholder label="Image" ratio="aspect-[16/9]" className="mb-5" />
-                <h3 className="font-display text-lg font-semibold text-ink">{p.t}</h3>
-                <p className="mt-2 text-[0.95rem] leading-[1.6] text-ink/55">{p.d}</p>
+            <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="At a glance">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
+              <p className="mt-3 text-sm leading-6 text-white/70">
+                What {SITE.name} brings together — every price for a product in one place, tracked over time, with
+                honest guidance alongside it.
+              </p>
+              <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
+                <Stat label="Marketplaces" value="8+" />
+                <Stat label="Categories" value={String(coverage.length)} />
+                <Stat label="Price checks" value="Daily" />
+                <Stat label="To use" value="Free" />
               </div>
-            ))}
+              <div className="mt-5 border-t border-white/10 pt-4 text-xs text-white/55">
+                No account required —{' '}
+                <Link href="/products" className="font-semibold text-[#ffe000] underline-offset-2 hover:underline">
+                  start comparing
+                </Link>
+                .
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* what we cover */}
-      <section className="py-16 sm:py-20">
-        <div className={SHELL}>
-          <span className={EYEBROW}>What we cover</span>
-          <h2 className={`mt-2 ${H2}`}>The tech people actually shop around for.</h2>
-          <p className={`mt-3 max-w-[70ch] ${BODY}`}>
-            From pocket devices to the living room to the smart home &mdash; and right through to the maker bench.
-          </p>
-          <ul className="mt-7 flex flex-wrap gap-2.5">
-            {coverage.map((c) => (
-              <li key={c} className="rounded-full border border-ink/12 bg-muted px-4 py-2 text-[0.9rem] font-semibold text-ink/70">
-                {c}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* how we're different — split */}
-      <section className="border-t border-ink/10 py-16 sm:py-20">
-        <div className={SHELL}>
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div>
-              <span className={EYEBROW}>How we&apos;re different</span>
-              <h2 className={`mt-2 ${H2}`}>Independent, and on your side.</h2>
-              <p className={`mt-4 ${BODY}`}>
-                We&apos;re an <strong className="font-semibold text-ink">independent</strong> price-comparison
-                platform, not a storefront. We don&apos;t sell the products; we help you find the best place to buy
-                them. That independence is the whole point &mdash; our job is to be on your side of the transaction.
-              </p>
-              <p className={`mt-4 ${BODY}`}>
-                We also keep it genuinely low-friction. Comparing prices, checking a product&apos;s history and
-                browsing our guides is <strong className="font-semibold text-ink">free and requires no signup</strong>.
-              </p>
-            </div>
-            <ImagePlaceholder label="Image" ratio="aspect-[4/3]" />
-          </div>
-        </div>
-      </section>
-
-      {/* why it matters — split reversed */}
-      <section className="border-t border-ink/10 py-16 sm:py-20">
-        <div className={SHELL}>
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <ImagePlaceholder label="Image" ratio="aspect-[4/3]" className="lg:order-1" />
-            <div className="lg:order-2">
-              <span className={EYEBROW}>Why it matters</span>
-              <h2 className={`mt-2 ${H2}`}>Transparency beats luck and timing.</h2>
-              <p className={`mt-4 ${BODY}`}>
-                Prices on the same gadget can swing widely from one marketplace to the next, and from one week to the
-                next. Without a way to see all of it at once, &ldquo;getting a good deal&rdquo; comes down to luck and
-                timing. {SITE.name} replaces the guesswork with transparency &mdash; real prices, real history, and
-                honest, side-by-side comparisons &mdash; so the deal you get is the best one available, not just the
-                first one you found.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* get in touch CTA */}
-      <section className="py-16 sm:py-20">
-        <div className={SHELL}>
-          <div className="relative overflow-hidden rounded-3xl bg-ink px-6 py-16 text-center text-white sm:px-14">
-            <div aria-hidden className="pointer-events-none absolute left-1/2 -top-[100px] h-[300px] w-[420px] -translate-x-1/2 bg-[radial-gradient(circle,rgba(0,70,190,0.28),transparent_60%)]" />
-            <span className="relative text-[0.74rem] font-bold uppercase tracking-[0.16em] text-primary">Get in touch</span>
-            <h2 className="relative mt-2.5 font-display font-extrabold tracking-[-0.02em] !text-[clamp(1.8rem,3vw,2.2rem)]">
-              Never pay full price again.
-            </h2>
-            <p className="relative mx-auto mt-4 max-w-[52ch] text-[1rem] leading-[1.6] text-white/65">
-              Questions, feedback, or a product you&apos;d like us to track? We&apos;d love to hear from you.
+      {/* Content */}
+      <div id="about-content">
+        {/* what we do */}
+        <section className="py-14 sm:py-16">
+          <div className={SHELL}>
+            <span className={EYEBROW}>What we do</span>
+            <h2 className={`mt-2 ${H2}`}>Compare, track, and cut through the noise.</h2>
+            <p className={`mt-3 max-w-[70ch] ${BODY}`}>
+              We bring three things together so you don&apos;t have to hunt for them separately.
             </p>
-            <div className="relative mt-8 flex flex-wrap justify-center gap-3.5">
-              <Link href="/best-deals" className="rounded-[11px] bg-primary px-7 py-3.5 font-display text-[0.95rem] font-bold text-white transition hover:-translate-y-0.5 hover:bg-primary-emphasis">
-                See today&apos;s best deals
-              </Link>
-              <Link href="/contact" className="rounded-[11px] border border-white/[0.18] bg-white/[0.08] px-7 py-3.5 font-display text-[0.95rem] font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/[0.16]">
-                Contact us
-              </Link>
+            <div className="mt-9 grid gap-6 md:grid-cols-3">
+              {pillars.map((p) => (
+                <div key={p.t} className="flex flex-col rounded-2xl border border-ink/10 bg-white p-6">
+                  <ImagePlaceholder label="Image" ratio="aspect-[16/9]" className="mb-5" />
+                  <h3 className="font-display text-lg font-semibold text-ink">{p.t}</h3>
+                  <p className="mt-2 text-[0.95rem] leading-[1.6] text-ink/55">{p.d}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* what we cover */}
+        <section className="border-t border-ink/10 bg-white py-14 sm:py-16">
+          <div className={SHELL}>
+            <span className={EYEBROW}>What we cover</span>
+            <h2 className={`mt-2 ${H2}`}>The tech people actually shop around for.</h2>
+            <p className={`mt-3 max-w-[70ch] ${BODY}`}>
+              From pocket devices to the living room to the smart home &mdash; and right through to the maker bench.
+            </p>
+            <ul className="mt-7 flex flex-wrap gap-2.5">
+              {coverage.map((c) => (
+                <li key={c} className="rounded-full border border-ink/12 bg-muted px-4 py-2 text-[0.9rem] font-semibold text-ink/70">
+                  {c}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* how we're different */}
+        <section className="border-t border-ink/10 py-14 sm:py-16">
+          <div className={SHELL}>
+            <div className="grid items-center gap-12 lg:grid-cols-2">
+              <div>
+                <span className={EYEBROW}>How we&apos;re different</span>
+                <h2 className={`mt-2 ${H2}`}>Independent, and on your side.</h2>
+                <p className={`mt-4 ${BODY}`}>
+                  We&apos;re an <strong className="font-semibold text-ink">independent</strong> price-comparison
+                  platform, not a storefront. We don&apos;t sell the products; we help you find the best place to buy
+                  them. That independence is the whole point &mdash; our job is to be on your side of the transaction.
+                </p>
+                <p className={`mt-4 ${BODY}`}>
+                  We also keep it genuinely low-friction. Comparing prices, checking a product&apos;s history and
+                  browsing our guides is <strong className="font-semibold text-ink">free and requires no signup</strong>.
+                </p>
+              </div>
+              <ImagePlaceholder label="Image" ratio="aspect-[4/3]" />
+            </div>
+          </div>
+        </section>
+
+        {/* why it matters */}
+        <section className="border-t border-ink/10 bg-white py-14 sm:py-16">
+          <div className={SHELL}>
+            <div className="grid items-center gap-12 lg:grid-cols-2">
+              <ImagePlaceholder label="Image" ratio="aspect-[4/3]" className="lg:order-1" />
+              <div className="lg:order-2">
+                <span className={EYEBROW}>Why it matters</span>
+                <h2 className={`mt-2 ${H2}`}>Transparency beats luck and timing.</h2>
+                <p className={`mt-4 ${BODY}`}>
+                  Prices on the same gadget can swing widely from one marketplace to the next, and from one week to the
+                  next. Without a way to see all of it at once, &ldquo;getting a good deal&rdquo; comes down to luck and
+                  timing. {SITE.name} replaces the guesswork with transparency &mdash; real prices, real history, and
+                  honest, side-by-side comparisons &mdash; so the deal you get is the best one available, not just the
+                  first one you found.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* get in touch — light background */}
+        <section className="border-t border-ink/10 py-14 sm:py-16">
+          <div className={SHELL}>
+            <div className="overflow-hidden rounded-3xl border border-ink/10 bg-[#f0f2f4] px-6 py-14 text-center sm:px-14">
+              <span className={EYEBROW}>Get in touch</span>
+              <h2 className={`mt-2 ${H2}`}>Questions, feedback, or a product to track?</h2>
+              <p className="mx-auto mt-3 max-w-[54ch] text-[1.02rem] leading-[1.6] text-ink/60">
+                We&apos;d love to hear from you — suggest a product for us to track, flag a price, or just say hello.
+              </p>
+              <div className="mt-8 flex flex-wrap justify-center gap-3.5">
+                <Link href="/best-deals" className="rounded-[11px] bg-primary px-7 py-3.5 font-display text-[0.95rem] font-bold text-white transition hover:-translate-y-0.5 hover:bg-primary-emphasis">
+                  See today&apos;s best deals
+                </Link>
+                <Link href="/contact" className="rounded-[11px] border border-ink/15 bg-white px-7 py-3.5 font-display text-[0.95rem] font-bold text-ink transition hover:-translate-y-0.5 hover:border-primary hover:text-primary">
+                  Contact us
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="font-display text-2xl font-bold text-white">{value}</p>
+      <p className="mt-1 text-sm text-white/55">{label}</p>
     </div>
   );
 }
