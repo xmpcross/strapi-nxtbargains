@@ -40,6 +40,16 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { category } = await params;
   if (isReserved(category)) return {};
   const cmsCategory = await getCategory(category).catch(() => null);
+  // Unknown slugs render a real 404 (see CategoryPage); keep their metadata
+  // clean and non-indexable rather than echoing the slug back as a title.
+  const known =
+    Boolean(cmsCategory) ||
+    SECTIONS.some((s) => s.slug === category) ||
+    Boolean(getEditorialCategoryConfig(category)) ||
+    ARTICLE_SIDEBAR_CATEGORIES.some((c) => c.slug === category);
+  if (!known) {
+    return { title: 'Page not found', robots: { index: false, follow: false } };
+  }
   const name = await resolveCategoryName(category, cmsCategory?.name);
   const description =
     resolveArticleCategoryBlurb(category, cmsCategory?.description) ?? `${name} from ${SITE.name} — ${SITE.tagline}`;
@@ -89,6 +99,18 @@ export default async function CategoryPage({
 
   const sectionMeta = SECTIONS.find((s) => s.slug === category);
   const editorialConfig = getEditorialCategoryConfig(category);
+
+  // Return a real 404 for slugs that aren't a known category — a CMS category,
+  // a defined section/editorial config, a sidebar category, or something that
+  // actually has posts. Prevents soft-404s (200 pages for nonexistent URLs).
+  const isKnownCategory =
+    Boolean(cmsCategory) ||
+    Boolean(sectionMeta) ||
+    Boolean(editorialConfig) ||
+    ARTICLE_SIDEBAR_CATEGORIES.some((c) => c.slug === category) ||
+    total > 0;
+  if (!isKnownCategory) notFound();
+
   const heroBlurb = categoryBlurb ?? sectionMeta?.blurb;
 
   if (editorialConfig) {

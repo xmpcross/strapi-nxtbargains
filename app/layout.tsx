@@ -11,7 +11,7 @@ import { cmsOrigin, siteGraphJsonLd } from '@/lib/seo';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: `${SITE.name} — ${SITE.tagline}`,
+    default: `${SITE.name} — Compare Prices, Deals & Honest Reviews`,
     template: `%s · ${SITE.name}`,
   },
   description: SITE.description,
