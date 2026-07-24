@@ -242,6 +242,69 @@ function SectionHead({
 }
 
 /* --------------------------------------------------------------- Deal card */
+/* Multi-merchant price comparison block (price range → merchant price+logo tiles
+   → "Compare N prices"), shown on the price-drop and trending cards. */
+function OfferComparison({ product }: { product: CommerceProduct }) {
+  const priced = collectOfferRows(product)
+    .map((row) => ({
+      price: offerPrice(row.offer),
+      name: merchantName(row.offer),
+      logo: mediaUrl(row.offer.merchant?.logo ?? null),
+      currency: row.offer.currency ?? 'USD',
+    }))
+    .filter((o): o is { price: number; name: string; logo: string | null; currency: string } => o.price !== null);
+
+  if (priced.length === 0) {
+    return (
+      <span className="mt-3 block rounded-[10px] bg-primary px-4 py-2.5 text-center font-display text-[0.85rem] font-bold text-white transition group-hover:bg-primary-emphasis">
+        Compare prices
+      </span>
+    );
+  }
+
+  // Cheapest offer per merchant, for the tiles.
+  const byMerchant = new Map<string, { price: number; name: string; logo: string | null; currency: string }>();
+  for (const o of priced) {
+    const key = o.name.toLowerCase();
+    const cur = byMerchant.get(key);
+    if (!cur || o.price < cur.price) byMerchant.set(key, o);
+  }
+  const merchants = [...byMerchant.values()].sort((a, b) => a.price - b.price);
+  const currency = merchants[0].currency;
+  const min = merchants[0].price;
+  const max = merchants[merchants.length - 1].price;
+  const tiles = merchants.slice(0, 3);
+  const count = priced.length;
+
+  return (
+    <div className="mt-3">
+      <div className="text-center font-display text-[1.05rem] font-extrabold text-ink">
+        {min === max ? formatMoney(min, currency) : `${formatMoney(min, currency)} – ${formatMoney(max, currency)}`}
+      </div>
+      <p className="mt-1 text-center text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink/40">Promoted</p>
+      <div className="mt-2 grid grid-cols-3 gap-1.5">
+        {tiles.map((o) => (
+          <div
+            key={o.name}
+            className="flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-[9px] border border-ink/10 bg-white px-1 py-1.5 text-center"
+          >
+            <span className="font-display text-[0.78rem] font-bold text-ink">{formatMoney(o.price, currency)}</span>
+            {o.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={o.logo} alt={o.name} referrerPolicy="no-referrer" className="h-3.5 max-w-[54px] object-contain" />
+            ) : (
+              <span className="line-clamp-1 text-[0.58rem] font-semibold uppercase tracking-wide text-ink/55">{o.name}</span>
+            )}
+          </div>
+        ))}
+      </div>
+      <span className="mt-2.5 block rounded-[10px] bg-primary px-4 py-2.5 text-center font-display text-[0.85rem] font-bold text-white transition group-hover:bg-primary-emphasis">
+        Compare {count} price{count === 1 ? '' : 's'}
+      </span>
+    </div>
+  );
+}
+
 function DealCard({ deal }: { deal: Deal }) {
   return (
     <Link href={deal.href} className="group flex flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]" data-testid={`pricedrop-${deal.product.slug}`}>
@@ -258,15 +321,7 @@ function DealCard({ deal }: { deal: Deal }) {
       </div>
       <div className="px-[15px] pb-4 pt-3.5">
         <h3 className="product-card-title line-clamp-2 h-[2.6em] leading-[1.3] text-ink transition group-hover:text-primary">{deal.name}</h3>
-        <div className="mt-2.5 flex items-baseline gap-2">
-          <span className="font-display text-[1.15rem] font-extrabold text-primary">{formatMoney(deal.price, deal.currency)}</span>
-          {deal.pct > 0 && deal.original !== null && (
-            <span className="text-[0.82rem] text-ink/45 line-through">{formatMoney(deal.original, deal.currency)}</span>
-          )}
-        </div>
-        <div className="mt-2.5 flex items-center gap-1.5 text-[0.72rem] text-ink/55">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary" />{deal.merchant}
-        </div>
+        <OfferComparison product={deal.product} />
       </div>
     </Link>
   );
@@ -418,32 +473,29 @@ function GuideCompactRow({ post }: { post: NxtPost }) {
 
 /* ------------------------------------------------------------- Trending card */
 function TrendingCard({ product }: { product: CommerceProduct }) {
-  const best = bestOffer(collectOfferRows(product));
-  const price = best ? offerPrice(best.offer) : null;
   const image = productImageUrl(product);
   const category = product.categories?.[0]?.name ?? product.category ?? 'Product';
   const href = productHref(product);
   return (
-    <div className="group flex flex-col rounded-2xl border border-ink/10 bg-white p-[18px] transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]">
-      <Link href={href} className="trending-image-box mb-3.5 grid aspect-square place-items-center overflow-hidden rounded-[11px] bg-white">
+    <Link
+      href={href}
+      className="group flex flex-col rounded-2xl border border-ink/10 bg-white p-[18px] transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]"
+      data-testid={`trending-${product.slug}`}
+    >
+      <div className="trending-image-box mb-3.5 grid aspect-square place-items-center overflow-hidden rounded-[11px] bg-white">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={image} alt={product.name} className="trending-image h-full w-full object-contain p-3 mix-blend-multiply transition duration-500 group-hover:scale-[1.04]" />
         ) : (
           <span className="font-display text-lg font-bold text-ink/25">NXT</span>
         )}
-      </Link>
-      <span className="text-[0.7rem] font-bold uppercase tracking-[0.05em] text-primary">{category}</span>
-      <Link href={href}>
-        <h3 className="product-card-title mb-3 mt-1.5 line-clamp-2 h-[2.6em] overflow-hidden leading-[1.3] text-ink transition group-hover:text-primary">{product.name}</h3>
-      </Link>
-      <div className="mt-auto flex items-center justify-between border-t border-ink/10 pt-3">
-        <div className="text-[0.74rem] text-ink/55">
-          From<b className="block font-display text-[1.1rem] font-extrabold text-ink">{price !== null ? formatMoney(price, best?.offer.currency ?? 'USD') : 'Check price'}</b>
-        </div>
-        <Link href={href} className="rounded-[9px] bg-primary px-3.5 py-2 font-display text-[0.8rem] font-semibold text-white transition group-hover:bg-primary-emphasis">Compare</Link>
       </div>
-    </div>
+      <span className="text-[0.7rem] font-bold uppercase tracking-[0.05em] text-primary">{category}</span>
+      <h3 className="product-card-title mt-1.5 line-clamp-2 h-[2.6em] overflow-hidden leading-[1.3] text-ink transition group-hover:text-primary">{product.name}</h3>
+      <div className="mt-auto">
+        <OfferComparison product={product} />
+      </div>
+    </Link>
   );
 }
 
