@@ -340,6 +340,36 @@ function BrowseCard({ href, title, subtitle }: { href: string; title: string; su
   );
 }
 
+// The realtime feed links to Google Shopping. Turn a deal into the merchant's
+// own product-search URL (store + title) so the affiliate wrapper sends users to
+// the actual retailer, not a Google Shopping results page.
+const MERCHANT_SEARCH: Array<[RegExp, (q: string) => string]> = [
+  [/wal.?mart/i, (q) => `https://www.walmart.com/search?q=${q}`],
+  [/best.?buy/i, (q) => `https://www.bestbuy.com/site/searchpage.jsp?st=${q}`],
+  [/target/i, (q) => `https://www.target.com/s?searchTerm=${q}`],
+  [/newegg/i, (q) => `https://www.newegg.com/p/pl?d=${q}`],
+  [/\bdell\b/i, (q) => `https://www.dell.com/en-us/search/${q}`],
+  [/\bhp\b/i, (q) => `https://www.hp.com/us-en/shop/SiteSearch?keyword=${q}`],
+  [/lenovo/i, (q) => `https://www.lenovo.com/us/en/search?text=${q}`],
+  [/samsung/i, (q) => `https://www.samsung.com/us/search/searchMain/?listType=g&searchTerm=${q}`],
+  [/\bsony\b/i, (q) => `https://electronics.sony.com/search?text=${q}`],
+  [/staples/i, (q) => `https://www.staples.com/search?query=${q}`],
+  [/\bbj'?s\b/i, (q) => `https://www.bjs.com/search/${q}`],
+  [/instacart/i, (q) => `https://www.instacart.com/store/s?k=${q}`],
+  [/\bebay\b/i, (q) => `https://www.ebay.com/sch/i.html?_nkw=${q}`],
+  [/amazon/i, (q) => `https://www.amazon.com/s?k=${q}`],
+];
+
+function merchantDealUrl(store: string, title: string, fallback: string): string {
+  const q = encodeURIComponent(title.trim().slice(0, 150));
+  const match = MERCHANT_SEARCH.find(([re]) => re.test(store));
+  if (match) return match[1](q);
+  // Unknown single-word merchant: guess its .com; else keep the original link.
+  const slug = store.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (slug && !/\s/.test(store.trim())) return `https://www.${slug}.com/`;
+  return fallback;
+}
+
 async function loadRealTimeBestDeals() {
   try {
     const file = await fs.readFile(path.join(process.cwd(), 'data', 'best-deals-realtime.json'), 'utf8');
@@ -348,14 +378,15 @@ async function loadRealTimeBestDeals() {
       .filter((item) => item.title && item.image && item.url && item.priceValue !== null)
       .sort((a, b) => b.discountPercent - a.discountPercent || b.savingsValue - a.savingsValue)
       .slice(0, 36);
-    // The source feed links to Google Shopping. Route each outbound link through
-    // the affiliate wrapper (Impact deep-link when the domain qualifies, else a
-    // GeniusLink short URL) so clicks resolve to the merchant with our affiliate
-    // ID embedded instead of dropping the user on a Google Shopping page.
+    // Replace the Google Shopping link with the merchant's own search URL, then
+    // affiliate-wrap it (Impact deep-link when the domain qualifies — e.g.
+    // walmart.com — else a GeniusLink short URL) so clicks land on the actual
+    // retailer, not a Google Shopping results page.
     // Sequential (not Promise.all) to avoid the geni.us API rate-limiting bursts.
     const monetized: RealTimeBestDeal[] = [];
     for (const item of items) {
-      monetized.push({ ...item, url: await monetizeUrl(item.url) });
+      const merchantUrl = merchantDealUrl(item.store, item.title, item.url);
+      monetized.push({ ...item, url: await monetizeUrl(merchantUrl) });
     }
     flushGeniusCache();
     return {
