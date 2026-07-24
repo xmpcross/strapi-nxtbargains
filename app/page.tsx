@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE } from '@/lib/site';
 import {
@@ -94,6 +95,17 @@ function toDeal(product: CommerceProduct): Deal | null {
     currency: chosen.currency ?? 'USD',
   };
 }
+
+// Homepage relies on the root layout for title/description/OG image, but must
+// emit its own canonical explicitly (layout inheritance doesn't render one).
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+  openGraph: {
+    url: SITE.url,
+    images: [{ url: `${SITE.url}${SITE.ogImage}`, width: 1200, height: 630, alt: SITE.name }],
+  },
+  twitter: { images: [`${SITE.url}${SITE.ogImage}`] },
+};
 
 export default async function HomePage() {
   // Pull live data; never let a Strapi hiccup break the page.

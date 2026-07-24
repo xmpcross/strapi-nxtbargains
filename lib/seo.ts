@@ -48,7 +48,13 @@ export function pageOpenGraph({
   type?: 'website' | 'article';
 }): Pick<Metadata, 'openGraph' | 'twitter'> {
   const url = `${SITE.url}${path.startsWith('/') ? path : `/${path}`}`;
-  const images = image ? [{ url: image }] : undefined;
+  // Always emit a share image: use the page's own image when provided,
+  // otherwise fall back to the site-wide default (never leave OG imageless,
+  // since this openGraph object overrides the layout default).
+  const ogImageUrl = image || `${SITE.url}${SITE.ogImage}`;
+  const images = image
+    ? [{ url: image }]
+    : [{ url: ogImageUrl, width: 1200, height: 630, alt: title }];
 
   return {
     openGraph: {
@@ -59,10 +65,12 @@ export function pageOpenGraph({
       images,
     },
     twitter: {
-      card: image ? 'summary_large_image' : 'summary',
+      card: 'summary_large_image',
       title,
       description,
-      images: image ? [image] : undefined,
+      site: SITE.twitterHandle,
+      creator: SITE.twitterHandle,
+      images: [ogImageUrl],
     },
   };
 }

@@ -5,11 +5,36 @@ export const SITE = {
     'Side-by-side product comparisons, honest reviews, roundups and how-to guides — pick the right gadget without the wading.',
   url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://nxtbargains.fxnstudio.com').replace(/\/$/, ''),
   amazonAffiliateTag: process.env.NEXT_PUBLIC_AMAZON_AFFILIATE_TAG || '',
+  /** Default social share image (1200×630), path relative to SITE.url. */
+  ogImage: '/og/default.png',
+  /** Brand handle for Twitter/X cards. */
+  twitterHandle: '@nxtbargains',
   social: {
     facebook: 'https://www.facebook.com/nxtbargains',
     twitter: 'https://x.com/nxtbargains',
   },
 };
+
+// Guardrail: never let production canonical / OG / JSON-LD URLs silently point
+// at a staging (*.fxnstudio.com) domain. Warns loudly in production builds so a
+// missing NEXT_PUBLIC_SITE_URL is caught immediately.
+(() => {
+  let host = '';
+  try {
+    host = new URL(SITE.url).hostname;
+  } catch {
+    /* ignore */
+  }
+  if (process.env.NODE_ENV === 'production' && /\.fxnstudio\.com$/i.test(host)) {
+    console.error(
+      '\n\n⚠️  [lib/site] SITE.url = "' +
+        SITE.url +
+        '" — a STAGING domain — in a PRODUCTION build.\n' +
+        '    Set NEXT_PUBLIC_SITE_URL=https://nxt.bargains before building, or every canonical,\n' +
+        '    OpenGraph, and JSON-LD URL will point at staging (serious SEO problem).\n\n',
+    );
+  }
+})();
 
 export const INFORMATIVE_ARTICLES_SLUG = 'nxt-bargains-informative-articles' as const;
 

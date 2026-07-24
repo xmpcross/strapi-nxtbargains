@@ -17,8 +17,19 @@ export const metadata: Metadata = {
   },
   description: clampDescription(SITE.description),
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
-  openGraph: { type: 'website', siteName: SITE.name, locale: 'en_US' },
-  twitter: { card: 'summary_large_image', site: '@nxtbargains' },
+  openGraph: {
+    type: 'website',
+    siteName: SITE.name,
+    locale: 'en_US',
+    url: SITE.url,
+    images: [{ url: `${SITE.url}${SITE.ogImage}`, width: 1200, height: 630, alt: SITE.name }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: SITE.twitterHandle,
+    creator: SITE.twitterHandle,
+    images: [`${SITE.url}${SITE.ogImage}`],
+  },
   alternates: {
     types: {
       'application/rss+xml': [{ url: '/feed.xml', title: `${SITE.name} RSS` }],
