@@ -56,6 +56,18 @@ const first = (o, keys) => { for (const k of keys) if (o[k] != null && o[k] !== 
 
 function domainFromUrl(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } }
 
+// Keep only coupons for a given locale (default US) — the feed mixes regions
+// (e.g. amazon.co.uk is GB). Uses locations[] / primary_location; keeps unknowns.
+const LOCATION = (process.env.COUPONAPI_LOCATION || 'US').toUpperCase();
+function isTargetLocation(r) {
+  const raw = r.locations ?? r.location ?? [];
+  const arr = (Array.isArray(raw) ? raw : [raw]).map((x) => String(x).toUpperCase());
+  if (arr.length) return arr.includes(LOCATION);
+  const pl = String(r.primary_location || '').toLowerCase();
+  if (pl) return pl.includes('united states');
+  return true;
+}
+
 // Normalize a raw store/domain to a clean brand name + canonical slug so coupons
 // attach to the right /coupons/{slug} store pages.
 const STORE_MAP = [
@@ -136,6 +148,7 @@ async function main() {
   console.log(`Feed returned ${raw.length} record(s).`);
 
   const coupons = raw
+    .filter((r) => isTargetLocation(r))
     .filter((r) => matchesTarget(first(r, ['store', 'merchant', 'store_name']) || '', first(r, ['url', 'aff_url', 'store_url']) || ''))
     .map(mapCoupon)
     // Amazon stays on Amazon Associates + GeniusLink (CJ "amazon" data is junk).
