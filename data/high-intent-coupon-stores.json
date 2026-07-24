@@ -1,0 +1,448 @@
+{
+  "source": "User-selected high-intent coupon stores",
+  "updatedAt": "2026-06-21",
+  "notes": [
+    "Public coupon pages should refresh these stores from cache instead of calling RapidAPI per visitor.",
+    "Some requested stores were not present in the imported RapidAPI store cache and are listed under unmatched."
+  ],
+  "stores": [
+    {
+      "label": "Amazon",
+      "storeId": 457923,
+      "matchedName": "Amazon US",
+      "domain": "amazon.com",
+      "country": "US",
+      "slug": "amazon",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "eBay",
+      "storeId": 461700,
+      "matchedName": "eBay",
+      "domain": "ebay.com",
+      "country": "US",
+      "slug": "ebay",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "Walmart",
+      "storeId": 413322,
+      "matchedName": "Walmart",
+      "domain": "walmart.com",
+      "country": "US",
+      "slug": "walmart",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "Newegg",
+      "storeId": 410910,
+      "matchedName": "Newegg",
+      "domain": "newegg.com",
+      "country": "US",
+      "slug": "newegg",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "HP",
+      "storeId": 487366,
+      "matchedName": "HP.com",
+      "domain": "hp.com",
+      "country": "US",
+      "slug": "hp",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "Dell",
+      "storeId": 410929,
+      "matchedName": "Dell",
+      "domain": "dell.com",
+      "country": "US",
+      "slug": "dell",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "Lenovo",
+      "storeId": 461135,
+      "matchedName": "Lenovo",
+      "domain": "lenovo.com",
+      "country": "US",
+      "slug": "lenovo",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "Samsung",
+      "storeId": 435023,
+      "matchedName": "Samsung",
+      "domain": "samsung.com",
+      "country": "US",
+      "slug": "samsung",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "Apple",
+      "storeId": 458121,
+      "matchedName": "Apple Store",
+      "domain": "apple.com",
+      "country": "US",
+      "slug": "apple",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "Best Buy",
+      "storeId": 410934,
+      "matchedName": "Best Buy",
+      "domain": "bestbuy.com",
+      "country": "US",
+      "slug": "best-buy",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "Target",
+      "storeId": 440318,
+      "matchedName": "Target",
+      "domain": "target.com",
+      "country": "US",
+      "slug": "target",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "Nike",
+      "storeId": 470662,
+      "matchedName": "Nike Emerging Markets",
+      "domain": "nike.com",
+      "country": "US",
+      "slug": "nike",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "Dyson",
+      "storeId": 414554,
+      "matchedName": "Dyson",
+      "domain": "dyson.com",
+      "country": "US",
+      "slug": "dyson",
+      "priority": 1,
+      "status": "active"
+    },
+    {
+      "label": "The Home Depot",
+      "storeId": 412443,
+      "matchedName": "Home Depot",
+      "domain": "homedepot.com",
+      "country": "US",
+      "slug": "home-depot",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Lowe's",
+      "storeId": 468277,
+      "matchedName": "Lowe's",
+      "domain": "lowes.com",
+      "country": "US",
+      "slug": "lowes",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Wayfair",
+      "storeId": 422921,
+      "matchedName": "Wayfair",
+      "domain": "wayfair.com",
+      "country": "US",
+      "slug": "wayfair",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Kohl's",
+      "storeId": 411286,
+      "matchedName": "Kohls",
+      "domain": "kohls.com",
+      "country": "US",
+      "slug": "kohls",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Ulta Beauty",
+      "storeId": 464360,
+      "matchedName": "ULTA",
+      "domain": "ulta.com",
+      "country": "US",
+      "slug": "ulta-beauty",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Sephora",
+      "storeId": 454645,
+      "matchedName": "Sephora",
+      "domain": "sephora.com",
+      "country": "US",
+      "slug": "sephora",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Staples",
+      "storeId": 413515,
+      "matchedName": "Staples",
+      "domain": "staples.com",
+      "country": "US",
+      "slug": "staples",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "ASOS",
+      "storeId": 460843,
+      "matchedName": "ASOS",
+      "domain": "asos.com",
+      "country": "GB",
+      "slug": "asos",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "John Lewis & Partners",
+      "storeId": 439616,
+      "matchedName": "John Lewis",
+      "domain": "johnlewis.com",
+      "country": "GB",
+      "slug": "john-lewis",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Argos",
+      "storeId": 439774,
+      "matchedName": "Argos",
+      "domain": "argos.co.uk",
+      "country": "GB",
+      "slug": "argos",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Currys",
+      "storeId": 459052,
+      "matchedName": "Currys",
+      "domain": "currys.co.uk",
+      "country": "GB",
+      "slug": "currys",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Decathlon",
+      "storeId": 554912,
+      "matchedName": "Decathlon.com",
+      "domain": "decathlon.com",
+      "country": "",
+      "slug": "decathlon",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "El Corte Ingles",
+      "storeId": 408134,
+      "matchedName": "EL Corte Ingles",
+      "domain": "elcorteingles.com",
+      "country": "FR",
+      "slug": "el-corte-ingles",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Selfridges",
+      "storeId": 461292,
+      "matchedName": "Selfridges",
+      "domain": "selfridges.com",
+      "country": "GB",
+      "slug": "selfridges",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "AliExpress",
+      "storeId": 439806,
+      "matchedName": "AliExpress",
+      "domain": "aliexpress.com",
+      "country": "RU",
+      "slug": "aliexpress",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Adorama",
+      "storeId": 462312,
+      "matchedName": "Adorama",
+      "domain": "adorama.com",
+      "country": "US",
+      "slug": "adorama",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Office Depot / OfficeMax",
+      "storeId": 413715,
+      "matchedName": "Office Depot",
+      "domain": "officedepot.com",
+      "country": "US",
+      "slug": "office-depot",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Bloomingdale's",
+      "storeId": 475600,
+      "matchedName": "Bloomingdale's",
+      "domain": "bloomingdales.com",
+      "country": "US",
+      "slug": "bloomingdales",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "DSW",
+      "storeId": 437096,
+      "matchedName": "DSW",
+      "domain": "dsw.com",
+      "country": "US",
+      "slug": "dsw",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "adidas",
+      "storeId": 460817,
+      "matchedName": "adidas",
+      "domain": "adidas.co.uk",
+      "country": "GB",
+      "slug": "adidas",
+      "priority": 2,
+      "status": "active",
+      "note": "US Adidas feed returned 0 coupons on 2026-07-09; using UK Adidas feed with live offers."
+    },
+    {
+      "label": "H&M",
+      "storeId": 435333,
+      "matchedName": "H&M",
+      "domain": "hm.com",
+      "country": "US",
+      "slug": "h-and-m",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Sally Beauty",
+      "storeId": 472756,
+      "matchedName": "Sally Beauty Supply",
+      "domain": "sallybeauty.com",
+      "country": "US",
+      "slug": "sally-beauty",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Walgreens",
+      "storeId": 413350,
+      "matchedName": "Walgreens",
+      "domain": "walgreens.com",
+      "country": "US",
+      "slug": "walgreens",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "CVS",
+      "storeId": 413710,
+      "matchedName": "CVS",
+      "domain": "cvs.com",
+      "country": "US",
+      "slug": "cvs",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Dermstore",
+      "storeId": 440939,
+      "matchedName": "DermStore",
+      "domain": "dermstore.com",
+      "country": "US",
+      "slug": "dermstore",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "GNC",
+      "storeId": 440420,
+      "matchedName": "GNC",
+      "domain": "gnc.com",
+      "country": "US",
+      "slug": "gnc",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "The Vitamin Shoppe",
+      "storeId": 439930,
+      "matchedName": "The Vitamin Shoppe",
+      "domain": "vitaminshoppe.com",
+      "country": "US",
+      "slug": "the-vitamin-shoppe",
+      "priority": 2,
+      "status": "active"
+    },
+    {
+      "label": "Lookfantastic US",
+      "storeId": 466996,
+      "matchedName": "lookfantastic",
+      "domain": "lookfantastic.com",
+      "country": "GB",
+      "slug": "lookfantastic",
+      "priority": 3,
+      "status": "active",
+      "note": "Matched global/GB store; no exact US store was found in cache."
+    }
+  ],
+  "unmatched": [
+    {
+      "label": "Zalando",
+      "reason": "No reliable store match in imported RapidAPI cache."
+    },
+    {
+      "label": "bol.com",
+      "reason": "No reliable store match in imported RapidAPI cache."
+    },
+    {
+      "label": "REVOLVE",
+      "reason": "Only unrelated Rev/Revo matches found."
+    },
+    {
+      "label": "SHEIN",
+      "reason": "No reliable store match in imported RapidAPI cache."
+    },
+    {
+      "label": "iHerb",
+      "reason": "No reliable store match in imported RapidAPI cache."
+    },
+    {
+      "label": "Nordstrom",
+      "reason": "Only Nordstrom Rack found; full Nordstrom store was not found."
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "marketplace": "newegg",
+  "store": "Newegg",
+  "query": "best sellers",
+  "capturedAt": "2026-07-09T01:20:57.466Z",
+  "items": [
+    {
+      "rank": 1,
+      "id": "catalogid:5391883256833034359,productid:11514783491620938381,gpcid:16955904625275539156,headlineOfferDocid:7165214195517680996,rds:PC_16955904625275539156|PROD_PC_16955904625275539156,imageDocid:15934424240531040286,mid:576462897743126645,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "Corsair Vengeance LPX DDR4 Memory CMK",
+      "price": "$239.99",
+      "priceValue": 239.99,
+      "image": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQwjjcu0CO_jS0QrSWdroNf4Jb510ZHdDFPpXlmPQEFHCpjJxFe4btnteJTbiDvaZcHasxiS5KFA_BCT0Rqquv4blhzk7u7xkYREA9Ukth3",
+      "rating": 4.8,
+      "ratingCount": 82,
+      "url": "https://geni.us/fkoRV"
+    },
+    {
+      "rank": 2,
+      "id": "catalogid:3629999327752956808,productid:5403166447021413937,gpcid:2614045816119673849,headlineOfferDocid:5204135880269463481,rds:PC_2614045816119673849|PROD_PC_2614045816119673849,imageDocid:7268929670586377376,mid:576462557539148939,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "G.SKILL Ripjaws V 288-Pin DDR4",
+      "price": "$64.90",
+      "priceValue": 64.9,
+      "image": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRWWqkDw7yLOOhCuXlWaivAcyY68QYfpB2TZxfYo94_wTjVDwqSuXajPitLJRU37NS1JTw6k-CBWvRkxXG2jRFGjIIX_cko28_Ub0LHW3c5",
+      "rating": 4.5,
+      "ratingCount": 12,
+      "url": "https://geni.us/ffieBZ6"
+    },
+    {
+      "rank": 3,
+      "id": "catalogid:17902267988577855269,productid:8662748347722847533,gpcid:3524245500532446126,headlineOfferDocid:1913094647730451053,rds:PC_3524245500532446126|PROD_PC_3524245500532446126,imageDocid:6041823710914555254,mid:576462897664614617,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "Corsair Vengeance LPX DDR4 Memory CMK32GX4M2D3600C18",
+      "price": "$209.00",
+      "priceValue": 209,
+      "image": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcT75lV2eczqDQk8L5je2bXKjQldiHHKDDK9xpU1UR7hQ18YNq3rfcapYUKEPchS6gDRuQ1Gui4_56iEpMPce9TK8UQf5pBx3hfHi0iv-Fe5",
+      "rating": 4.8,
+      "ratingCount": 18,
+      "url": "https://geni.us/HE6AR"
+    },
+    {
+      "rank": 4,
+      "id": "catalogid:3264124649104565010,productid:17734028874702985985,gpcid:10985386445503905278,headlineOfferDocid:4739201273894031309,rds:PC_10985386445503905278|PROD_PC_10985386445503905278,imageDocid:12751517743498386351,mid:576462852357709902,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "Corsair Vengeance RGB Pro SL DDR4 Memory Kit CMH",
+      "price": "$164.99",
+      "priceValue": 164.99,
+      "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRjeQf0Fxq1aq7enXZAPI9OlNfNGUKdnl7iPqmWjF-IuhQf3F3jprs3sNKW7d2LoPyBev7AsX_PLN2o8SuE1rOqFNJYo_P1br1Ontwu6GqI",
+      "rating": 4.8,
+      "ratingCount": 23,
+      "url": "https://geni.us/6GP2H"
+    },
+    {
+      "rank": 5,
+      "id": "catalogid:497537485384514367,productid:16865317220131804644,gpcid:1377161283319138607,headlineOfferDocid:15264548484604711395,rds:PC_1377161283319138607|PROD_PC_1377161283319138607,imageDocid:15441986939832206945,mid:576462897962508870,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "Seagate BarraCuda 4TB 3.5\" Internal Hard Drive",
+      "price": "$149.99",
+      "priceValue": 149.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRtW56TCMFkgOTxtTuJqDVhPlFKPngltku1IFZxtW5XWsCoA7E7L_2_WVaOza5nsnkswtHf-3oz9036IBNKVlxU6LIl5bQT2SUXm1Yw-iL8ilQc7vSq1Phg",
+      "rating": 4.4,
+      "ratingCount": 21,
+      "url": "https://geni.us/TJKvbT"
+    },
+    {
+      "rank": 6,
+      "id": "catalogid:6100828119009773572,productid:39501706316883171,gpcid:14082310289530905160,headlineOfferDocid:592037847852390819,rds:PC_14082310289530905160|PROD_PC_14082310289530905160,imageDocid:3646182513898619381,mid:,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "WD RED Hard Drive",
+      "price": "$389.99",
+      "priceValue": 389.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTKy6a6I2FbL5foMa41nSQOZk2sF-ts9AqmwtjCbYinaeUZtw2M7LPmvgRKOWGSJ15XW1dlDl8AEkxinhahI_8ZyQE7H-BwVg",
+      "rating": 4.4,
+      "ratingCount": 49,
+      "url": "https://geni.us/klppL"
+    },
+    {
+      "rank": 7,
+      "id": "catalogid:9276150916656129677,productid:6639695230817608351,gpcid:6141555070190905664,headlineOfferDocid:277496954985448689,rds:PC_6141555070190905664|PROD_PC_6141555070190905664,imageDocid:5412317987025440988,mid:576462758508712301,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "Corsair Vengeance RGB Pro DDR4 Memory",
+      "price": "$299.99",
+      "priceValue": 299.99,
+      "image": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSlZFK0wfHoWNWpK-cx5jY9eFmvnYf3TUec1t2a9GR6cckfaqcE7JdIA8Pmh1Dm-KUapd39LgOLjDnZlW9_i74wZevg3VBjr5CSRFcHQQU5zHc9DS_6nTZu",
+      "rating": 4.8,
+      "ratingCount": 67,
+      "url": "https://geni.us/49BULc1"
+    },
+    {
+      "rank": 8,
+      "id": "catalogid:2889792169069674613,productid:2386962455802286130,gpcid:570237409851120804,headlineOfferDocid:13221710269932641220,rds:PC_570237409851120804|PROD_PC_570237409851120804,imageDocid:17942971944821912046,mid:576462892665791966,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "Corsair Vengeance RGB Pro SL 16GB DDR4 3600MHz CL18 Memory",
+      "price": "$164.99",
+      "priceValue": 164.99,
+      "image": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTw56mA85GeXCRBoxMm1V4sAqOhKaetACDdSqDPcJF_dtx9hGMwKnsW_BIxHJQOoOrglL6JvM81-SsWbl_7dwpB-xfeO_3DAqkXDqabQUA",
+      "rating": 4.8,
+      "ratingCount": 317,
+      "url": "https://geni.us/XXKB"
+    },
+    {
+      "rank": 9,
+      "id": "catalogid:7444886502815734247,productid:9398468303790979254,gpcid:10676190519901961420,headlineOfferDocid:487177754692456831,rds:PC_10676190519901961420|PROD_PC_10676190519901961420,imageDocid:13238627474809107282,mid:576462563303716158,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "Team Group DELTA RGB 16GB DDR4 3200MHz CL16 Memory",
+      "price": "$164.99",
+      "priceValue": 164.99,
+      "image": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTXg1bcRyeQ7OjzryJGUxyhVCwPLGKzoYANTo4x-r5f7gvo662scmy9ZnKoOW-3FGtRq8kSwBkoz2T3SZ5usLe8lk6OfBmL",
+      "rating": 4.9,
+      "ratingCount": 182,
+      "url": "https://geni.us/TFOil"
+    },
+    {
+      "rank": 10,
+      "id": "catalogid:5127889662560967517,productid:301505002943069973,gpcid:15389343356860787690,headlineOfferDocid:10307499374335319930,rds:PC_15389343356860787690|PROD_PC_15389343356860787690,imageDocid:5881579471448790756,mid:576462898013119563,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "Crucial Pro 32GB DDR4 SDRAM Memory Module",
+      "price": "$229.99",
+      "priceValue": 229.99,
+      "image": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQawB8SWHW-A8j8PQcFOOXq2jJMOPlicCVXxDgZ4Q34VXm_NMnnjJoUlymurrXkFBc6i5auawEvownc9Uhdhp2UCtfJ9WtA_8vAJxsqOlztQAbi5TMdpePGIg",
+      "rating": 4.7,
+      "ratingCount": 332,
+      "url": "https://geni.us/WxoVZj"
+    },
+    {
+      "rank": 11,
+      "id": "catalogid:15506181090763289416,productid:10738965721726046335,gpcid:615903488044491786,headlineOfferDocid:8023801489127095028,rds:PC_615903488044491786|PROD_PC_615903488044491786,imageDocid:1060418239261213657,mid:576462892686433643,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "T-Force Delta RGB 32GB DDR4 3200MHz CL16 Dual Memory Kit",
+      "price": "$259.99",
+      "priceValue": 259.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQjKoSza24n57vIWo0sR_uOQy3QeUVJeVpUVLjSRzf46--_mUJpQof0UGWsv1JoD_xBiGB42MeHJqf9-oWx0brqHxkGJnOUIQ",
+      "rating": 4.6,
+      "ratingCount": 115,
+      "url": "https://geni.us/kJUIIk"
+    },
+    {
+      "rank": 12,
+      "id": "catalogid:15493223094501370689,productid:2203096946971197187,gpcid:17969910580662425775,headlineOfferDocid:6249538922043313400,rds:PC_17969910580662425775|PROD_PC_17969910580662425775,imageDocid:2920511325199039602,mid:576462888167947979,pvt:hg,pvf:",
+      "marketplace": "newegg",
+      "title": "HP Z4 G5 Workstation Xeon",
+      "price": "$3,739.99",
+      "priceValue": 3739.99,
+      "image": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRUpo1idbVG6P_nd0b-__QFhCYbxHeN0aiLKKnBWuZt47IypYpLvWXQIjVDj1rcdHQw1xaMDCz-6sTifPgmF5S9lLlczFJb",
+      "rating": 3.3,
+      "ratingCount": 3,
+      "url": "https://geni.us/Xeuz"
+    }
+  ]
+}

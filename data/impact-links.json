@@ -1,0 +1,18 @@
+{
+  "capturedAt": "2026-07-08T16:20:02.074Z",
+  "advertisers": {
+    "walmart-com": {
+      "advertiser": "Walmart.com",
+      "campaignId": "9383",
+      "trackingLink": "https://goto.walmart.com/c/2688487/565706/9383?veh=aff&sourceid=imp_000011112222333344&u=https%3A%2F%2Fwww.walmart.com",
+      "allowsDeeplinking": true,
+      "deeplinkDomains": [
+        "walmart.com",
+        "walmartpetrx.com",
+        "walmart.ca",
+        "*.walmart.com",
+        "info.walmartbusiness.com"
+      ]
+    }
+  }
+}

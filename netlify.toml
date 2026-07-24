@@ -8,3 +8,9 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# The app reads data/*.json at runtime (coupons, stores, best-sellers). Bundle
+# any that are committed into every serverless/SSR function, since Netlify's
+# function filesystem is read-only and won't contain uncommitted files.
+[functions]
+  included_files = ["data/**"]

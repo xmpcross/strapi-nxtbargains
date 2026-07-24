@@ -1,0 +1,796 @@
+{
+  "source": "rapidapi:amazon-promo-codes-and-deals",
+  "capturedAt": "2026-07-09T19:04:49.886Z",
+  "host": "amazon-promo-codes-and-deals.p.rapidapi.com",
+  "path": "/deals.php?limit=20&offset=0&merchant=Amazon&condition=New",
+  "data": {
+    "status": "ok",
+    "disclaimer": "Deals with 'has_both_discounts: true' have both a promo code AND a clippable coupon — use ?dual_offer=1 to filter for these. The 'estimated_combined_price' assumes both discounts apply, which is not guaranteed. Always verify at Amazon checkout.",
+    "total": 152,
+    "limit": 20,
+    "offset": 0,
+    "count": 20,
+    "deals": [
+      {
+        "asin": "B0DRJNSHS2",
+        "product_name": "Power Tool Organizer with Charging Station Wall Mount, Built in 8 Outlet Surge Protection Power Strip, Drill Holder Wall Mount, Heavy Duty Metal Power Tool Storage Rack for Garage Organization Black",
+        "category": "Home",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$63.54",
+          "original_price": "$75.29",
+          "price_after_promo_only": "$31.77",
+          "price_after_coupon_only": "$63.54",
+          "estimated_combined_price": "$31.77"
+        },
+        "promo": {
+          "code": "QCCRTA3W",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/AUQRDEVCARU7M",
+          "start_date": "2026-07-06",
+          "start_hour": "10:59:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 50,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0DRJNSHS2",
+          "affiliate": "https://www.amazon.com/dp/B0DRJNSHS2?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=QCCRTA3W",
+          "image": "https://m.media-amazon.com/images/I/51Hf6GJDD+L._SL500_.jpg"
+        },
+        "channel": 1,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-06 13:59:51"
+      },
+      {
+        "asin": "B0D7CQWZMX",
+        "product_name": "Nacial Power Tool Organizer Wall Mount, 8 Drill Holder Wall Mount with 3 Layer Cordless Tool Organizer, Heavy Duty Tools Organizer with 12 Hooks, Power Tool Storage for Garage Organization, Yellow",
+        "category": "Home",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$54.39",
+          "original_price": "$54.39",
+          "price_after_promo_only": "$27.20",
+          "price_after_coupon_only": "$54.39",
+          "estimated_combined_price": "$27.20"
+        },
+        "promo": {
+          "code": "QCCRTA3W",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/AUQRDEVCARU7M",
+          "start_date": "2026-07-06",
+          "start_hour": "09:22:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 50,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0D7CQWZMX",
+          "affiliate": "https://www.amazon.com/dp/B0D7CQWZMX?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=QCCRTA3W",
+          "image": "https://m.media-amazon.com/images/I/51ZVEJw9PTL._SL500_.jpg"
+        },
+        "channel": 1,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-06 13:27:57"
+      },
+      {
+        "asin": "B0G2GKLX2M",
+        "product_name": "Vikaluz 3.2QT 2-in-1 Stand Mixer, Electric Kitchen Mixer with Auto-Rotating Bowl & Tilt-Head, 5-Speed 250W Turbo Baking Machine for Beginners with Beater & Dough Hook for Cookie, Bread, Cake (White)",
+        "category": "Kitchen",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$69.99",
+          "original_price": "$69.99",
+          "price_after_promo_only": "$41.99",
+          "price_after_coupon_only": "$69.99",
+          "estimated_combined_price": "$41.99"
+        },
+        "promo": {
+          "code": "KRLEL75H",
+          "discount_pct": 40,
+          "promo_url": "https://www.amazon.com/promocode/A3CNRMV91W6ZTO",
+          "start_date": "2026-07-06",
+          "start_hour": "07:27:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 40,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0G2GKLX2M",
+          "affiliate": "https://www.amazon.com/dp/B0G2GKLX2M?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=KRLEL75H",
+          "image": "https://m.media-amazon.com/images/I/41LbEGEHR-L._SL500_.jpg"
+        },
+        "channel": 4,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-06 10:44:16"
+      },
+      {
+        "asin": "B0D471KC5P",
+        "product_name": "Ezebaby Bedside Bassinet for Baby, Portable Baby Bassinet Bedside Sleeper for Newborn Infants with Wheels Storage Basket, Adjustable 7 Heights and All Mesh Sides",
+        "category": "Baby Product",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$83.69",
+          "original_price": "$92.99",
+          "price_after_promo_only": "$50.21",
+          "price_after_coupon_only": "$83.69",
+          "estimated_combined_price": "$50.21"
+        },
+        "promo": {
+          "code": "ZSW57OL4",
+          "discount_pct": 40,
+          "promo_url": "https://www.amazon.com/promocode/AT9P2DKWLX8RC",
+          "start_date": "2026-07-04",
+          "start_hour": "01:58:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 40,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0D471KC5P",
+          "affiliate": "https://www.amazon.com/dp/B0D471KC5P?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=ZSW57OL4",
+          "image": "https://m.media-amazon.com/images/I/41c098qqvoL._SL500_.jpg"
+        },
+        "channel": 2,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-04 04:58:50"
+      },
+      {
+        "asin": "B0FWR6HL4M",
+        "product_name": "COMHOMA Big and Tall Office Chair Heavy Duty Gaming Chair with Deluxe Embossing Leather High Back Wider Ergonomic Computer Chair with Foot Rest 150°Reclining Pocket Spring Lumbar Support",
+        "category": "Furniture",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$179.93",
+          "original_price": "$229.99",
+          "price_after_promo_only": "$107.96",
+          "price_after_coupon_only": "$179.93",
+          "estimated_combined_price": "$107.96"
+        },
+        "promo": {
+          "code": "HL76PRQH",
+          "discount_pct": 40,
+          "promo_url": "https://www.amazon.com/promocode/A1M50UW008RI9I",
+          "start_date": "2026-07-06",
+          "start_hour": "07:54:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 40,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0FWR6HL4M",
+          "affiliate": "https://www.amazon.com/dp/B0FWR6HL4M?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=HL76PRQH",
+          "image": "https://m.media-amazon.com/images/I/41dJhFO9OLL._SL500_.jpg"
+        },
+        "channel": 4,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-03 07:57:09"
+      },
+      {
+        "asin": "B0GXY9QKLY",
+        "product_name": "VeriNatural Calla Lily Artificial Flowers with Vase, 10\" Faux Calla Lilies Arrangements in Glass Vase with Faux Water,19 Pcs PU Fake Calla Lily Stems Real Touch for Home Table Kitchen Wedding Decor",
+        "category": "Home",
+        "has_both_discounts": true,
+        "has_coupon": true,
+        "pricing": {
+          "listed_price": "$19.99",
+          "original_price": "$19.99",
+          "price_after_promo_only": "$9.99",
+          "price_after_coupon_only": "$9.99",
+          "estimated_combined_price": "$0.00"
+        },
+        "promo": {
+          "code": "D4UTPY6J",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/A10BM0H4TC1OUL",
+          "start_date": "2026-07-05",
+          "start_hour": "06:06:00"
+        },
+        "coupon": {
+          "raw": "50% coupon",
+          "type": "percent",
+          "value": 50
+        },
+        "total_discount_pct": 100,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0GXY9QKLY",
+          "affiliate": "https://www.amazon.com/dp/B0GXY9QKLY?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=D4UTPY6J",
+          "image": "https://m.media-amazon.com/images/I/413xQ0JPlXL._SL500_.jpg"
+        },
+        "channel": 1,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-03 04:17:19"
+      },
+      {
+        "asin": "B0DB52QQ4G",
+        "product_name": "Artkey Metallic Acrylic Paint - Gold (120 ml/4.06 oz) Tubes, Rich & Vibrant Pigments, Professional Artists Acrylic Paints - Art Supplies for Canvas Wood Rock Clay Fabric Ceramics Art Crafts Painting",
+        "category": "Home",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$6.78",
+          "original_price": "$7.99",
+          "price_after_promo_only": "$3.39",
+          "price_after_coupon_only": "$6.78",
+          "estimated_combined_price": "$3.39"
+        },
+        "promo": {
+          "code": "8NS9UC59",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/A1DSH5NTOPGHUD",
+          "start_date": "2026-07-05",
+          "start_hour": "07:18:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 50,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0DB52QQ4G",
+          "affiliate": "https://www.amazon.com/dp/B0DB52QQ4G?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=8NS9UC59",
+          "image": "https://m.media-amazon.com/images/I/31CXVysaekL._SL500_.jpg"
+        },
+        "channel": 1,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-02 21:29:47"
+      },
+      {
+        "asin": "B0DM619D8V",
+        "product_name": "DOLOPL Lunch Box for Men, Tactical Insulated Expandable Lunch Bag for Women, 16L Large Leakproof Waterproof Women Lunch Bag With Adjustable Shoulder Strap for Outdoor, Picnic, Office, Blue",
+        "category": "Kitchen",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$29.99",
+          "original_price": "$29.99",
+          "price_after_promo_only": "$14.99",
+          "price_after_coupon_only": "$29.99",
+          "estimated_combined_price": "$14.99"
+        },
+        "promo": {
+          "code": "SQHW9EFF",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/A2WVOI73P889QC",
+          "start_date": "2026-07-05",
+          "start_hour": "15:36:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 50,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0DM619D8V",
+          "affiliate": "https://www.amazon.com/dp/B0DM619D8V?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=SQHW9EFF",
+          "image": "https://m.media-amazon.com/images/I/41zl5vNgh0L._SL500_.jpg"
+        },
+        "channel": 3,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-02 19:47:22"
+      },
+      {
+        "asin": "B0FQY4PJ2Y",
+        "product_name": "iSpring Ultimate Protection Whole House Water Filter System, Reduces Heavy Metals, Scale, Chlorine, Chloramine, Hydrogen Sulfide, 3-Stage Filtration, 1\" Inlet/Outlet, Model: WGB31B-KDS",
+        "category": "BISS",
+        "has_both_discounts": true,
+        "has_coupon": true,
+        "pricing": {
+          "listed_price": "$468.98",
+          "original_price": "$468.98",
+          "price_after_promo_only": "$309.53",
+          "price_after_coupon_only": "$388.98",
+          "estimated_combined_price": "$229.53"
+        },
+        "promo": {
+          "code": "WGB31BKDS34",
+          "discount_pct": 34,
+          "promo_url": "https://www.amazon.com/promocode/A75RQT6UK7NU2",
+          "start_date": "2026-07-02",
+          "start_hour": "16:32:00"
+        },
+        "coupon": {
+          "raw": "Apply $80",
+          "type": "dollar",
+          "value": 80
+        },
+        "total_discount_pct": 51.1,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0FQY4PJ2Y",
+          "affiliate": "https://www.amazon.com/dp/B0FQY4PJ2Y?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=WGB31BKDS34",
+          "image": "https://m.media-amazon.com/images/I/41pG5FYSUwL._SL500_.jpg"
+        },
+        "channel": 2,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-02 19:34:16"
+      },
+      {
+        "asin": "B0G4QYSRBR",
+        "product_name": "3-Tier Bathroom Countertop Makeup Organizer - Big Make Up Storage with Slide-Out Tray & Bottom Drawer, Transparent Acrylic for Cosmetics Brushes Lipsticks Skincare",
+        "category": "Home",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$24.98",
+          "original_price": "$24.98",
+          "price_after_promo_only": "$12.49",
+          "price_after_coupon_only": "$24.98",
+          "estimated_combined_price": "$12.49"
+        },
+        "promo": {
+          "code": "QIJNVD8V",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/A2QH2B4PK4K3EY",
+          "start_date": "2026-07-05",
+          "start_hour": "18:50:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 50,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0G4QYSRBR",
+          "affiliate": "https://www.amazon.com/dp/B0G4QYSRBR?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=QIJNVD8V",
+          "image": "https://m.media-amazon.com/images/I/51r2yd+6zjL._SL500_.jpg"
+        },
+        "channel": 2,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-02 18:23:38"
+      },
+      {
+        "asin": "B09J827VSB",
+        "product_name": "Artkey Canvases for Painting 8 x 10 Inch 10 - Pack, 5/8\" Profile Stretched Canvas - 10 oz Primed, 100% Cotton White Blank Canvas - Art Paint Canvases for Acrylic Oil Paint",
+        "category": "Home",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$18.99",
+          "original_price": "$18.99",
+          "price_after_promo_only": "$9.49",
+          "price_after_coupon_only": "$18.99",
+          "estimated_combined_price": "$9.49"
+        },
+        "promo": {
+          "code": "8NS9UC59",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/A1DSH5NTOPGHUD",
+          "start_date": "2026-07-03",
+          "start_hour": "15:16:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 50,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B09J827VSB",
+          "affiliate": "https://www.amazon.com/dp/B09J827VSB?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=8NS9UC59",
+          "image": "https://m.media-amazon.com/images/I/51QoJPj-YwL._SL500_.jpg"
+        },
+        "channel": 5,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-02 15:30:02"
+      },
+      {
+        "asin": "B0CKP6Y6KB",
+        "product_name": "Typhur Dome 2 AI Smart Air Fryer, 15-in-1 Large Flat Airfryer with Top & Bottom Heating, Self-Cleaning Digital Fryer, PFAS-Free Ceramic Basket, Fits a 12\" Pizza or Steaks, Whisper-Quiet, 120V",
+        "category": "Kitchen",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$390.00",
+          "original_price": "$390.00",
+          "price_after_promo_only": "$222.30",
+          "price_after_coupon_only": "$390.00",
+          "estimated_combined_price": "$222.30"
+        },
+        "promo": {
+          "code": "2QHJES47",
+          "discount_pct": 43,
+          "promo_url": "https://www.amazon.com/promocode/A1O5NAUZSDSFHZ",
+          "start_date": "2026-07-04",
+          "start_hour": "21:55:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 43,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0CKP6Y6KB",
+          "affiliate": "https://www.amazon.com/dp/B0CKP6Y6KB?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=2QHJES47",
+          "image": "https://m.media-amazon.com/images/I/31YcFgdYAqL._SL500_.jpg"
+        },
+        "channel": 4,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-02 14:57:41"
+      },
+      {
+        "asin": "B0GX5VP55V",
+        "product_name": "MESCOMB 5 in 1 Hot Air Styler, Hair Dryer Brush with Auto-Wrap Curlers, 110,000 RPM Ionic Blow Dryer Brush & Volumizer for Soft Curls, Bouncy Blowouts, Smoothing and Frizz Control",
+        "category": "Electronics",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$89.99",
+          "original_price": "$99.99",
+          "price_after_promo_only": "$44.99",
+          "price_after_coupon_only": "$89.99",
+          "estimated_combined_price": "$44.99"
+        },
+        "promo": {
+          "code": "HH8DUFLF",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/A1X8FDRZL8ODVT",
+          "start_date": "2026-07-06",
+          "start_hour": "05:55:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 50,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0GX5VP55V",
+          "affiliate": "https://www.amazon.com/dp/B0GX5VP55V?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=HH8DUFLF",
+          "image": "https://m.media-amazon.com/images/I/51JXVYfQ6BL._SL500_.jpg"
+        },
+        "channel": 2,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-02 14:53:47"
+      },
+      {
+        "asin": "B0GLF2T4TW",
+        "product_name": "VeriNatural White Artificial Flowers Tulips with Vase, 10\" Fake Tulips Arrangements in Glass Vase with Faux Water,18 Pcs PU Faux Tulip Stems Real Touch for Home,Table,Kitchen,Wedding Decor",
+        "category": "Home",
+        "has_both_discounts": true,
+        "has_coupon": true,
+        "pricing": {
+          "listed_price": "$19.99",
+          "original_price": "$19.99",
+          "price_after_promo_only": "$9.99",
+          "price_after_coupon_only": "$9.99",
+          "estimated_combined_price": "$0.00"
+        },
+        "promo": {
+          "code": "D4UTPY6J",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/A10BM0H4TC1OUL",
+          "start_date": "2026-07-06",
+          "start_hour": "07:30:00"
+        },
+        "coupon": {
+          "raw": "50% coupon",
+          "type": "percent",
+          "value": 50
+        },
+        "total_discount_pct": 100,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0GLF2T4TW",
+          "affiliate": "https://www.amazon.com/dp/B0GLF2T4TW?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=D4UTPY6J",
+          "image": "https://m.media-amazon.com/images/I/41NsAS7xerL._SL500_.jpg"
+        },
+        "channel": 2,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-02 13:31:41"
+      },
+      {
+        "asin": "B0DM5X6TSW",
+        "product_name": "DOLOPL Lunch Box for Men, Tactical Insulated Expandable Lunch Box for Men/Women, 16L Large Leakproof Waterproof Women Lunch Bag With Adjustable Shoulder Strap for Outdoor, Picnic, Office, Grey",
+        "category": "Kitchen",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$29.99",
+          "original_price": "$29.99",
+          "price_after_promo_only": "$14.99",
+          "price_after_coupon_only": "$29.99",
+          "estimated_combined_price": "$14.99"
+        },
+        "promo": {
+          "code": "SQHW9EFF",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/A2WVOI73P889QC",
+          "start_date": "2026-07-05",
+          "start_hour": "22:48:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 50,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0DM5X6TSW",
+          "affiliate": "https://www.amazon.com/dp/B0DM5X6TSW?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=SQHW9EFF",
+          "image": "https://m.media-amazon.com/images/I/41plMXPjgCL._SL500_.jpg"
+        },
+        "channel": 3,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-02 12:14:26"
+      },
+      {
+        "asin": "B0H2V8131H",
+        "product_name": "GTPLAYER Big and Tall Office Chair with Pocket Spring Cushion & Ergonomic Lumbar Support for Lower Back Pain Relief, High Back Computer Gaming Chair with Foot Rest, Soft Velvet Fabric, Black",
+        "category": "Furniture",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$148.49",
+          "original_price": "$164.99",
+          "price_after_promo_only": "$89.09",
+          "price_after_coupon_only": "$148.49",
+          "estimated_combined_price": "$89.09"
+        },
+        "promo": {
+          "code": "6ME88EEP",
+          "discount_pct": 40,
+          "promo_url": "https://www.amazon.com/promocode/A5U1X5Y88KCZ6",
+          "start_date": "2026-07-06",
+          "start_hour": "04:43:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 40,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0H2V8131H",
+          "affiliate": "https://www.amazon.com/dp/B0H2V8131H?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=6ME88EEP",
+          "image": "https://m.media-amazon.com/images/I/51LKGOJIELL._SL500_.jpg"
+        },
+        "channel": 2,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-01 23:43:36"
+      },
+      {
+        "asin": "B0H5QNSV4Z",
+        "product_name": "GTPLAYER Executive Office Chair Big and Tall Leather Gaming Chair with Pocket Spring Cushion & Ergonomic Lumbar Support for Lower Back Pain Relief, Comfy Desk Chair with Footrest, Matte-Black",
+        "category": "Furniture",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$148.49",
+          "original_price": "$164.99",
+          "price_after_promo_only": "$89.09",
+          "price_after_coupon_only": "$148.49",
+          "estimated_combined_price": "$89.09"
+        },
+        "promo": {
+          "code": "8MSI8TGA",
+          "discount_pct": 40,
+          "promo_url": "https://www.amazon.com/promocode/A24ZDCR6FTA19Z",
+          "start_date": "2026-07-05",
+          "start_hour": "05:20:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 40,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0H5QNSV4Z",
+          "affiliate": "https://www.amazon.com/dp/B0H5QNSV4Z?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=8MSI8TGA",
+          "image": "https://m.media-amazon.com/images/I/51k9OKAQPXL._SL500_.jpg"
+        },
+        "channel": 3,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-01 22:33:16"
+      },
+      {
+        "asin": "B0FWR8HDBL",
+        "product_name": "COMHOMA Big and Tall Office Chair Heavy Duty Gaming Chair with Deluxe Embossing Leather High Back Wider Ergonomic Computer Chair with Foot Rest 150°Reclining Pocket Spring Lumbar Support",
+        "category": "Furniture",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$179.96",
+          "original_price": "$229.99",
+          "price_after_promo_only": "$107.98",
+          "price_after_coupon_only": "$179.96",
+          "estimated_combined_price": "$107.98"
+        },
+        "promo": {
+          "code": "PMJG7Z5A",
+          "discount_pct": 40,
+          "promo_url": "https://www.amazon.com/promocode/AM4IW0I1CM151",
+          "start_date": "2026-07-05",
+          "start_hour": "08:04:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 40,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0FWR8HDBL",
+          "affiliate": "https://www.amazon.com/dp/B0FWR8HDBL?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=PMJG7Z5A",
+          "image": "https://m.media-amazon.com/images/I/51H6iNUViUL._SL500_.jpg"
+        },
+        "channel": 1,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-01 22:20:30"
+      },
+      {
+        "asin": "B0H2V9VNG5",
+        "product_name": "GTPLAYER Big and Tall Office Chair with Pocket Spring Cushion & Ergonomic Lumbar Support for Lower Back Pain Relief, High Back Computer Gaming Chair with Foot Rest, Comfy Teddy Fleece, White",
+        "category": "Furniture",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$148.49",
+          "original_price": "$164.99",
+          "price_after_promo_only": "$89.09",
+          "price_after_coupon_only": "$148.49",
+          "estimated_combined_price": "$89.09"
+        },
+        "promo": {
+          "code": "8MSI8TGA",
+          "discount_pct": 40,
+          "promo_url": "https://www.amazon.com/promocode/A24ZDCR6FTA19Z",
+          "start_date": "2026-07-05",
+          "start_hour": "10:11:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 40,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0H2V9VNG5",
+          "affiliate": "https://www.amazon.com/dp/B0H2V9VNG5?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=8MSI8TGA",
+          "image": "https://m.media-amazon.com/images/I/51Cipw6a1yL._SL500_.jpg"
+        },
+        "channel": 2,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-07-01 22:18:17"
+      },
+      {
+        "asin": "B0DQY3T8WZ",
+        "product_name": "Artkey Metallic Chalk Markers Set - 8 Pack with Reversible Tips (Chisel & Bullet) for Chalkboards, Windows, Glass & More - Vibrant Colors for Art & Craft Projects",
+        "category": "Home",
+        "has_both_discounts": false,
+        "has_coupon": false,
+        "pricing": {
+          "listed_price": "$7.99",
+          "original_price": "$7.99",
+          "price_after_promo_only": "$4.00",
+          "price_after_coupon_only": "$7.99",
+          "estimated_combined_price": "$4.00"
+        },
+        "promo": {
+          "code": "WN6NJWQJ",
+          "discount_pct": 50,
+          "promo_url": "https://www.amazon.com/promocode/A2T2U6SKIO8I7G",
+          "start_date": "2026-05-24",
+          "start_hour": "02:35:00"
+        },
+        "coupon": {
+          "raw": null,
+          "type": null,
+          "value": null
+        },
+        "total_discount_pct": 50,
+        "urls": {
+          "product": "https://www.amazon.com/dp/B0DQY3T8WZ",
+          "affiliate": "https://www.amazon.com/dp/B0DQY3T8WZ?tag=danielstanits-20&linkCode=ogi&th=1&psc=1&k=WN6NJWQJ",
+          "image": "https://m.media-amazon.com/images/I/417G-U0yB8L._SL500_.jpg"
+        },
+        "channel": 1,
+        "offer": {
+          "merchant": "Amazon.com",
+          "buy_box_winner": true,
+          "condition": "New"
+        },
+        "posted_at": "2026-05-24 05:35:58"
+      }
+    ]
+  }
+}

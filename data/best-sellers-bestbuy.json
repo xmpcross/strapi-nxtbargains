@@ -1,0 +1,152 @@
+{
+  "marketplace": "bestbuy",
+  "store": "Best Buy",
+  "query": "best sellers",
+  "capturedAt": "2026-07-09T00:37:46.728Z",
+  "items": [
+    {
+      "rank": 1,
+      "id": "catalogid:1209094430150901082,productid:13785085255552410175,gpcid:14627155168275085036,headlineOfferDocid:14504683732053710759,rds:PC_14627155168275085036|PROD_PC_14627155168275085036,imageDocid:12084412558911083679,mid:576462498302775998,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "Insignia Class F50 Series LED 4K UHD Smart Fire TV",
+      "price": "$179.99",
+      "priceValue": 179.99,
+      "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRMb8akrQDXANAYcWaF3qF52VT03YHCuRTD10L_MCTu0OKtnCmyTGd7FDrxko7kuW2okCPVVT5i1xyVYKDAm7Mw9BmyD_vb0ZUovsw6pWk9Yj8rHWRHeRdc",
+      "rating": 4.6,
+      "ratingCount": 89,
+      "url": "https://geni.us/qalJ4M5"
+    },
+    {
+      "rank": 2,
+      "id": "catalogid:1812099730167334648,productid:8836212597553470410,gpcid:13608742210378093836,headlineOfferDocid:3362160740688963031,rds:PC_13608742210378093836|PROD_PC_13608742210378093836,imageDocid:10289415403779407335,mid:576462875805788830,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "Toshiba C350 Series 4K UHD Smart Fire TV",
+      "price": "$129.99",
+      "priceValue": 129.99,
+      "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRlitJFlkVdTC8M7G0zkYeL02nby1yU2pRjEXPCjTZZxfdoE8tRM0_wPInPtp5s3NGVvLZBLWs9KE7ZyE365u5jQXnN8RWyz45lBQG9ZsTAm8jB9mJDkKH2EA",
+      "rating": 4.6,
+      "ratingCount": 24,
+      "url": "https://geni.us/mOtW9L"
+    },
+    {
+      "rank": 3,
+      "id": "catalogid:8339800509399402493,productid:12157069273656958773,gpcid:16045017672837206632,headlineOfferDocid:789311332345699625,rds:PC_16045017672837206632|PROD_PC_16045017672837206632,imageDocid:4107502249026671203,mid:576462517564703285,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "Samsung Class Crystal UHD U7900F 4K Smart TV",
+      "price": "$329.99",
+      "priceValue": 329.99,
+      "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTTx0KuY_ayJQScEYA_iQHbuJcVOPbMCqPttWph_jScHLR-JHlhnb3LceoUXorzrNekmo-yolXtkfZEPb7hDWPc6Jo4LwLKVw6k1vgBwCHw72jfv3uJ9Ft_lQ",
+      "rating": 4.4,
+      "ratingCount": 15,
+      "url": "https://geni.us/yytS2"
+    },
+    {
+      "rank": 4,
+      "id": "catalogid:1162483734985481855,productid:1682543984926353568,gpcid:14529428270945995527,headlineOfferDocid:13792484332125467894,rds:PC_14529428270945995527|PROD_PC_14529428270945995527,imageDocid:3001686378819890956,mid:576462892633431227,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "Apple iPhone 17 256GB",
+      "price": "$23.05",
+      "priceValue": 23.05,
+      "image": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQWxOYipa-tPBNzEDD-xRvP-He5uNkNFkJGynK2SVhulrUhyN5kM3yynKsCICGKb7B-ARfkvpCCMMoMg-vLachgvB0uSbZNBfPITBzE-6c",
+      "rating": 4.6,
+      "ratingCount": 18,
+      "url": "https://geni.us/wycd2"
+    },
+    {
+      "rank": 5,
+      "id": "catalogid:4527358743927429455,productid:16528714789465710184,gpcid:291618688189881138,headlineOfferDocid:10751521727549990368,rds:PC_291618688189881138|PROD_PC_291618688189881138,imageDocid:18088867204309216705,mid:576462867516851515,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "Pioneer Class LED 4K UHD Smart Roku TV",
+      "price": "$149.99",
+      "priceValue": 149.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQqOVOrkgjici4ilHS_dU6YI1HHLd5o9_jEzSd8q1jUcj_SdoehOH1zMg8f0OK9qx_m0dopfsB1lj0o1IQStlu9FVsi-jAqYtmrJrEUE8rDQ6ClOdbeZJx7",
+      "rating": 4.7,
+      "ratingCount": 15,
+      "url": "https://geni.us/WE7cEtH"
+    },
+    {
+      "rank": 6,
+      "id": "catalogid:10536022693905475039,productid:3082395016316747004,gpcid:4867250886722056820,headlineOfferDocid:15551804716521969352,rds:PC_4867250886722056820|PROD_PC_4867250886722056820,imageDocid:6583468860866954469,mid:,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "Apple iPhone 17 Pro Max",
+      "price": "$1,199.99",
+      "priceValue": 1199.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSWtoLvSfLi8L-CW86sIJo0QLBAeQmGxQyHXAqIWru3UtyjqsZnGGhqj-oJ0KHYK1rVstGr7RBBrUnL7iGrhAOGGC2rlrui",
+      "rating": 4.4,
+      "ratingCount": 18,
+      "url": "https://geni.us/1rKDSE4"
+    },
+    {
+      "rank": 7,
+      "id": "catalogid:15278221209569290603,productid:14765687599961774219,gpcid:12572330305588470027,headlineOfferDocid:15645027084626779894,rds:PC_12572330305588470027|PROD_PC_12572330305588470027,imageDocid:3932667329130279850,mid:,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "HP Chromebook 14\" HD Intel Celeron N4500",
+      "price": "$199.00",
+      "priceValue": 199,
+      "image": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSgCDl_YuNMSIKP67QRf3wXpuaj8aRFL7qG4RP_nX7Mnmz3ti9NcTjLA_nYFwYlX7zVkIW7M9skp11ZZEgo5v4LyqwsJ2f8voxnlECoWxqK",
+      "rating": 4.5,
+      "ratingCount": 14,
+      "url": "https://geni.us/Hj4t"
+    },
+    {
+      "rank": 8,
+      "id": "catalogid:13131270424901590914,productid:14716026413805903270,gpcid:7828364965549902649,headlineOfferDocid:8695180017599035811,rds:PC_7828364965549902649|PROD_PC_7828364965549902649,imageDocid:8035044480791440837,mid:576462801467792102,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "Beats Studio Pro Wireless Headphones",
+      "price": "$229.99",
+      "priceValue": 229.99,
+      "image": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRVuR_-tSqO2mKiai3m4SzlppMIF9FbR_cIkPluApN43CJxNjFi2oe--ovcyG0DULzrSmx7lAqG3q9pB-ggyy5F4eetM1GGG3wy7X5GL2E",
+      "rating": 4.6,
+      "ratingCount": 19,
+      "url": "https://geni.us/BpjD8S"
+    },
+    {
+      "rank": 9,
+      "id": "catalogid:14520563747025560929,productid:12127214619677266336,gpcid:17044330197485801810,headlineOfferDocid:4154117983160223825,rds:PC_17044330197485801810|PROD_PC_17044330197485801810,imageDocid:3486424320182624689,mid:576462433642184478,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "LG 27 Cu. ft Stainless Steel Smart Counter Depth French Door Refrigerator",
+      "price": "$1,549.99",
+      "priceValue": 1549.99,
+      "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTdLGB0WUF2-y-tKbKzgTjBX-JnU1mhytS1XV44jMRWjd4FRjFj6WqpejZl3ZAMTYnURIEjN23xWSz_0yajjyI6TUoWUBL9ZE_Wq_85-zALPQnUoVH3HH9z",
+      "rating": 4.3,
+      "ratingCount": 39,
+      "url": "https://geni.us/nQuaY"
+    },
+    {
+      "rank": 10,
+      "id": "catalogid:860377455694156972,productid:18062534913739454646,gpcid:2606709028318419748,headlineOfferDocid:5032073663697248984,rds:PC_2606709028318419748|PROD_PC_2606709028318419748,imageDocid:12574715189746037337,mid:576462823135977205,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "Garmin Vivoactive 6",
+      "price": "$299.99",
+      "priceValue": 299.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcS1pj5TCK381MjyQOFLBMhQpUCUDetJ_-MlvqwDoS18F5dM__4j3GINpXBCEFZIL2yWzDFQCHUkTDN_6okOyj-FbcgUU5RZEDlsAx-4ZKD02tIdW5kjy1DYQA",
+      "rating": 4.6,
+      "ratingCount": 21,
+      "url": "https://geni.us/MbXtiuW"
+    },
+    {
+      "rank": 11,
+      "id": "catalogid:2327420681279440941,productid:15969768374614330185,gpcid:11148109670601210252,headlineOfferDocid:12276862239405079768,rds:PC_11148109670601210252|PROD_PC_11148109670601210252,imageDocid:894601340348870736,mid:,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "Apple AirPods Pro 3 True Wireless earbuds",
+      "price": "$249.99",
+      "priceValue": 249.99,
+      "image": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcS-_Aono-HkK3jwrfwyHKp1-p1643jrfPf09MyE0B84hLOe3G8HVQWbFE3iYjMKq96slNM-Kk1XG_3V3LiJ_0GWcF1-0cl63nCzn4PoGJXZ",
+      "rating": 4.7,
+      "ratingCount": 11,
+      "url": "https://geni.us/16guFJO"
+    },
+    {
+      "rank": 12,
+      "id": "catalogid:18229686314060382515,productid:7078198559453301982,gpcid:6528394562471746666,headlineOfferDocid:9902526379315291767,rds:PC_6528394562471746666|PROD_PC_6528394562471746666,imageDocid:15292591038229432031,mid:,pvt:hg,pvf:",
+      "marketplace": "bestbuy",
+      "title": "Shark Navigator Lift-Away Deluxe Upright Vacuum Cleaner",
+      "price": "$189.99",
+      "priceValue": 189.99,
+      "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSbWhouW5WZ3zHksxWlOXB5AGj9z7dySjB2DjSI7bee62oSDHpVnez4snkLGnsQizIwAtAMv82Se78nB5pboo63zjVgBI5fNdzdFxhT9mbIcnumkUYUKupT",
+      "rating": 4.4,
+      "ratingCount": 16,
+      "url": "https://geni.us/MkbM5"
+    }
+  ]
+}

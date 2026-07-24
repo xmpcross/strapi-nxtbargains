@@ -1,0 +1,152 @@
+{
+  "marketplace": "target",
+  "store": "Target",
+  "query": "electronics deals",
+  "capturedAt": "2026-07-09T01:31:57.560Z",
+  "items": [
+    {
+      "rank": 1,
+      "id": "catalogid:3909888949331802702,productid:12784395585373544530,gpcid:9007289106248278047,headlineOfferDocid:17011904039546148017,rds:PC_9007289106248278047|PROD_PC_9007289106248278047,imageDocid:13614979005709728819,mid:,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "Samsung 32\" HD Smart TV",
+      "price": "$99.99",
+      "priceValue": 99.99,
+      "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcR0EftoD1trTEsiLCRF_AYh5M5VbmEZtxQFGMBZDXDO2sgfRhRVM9vVjD8JS664-xh9BuH1IGPqFaONpCgDV0LS4b6TCirCaA",
+      "rating": 4.5,
+      "ratingCount": 47,
+      "url": "https://geni.us/HmYOwTX"
+    },
+    {
+      "rank": 2,
+      "id": "catalogid:3987504213791919966,productid:3134675063824059667,gpcid:8048874279160943732,headlineOfferDocid:15755596483639653864,rds:PC_8048874279160943732|PROD_PC_8048874279160943732,imageDocid:8588974742721112263,mid:,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "Amazon Fire TV Stick 4K Select",
+      "price": "$21.99",
+      "priceValue": 21.99,
+      "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTLXYu1QNAsA2rUWcPR9GCzCfmWDVg2S5ZKQilOE3UBNXjH2oZ1onkUUHA_VBFoMtkjItmvZzIg00YA8OJc67rriyeodWZ0lg",
+      "rating": 4.2,
+      "ratingCount": 693,
+      "url": "https://geni.us/r9pm"
+    },
+    {
+      "rank": 3,
+      "id": "catalogid:5559221840640268221,productid:10571733872428403881,gpcid:10214943891238840871,headlineOfferDocid:2642481393837114308,rds:PC_10214943891238840871|PROD_PC_10214943891238840871,imageDocid:13200415470399067588,mid:576462879459057931,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "Keurig K-Mini Go Single-Serve K-Cup Pod Coffee Maker",
+      "price": "$49.99",
+      "priceValue": 49.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRWFoF3_kQV_evwAnb6kSWbGECFSp87Oi70uhmwwgjqW5v8GXbMB7wprbHDjS9GtvVwcYewz4LOvHG8-qDaJx7_ICzOFrQC",
+      "rating": 3.6,
+      "ratingCount": 895,
+      "url": "https://geni.us/24DcJA"
+    },
+    {
+      "rank": 4,
+      "id": "catalogid:12630813208103689443,productid:16104261299413058360,gpcid:15369761795198054277,headlineOfferDocid:2602712016289957467,rds:PC_15369761795198054277|PROD_PC_15369761795198054277,imageDocid:14071340222623478461,mid:576462759217436039,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "Gourmia 6-Qt Digital Window Air Fryer",
+      "price": "$39.99",
+      "priceValue": 39.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRtrOyOV9FZ_8XFeYLadpEkCgngjbLptIC2z9uwTgus1fOzzbC5NnZxL1F0iKEWVXg_q3jEBpwXdG-i-BfNcaXUsMAIRmB_aA",
+      "rating": 3.8,
+      "ratingCount": 937,
+      "url": "https://geni.us/A8Zn92u"
+    },
+    {
+      "rank": 5,
+      "id": "catalogid:4383758018466594197,productid:12545096649680233523,gpcid:392338834705389687,headlineOfferDocid:1171334340204960801,rds:PC_392338834705389687|PROD_PC_392338834705389687,imageDocid:14827506865137136517,mid:576462859073282170,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "Anker Soundcore Space One Pro Wireless Headphones",
+      "price": "$139.99",
+      "priceValue": 139.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ79GRm7Am_0NzsHvK6Difc129lbbMSZy4Suk3vc1-9nUvognhSmuOx-rgJTBoPrktEOCZ3r_nX-1kZET7iYcN9_Kz9b-Mx",
+      "rating": 4.7,
+      "ratingCount": 529,
+      "url": "https://geni.us/Mwod"
+    },
+    {
+      "rank": 6,
+      "id": "catalogid:4391620370375097002,productid:8162357016874470812,gpcid:14748751143132650264,headlineOfferDocid:13856695385406613814,rds:PC_14748751143132650264|PROD_PC_14748751143132650264,imageDocid:12017788281640433133,mid:576462491044940589,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "TP-Link Archer BE6500 Wi-Fi 7 Dual-Band Router",
+      "price": "$129.99",
+      "priceValue": 129.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSudzJepuMwPuEbvFAq2pFQ8djTcY-8PZmemgIXNSGNj1f1HRzeO0PlDq8IlZg-YxSYHmq9rt805Tiu38i05--0idrFMvcGSA",
+      "rating": 4.6,
+      "ratingCount": 338,
+      "url": "https://geni.us/YwHuC1y"
+    },
+    {
+      "rank": 7,
+      "id": "catalogid:2634111315296121992,productid:6922023246335817332,gpcid:3073773341464519089,headlineOfferDocid:16637034753793025244,rds:PC_3073773341464519089|PROD_PC_3073773341464519089,imageDocid:4070553534140400315,mid:576462854773552842,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "Beats Solo 4 On-Ear Wireless Headphones",
+      "price": "$149.99",
+      "priceValue": 149.99,
+      "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcShWxxBb3ySC-hOMZZmD1EgRNaLmBK4T-21e05QFuuSKM3lfyXmipHDhKAUrmfOahhEjja_wTyOGrQGj-FVYyS2jrq-I0PjMQ",
+      "rating": 4.5,
+      "ratingCount": 12,
+      "url": "https://geni.us/iPmMC"
+    },
+    {
+      "rank": 8,
+      "id": "catalogid:16150509841546001457,productid:12138170152105664661,gpcid:17437267780462079695,headlineOfferDocid:7030515367306553249,rds:PC_17437267780462079695|PROD_PC_17437267780462079695,imageDocid:15461497878925871125,mid:,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "Epson WorkForce Pro WF-3820 Wireless Inkjet All-in-One Color Printer",
+      "price": "$99.99",
+      "priceValue": 99.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcT5MaDQxUt7trdfi_wXdx0kfyysvPvFF-AtZLcRSR2R-OiZ_6r6OScAUYQHkk1AJWwU_QtfWjCZ8HX0hAZvxA6i_Wwh_bUL6Q",
+      "rating": 4.1,
+      "ratingCount": 36,
+      "url": "https://geni.us/F2736"
+    },
+    {
+      "rank": 9,
+      "id": "catalogid:2583203268761036702,productid:5120790537924650407,gpcid:2786756917538688235,headlineOfferDocid:5148952067814683768,rds:PC_2786756917538688235|PROD_PC_2786756917538688235,imageDocid:15207157515713434896,mid:576462810940943431,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "Hamilton Beach Programmable Coffee Maker",
+      "price": "$19.99",
+      "priceValue": 19.99,
+      "image": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQMceUoEAFaKW7u6ImHv6kSJg8oei-BUn7H-wPQ7VoSrlGrxnXJ2qRCButFFdtMtGNqUc6F1YwE9yQNbHBZLiAFaE1glwSkEhZtvwuC-VxEkaJi79ISCnIdGw",
+      "rating": 3.9,
+      "ratingCount": 13,
+      "url": "https://geni.us/JKs9fD5"
+    },
+    {
+      "rank": 10,
+      "id": "catalogid:4434647701447465928,productid:6632814453471051997,gpcid:560293065643465382,headlineOfferDocid:8680324676156041590,rds:PC_560293065643465382|PROD_PC_560293065643465382,imageDocid:2403418474974229572,mid:,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "HP Chromebook 14\" Intel Celeron N4500",
+      "price": "$199.99",
+      "priceValue": 199.99,
+      "image": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQNFo8jPbrhN5qapNJCbfdLiXAWr1OD1mHm9pUHL2nxs9fo4rIzJv0Ioz0UGSGIfjqBC7odBnHEUc3PbJkibSnAXbuEz_5D",
+      "rating": 4.6,
+      "ratingCount": 5,
+      "url": "https://geni.us/J44hg"
+    },
+    {
+      "rank": 11,
+      "id": "catalogid:9623823286616088924,productid:4218710478962919210,gpcid:16548702103807154582,headlineOfferDocid:2446073514932072200,rds:PC_16548702103807154582|PROD_PC_16548702103807154582,imageDocid:727121041379572976,mid:576462830111629077,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "Soundcore Boom 3i Portable Rugged Outdoor Speaker",
+      "price": "$94.99",
+      "priceValue": 94.99,
+      "image": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRl_Uw6s8VccxNV1-0NR6IaE4yGG49P3oRlogvb6LXsGmXq7qdlXLyOQHwXR5q7F4UInHtPkvedBRUwKeoe7hc3pe71XF7l",
+      "rating": 4.8,
+      "ratingCount": 322,
+      "url": "https://geni.us/obQp5O"
+    },
+    {
+      "rank": 12,
+      "id": "catalogid:16320722965961628868,productid:6183662335419549101,gpcid:12469297981818165768,headlineOfferDocid:12557531443067866185,rds:PC_12469297981818165768|PROD_PC_12469297981818165768,imageDocid:11825677135910486593,mid:576462891240128294,pvt:hg,pvf:",
+      "marketplace": "target",
+      "title": "Midea Microwave Oven",
+      "price": "$79.99",
+      "priceValue": 79.99,
+      "image": "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTPURM7KRSS2v1XbpFOdyl2OLycp8C7BqT97ljUcss32sp8MSlzbUN0vMB5jwrD_Ay1BjDa8WZsstMagi-FMKFapU7GDmGI",
+      "rating": 4.4,
+      "ratingCount": 15,
+      "url": "https://geni.us/xYmhNZ"
+    }
+  ]
+}

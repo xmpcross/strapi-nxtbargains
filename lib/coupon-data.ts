@@ -173,7 +173,13 @@ function loadGeniusCache() {
 
 export function flushGeniusCache() {
   if (!geniusDirty || !geniusCache) return;
-  writeFileSync(GENIUSLINK_CACHE_FILE, JSON.stringify(geniusCache, null, 2));
+  try {
+    // Read-only filesystems (e.g. Netlify/serverless functions) can't persist
+    // the cache — that's fine, it just stays in-memory for this instance.
+    writeFileSync(GENIUSLINK_CACHE_FILE, JSON.stringify(geniusCache, null, 2));
+  } catch {
+    // ignore — no disk persistence available
+  }
   geniusDirty = false;
 }
 
