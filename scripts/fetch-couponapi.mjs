@@ -34,7 +34,11 @@ for (const line of (existsSync(join(ROOT, '.env.local')) ? readFileSync(join(ROO
 const arg = (k, d) => process.argv.find((a) => a.startsWith(`--${k}=`))?.split('=')[1] ?? d;
 const DRY = process.argv.includes('--dry');
 const INCREMENTAL = process.argv.includes('--incremental');
-const LIMIT = parseInt(arg('limit', '1000'), 10);
+const LIMIT = parseInt(arg('limit', '5000'), 10);
+// --all (or COUPONAPI_MERCHANTS=all) keeps every store that passes the US-location
+// filter, instead of only the target-merchant list. Amazon stays excluded.
+const ALL_MERCHANTS =
+  process.argv.includes('--all') || (process.env.COUPONAPI_MERCHANTS || '').trim().toLowerCase() === 'all';
 
 const KEY = process.env.COUPONAPI_KEY;
 const BASE = (process.env.COUPONAPI_BASE_URL || 'https://couponapi.org/api').replace(/\/$/, '');
@@ -64,7 +68,9 @@ function isTargetLocation(r) {
   const arr = (Array.isArray(raw) ? raw : [raw]).map((x) => String(x).toUpperCase());
   if (arr.length) return arr.includes(LOCATION);
   const pl = String(r.primary_location || '').toLowerCase();
-  if (pl) return pl.includes('united states');
+  // Keep US plus multi-region offers (e.g. "multi country", worldwide/global),
+  // which are available to US shoppers. Only drop explicitly single non-US regions.
+  if (pl) return pl.includes('united states') || pl.includes('multi') || pl.includes('worldwide') || pl.includes('global');
   return true;
 }
 
@@ -136,7 +142,7 @@ async function fetchFeed() {
 }
 
 async function main() {
-  console.log(`CouponAPI.org sync (${INCREMENTAL ? 'incremental' : 'full'}${DRY ? ', DRY' : ''}) · targets: ${TARGETS.join(', ')}`);
+  console.log(`CouponAPI.org sync (${INCREMENTAL ? 'incremental' : 'full'}${DRY ? ', DRY' : ''}) · ${ALL_MERCHANTS ? 'ALL US stores' : `targets: ${TARGETS.join(', ')}`}`);
   let raw;
   try {
     raw = await fetchFeed();
@@ -149,14 +155,14 @@ async function main() {
 
   const coupons = raw
     .filter((r) => isTargetLocation(r))
-    .filter((r) => matchesTarget(first(r, ['store', 'merchant', 'store_name']) || '', first(r, ['url', 'aff_url', 'store_url']) || ''))
+    .filter((r) => ALL_MERCHANTS || matchesTarget(first(r, ['store', 'merchant', 'store_name']) || '', first(r, ['url', 'aff_url', 'store_url']) || ''))
     .map(mapCoupon)
     // Amazon stays on Amazon Associates + GeniusLink (CJ "amazon" data is junk).
     .filter((c) => c.store && c.title && c.storeSlug !== 'amazon')
     .slice(0, LIMIT);
 
   const byStore = coupons.reduce((m, c) => (m[c.store] = (m[c.store] || 0) + 1, m), {});
-  console.log(`${coupons.length} coupon(s) for target merchants:`, byStore);
+  console.log(`${coupons.length} coupon(s) across ${Object.keys(byStore).length} store(s):`, byStore);
 
   if (DRY) {
     console.log(JSON.stringify(coupons.slice(0, 5), null, 2));
