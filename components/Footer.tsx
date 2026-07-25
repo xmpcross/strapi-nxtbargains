@@ -87,7 +87,7 @@ export default function Footer() {
             </div>
 
             <div className="mt-6">
-              <div className="mb-1.5 text-xs font-bold uppercase tracking-wide text-primary">Tips &amp; partnerships</div>
+              <div className="mb-3 text-xs font-bold uppercase tracking-wide text-primary">Tips &amp; partnerships</div>
               <Link href="/contact" className="border-b border-primary/50 pb-px text-[20px] font-medium text-white transition hover:text-primary">
                 hello@nxt.bargains
               </Link>
