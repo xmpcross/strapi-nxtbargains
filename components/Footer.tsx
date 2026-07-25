@@ -34,6 +34,7 @@ const aboutLinks = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About Us' },
   { href: '/coupons', label: 'Coupons' },
+  { href: '/coupons/popular-brands', label: 'Popular Brands' },
   { href: '/price-drops', label: 'Price Drops' },
   { href: '/best-deals', label: 'Best Deals' },
   { href: '/sitemap', label: 'Site Map' },

@@ -52,6 +52,7 @@ function buildNav(blogCategories: Array<{ slug: string; name: string }>): NavIte
     href: '/coupons',
     label: 'Coupons',
     children: [
+      { href: '/coupons/popular-brands', label: 'Popular Brands' },
       { href: '/stores', label: 'Stores' },
       { href: '/brands', label: 'Brands' },
     ],
