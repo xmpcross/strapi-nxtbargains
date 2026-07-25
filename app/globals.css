@@ -1852,25 +1852,25 @@ article[data-testid^="post-"] .post-content th[scope] {
    The global footer is dark (#1d252c). On /best-sellers we recolor it for a
    light background: #f5f6fa footer, #ebedf5 copyright bar, and the white text /
    links / logo flipped to dark equivalents so everything stays readable. */
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] {
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] {
   background: #f5f6fa;
   color: rgb(29 37 44 / 0.72);
 }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .bg-black {
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .bg-black {
   background: #ebedf5 !important;
 }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .text-white { color: #1d252c; }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .text-white\/85 { color: rgb(29 37 44 / 0.85); }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .text-white\/80 { color: rgb(29 37 44 / 0.82); }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .text-white\/70 { color: rgb(29 37 44 / 0.72); }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .text-white\/65 { color: rgb(29 37 44 / 0.66); }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .text-white\/60 { color: rgb(29 37 44 / 0.62); }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .text-white\/55 { color: rgb(29 37 44 / 0.6); }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .text-white\/45 { color: rgb(29 37 44 / 0.5); }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .hover\:text-white:hover { color: #1d252c; }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .border-white\/\[0\.13\] { border-color: rgb(29 37 44 / 0.12); }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .border-white\/10 { border-color: rgb(29 37 44 / 0.14); }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] .bg-white\/\[0\.07\] { background: rgb(29 37 44 / 0.05); }
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] [data-testid="social-links"] a { color: rgb(29 37 44 / 0.7); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white { color: #1d252c; }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/85 { color: rgb(29 37 44 / 0.85); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/80 { color: rgb(29 37 44 / 0.82); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/70 { color: rgb(29 37 44 / 0.72); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/65 { color: rgb(29 37 44 / 0.66); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/60 { color: rgb(29 37 44 / 0.62); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/55 { color: rgb(29 37 44 / 0.6); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/45 { color: rgb(29 37 44 / 0.5); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .hover\:text-white:hover { color: #1d252c; }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .border-white\/\[0\.13\] { border-color: rgb(29 37 44 / 0.12); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .border-white\/10 { border-color: rgb(29 37 44 / 0.14); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .bg-white\/\[0\.07\] { background: rgb(29 37 44 / 0.05); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] [data-testid="social-links"] a { color: rgb(29 37 44 / 0.7); }
 /* light footer logo (the SVG is a light/white variant) → render dark so it shows */
-body:has([data-testid="best-sellers-index-page"]) footer[data-testid="site-footer"] img[alt="NXT.Bargains"] { filter: brightness(0) opacity(0.85); }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="NXT.Bargains"] { filter: brightness(0) opacity(0.85); }

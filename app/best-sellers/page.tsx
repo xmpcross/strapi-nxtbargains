@@ -23,7 +23,7 @@ export default function BestSellersIndexPage() {
   const totalProducts = groups.reduce((sum, group) => sum + group.items.length, 0);
 
   return (
-    <main data-testid="best-sellers-index-page">
+    <main data-page="best-sellers" data-testid="best-sellers-index-page">
       {/* Hero — matches the /products header */}
       <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white" data-testid="best-sellers-page-header">
         <div
