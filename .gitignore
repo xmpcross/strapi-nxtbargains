@@ -21,3 +21,4 @@ next-env.d.ts.bak
 !/data/amazon-coupons.json
 !/data/impact-links.json
 data/getpromo-usage.json
+data/openwebninja-usage.json
