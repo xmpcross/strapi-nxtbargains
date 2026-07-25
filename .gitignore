@@ -12,7 +12,7 @@ next-env.d.ts.bak
 # geniuslink-cache.json stays ignored (~18MB, degrades gracefully without it).
 !/data/coupon-stores.json
 !/data/coupon-store-coupons.json
-!/data/coupons-couponapi.json
+!/data/coupons-getpromo.json
 !/data/high-intent-coupon-stores.json
 !/data/best-sellers*.json
 !/data/best-deals-realtime.json
