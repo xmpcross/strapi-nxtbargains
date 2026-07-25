@@ -68,12 +68,12 @@ export default function Footer() {
                 className="h-10 w-auto"
               />
             </Link>
-            <p className="mb-5 max-w-sm text-sm leading-6 text-white/70">
+            <p className="mb-5 max-w-sm text-[16px] leading-6 text-white/70">
               Compare one product across the major marketplaces, track its price history,
               and buy at the lowest price. Never pay full price again.
             </p>
 
-            <div className="mb-5 flex gap-2" data-testid="social-links">
+            <div className="mt-6 mb-6 flex gap-2" data-testid="social-links">
               <SocialLink href={SITE.social?.facebook ?? 'https://www.facebook.com/nxtbargains'} label="Facebook">
                 <path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v6h3v-6h2.5l.5-3H14V9.5c0-.3.2-.5.5-.5z" />
               </SocialLink>
@@ -86,9 +86,9 @@ export default function Footer() {
               </SocialLink>
             </div>
 
-            <div>
+            <div className="mt-6">
               <div className="mb-1.5 text-xs font-bold uppercase tracking-wide text-primary">Tips &amp; partnerships</div>
-              <Link href="/contact" className="border-b border-primary/50 pb-px text-sm font-medium text-white transition hover:text-primary">
+              <Link href="/contact" className="border-b border-primary/50 pb-px text-[20px] font-medium text-white transition hover:text-primary">
                 hello@nxt.bargains
               </Link>
             </div>
@@ -96,7 +96,7 @@ export default function Footer() {
 
           <FooterColumn title="About" links={aboutLinks} className="footer-about-column" />
           <FooterColumn title="All Articles" links={FOOTER_ARTICLE_NAV_LINKS} className="footer-articles-column" />
-          <FooterColumn title="Product Categories" links={shopLinks} className="footer-shop-column" />
+          <FooterColumn title="Products" links={shopLinks} className="footer-shop-column" />
         </div>
 
         {/* comparing prices across */}
