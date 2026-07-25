@@ -228,10 +228,13 @@ export default async function CouponsPage() {
             ))}
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/coupons/popular-brands" className="inline-flex bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
+              Popular brands
+            </Link>
             <Link href="/brands" className="inline-flex border border-ink/15 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition hover:border-primary hover:text-primary">
               Browse brands
             </Link>
-            <Link href="/stores" className="inline-flex bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
+            <Link href="/stores" className="inline-flex border border-ink/15 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition hover:border-primary hover:text-primary">
               All stores
             </Link>
           </div>

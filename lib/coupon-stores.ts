@@ -246,3 +246,44 @@ function domainFromUrl(url: string) {
   }
 }
 
+
+/**
+ * Most popular brands, ranked by number of active coupons (from the get-promo
+ * feed). Cleans domain-style names, drops non-EN raw domains, and only returns
+ * brands that have a live /coupons/{slug} page.
+ */
+export function listPopularBrands(limit = 48): Array<{ name: string; slug: string; logo: string; count: number; country: string }> {
+  const counts = new Map<string, number>();
+  try {
+    const path = join(process.cwd(), 'data', 'coupons-getpromo.json');
+    if (existsSync(path)) {
+      const items = (JSON.parse(readFileSync(path, 'utf8')).items ?? []) as Array<{ store?: string }>;
+      for (const c of items) {
+        const key = (c.store ?? '').toLowerCase().trim();
+        if (key) counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+
+  const cleanName = (n: string) =>
+    n
+      .replace(/&amp;/g, '&')
+      .replace(/\.(com|co\.uk|co|net|org|us|shop|store|io)$/i, '')
+      .trim()
+      .replace(/\b([a-z])/g, (m) => m.toUpperCase());
+
+  return listCouponStores()
+    .stores.map((store) => ({ store, count: counts.get((store.name ?? '').toLowerCase().trim()) ?? 0 }))
+    .filter((r) => r.count > 0 && !/\.(de|fr|es|it|nl|pl)$/i.test(r.store.name))
+    .sort((a, b) => b.count - a.count || a.store.name.localeCompare(b.store.name))
+    .slice(0, limit)
+    .map((r) => ({
+      name: cleanName(r.store.name),
+      slug: couponStorePublicSlug(r.store),
+      logo: storeLogoUrl(r.store),
+      count: r.count,
+      country: r.store.country || '',
+    }));
+}
