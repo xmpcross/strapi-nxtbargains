@@ -102,7 +102,7 @@ export default function BestSellersIndexPage() {
       </section>
 
       {/* Marketplace sections — products listed under each merchant */}
-      <section id="marketplaces" className="bg-[#f0f2f4] py-10 sm:py-14">
+      <section id="marketplaces" className="bg-white py-10 sm:py-14">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           {groups.length === 0 ? (
             <div className="border border-ink/10 bg-white p-8">

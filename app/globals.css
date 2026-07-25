@@ -1874,3 +1874,6 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .bg-white
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] [data-testid="social-links"] a { color: rgb(29 37 44 / 0.7); }
 /* light footer logo (the SVG is a light/white variant) → render dark so it shows */
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="NXT.Bargains"] { filter: brightness(0) opacity(0.85); }
+
+/* Best-sellers pages (index + merchant): uniform h2 size */
+[data-page="best-sellers"] h2 { font-size: 1.5rem !important; }

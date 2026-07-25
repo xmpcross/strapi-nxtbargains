@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import BestSellerCard from '@/components/BestSellerCard';
+import BestSellerCategoryTabs from '@/components/BestSellerCategoryTabs';
 import {
   BEST_SELLER_MARKETPLACES,
   getBestSellerMarketplace,
@@ -113,7 +114,7 @@ export default async function MarketplaceBestSellersPage({ params }: { params: P
       </section>
 
       {/* Content */}
-      <section id="ranking" className="bg-[#f0f2f4] py-10 sm:py-12">
+      <section id="ranking" className="bg-white py-10 sm:py-12">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           {/* marketplace switcher */}
           <div className="border border-ink/10 bg-white p-4 sm:p-5">
@@ -136,22 +137,6 @@ export default async function MarketplaceBestSellersPage({ params }: { params: P
             </nav>
           </div>
 
-          {/* category jump nav (Amazon) */}
-          {showCategoryGroups && (
-            <nav className="mt-4 flex flex-wrap gap-2" aria-label={`${marketplace.label} categories`}>
-              {categoryGroups.map((group) => (
-                <a
-                  key={group.key}
-                  href={`#best-sellers-${marketplace.key}-${group.key}`}
-                  className="inline-flex border border-ink/10 bg-white px-3 py-1.5 text-xs font-bold text-ink/65 transition hover:border-primary hover:text-primary"
-                >
-                  {group.label}
-                  <span className="ml-1.5 text-ink/35">{group.items.length}</span>
-                </a>
-              ))}
-            </nav>
-          )}
-
           {items.length === 0 ? (
             <div className="mt-6 border border-ink/10 bg-white p-8">
               <h2 className="font-display text-2xl font-bold text-ink">No {marketplace.label} best sellers cached yet</h2>
@@ -160,29 +145,17 @@ export default async function MarketplaceBestSellersPage({ params }: { params: P
               </p>
             </div>
           ) : showCategoryGroups ? (
-            <div className="mt-6 space-y-10">
-              {categoryGroups.map((group) => (
-                <section
-                  key={group.key}
-                  id={`best-sellers-${marketplace.key}-${group.key}`}
-                  aria-labelledby={`heading-${marketplace.key}-${group.key}`}
-                  className="scroll-mt-24"
-                >
-                  <div className="flex flex-wrap items-end justify-between gap-3 border border-ink/10 bg-white p-5 sm:p-6">
-                    <div>
-                      <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">{group.items.length} products</p>
-                      <h2 id={`heading-${marketplace.key}-${group.key}`} className="mt-2 font-display text-2xl font-bold text-ink sm:text-3xl">
-                        {group.label}
-                      </h2>
-                    </div>
-                  </div>
-                  <div className="mt-5 grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
-                    {group.items.map((item) => (
-                      <BestSellerCard key={`${group.key}-${item.marketplace}-${item.asin || item.id || item.rank}`} item={item} />
-                    ))}
-                  </div>
-                </section>
-              ))}
+            <div className="mt-6">
+              <div className="flex flex-wrap items-end justify-between gap-3 border border-ink/10 bg-white p-5 sm:p-6">
+                <div>
+                  <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">{items.length} products ranked</p>
+                  <h2 className="mt-2 font-display text-2xl font-bold text-ink sm:text-3xl">Top {marketplace.label} products</h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/55">Pick a category to see its top-ranked products.</p>
+                </div>
+              </div>
+              <div className="mt-5">
+                <BestSellerCategoryTabs groups={categoryGroups} />
+              </div>
             </div>
           ) : (
             <div className="mt-6">
