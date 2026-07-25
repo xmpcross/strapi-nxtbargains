@@ -1880,3 +1880,14 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 
 /* Best-sellers pages: green rank badges (bg-ink override) */
 [data-page="best-sellers"] .bg-ink { background-color: #318000 !important; }
+
+/* best-sellers-articles: product title promoted to <h1> but kept at h4 size */
+.post-content > :where(h1.post-title-h1) {
+  font-family: theme('fontFamily.display');
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: theme('colors.ink');
+}

@@ -207,7 +207,14 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     .filter((f) => f.question && f.answer);
   const faqLd = faqs.length >= 2 ? faqJsonLd(faqs) : null;
 
-  const postContent = await enrichPostCarouselHtml(post.content);
+  const isBestSellersArticle = category === 'best-sellers-articles' || cat?.slug === 'best-sellers-articles';
+  let postContent = await enrichPostCarouselHtml(post.content);
+  // best-sellers-articles: promote the first body heading (the product title) to
+  // a semantic <h1> while keeping the h4 size (.post-title-h1), and drop the
+  // redundant screen-reader h1 below so there's a single visible h1.
+  if (isBestSellersArticle) {
+    postContent = postContent.replace(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/i, '<h1 class="post-title-h1">$2</h1>');
+  }
 
   return (
     <article
@@ -241,7 +248,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
       </section>
 
       <div className="mx-auto max-w-7xl px-6">
-        <h1 className="sr-only">{post.title}</h1>
+        {!isBestSellersArticle && <h1 className="sr-only">{post.title}</h1>}
 
         <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
           <div className="w-full" data-testid="post-body">
