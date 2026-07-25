@@ -168,6 +168,43 @@ featured/indexable), not a pure cache.
 categories, and coupon stores that actually have content); thin coupon-store
 pages are `noindex`. `/sitemap` is a human-facing, filterable index.
 
+### AI crawler policy
+
+`robots.txt` is **version-controlled** in `app/robots.txt/route.ts` — that route
+handler is the single source of truth. We deliberately split AI crawlers into
+two classes and treat them differently:
+
+- **Training crawlers → `Disallow: /`** — we do not permit our original review /
+  comparison content to be scraped for training or fine-tuning AI models.
+  Blocked: `GPTBot`, `Google-Extended`, `Applebot-Extended`, `ClaudeBot`,
+  `CCBot`, `Bytespider`, `Amazonbot`, `meta-externalagent`, `cohere-ai`,
+  `Diffbot`, `Omgilibot`, `Timpibot`.
+- **Answer / search crawlers → explicitly `Allow: /`** — these drive citations
+  and referral traffic in generative search, which is worth real visibility for
+  a deals site, with no content-protection downside. Allowed:
+  `OAI-SearchBot`, `ChatGPT-User`, `PerplexityBot`, `Perplexity-User`,
+  `Claude-SearchBot`, `Claude-User`, `Applebot`. (Conventional `Googlebot` /
+  `Bingbot` are covered by the default `*` group.)
+
+The `*` group carries `Content-Signal: search=yes,ai-train=no,use=reference` (a
+Cloudflare content-signals / EU DSM Directive Art. 4 reservation of rights) and
+keeps `Disallow: /search` + `Disallow: /api/` plus the `Sitemap:` directive. The
+same two disallows are repeated on each explicitly-allowed answer bot, because a
+crawler that matches its own `User-agent` group ignores the `*` group.
+
+> ⚠️ **Cloudflare "Managed robots.txt / Block AI bots" must stay OFF.** That
+> feature *prepends* Cloudflare's own AI-bot block to whatever the origin serves.
+> If it is re-enabled, the served `robots.txt` ends up with duplicate/conflicting
+> groups and `app/robots.txt/route.ts` is no longer authoritative. It was ON
+> previously (the served file showed a `# BEGIN Cloudflare Managed content`
+> block); it must be **disabled in the Cloudflare dashboard** (AI Audit → bot
+> controls / Managed robots.txt) so this repo governs crawl policy. Verify with
+> `curl -s https://nxt.bargains/robots.txt` — there should be **no**
+> `Cloudflare Managed content` block.
+
+To change the policy, edit the `ANSWER_BOTS` / `TRAINING_BOTS` lists in
+`app/robots.txt/route.ts` and redeploy.
+
 ---
 
 ## 7. Environment variables
