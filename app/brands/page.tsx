@@ -310,7 +310,7 @@ export default async function BrandsPage({
               <div className="mt-8 space-y-10">
                 {groupedByCategory.map((group) => (
                   <div key={group.name}>
-                    <h3 className="font-display text-lg font-bold text-ink">{group.name}</h3>
+                    <h3 className="font-display !text-[1rem] font-bold text-ink">{group.name}</h3>
                     <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                       {group.brands.map((row) => (
                         <BrandCard key={row.store.id} row={row} featured={row.priority <= 1} />
@@ -393,7 +393,7 @@ function SectionHead({ eyebrow, title, subtitle }: { eyebrow: string; title: str
   return (
     <div className="max-w-2xl">
       <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">{eyebrow}</p>
-      <h2 className="mt-2 font-display font-bold text-ink">{title}</h2>
+      <h2 className="mt-2 font-display !text-[1.3rem] font-bold text-ink">{title}</h2>
       {subtitle && <p className="mt-3 text-sm leading-7 text-ink/60 sm:text-base">{subtitle}</p>}
     </div>
   );
