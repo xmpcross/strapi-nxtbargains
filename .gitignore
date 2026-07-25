@@ -20,3 +20,4 @@ next-env.d.ts.bak
 !/data/promo_code.json
 !/data/amazon-coupons.json
 !/data/impact-links.json
+data/getpromo-usage.json

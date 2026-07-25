@@ -68,34 +68,54 @@ const domainFromUrl = (u) => { try { return new URL(u).hostname.replace(/^www\./
 const recordsFrom = (body) =>
   Array.isArray(body) ? body : (body?.data || body?.coupons || body?.result || body?.offers || []);
 
-// get-promo-codes record → shared nxt-coupon shape. Field names are matched
-// loosely; run --dry once and tweak if the live payload differs.
-function mapCoupon(r) {
-  const store = String(
-    first(r, ['store', 'store_name', 'merchant', 'merchant_name', 'shop', 'brand']) ||
-      domainFromUrl(first(r, ['url', 'store_url', 'link'])),
-  ).trim();
-  const title = String(first(r, ['title', 'description', 'coupon_title', 'offer', 'name', 'product_title'])).trim();
-  if (!store || !title) return null;
+// Store directory (id -> { name, domain, url }) so coupons get clean store names
+// instead of raw domains. get-coupons records only carry `store_id`.
+function loadStoreIndex() {
+  const map = new Map();
+  try {
+    const d = JSON.parse(readFileSync(join(ROOT, 'data', 'coupon-stores.json'), 'utf8'));
+    const arr = d.stores || d.items || (Array.isArray(d) ? d : []);
+    for (const s of arr) map.set(Number(s.id), s);
+  } catch {}
+  return map;
+}
+
+// Pull a human discount snippet out of the coupon title/description.
+function extractDiscount(text) {
+  const m = String(text || '').match(/(\d{1,3}%\s*off|\$\s?\d[\d.,]*\s*off|free shipping|bogo|buy one[, ]+get one)/i);
+  return m ? m[1].replace(/\s+/g, ' ').trim() : '';
+}
+
+// get-promo-codes record → shared nxt-coupon shape.
+function mapCoupon(r, storeIndex) {
+  const status = String(r.status || '').toLowerCase();
+  if (status && status !== 'active') return null;
+
+  const title = String(first(r, ['title', 'description', 'coupon_title', 'offer', 'name'])).trim();
+  if (!title) return null;
+
+  const url = first(r, ['url', 'affiliate_url', 'tracking_url', 'deeplink', 'store_url', 'link']);
+  const st = storeIndex.get(Number(r.store_id));
+  const store = String((st?.name && String(st.name).trim()) || domainFromUrl(url) || (r.store_id ? `Store ${r.store_id}` : '')).trim();
+  if (!store) return null;
 
   const code = first(r, ['code', 'coupon_code', 'promo_code', 'discount_code']) || null;
-  const href = first(r, ['affiliate_url', 'affiliateUrl', 'tracking_url', 'deeplink', 'url', 'store_url', 'link']);
-  const type = String(first(r, ['type', 'offer_type']) || '').toLowerCase();
   return {
     externalId: `getpromo:${first(r, ['id', 'coupon_id', 'offer_id']) || `${slugify(store)}:${code || slugify(title)}`}`,
     source: 'rapidapi:get-promo-codes',
+    storeId: r.store_id != null ? Number(r.store_id) : undefined,
     store,
     storeSlug: slugify(store),
     title,
     code: code || undefined,
-    discount: first(r, ['discount', 'discount_text', 'value', 'savings', 'percent_off']) || (code ? 'Promo code' : ''),
-    category: first(r, ['category', 'category_name', 'type']) || `${store} coupons`,
-    couponType: code ? 'Promo code' : /sale|deal/.test(type) ? 'Sale' : 'Coupon',
-    affiliateUrl: href || undefined,
+    discount: extractDiscount(title) || (code ? 'Promo code' : ''),
+    category: `${store} coupons`,
+    couponType: code ? 'Promo code' : 'Sale',
+    affiliateUrl: url || undefined,
     featured: false,
     isBrand: true,
     verifiedLabel: 'Verified',
-    expiresAt: first(r, ['expires', 'expiry', 'end_date', 'expire_date']) || null,
+    expiresAt: first(r, ['end_time', 'end_date', 'expiry', 'expire_date']) || null,
   };
 }
 
@@ -120,6 +140,7 @@ async function main() {
     return;
   }
 
+  const storeIndex = loadStoreIndex();
   const seen = new Set();
   const coupons = [];
   let used = 0;
@@ -133,7 +154,7 @@ async function main() {
       console.error(e.message);
       break;
     }
-    const rows = recordsFrom(body).map(mapCoupon).filter(Boolean);
+    const rows = recordsFrom(body).map((r) => mapCoupon(r, storeIndex)).filter(Boolean);
     if (rows.length === 0) { console.log(`page ${page}: empty — end of feed.`); break; }
     for (const c of rows) {
       if (seen.has(c.externalId)) continue;
