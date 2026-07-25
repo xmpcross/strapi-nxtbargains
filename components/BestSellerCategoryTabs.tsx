@@ -52,18 +52,23 @@ export default function BestSellerCategoryTabs({ groups }: { groups: BestSellerC
         </div>
       </div>
 
-      {groups.map((group) => (
-        <div
-          key={group.key}
-          role="tabpanel"
-          hidden={group.key !== active}
-          className="mt-6 grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4"
-        >
-          {group.items.map((item) => (
-            <BestSellerCard key={`${group.key}-${item.marketplace}-${item.asin || item.id || item.rank}`} item={item} />
-          ))}
-        </div>
-      ))}
+      {groups.map((group) => {
+        const selected = group.key === active;
+        // NB: use the `hidden` utility class (not the HTML `hidden` attribute) —
+        // the attribute's display:none is overridden by `.grid { display:grid }`.
+        return (
+          <div
+            key={group.key}
+            role="tabpanel"
+            aria-hidden={!selected}
+            className={selected ? 'mt-6 grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4' : 'hidden'}
+          >
+            {group.items.map((item) => (
+              <BestSellerCard key={`${group.key}-${item.marketplace}-${item.asin || item.id || item.rank}`} item={item} />
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
