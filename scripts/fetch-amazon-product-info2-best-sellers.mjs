@@ -43,6 +43,8 @@ const CATEGORY_CONFIG = [
   { key: 'smartwatches', label: 'Smartwatches', query: 'amazon best sellers smartwatches' },
   { key: 'headphones', label: 'Headphones', query: 'amazon best sellers headphones earbuds' },
   { key: 'smart-tvs', label: 'Smart TVs', query: 'amazon best sellers smart tvs' },
+  { key: 'smart-home', label: 'Smart Home', query: 'amazon best sellers smart home devices' },
+  { key: 'smart-electronics', label: 'Smart Electronics', query: 'amazon best sellers smart electronics gadgets' },
 ];
 
 if (!KEY) {
