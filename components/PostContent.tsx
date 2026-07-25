@@ -75,6 +75,34 @@ export default function PostContent({ html }: { html: string }) {
       cleanups.push(() => window.clearInterval(interval));
     });
 
+    // Make comparison/spec tables snippet-eligible + responsive: fill in missing
+    // scope attributes (col on the header row, row on each row's first <th>) and
+    // wrap wide tables so they scroll horizontally instead of overflowing.
+    root.querySelectorAll<HTMLTableElement>('table').forEach((table) => {
+      if (table.dataset.enhanced) return;
+      table.dataset.enhanced = 'true';
+
+      const headRow = table.tHead?.rows[0] ?? table.rows[0];
+      headRow?.querySelectorAll('th').forEach((th) => {
+        if (!th.getAttribute('scope')) th.setAttribute('scope', 'col');
+      });
+      Array.from(table.tBodies).forEach((tb) => {
+        Array.from(tb.rows).forEach((row) => {
+          const first = row.cells[0];
+          if (first && first.tagName === 'TH' && !first.getAttribute('scope')) {
+            first.setAttribute('scope', 'row');
+          }
+        });
+      });
+
+      if (!table.closest('.post-table-wrap')) {
+        const wrap = document.createElement('div');
+        wrap.className = 'post-table-wrap';
+        table.parentNode?.insertBefore(wrap, table);
+        wrap.appendChild(table);
+      }
+    });
+
     return () => cleanups.forEach((fn) => fn());
   }, [body, shouldRenderMarkdown]);
 

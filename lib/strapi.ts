@@ -79,6 +79,9 @@ export type NxtPost = {
   slug: string;
   excerpt?: string;
   content: string;
+  /** Optional editor-authored TL;DR / key takeaways (markdown or HTML), shown
+   *  as a callout at the top of comparisons, reviews and guides. */
+  keyTakeaways?: string;
   postType?: NxtPostType;
   amazonAffiliateTag?: string;
   priceComparisonEnabled?: boolean;

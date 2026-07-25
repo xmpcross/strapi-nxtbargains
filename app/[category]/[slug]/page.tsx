@@ -9,6 +9,7 @@ import { breadcrumbJsonLd } from '@/lib/jsonld';
 import { enrichPostCarouselHtml } from '@/lib/enrich-post-carousel';
 import { clampDescription, firstImageUrl, fmtDate, parseHowToSteps, primaryCategorySlug, postPath, stripHtml, warnSeoLength } from '@/lib/format';
 import PostContent from '@/components/PostContent';
+import { KeyTakeaways } from '@/components/KeyTakeaways';
 import PostPriceComparison from '@/components/PostPriceComparison';
 import CommentForm from '@/components/CommentForm';
 import ProductCarousel from '@/components/ProductCarousel';
@@ -285,6 +286,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
         <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
           <div className="w-full" data-testid="post-body">
+            <KeyTakeaways content={post.keyTakeaways} />
             <PostContent html={postContent} />
 
             {stepsAreAuthored && useHowTo ? (
