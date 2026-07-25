@@ -68,8 +68,8 @@ export default async function CouponStorePage({
       <section className="mx-auto max-w-[1366px] px-6 py-8">
         {coupons.length === 0 ? (
           <div className="border border-ink/10 bg-white p-6">
-            <p className="font-semibold text-ink">No live coupons returned for this store right now.</p>
-            <p className="mt-2 text-sm text-ink/60">The store exists in RapidAPI, but its current coupon endpoint is empty.</p>
+            <p className="font-semibold text-ink">No coupons for this store right now.</p>
+            <p className="mt-2 text-sm text-ink/60">This store is in our directory, but has no coupons cached at the moment.</p>
           </div>
         ) : (
           <div>

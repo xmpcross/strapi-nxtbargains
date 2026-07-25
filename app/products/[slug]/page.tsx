@@ -168,7 +168,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
   const image = productImageUrl(product);
   const brand = product.brandRef?.name ?? product.brand;
 
-  // Live multi-store offers (scripts/fetch-live-offers.mjs → data/live-offers.json).
+  // Multi-store offers from the data/live-offers.json cache (static snapshot).
   // Only show when the match is confident (2+ stores), so we never display a
   // mis-matched single offer. Links are already GeniusLink-wrapped at fetch time.
   let liveOffers: LiveOffer[] = [];

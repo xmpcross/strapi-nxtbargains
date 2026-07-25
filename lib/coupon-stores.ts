@@ -246,39 +246,3 @@ function domainFromUrl(url: string) {
   }
 }
 
-export async function searchCouponStoresRemote(keyword: string, page = 1): Promise<CouponStoreCache> {
-  const host = process.env.RAPIDAPI_PROMO_CODES_HOST || 'get-promo-codes.p.rapidapi.com';
-  const key = process.env.RAPIDAPI_KEY;
-  if (!key || !keyword.trim()) return { stores: [] };
-
-  const res = await fetch(
-    `https://${host}/data/get-stores/?page=${page}&keyword=${encodeURIComponent(keyword.trim())}`,
-    {
-      headers: {
-        'x-rapidapi-host': host,
-        'x-rapidapi-key': key,
-      },
-      next: { revalidate: 86400 },
-    },
-  );
-  if (!res.ok) return { stores: [] };
-  const json = await res.json();
-  const stores = (Array.isArray(json?.data) ? json.data : [])
-    .map((record: Record<string, unknown>) => ({
-      id: Number(record.store_id ?? record.id),
-      name: String(record.store_name ?? record.name ?? '').trim(),
-      url: String(record.url ?? '').trim(),
-      domain: String(record.domain ?? '').trim(),
-      logo: String(record.logo ?? '').trim(),
-      country: String(record.country ?? '').trim(),
-    }))
-    .filter((store: CouponStore) => store.id && store.name);
-
-  return {
-    source: 'rapidapi:get-promo-codes:keyword',
-    total: Number(json?.total ?? stores.length),
-    pageSize: 100,
-    pagesFetched: page,
-    stores,
-  };
-}

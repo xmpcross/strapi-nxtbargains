@@ -5,7 +5,6 @@ import type { ReactNode } from 'react';
 import {
   countryName,
   listCouponStores,
-  searchCouponStoresRemote,
   storeCategory,
   storeLogoUrl,
   storeSearchText,
@@ -15,7 +14,7 @@ export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: 'Private Coupon Store Research',
-  description: 'Private RapidAPI coupon-store research directory.',
+  description: 'Private coupon-store research directory.',
   robots: { index: false, follow: false },
 };
 
@@ -48,10 +47,7 @@ export default async function CouponStoresPage({
     code,
     count: cache.stores.filter((store) => letterOf(store.name) === code).length,
   }));
-  const cachePageCount = cache.total && cache.pageSize ? Math.ceil(cache.total / cache.pageSize) : 0;
-  const cacheIncomplete = cachePageCount > 0 && (cache.pagesFetched ?? 0) < cachePageCount;
-  const remote = q && (cache.stores.length === 0 || cacheIncomplete) ? await searchCouponStoresRemote(q, page) : null;
-  const sourceStores = remote?.stores.length ? remote.stores : cache.stores;
+  const sourceStores = cache.stores;
   const filtered = sourceStores.filter((store) => {
     if (q && !storeSearchText(store).includes(q)) return false;
     if (country && store.country !== country) return false;
@@ -74,11 +70,10 @@ export default async function CouponStoresPage({
       <section className="border-b border-ink/10 bg-white">
         <div className="mx-auto max-w-[1366px] px-6 py-10">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Private research</p>
-          <h1 className="mt-4 font-display !text-[2rem] font-bold text-ink">RapidAPI Coupon Store Directory</h1>
+          <h1 className="mt-4 font-display !text-[2rem] font-bold text-ink">Coupon Store Directory</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/60">
-            Search the cached RapidAPI store list. {cache.total ? `${cache.total.toLocaleString()} stores reported` : 'No total reported'}
+            Search the cached store list. {cache.total ? `${cache.total.toLocaleString()} stores reported` : 'No total reported'}
             {cache.capturedAt ? `, last fetched ${new Date(cache.capturedAt).toLocaleString('en-US')}` : ''}.
-            {remote ? ' This result is from live keyword search because the full cache is not available yet.' : ''}
           </p>
 
           <form action="/coupons/stores" className="mt-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_190px_150px_auto]">
@@ -208,9 +203,9 @@ export default async function CouponStoresPage({
 
         {sourceStores.length === 0 ? (
           <div className="border border-ink/10 bg-white p-6">
-            <p className="font-semibold text-ink">No RapidAPI store cache found yet.</p>
+            <p className="font-semibold text-ink">No coupon stores in the cache yet.</p>
             <p className="mt-2 text-sm text-ink/60">
-              Run <code>node scripts/fetch-coupon-stores.mjs</code> to populate it, or search by keyword above for a live API lookup.
+              The store directory is served from a local cache (<code>data/coupon-stores.json</code>). Adjust your search filters above, or check back later.
             </p>
           </div>
         ) : (

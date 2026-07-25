@@ -119,38 +119,11 @@ const FALLBACK_RETAILERS: Retailer[] = [
   { name: 'HP', label: 'HP coupon codes', href: '/coupons/hp' },
 ];
 
-const PROMO_HOST = process.env.RAPIDAPI_PROMO_CODES_HOST || 'get-promo-codes.p.rapidapi.com';
-const PROMO_COUPONS_PATH = process.env.RAPIDAPI_PROMO_CODES_PATH || '/data/get-coupons/?page=1&sort=update_time_desc';
-const PROMO_STORES_PATH = process.env.RAPIDAPI_PROMO_STORES_PATH || '/data/get-stores/?page=1';
-const POPULAR_BRANDS = (process.env.RAPIDAPI_POPULAR_COUPON_BRANDS || 'amazon,ebay,walmart,newegg')
-  .split(',')
-  .map((brand) => brand.trim())
-  .filter(Boolean);
-
-// Kill-switch for live coupon API traffic. When COUPONS_API_PAUSED=true, all
-// RapidAPI coupon/store/brand fetches are skipped and pages fall back to the
-// cached/local coupon data (data/*.json). Set to false (or remove) to resume.
-const COUPONS_API_PAUSED = process.env.COUPONS_API_PAUSED === 'true';
-
-async function fetchRapidApi(host: string, path: string): Promise<unknown | null> {
-  if (COUPONS_API_PAUSED) return null;
-  const key = process.env.RAPIDAPI_KEY;
-  if (!key) return null;
-
-  try {
-    const res = await fetch(`https://${host}${path}`, {
-      headers: {
-        'x-rapidapi-host': host,
-        'x-rapidapi-key': key,
-      },
-      next: { revalidate: COUPON_REVALIDATE_SECONDS },
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
+// NOTE: The live RapidAPI "get-promo-codes" coupon/store/brand feed has been
+// removed (that subscription is no longer active). Coupons now come from the CMS
+// (Strapi nxt-coupon) and the local feed caches — CouponAPI.org / Feedico /
+// AWIN / TradeDoubler — written by the scripts/ fetchers. See README
+// "Coupon source priority".
 
 let geniusCache: Record<string, string> | null = null;
 let geniusDirty = false;
@@ -431,105 +404,6 @@ function retailerFromCoupon(coupon: Coupon): Retailer {
   };
 }
 
-function brandScore(record: ApiRecord, brand: string) {
-  const normalizedBrand = brand.toLowerCase().replace(/[^a-z0-9]/g, '');
-  const storeName = (textField(record, ['store_name', 'storeName', 'name']) || '').toLowerCase();
-  const domain = (textField(record, ['domain', 'url']) || '').toLowerCase();
-  const normalizedName = storeName.replace(/[^a-z0-9]/g, '');
-  const normalizedDomain = domain.replace(/[^a-z0-9]/g, '');
-
-  if (normalizedName === normalizedBrand) return 0;
-  if (normalizedDomain.startsWith(normalizedBrand)) return 1;
-  if (normalizedName.includes(normalizedBrand)) return 2;
-  if (normalizedDomain.includes(normalizedBrand)) return 3;
-  return 4;
-}
-
-async function fetchBrandGroup(brand: string): Promise<CouponBrandGroup | null> {
-  const storeData = await fetchRapidApi(PROMO_HOST, `/data/get-stores/?page=1&keyword=${encodeURIComponent(brand)}`);
-  const storeRecords = recordsFrom(storeData).sort((a, b) => brandScore(a, brand) - brandScore(b, brand));
-  let bestGroup: CouponBrandGroup | null = null;
-  let bestCouponCount = 0;
-
-  for (const storeRecord of storeRecords.slice(0, 8)) {
-    const storeId = textField(storeRecord, ['store_id', 'storeId', 'id']);
-    const store = retailerFromRecord(storeRecord);
-    if (!storeId || !store) continue;
-
-    const couponData = await fetchRapidApi(
-      PROMO_HOST,
-      `/data/get-coupons/?page=1&sort=update_time_desc&store_id=${encodeURIComponent(storeId)}`,
-    );
-    const storesById = new Map<string, Retailer>([[storeId, store]]);
-    const seen = new Set<string>();
-    const coupons = recordsFrom(couponData)
-      .map((record) => couponFromRecord(record, 'promo', storesById))
-      .filter((coupon): coupon is Coupon => coupon !== null)
-      .filter((coupon) => {
-        const key = `${coupon.store}|${coupon.code ?? ''}|${coupon.title}`.toLowerCase();
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-
-    if (coupons.length > bestCouponCount) {
-      bestCouponCount = coupons.length;
-      bestGroup = { store, coupons: await geniusWrapCoupons(coupons.slice(0, 4)) };
-    }
-  }
-
-  return bestGroup;
-}
-
-async function listBrandCouponGroups(): Promise<CouponBrandGroup[]> {
-  const groups = await Promise.all(POPULAR_BRANDS.map(fetchBrandGroup));
-  return groups.filter((group): group is CouponBrandGroup => group !== null).slice(0, 8);
-}
-
-async function fetchCouponApiData(): Promise<{ coupons: Coupon[]; retailers: Retailer[]; brandGroups: CouponBrandGroup[] }> {
-  const [promo, promoStores, brandGroups] = await Promise.all([
-    fetchRapidApi(PROMO_HOST, PROMO_COUPONS_PATH),
-    fetchRapidApi(PROMO_HOST, PROMO_STORES_PATH),
-    listBrandCouponGroups(),
-  ]);
-
-  const promoStoreRecords = recordsFrom(promoStores);
-  const storesById = new Map<string, Retailer>();
-  promoStoreRecords.forEach((record) => {
-    const id = textField(record, ['store_id', 'storeId', 'id']);
-    const retailer = retailerFromRecord(record);
-    if (id && retailer) storesById.set(id, retailer);
-  });
-
-  const mapped = [
-    ...recordsFrom(promo).map((record) => couponFromRecord(record, 'promo', storesById)),
-  ].filter((coupon): coupon is Coupon => coupon !== null);
-
-  const seen = new Set<string>();
-  const coupons = mapped
-    .filter((coupon) => {
-      const key = `${coupon.store}|${coupon.code ?? ''}|${coupon.title}`.toLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-    .slice(0, 36);
-
-  const retailerSeen = new Set<string>();
-  const retailers = [
-    ...coupons.map(retailerFromCoupon),
-    ...promoStoreRecords.map(retailerFromRecord).filter((retailer): retailer is Retailer => retailer !== null),
-  ]
-    .filter((retailer) => {
-      const key = retailer.name.toLowerCase();
-      if (retailerSeen.has(key)) return false;
-      retailerSeen.add(key);
-      return true;
-    })
-    .slice(0, 12);
-
-  return { coupons: await geniusWrapCoupons(coupons), retailers, brandGroups };
-}
 
 // Map a CMS coupon record to the frontend Coupon shape.
 function couponFromStrapi(c: NxtCoupon): Coupon {
@@ -639,12 +513,11 @@ export async function listCouponPageData(): Promise<{ coupons: Coupon[]; retaile
   const feedico = await buildCouponPageData(readCouponFeedCache(), false);
   if (feedico) return feedico;
 
-  const { coupons, retailers, brandGroups } = await fetchCouponApiData();
-
+  // No CMS/feed coupons available — fall back to the built-in starter set.
   return {
-    coupons: coupons.length > 0 ? coupons : STARTER_COUPONS,
-    retailers: retailers.length > 0 ? retailers : FALLBACK_RETAILERS,
-    brandGroups,
+    coupons: STARTER_COUPONS,
+    retailers: FALLBACK_RETAILERS,
+    brandGroups: [],
   };
 }
 
@@ -670,31 +543,8 @@ export async function listCouponsForStore(
   const cached = readStoreCouponCache(storeId);
   if (cached) return geniusWrapCoupons(cached);
 
-  const storeKey = String(storeId);
-  const couponData = await fetchRapidApi(
-    PROMO_HOST,
-    `/data/get-coupons/?page=1&sort=update_time_desc&store_id=${encodeURIComponent(storeKey)}`,
-  );
-  const storesById = storeName
-    ? new Map<string, Retailer>([[storeKey, {
-      name: storeName,
-      label: `${storeName} coupons`,
-      href: `/coupons/stores/${encodeURIComponent(storeKey)}`,
-    }]])
-    : undefined;
-  const seen = new Set<string>();
-  const coupons = recordsFrom(couponData)
-    .map((record) => couponFromRecord(record, 'promo', storesById))
-    .filter((coupon): coupon is Coupon => coupon !== null)
-    .filter((coupon) => {
-      const key = `${coupon.store}|${coupon.code ?? ''}|${coupon.title}`.toLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-    .slice(0, 48);
-
-  return geniusWrapCoupons(coupons);
+  // No CMS, feed, or cached coupons for this store.
+  return [];
 }
 
 export async function listCoupons(): Promise<Coupon[]> {
