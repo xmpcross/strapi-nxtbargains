@@ -301,21 +301,7 @@ export default async function StoresPage({
               Showing {pageStores.length.toLocaleString()} of {filtered.length.toLocaleString()} stores
               {hasFilters ? ' (filtered)' : ''}
             </p>
-            {pageCount > 1 && (
-              <nav className="flex items-center gap-2 text-sm font-semibold" data-testid="stores-pagination">
-                {safePage > 1 && (
-                  <Link href={pageHref(queryBase, safePage - 1)} className="border border-ink/10 bg-white px-3 py-2 text-primary hover:border-primary">
-                    ← Previous
-                  </Link>
-                )}
-                <span className="text-ink/50">Page {safePage} of {pageCount.toLocaleString()}</span>
-                {safePage < pageCount && (
-                  <Link href={pageHref(queryBase, safePage + 1)} className="border border-ink/10 bg-white px-3 py-2 text-primary hover:border-primary">
-                    Next →
-                  </Link>
-                )}
-              </nav>
-            )}
+            <StorePagination base={queryBase} page={safePage} pageCount={pageCount} />
           </div>
 
           {pageStores.length > 0 ? (
@@ -334,23 +320,9 @@ export default async function StoresPage({
             </div>
           )}
 
-          {pageCount > 1 && (
-            <nav className="mt-10 flex items-center justify-center gap-2 text-sm font-semibold">
-              {safePage > 1 && (
-                <Link href={pageHref(queryBase, safePage - 1)} className="border border-ink/10 bg-white px-4 py-2.5 text-primary hover:border-primary">
-                  ← Previous
-                </Link>
-              )}
-              <span className="rounded-full bg-muted px-4 py-2 text-ink/55">
-                Page {safePage} of {pageCount.toLocaleString()}
-              </span>
-              {safePage < pageCount && (
-                <Link href={pageHref(queryBase, safePage + 1)} className="border border-ink/10 bg-white px-4 py-2.5 text-primary hover:border-primary">
-                  Next →
-                </Link>
-              )}
-            </nav>
-          )}
+          <div className="mt-10">
+            <StorePagination base={queryBase} page={safePage} pageCount={pageCount} />
+          </div>
         </div>
       </section>
 
@@ -546,5 +518,55 @@ function ValueStrip() {
         ))}
       </div>
     </div>
+  );
+}
+
+// Windowed page list: 1 … (n-2 n-1 n n+1 n+2) … last
+function pageWindow(current: number, total: number, span = 2): (number | 'ellipsis')[] {
+  const out: (number | 'ellipsis')[] = [];
+  const start = Math.max(1, current - span);
+  const end = Math.min(total, current + span);
+  if (start > 1) {
+    out.push(1);
+    if (start > 2) out.push('ellipsis');
+  }
+  for (let p = start; p <= end; p++) out.push(p);
+  if (end < total) {
+    if (end < total - 1) out.push('ellipsis');
+    out.push(total);
+  }
+  return out;
+}
+
+function StorePagination({ base, page, pageCount }: { base: URLSearchParams; page: number; pageCount: number }) {
+  if (pageCount <= 1) return null;
+  const box = 'grid h-10 min-w-[2.5rem] place-items-center rounded-md px-3 text-sm font-bold transition';
+  return (
+    <nav className="flex flex-wrap items-center justify-start gap-2" data-testid="stores-pagination" aria-label="Store pages">
+      {page > 1 ? (
+        <Link href={pageHref(base, page - 1)} aria-label="Previous page" className={`${box} border border-ink/15 bg-white text-ink hover:border-primary hover:text-primary`}>
+          ‹
+        </Link>
+      ) : null}
+      {pageWindow(page, pageCount).map((p, i) =>
+        p === 'ellipsis' ? (
+          <span key={`ellipsis-${i}`} className="px-1 text-ink/40">…</span>
+        ) : (
+          <Link
+            key={p}
+            href={pageHref(base, p)}
+            aria-current={p === page ? 'page' : undefined}
+            className={`${box} ${p === page ? 'border-2 border-ink bg-primary text-white' : 'border border-ink/15 bg-white text-ink hover:border-primary hover:text-primary'}`}
+          >
+            {p}
+          </Link>
+        ),
+      )}
+      {page < pageCount ? (
+        <Link href={pageHref(base, page + 1)} aria-label="Next page" className={`${box} border border-ink/15 bg-white text-ink hover:border-primary hover:text-primary`}>
+          ›
+        </Link>
+      ) : null}
+    </nav>
   );
 }

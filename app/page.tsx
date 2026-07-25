@@ -23,9 +23,10 @@ import {
 } from '@/lib/commerce';
 import Hero from '@/components/Hero';
 import MarketplaceBestSellers from '@/components/MarketplaceBestSellers';
+import BestSellerCard from '@/components/BestSellerCard';
 import { listCouponPageData } from '@/lib/coupon-data';
 import HomepageCouponsSection from '@/components/HomepageCouponsSection';
-import { listBestSellerGroups } from '@/lib/best-sellers';
+import { listAmazonNewReleases, listBestSellerGroups } from '@/lib/best-sellers';
 import { productHref } from '@/lib/product-url';
 
 export const revalidate = 60;
@@ -134,6 +135,7 @@ export default async function HomePage() {
 
   // Best Sellers — one daily JSON cache per marketplace (scripts/fetch-*.mjs).
   const bestSellerGroups = listBestSellerGroups({ includeEmpty: true });
+  const newReleases = listAmazonNewReleases();
 
   const guideFeature = posts[0];
   const guideSidebarPosts = pickRandomPosts(posts.slice(1), 6);
@@ -183,6 +185,25 @@ export default async function HomePage() {
               title="Best Sellers"
               intro="The top-ranked products across the major marketplaces, refreshed daily."
             />
+          </div>
+        </section>
+      )}
+
+      {/* ---------- NEW ON AMAZON ---------- */}
+      {newReleases.length > 0 && (
+        <section className="pb-14 sm:pb-[72px]" data-testid="home-new-releases">
+          <div className="mx-auto max-w-[1366px] px-6">
+            <SectionHead
+              eyebrow="Just launched"
+              title="New on Amazon"
+              intro="The newest electronics releases on Amazon, refreshed weekly."
+              cta={{ href: '/best-sellers/amazon', label: 'View all' }}
+            />
+            <div className="mt-6 grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
+              {newReleases.slice(0, 8).map((item) => (
+                <BestSellerCard key={`home-nr-${item.asin || item.rank}`} item={item} />
+              ))}
+            </div>
           </div>
         </section>
       )}

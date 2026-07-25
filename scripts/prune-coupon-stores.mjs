@@ -46,7 +46,12 @@ for (const c of coupons) {
 const allow = storeArray(readJson(dataFile('high-intent-coupon-stores.json'), { stores: [] }));
 const allowIds = new Set(allow.map((s) => Number(s.storeId ?? s.id)).filter((n) => !Number.isNaN(n)));
 
-const kept = master.filter((s) => withCoupons.has(Number(s.id)) || allowIds.has(Number(s.id)));
+// Manually removed / unwanted stores — never keep these regardless of coupons.
+const BLOCKLIST = new Set([737873, 715413, 715564]); // Grüns, Life in Lilac, Noteworthy Scents
+
+const kept = master.filter(
+  (s) => !BLOCKLIST.has(Number(s.id)) && (withCoupons.has(Number(s.id)) || allowIds.has(Number(s.id))),
+);
 
 console.log(`Master: ${master.length} stores`);
 console.log(`Stores with coupons: ${withCoupons.size} · allowlist: ${allowIds.size}`);
