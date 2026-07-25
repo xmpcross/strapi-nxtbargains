@@ -51,6 +51,7 @@ export default function DealProductCard({
           <img
             src={image}
             alt={product.primaryImage?.alternativeText || product.name}
+              loading="lazy"
             className="max-h-40 w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.03]"
           />
         ) : (

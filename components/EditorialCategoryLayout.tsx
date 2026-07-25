@@ -370,7 +370,8 @@ function EditorialSpotlightCard({ post, cardLabel }: { post: NxtPost; cardLabel:
           <img
             src={img}
             alt={post.coverImage?.alternativeText || post.title}
-            className="editorial-spotlight-image aspect-[16/10] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.03]"
+            loading="lazy"
+              className="editorial-spotlight-image aspect-[16/10] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.03]"
           />
         ) : (
           <div className="grid aspect-[16/10] w-full place-items-center bg-[#f3f6fa] font-display text-xl font-bold text-ink/15">
@@ -408,7 +409,8 @@ function EditorialGridCard({ post, cardLabel }: { post: NxtPost; cardLabel: stri
           <img
             src={img}
             alt={post.coverImage?.alternativeText || post.title}
-            className="editorial-grid-image aspect-[4/3] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.02]"
+            loading="lazy"
+              className="editorial-grid-image aspect-[4/3] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.02]"
           />
         ) : (
           <div className="grid aspect-[4/3] w-full place-items-center bg-[#f3f6fa] font-display text-lg font-bold text-ink/15">

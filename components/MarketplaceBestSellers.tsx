@@ -78,7 +78,7 @@ export default function MarketplaceBestSellers({
                 <span className="w-[30px] shrink-0 font-display text-[1.05rem] font-extrabold text-primary">{i + 1}</span>
                 {it.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={it.image} alt="" loading="lazy" referrerPolicy="no-referrer" className="h-[64px] w-[64px] shrink-0 rounded-[9px] object-contain mix-blend-multiply" />
+                  <img src={it.image} alt={it.title} loading="lazy" referrerPolicy="no-referrer" className="h-[64px] w-[64px] shrink-0 rounded-[9px] object-contain mix-blend-multiply" />
                 ) : (
                   <span className="h-[64px] w-[64px] shrink-0 rounded-[9px] bg-muted" />
                 )}

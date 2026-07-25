@@ -35,6 +35,7 @@ export default function PostCard({
             <img
               src={img}
               alt={post.coverImage?.alternativeText || post.title}
+              loading="lazy"
               className="aspect-[16/10] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.02]"
             />
           ) : (
@@ -77,6 +78,7 @@ export default function PostCard({
             <img
               src={img}
               alt={post.coverImage?.alternativeText || post.title}
+              loading="lazy"
               className="aspect-[4/3] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.02]"
             />
           ) : (
@@ -115,6 +117,7 @@ export default function PostCard({
               <img
                 src={img}
                 alt={post.coverImage?.alternativeText || post.title}
+              loading="lazy"
                 className="aspect-square h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-105"
               />
             ) : (
@@ -144,6 +147,7 @@ export default function PostCard({
           <img
             src={img}
             alt={post.coverImage?.alternativeText || post.title}
+              loading="lazy"
             className="aspect-[4/3] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.02]"
           />
         ) : (

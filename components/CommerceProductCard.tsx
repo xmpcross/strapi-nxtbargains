@@ -55,6 +55,7 @@ export default function CommerceProductCard({
           <img
             src={image}
             alt={product.primaryImage?.alternativeText || product.name}
+            loading="lazy"
             className={imageClass}
           />
         ) : (

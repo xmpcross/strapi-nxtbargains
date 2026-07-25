@@ -154,6 +154,7 @@ export default async function HomePage() {
               alt={`${m.name} logo`}
               title={m.name}
               referrerPolicy="no-referrer"
+              loading="lazy"
               className="h-7 w-7 object-contain opacity-75 transition hover:opacity-100"
             />
           ))}
@@ -303,7 +304,7 @@ function OfferComparison({ product }: { product: CommerceProduct }) {
             <span className="font-display text-[0.78rem] font-bold text-ink">{formatMoney(o.price, currency)}</span>
             {o.logo ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={o.logo} alt={o.name} referrerPolicy="no-referrer" className="h-3.5 max-w-[54px] object-contain" />
+              <img src={o.logo} alt={o.name} loading="lazy" referrerPolicy="no-referrer" className="h-3.5 max-w-[54px] object-contain" />
             ) : (
               <span className="line-clamp-1 text-[0.58rem] font-semibold uppercase tracking-wide text-ink/55">{o.name}</span>
             )}
@@ -326,7 +327,7 @@ function DealCard({ deal }: { deal: Deal }) {
         )}
         {deal.image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={deal.image} alt={deal.name} className="price-drop-image uniform-product-image block h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.04]" />
+          <img src={deal.image} alt={deal.name} loading="lazy" className="price-drop-image uniform-product-image block h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.04]" />
         ) : (
           <span className="flex h-full w-full items-center justify-center font-display text-xl font-bold text-ink/25">NXT</span>
         )}
@@ -422,6 +423,7 @@ function GuideFeatureArticle({ post }: { post: NxtPost }) {
           <img
             src={img}
             alt={post.coverImage?.alternativeText || post.title}
+              loading="lazy"
             className="guide-feature-image aspect-[16/11] w-full mix-blend-multiply transition duration-500 group-hover:scale-[1.02]"
           />
         ) : (
@@ -464,6 +466,7 @@ function GuideCompactRow({ post }: { post: NxtPost }) {
             <img
               src={img}
               alt={post.coverImage?.alternativeText || post.title}
+              loading="lazy"
               className="guide-compact-image h-full w-full max-h-full max-w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-105"
             />
           ) : (
@@ -497,7 +500,7 @@ function TrendingCard({ product }: { product: CommerceProduct }) {
       <div className="trending-image-box mb-3.5 grid aspect-square place-items-center overflow-hidden rounded-[11px] bg-white">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={image} alt={product.name} className="trending-image h-full w-full object-contain p-3 mix-blend-multiply transition duration-500 group-hover:scale-[1.04]" />
+          <img src={image} alt={product.name} loading="lazy" className="trending-image h-full w-full object-contain p-3 mix-blend-multiply transition duration-500 group-hover:scale-[1.04]" />
         ) : (
           <span className="font-display text-lg font-bold text-ink/25">NXT</span>
         )}
