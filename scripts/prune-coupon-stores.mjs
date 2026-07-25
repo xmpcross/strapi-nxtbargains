@@ -49,9 +49,40 @@ const allowIds = new Set(allow.map((s) => Number(s.storeId ?? s.id)).filter((n) 
 // Manually removed / unwanted stores — never keep these regardless of coupons.
 const BLOCKLIST = new Set([737873, 715413, 715564]); // Grüns, Life in Lilac, Noteworthy Scents
 
-const kept = master.filter(
-  (s) => !BLOCKLIST.has(Number(s.id)) && (withCoupons.has(Number(s.id)) || allowIds.has(Number(s.id))),
-);
+// Also surface stores from these country + category combos even without US
+// coupons, so the /stores directory lists them. (Mirrors lib/coupon-stores.ts
+// storeCategory.)
+const EXTRA_INCLUDE = [{ country: 'AU', categories: new Set(['Electronics', 'Beauty and Health']) }];
+
+const CATEGORY_RULES = [
+  ['Electronics', /tech|electronic|computer|pc|laptop|phone|mobile|camera|audio|gadget|newegg|samsung|lenovo|dell|hp|apple|microsoft/],
+  ['Fashion', /fashion|clothing|apparel|shoe|sneaker|dress|wear|jacket|watch|style|boutique|nike|adidas/],
+  ['Home and Garden', /home|garden|furniture|decor|mattress|bedding|kitchen|appliance|lighting|dyson|wayfair/],
+  ['Beauty and Health', /beauty|skin|cosmetic|makeup|hair|health|wellness|vitamin|pharmacy|derma|spa/],
+  ['Travel', /travel|hotel|flight|vacation|trip|booking|cruise|airline|luggage|resort/],
+  ['Food and Grocery', /food|grocery|wine|coffee|tea|restaurant|meal|snack|drink|kitchen/],
+  ['Sports and Outdoors', /sport|outdoor|fitness|bike|camp|golf|hiking|run|yoga|gym/],
+  ['Automotive', /auto|car|motor|tire|truck|vehicle|parts|garage/],
+  ['Baby and Kids', /baby|kid|toy|stroller|children|child|nursery/],
+  ['Pets', /pet|dog|cat|aquarium|chewy/],
+  ['Office and Business', /office|business|print|supply|software|saas|hosting|domain/],
+  ['Gaming', /game|gaming|xbox|playstation|nintendo|steam/],
+  ['Jewelry', /jewel|diamond|ring|gold|silver/],
+  ['Finance', /finance|bank|credit|loan|card|money|insurance/],
+  ['Education', /course|learn|school|education|book|training/],
+];
+function storeCategory(s) {
+  const text = `${s.name || ''} ${s.domain || ''} ${s.url || ''}`.toLowerCase();
+  return CATEGORY_RULES.find(([, re]) => re.test(text))?.[0] ?? 'General';
+}
+function inExtraInclude(s) {
+  return EXTRA_INCLUDE.some((rule) => s.country === rule.country && rule.categories.has(storeCategory(s)));
+}
+
+const kept = master.filter((s) => {
+  if (BLOCKLIST.has(Number(s.id))) return false;
+  return withCoupons.has(Number(s.id)) || allowIds.has(Number(s.id)) || inExtraInclude(s);
+});
 
 console.log(`Master: ${master.length} stores`);
 console.log(`Stores with coupons: ${withCoupons.size} · allowlist: ${allowIds.size}`);

@@ -320,9 +320,6 @@ export default async function StoresPage({
             </div>
           )}
 
-          <div className="mt-10">
-            <StorePagination base={queryBase} page={safePage} pageCount={pageCount} />
-          </div>
         </div>
       </section>
 
