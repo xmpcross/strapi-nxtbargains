@@ -12,6 +12,8 @@ import {
   type CouponStore,
 } from '@/lib/coupon-stores';
 import { SITE } from '@/lib/site';
+import { collectionPageJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 
 export const revalidate = 86400;
 
@@ -141,21 +143,16 @@ export default async function StoresPage({
   if (category) queryBase.set('category', category);
   if (letter) queryBase.set('letter', letter);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  const jsonLd = collectionPageJsonLd({
     name: 'Coupon Stores',
     url: `${SITE.url}/stores`,
     description: metadata.description,
     numberOfItems: cache.stores.length,
-  };
+  });
 
   return (
     <div data-testid="stores-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd graph={[jsonLd]} />
 
       <Hero totalStores={cache.stores.length} popularCount={popularStores.length} />
 

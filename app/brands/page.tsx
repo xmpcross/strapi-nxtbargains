@@ -10,7 +10,8 @@ import {
   type CouponStore,
 } from '@/lib/coupon-stores';
 import { SITE } from '@/lib/site';
-import { breadcrumbJsonLd, itemListJsonLd } from '@/lib/jsonld';
+import { breadcrumbJsonLd, collectionPageJsonLd, itemListJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 
 export const revalidate = 86400;
 
@@ -134,14 +135,12 @@ export default async function BrandsPage({
     }))
     .filter((group) => group.brands.length > 0);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  const jsonLd = collectionPageJsonLd({
     name: 'Brands — Coupon Codes & Promo Deals',
     url: `${SITE.url}/brands`,
     description: metadata.description,
     numberOfItems: allBrands.length,
-  };
+  });
 
   const breadcrumbLd = breadcrumbJsonLd([
     { name: 'Home', url: '/' },
@@ -157,20 +156,7 @@ export default async function BrandsPage({
 
   return (
     <div data-testid="brands-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
-      />
-      {itemListLd ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
-        />
-      ) : null}
+      <JsonLd graph={[jsonLd, breadcrumbLd, itemListLd]} />
 
       <Hero brandCount={allBrands.length} featuredCount={featuredBrands.length} />
 

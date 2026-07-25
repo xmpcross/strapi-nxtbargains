@@ -10,6 +10,8 @@ import {
   relatedCouponStores,
   storeLogoUrl,
 } from '@/lib/coupon-stores';
+import { collectionPageJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 
 export const revalidate = 86400;
 
@@ -150,9 +152,7 @@ export default async function AmazonCouponsPage() {
   const featuredCoupons = coupons.filter((c) => c.code).slice(0, 4);
   const highlightCoupons = featuredCoupons.length > 0 ? featuredCoupons : coupons.slice(0, 4);
 
-  const pageJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  const pageJsonLd = collectionPageJsonLd({
     name: 'Amazon Coupons',
     url: `${SITE.url}/coupons/amazon`,
     description: metadata.description,
@@ -164,14 +164,11 @@ export default async function AmazonCouponsPage() {
       url: coupon.href,
       description: coupon.couponText || coupon.code || coupon.discount,
     })),
-  };
+  });
 
   return (
     <main data-testid="store-coupons-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
-      />
+      <JsonLd graph={[pageJsonLd]} />
 
       <Hero
         logo={logo}

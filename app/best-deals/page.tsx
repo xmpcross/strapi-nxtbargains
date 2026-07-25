@@ -7,6 +7,8 @@ import { SITE } from '@/lib/site';
 import { bestOffer, collectOfferRows, numericValue, offerPrice, type CommerceOfferRow } from '@/lib/commerce';
 import { flushGeniusCache, monetizeUrl } from '@/lib/coupon-data';
 import { listCommerceProductsForDeals, type CommerceProduct } from '@/lib/strapi';
+import { collectionPageJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 
 export const revalidate = 120;
 
@@ -91,21 +93,16 @@ export default async function BestDealsPage() {
     year: 'numeric',
   }).format(capturedAt ? new Date(capturedAt) : new Date());
 
-  const pageJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  const pageJsonLd = collectionPageJsonLd({
     name: 'Best Deals',
     url: `${SITE.url}/best-deals`,
     description: metadata.description,
     numberOfItems: dealCount,
-  };
+  });
 
   return (
     <main data-testid="best-deals-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
-      />
+      <JsonLd graph={[pageJsonLd]} />
 
       <Hero
         dealCount={dealCount}

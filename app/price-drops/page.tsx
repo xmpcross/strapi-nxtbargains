@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
+import { collectionPageJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 import {
   bestOffer,
   collectOfferRows,
@@ -72,21 +74,16 @@ export default async function PriceDropsPage() {
 
   const featuredDrops = drops.slice(0, 4);
 
-  const pageJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  const pageJsonLd = collectionPageJsonLd({
     name: 'Price Drops',
     url: `${SITE.url}/price-drops`,
     description: metadata.description,
     numberOfItems: dropCount,
-  };
+  });
 
   return (
     <main data-testid="price-drops-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
-      />
+      <JsonLd graph={[pageJsonLd]} />
 
       <Hero
         dropCount={dropCount}

@@ -18,7 +18,8 @@ import {
 import { listCommerceCategories, listCommerceProducts } from '@/lib/strapi';
 import { productCanonicalPath } from '@/lib/product-url';
 import { productImageUrl } from '@/lib/commerce';
-import { breadcrumbJsonLd, itemListJsonLd } from '@/lib/jsonld';
+import { breadcrumbJsonLd, collectionPageJsonLd, itemListJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 
 export const revalidate = 60;
 
@@ -69,14 +70,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const filterChips = buildActiveFilterChips(filters, categoryOptions, filterOptions);
   const featuredCategories = categoryOptions.slice(0, 8);
 
-  const pageJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  const pageJsonLd = collectionPageJsonLd({
     name: 'All Products',
     url: `${SITE.url}/products`,
     description: metadata.description,
     numberOfItems: total,
-  };
+  });
 
   const breadcrumbLd = breadcrumbJsonLd([
     { name: 'Home', url: SITE.url },
@@ -94,20 +93,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
   return (
     <main data-testid="products-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
-      />
-      {itemListLd ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
-        />
-      ) : null}
+      <JsonLd graph={[pageJsonLd, breadcrumbLd, itemListLd]} />
 
       <ProductsHero
         totalProducts={allProducts.length}

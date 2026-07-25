@@ -5,7 +5,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getPost, listPostComments, listPosts, mediaUrl, type NxtPost } from '@/lib/strapi';
 import { SECTIONS, SITE } from '@/lib/site';
-import { breadcrumbJsonLd } from '@/lib/jsonld';
+import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, howToJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 import { enrichPostCarouselHtml } from '@/lib/enrich-post-carousel';
 import { clampDescription, firstImageUrl, fmtDate, parseHowToSteps, primaryCategorySlug, postPath, stripHtml, warnSeoLength } from '@/lib/format';
 import PostContent from '@/components/PostContent';
@@ -167,40 +168,30 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
       : [];
   const useHowTo = isHowTo && howToSteps.length >= 2;
 
-  const articleJsonLd = useHowTo
+  const articleLd = useHowTo
     ? null
-    : {
-        '@context': 'https://schema.org',
-        '@type': post.postType === 'product-review' ? 'Review' : 'Article',
+    : articleJsonLd({
+        type: post.postType === 'product-review' ? 'Review' : 'Article',
         headline: post.title,
         description: post.seoDescription || post.excerpt,
-        image: cover ? [cover] : undefined,
+        image: cover,
         datePublished: post.publishedAt,
         dateModified: post.updatedAt,
-        publisher: {
-          '@type': 'Organization',
-          name: SITE.name,
-          url: SITE.url,
-        },
-        mainEntityOfPage: pageUrl,
-      };
+        url: pageUrl,
+      });
 
   const howToLd = useHowTo
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'HowTo',
+    ? howToJsonLd({
         name: post.seoTitle || post.title,
         description: clampDescription(stripHtml(post.seoDescription || post.excerpt || post.title)),
-        ...(cover ? { image: [cover] } : {}),
-        step: howToSteps.map((s, i) => ({
-          '@type': 'HowToStep',
-          position: i + 1,
+        image: cover,
+        steps: howToSteps.map((s, i) => ({
           name: s.name,
-          text: stripHtml(s.text),
+          text: s.text,
+          image: s.image,
           url: stepsAreAuthored ? `${pageUrl}#step-${i + 1}` : pageUrl,
-          ...(s.image ? { image: s.image } : {}),
         })),
-      }
+      })
     : null;
 
   const breadcrumbLd = breadcrumbJsonLd([
@@ -214,18 +205,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   const faqs = (post.faqs ?? [])
     .map((f) => ({ question: (f.question ?? '').trim(), answer: (f.answer ?? '').trim() }))
     .filter((f) => f.question && f.answer);
-  const faqLd =
-    faqs.length >= 2
-      ? {
-          '@context': 'https://schema.org',
-          '@type': 'FAQPage',
-          mainEntity: faqs.map((f) => ({
-            '@type': 'Question',
-            name: f.question,
-            acceptedAnswer: { '@type': 'Answer', text: stripHtml(f.answer) },
-          })),
-        }
-      : null;
+  const faqLd = faqs.length >= 2 ? faqJsonLd(faqs) : null;
 
   const postContent = await enrichPostCarouselHtml(post.content);
 
@@ -240,28 +220,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           (Content Egg + scoped Bootstrap). Only loaded on post pages. */}
       <link rel="stylesheet" href="/vendor/cegg-bootstrap.min.css" />
       <link rel="stylesheet" href="/vendor/cegg-products.min.css" />
-      {articleJsonLd ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-        />
-      ) : null}
-      {howToLd ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
-        />
-      ) : null}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
-      />
-      {faqLd ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-        />
-      ) : null}
+      <JsonLd graph={[articleLd, howToLd, breadcrumbLd, faqLd]} />
 
       <section className="article-breadcrumb-section bg-[#f8f8f8] py-4">
         <div className="mx-auto max-w-7xl px-6">

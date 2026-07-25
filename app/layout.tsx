@@ -6,7 +6,9 @@ import ClientErrorReporter from '@/components/ClientErrorReporter';
 import { CookieConsentProvider } from '@/components/CookieConsentProvider';
 import GeniuslinkScripts from '@/components/GeniuslinkScripts';
 import { SITE } from '@/lib/site';
-import { cmsOrigin, siteGraphJsonLd } from '@/lib/seo';
+import { cmsOrigin } from '@/lib/seo';
+import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 import { clampDescription } from '@/lib/format';
 
 export const metadata: Metadata = {
@@ -45,10 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href={cms} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={cms} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteGraphJsonLd()) }}
-        />
+        <JsonLd graph={[organizationJsonLd(), websiteJsonLd()]} />
       </head>
       <body className="min-h-screen flex flex-col font-sans font-normal" data-testid="app-shell">
         <CookieConsentProvider>

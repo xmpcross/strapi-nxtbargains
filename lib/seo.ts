@@ -5,34 +5,9 @@ export function cmsOrigin(): string {
   return new URL(process.env.NEXT_PUBLIC_STRAPI_URL || 'https://cms.fxnstudio.com').origin;
 }
 
-export function siteGraphJsonLd() {
-  return {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'Organization',
-        '@id': `${SITE.url}/#organization`,
-        name: SITE.name,
-        url: SITE.url,
-        description: SITE.description,
-        sameAs: Object.values(SITE.social),
-      },
-      {
-        '@type': 'WebSite',
-        '@id': `${SITE.url}/#website`,
-        name: SITE.name,
-        url: SITE.url,
-        description: SITE.description,
-        publisher: { '@id': `${SITE.url}/#organization` },
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: `${SITE.url}/search?q={search_term_string}`,
-          'query-input': 'required name=search_term_string',
-        },
-      },
-    ],
-  };
-}
+// Site-wide Organization + WebSite JSON-LD now lives in lib/jsonld.ts
+// (organizationJsonLd / websiteJsonLd) and is emitted from the root layout via
+// the <JsonLd> component.
 
 export function pageOpenGraph({
   title,

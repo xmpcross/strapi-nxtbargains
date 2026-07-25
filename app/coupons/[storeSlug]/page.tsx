@@ -14,6 +14,8 @@ import {
   storeCategory,
   storeLogoUrl,
 } from '@/lib/coupon-stores';
+import { collectionPageJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 
 export const revalidate = 86400;
 
@@ -57,9 +59,7 @@ export default async function StoreCouponsPage({ params }: { params: Promise<{ s
   const highlightCoupons = featuredCoupons.length > 0 ? featuredCoupons : coupons.slice(0, 4);
   const canonicalSlug = couponStoreCanonicalSlug(store);
 
-  const couponJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  const couponJsonLd = collectionPageJsonLd({
     name: `${store.name} Coupons`,
     url: `${SITE.url}/coupons/${canonicalSlug}`,
     description: `Current coupon codes and deals for ${store.name}.`,
@@ -70,14 +70,11 @@ export default async function StoreCouponsPage({ params }: { params: Promise<{ s
       url: coupon.href.startsWith('http') ? coupon.href : `${SITE.url}${coupon.href}`,
       description: coupon.discount,
     })),
-  };
+  });
 
   return (
     <main data-testid="store-coupons-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(couponJsonLd) }}
-      />
+      <JsonLd graph={[couponJsonLd]} />
 
       <Hero
         storeName={store.name}

@@ -4,6 +4,8 @@ import PostCard from '@/components/PostCard';
 import { listCategories, listPosts, type NxtCategory, type NxtPost } from '@/lib/strapi';
 import { SITE } from '@/lib/site';
 import { pageOpenGraph } from '@/lib/seo';
+import { collectionPageJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 
 export const revalidate = 60;
 
@@ -35,23 +37,18 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
   const total = res?.meta?.pagination?.total ?? posts.length;
   const pageCount = res?.meta?.pagination?.pageCount ?? 1;
 
-  const pageJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  const pageJsonLd = collectionPageJsonLd({
     name: 'All Articles',
     url: `${SITE.url}/posts`,
     description: metadata.description,
     numberOfItems: total,
-  };
+  });
 
   const featuredCategories = categories.slice(0, 10);
 
   return (
     <main data-testid="posts-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
-      />
+      <JsonLd graph={[pageJsonLd]} />
 
       <PostsHero
         totalPosts={total}

@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
 import { listCouponPageData, type Coupon, type CouponBrandGroup, type Retailer } from '@/lib/coupon-data';
 import { highIntentStoreAliases, listCouponStores, couponStoreSlug, findCouponStoreBySlug, storeLogoUrl, type CouponStore } from '@/lib/coupon-stores';
+import { collectionPageJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 
 export const revalidate = 86400;
 
@@ -188,9 +190,7 @@ export default async function CouponsPage() {
   const categorySections = buildCategorySections(focusedCoupons);
   const topStoreLinks = storeLinks.slice(0, 12);
 
-  const couponJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
+  const couponJsonLd = collectionPageJsonLd({
     name: 'Coupons, Promo Codes & Store Deals',
     url: `${SITE.url}/coupons`,
     description: metadata.description,
@@ -201,14 +201,11 @@ export default async function CouponsPage() {
       url: offerUrl(coupon.href),
       description: coupon.title,
     })),
-  };
+  });
 
   return (
     <main data-testid="coupons-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(couponJsonLd) }}
-      />
+      <JsonLd graph={[couponJsonLd]} />
 
       <Hero
         couponCount={focusedCoupons.length}

@@ -39,7 +39,8 @@ import { productCanonicalPath, primaryCategorySlug } from '@/lib/product-url';
 import { clampDescription, fmtDate } from '@/lib/format';
 import { SITE } from '@/lib/site';
 import { pageOpenGraph } from '@/lib/seo';
-import { breadcrumbJsonLd } from '@/lib/jsonld';
+import { breadcrumbJsonLd, productJsonLd } from '@/lib/jsonld';
+import { JsonLd } from '@/components/JsonLd';
 import PriceAlertForm from '@/components/PriceAlertForm';
 import ReviewForm from '@/components/ReviewForm';
 import CommerceProductCard from '@/components/CommerceProductCard';
@@ -201,48 +202,20 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
   const averageRating =
     reviewCount > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount : null;
 
-  const productJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
+  const productLd = productJsonLd({
     name: product.name,
-    brand: brand ? { '@type': 'Brand', name: brand } : undefined,
+    brand,
     category,
-    image: image ? [image] : undefined,
+    image,
     sku: product.sku ?? product.mpn ?? product.gtin ?? undefined,
     gtin: product.gtin ?? undefined,
     mpn: product.mpn ?? undefined,
     description: product.shortDescription ?? product.description ?? undefined,
-    ...(averageRating !== null
-      ? {
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: Math.round(averageRating * 10) / 10,
-            reviewCount,
-            bestRating: 5,
-            worstRating: 1,
-          },
-        }
-      : {}),
-    ...(reviewCount > 0
-      ? {
-          review: reviews.slice(0, 10).map((review) => ({
-            '@type': 'Review',
-            author: { '@type': 'Person', name: review.authorName },
-            datePublished: review.createdAt,
-            reviewRating: {
-              '@type': 'Rating',
-              ratingValue: review.rating,
-              bestRating: 5,
-              worstRating: 1,
-            },
-            name: review.title ?? undefined,
-            reviewBody: review.body,
-          })),
-        }
-      : {}),
+    averageRating,
+    reviewCount,
+    reviews,
     offers: rows.length
       ? {
-          '@type': 'AggregateOffer',
           offerCount: rows.length,
           lowPrice: bestPrice ?? undefined,
           highPrice: pricedRows.length
@@ -251,8 +224,8 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
           priceCurrency: best?.offer.currency ?? 'USD',
           offers: rows.map((row) => offerJsonLd(row.offer)),
         }
-      : undefined,
-  };
+      : null,
+  });
 
   const breadcrumbLd = breadcrumbJsonLd([
     { name: 'Home', url: `${SITE.url}/` },
@@ -267,14 +240,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
 
   return (
     <main className="bg-white" data-testid={`product-price-${product.slug}`}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
-      />
+      <JsonLd graph={[productLd, breadcrumbLd]} />
 
       <section className="product-breadcrumb-section bg-[#f8f8f8] py-4">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
