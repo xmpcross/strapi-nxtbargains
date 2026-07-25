@@ -429,23 +429,19 @@ function couponStoreHref(c: NxtCoupon): string {
 
 // Local coupon-feed caches (written by the sync scripts). Read even before the
 // Strapi collection exists so synced coupons show immediately.
-//   COUPON_FEED_SOURCE=couponapi  → read only CouponAPI.org (Feedico off)
-//   COUPON_FEED_SOURCE=feedico    → read only Feedico
-//   (unset / auto)                → CouponAPI.org preferred, Feedico fallback
+// NOTE: CouponAPI.org was discontinued; Feedico is the remaining local feed.
 const COUPON_FEED_FILES: Record<string, string> = {
-  couponapi: join(process.cwd(), 'data', 'coupons-couponapi.json'),
   feedico: join(process.cwd(), 'data', 'coupons-feedico.json'),
 };
 
 function couponFeedOrder(): string[] {
   const forced = (process.env.COUPON_FEED_SOURCE || '').trim().toLowerCase();
   if (forced && COUPON_FEED_FILES[forced]) return [forced];
-  return ['couponapi', 'feedico']; // priority: CouponAPI.org first
+  return ['feedico'];
 }
 
 function readCouponFeedCache(): NxtCoupon[] {
-  // Merge sources in priority order (couponapi first), deduped — so each store
-  // keeps its coupons (e.g. Walmart from CouponAPI, AliExpress from Feedico).
+  // Merge local feed caches (currently Feedico) in priority order, deduped.
   const seen = new Set<string>();
   const merged: NxtCoupon[] = [];
   for (const source of couponFeedOrder()) {
