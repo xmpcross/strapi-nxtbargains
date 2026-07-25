@@ -541,7 +541,7 @@ function StorePagination({ base, page, pageCount }: { base: URLSearchParams; pag
   return (
     <nav className="flex flex-wrap items-center justify-start gap-2" data-testid="stores-pagination" aria-label="Store pages">
       {page > 1 ? (
-        <Link href={pageHref(base, page - 1)} aria-label="Previous page" className={`${box} border border-ink/15 bg-white text-ink hover:border-primary hover:text-primary`}>
+        <Link href={pageHref(base, page - 1)} scroll={false} aria-label="Previous page" className={`${box} border border-ink/15 bg-white text-ink hover:border-primary hover:text-primary`}>
           ‹
         </Link>
       ) : null}
@@ -552,6 +552,7 @@ function StorePagination({ base, page, pageCount }: { base: URLSearchParams; pag
           <Link
             key={p}
             href={pageHref(base, p)}
+            scroll={false}
             aria-current={p === page ? 'page' : undefined}
             className={`${box} ${p === page ? 'border-2 border-ink bg-primary text-white' : 'border border-ink/15 bg-white text-ink hover:border-primary hover:text-primary'}`}
           >
@@ -560,7 +561,7 @@ function StorePagination({ base, page, pageCount }: { base: URLSearchParams; pag
         ),
       )}
       {page < pageCount ? (
-        <Link href={pageHref(base, page + 1)} aria-label="Next page" className={`${box} border border-ink/15 bg-white text-ink hover:border-primary hover:text-primary`}>
+        <Link href={pageHref(base, page + 1)} scroll={false} aria-label="Next page" className={`${box} border border-ink/15 bg-white text-ink hover:border-primary hover:text-primary`}>
           ›
         </Link>
       ) : null}
