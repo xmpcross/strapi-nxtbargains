@@ -1877,3 +1877,6 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 
 /* Best-sellers pages (index + merchant): uniform h2 size */
 [data-page="best-sellers"] h2 { font-size: 1.5rem !important; }
+
+/* Best-sellers pages: green rank badges (bg-ink override) */
+[data-page="best-sellers"] .bg-ink { background-color: #318000 !important; }

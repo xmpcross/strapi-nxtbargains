@@ -7,6 +7,7 @@ export type BestSellerCategoryTab = {
   key: string;
   label: string;
   items: BestSeller[];
+  description?: string;
 };
 
 /**
@@ -27,7 +28,7 @@ export default function BestSellerCategoryTabs({ groups }: { groups: BestSellerC
         <div
           role="tablist"
           aria-label="Best seller categories"
-          className="inline-flex min-w-full gap-1 rounded-2xl bg-[#e9eaf1] p-1.5"
+          className="inline-flex min-w-full gap-1 rounded-[4px] bg-[#e9eaf1] p-1.5"
         >
           {groups.map((group) => {
             const selected = group.key === active;
@@ -38,7 +39,7 @@ export default function BestSellerCategoryTabs({ groups }: { groups: BestSellerC
                 role="tab"
                 aria-selected={selected}
                 onClick={() => setActive(group.key)}
-                className={`flex-1 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
+                className={`flex-1 whitespace-nowrap rounded-[4px] px-4 py-2.5 text-sm font-semibold transition ${
                   selected
                     ? 'bg-white text-ink shadow-[0_1px_3px_rgba(13,27,42,0.14)]'
                     : 'text-ink/45 hover:text-ink/80'
@@ -57,15 +58,15 @@ export default function BestSellerCategoryTabs({ groups }: { groups: BestSellerC
         // NB: use the `hidden` utility class (not the HTML `hidden` attribute) —
         // the attribute's display:none is overridden by `.grid { display:grid }`.
         return (
-          <div
-            key={group.key}
-            role="tabpanel"
-            aria-hidden={!selected}
-            className={selected ? 'mt-6 grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4' : 'hidden'}
-          >
-            {group.items.map((item) => (
-              <BestSellerCard key={`${group.key}-${item.marketplace}-${item.asin || item.id || item.rank}`} item={item} />
-            ))}
+          <div key={group.key} role="tabpanel" aria-hidden={!selected} className={selected ? 'mt-6' : 'hidden'}>
+            {group.description ? (
+              <p className="max-w-3xl text-sm leading-6 text-ink/60">{group.description}</p>
+            ) : null}
+            <div className="mt-4 grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
+              {group.items.map((item) => (
+                <BestSellerCard key={`${group.key}-${item.marketplace}-${item.asin || item.id || item.rank}`} item={item} />
+              ))}
+            </div>
           </div>
         );
       })}

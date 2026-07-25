@@ -164,3 +164,31 @@ function marketplaceSearchUrl(marketplace: Marketplace, title: string) {
   if (marketplace === 'walmart') return `https://www.walmart.com/search?q=${query}`;
   return '';
 }
+
+// SEO-friendly blurbs shown under each Amazon best-seller category tab.
+const CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  'smart-phones':
+    "Amazon's best-selling smartphones right now — unlocked flagships and budget picks ranked by real sales, with ratings, Prime availability and current deals so you can compare before you buy.",
+  laptops:
+    'The top-selling laptops on Amazon, from lightweight ultrabooks to gaming machines — ranked by popularity so you can see exactly which models shoppers are buying most.',
+  tablets:
+    "Amazon's most popular tablets — iPads, Android slates and e-readers — ranked by sales, with star ratings and prices at a glance.",
+  smartwatches:
+    'Best-selling smartwatches and fitness trackers on Amazon, ranked by sales — compare health features, battery life, ratings and price in one place.',
+  headphones:
+    'The top-selling headphones and earbuds on Amazon — noise-cancelling over-ears, true-wireless buds and workout pairs — ranked by what people are actually buying.',
+  'smart-tvs':
+    "Amazon's best-selling smart TVs ranked by sales — 4K, QLED, OLED and budget models with ratings and the latest deals.",
+  'smart-home':
+    'The most popular smart home devices on Amazon — smart plugs, cameras, video doorbells, lights, locks and hubs — ranked by current demand.',
+  'smart-electronics':
+    'Top-selling smart electronics and connected gadgets on Amazon, ranked by popularity — the trending tech worth a look.',
+};
+
+/** A category blurb for the best-seller tabs, with a sensible generated fallback. */
+export function categoryDescription(key: string, label?: string): string {
+  return (
+    CATEGORY_DESCRIPTIONS[key] ??
+    `The best-selling ${(label ?? key).toLowerCase()} on Amazon right now, ranked by real sales with ratings, Prime availability and current deals.`
+  );
+}

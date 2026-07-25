@@ -5,6 +5,7 @@ import BestSellerCard from '@/components/BestSellerCard';
 import BestSellerCategoryTabs from '@/components/BestSellerCategoryTabs';
 import {
   BEST_SELLER_MARKETPLACES,
+  categoryDescription,
   getBestSellerMarketplace,
   listBestSellerCategoryGroupsForMarketplace,
   listBestSellersForMarketplace,
@@ -154,7 +155,12 @@ export default async function MarketplaceBestSellersPage({ params }: { params: P
                 </div>
               </div>
               <div className="mt-5">
-                <BestSellerCategoryTabs groups={categoryGroups} />
+                <BestSellerCategoryTabs
+                  groups={categoryGroups.map((group) => ({
+                    ...group,
+                    description: categoryDescription(group.key, group.label),
+                  }))}
+                />
               </div>
             </div>
           ) : (

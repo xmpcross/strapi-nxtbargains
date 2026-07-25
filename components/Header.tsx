@@ -79,7 +79,7 @@ export default async function Header() {
       data-testid="site-header"
     >
       <StickyHeaderShadow />
-      <div className="mx-auto flex h-16 max-w-[1366px] items-center justify-between gap-4 px-4 sm:h-[84px] sm:px-6">
+      <div className="mx-auto flex h-[70px] max-w-[1366px] items-center justify-between gap-4 px-4 sm:h-[70px] sm:px-6">
         {/* Logo */}
         <Link
           href="/"
