@@ -98,11 +98,26 @@ function matchesTarget(store, url) {
   return TARGETS.some((t) => hay.includes(norm(t)) || (t === 'bestbuy' && hay.includes('bestbuy')));
 }
 
+// Detect a non-US region from the store domain (e.g. bestbuy.ca, sony.co.uk) so
+// non-US storefronts stay separate from their US counterparts instead of merging.
+function regionFromStore(raw) {
+  const s = String(raw || '').toLowerCase();
+  if (/\.co\.uk|\.uk(?:\/|$)/.test(s)) return 'UK';
+  if (/\.ca(?:\/|$)/.test(s)) return 'CA';
+  if (/\.com\.au|\.au(?:\/|$)/.test(s)) return 'AU';
+  if (/\.de(?:\/|$)/.test(s)) return 'DE';
+  if (/\.fr(?:\/|$)/.test(s)) return 'FR';
+  return 'US';
+}
+
 // CouponAPI record → shared nxt-coupon shape. Adjust field names after a --dry.
 function mapCoupon(r) {
   const rawStore = first(r, ['store', 'merchant', 'store_name', 'merchant_name', 'advertiser'])
     || domainFromUrl(first(r, ['url', 'aff_url', 'store_url']) || '');
-  const { name: store, slug: storeSlug } = cleanStore(rawStore);
+  const base = cleanStore(rawStore);
+  const region = regionFromStore(rawStore);
+  const store = region === 'US' ? base.name : `${base.name} ${region}`;
+  const storeSlug = region === 'US' ? base.slug : `${base.slug}-${region.toLowerCase()}`;
   const code = first(r, ['coupon_code', 'code', 'couponcode']) || null;
   const affLink = first(r, ['aff_url', 'affiliate_link', 'affiliateUrl', 'tracking_url', 'deeplink', 'aff_link']) || '';
   const rawLink = first(r, ['url', 'directurl', 'merchant_home_page', 'store_url', 'landing_url']) || '';
@@ -154,11 +169,12 @@ async function main() {
   console.log(`Feed returned ${raw.length} record(s).`);
 
   const coupons = raw
-    .filter((r) => isTargetLocation(r))
+    // --all keeps every region; otherwise US-only.
+    .filter((r) => ALL_MERCHANTS || isTargetLocation(r))
     .filter((r) => ALL_MERCHANTS || matchesTarget(first(r, ['store', 'merchant', 'store_name']) || '', first(r, ['url', 'aff_url', 'store_url']) || ''))
     .map(mapCoupon)
-    // Amazon stays on Amazon Associates + GeniusLink (CJ "amazon" data is junk).
-    .filter((c) => c.store && c.title && c.storeSlug !== 'amazon')
+    // Amazon (any region) stays on Amazon Associates + GeniusLink (CJ "amazon" data is junk).
+    .filter((c) => c.store && c.title && !c.storeSlug.startsWith('amazon'))
     .slice(0, LIMIT);
 
   const byStore = coupons.reduce((m, c) => (m[c.store] = (m[c.store] || 0) + 1, m), {});
