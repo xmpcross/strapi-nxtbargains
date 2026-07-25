@@ -244,24 +244,24 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
 
       <section className="product-breadcrumb-section bg-[#f8f8f8] py-4">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <nav className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.16em] text-ink/45" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-primary">Home</Link>
-            <span>/</span>
-            <Link href="/products" className="hover:text-primary">Products</Link>
+          <nav className="flex items-center gap-2 overflow-hidden whitespace-nowrap text-sm text-ink/45" aria-label="Breadcrumb">
+            <Link href="/" className="shrink-0 hover:text-primary">Home</Link>
+            <span aria-hidden className="shrink-0 text-ink/30">›</span>
+            <Link href="/products" className="shrink-0 hover:text-primary">Products</Link>
             {category && categorySlug && (
               <>
-                <span>/</span>
-                <Link href={`/category/${categorySlug}`} className="hover:text-primary">{category}</Link>
+                <span aria-hidden className="shrink-0 text-ink/30">›</span>
+                <Link href={`/category/${categorySlug}`} className="shrink-0 hover:text-primary">{category}</Link>
               </>
             )}
             {category && !categorySlug && (
               <>
-                <span>/</span>
-                <span className="text-ink/60">{category}</span>
+                <span aria-hidden className="shrink-0 text-ink/30">›</span>
+                <span className="shrink-0 text-ink/60">{category}</span>
               </>
             )}
-            <span>/</span>
-            <span className="line-clamp-1 text-ink/70">{product.name}</span>
+            <span aria-hidden className="shrink-0 text-ink/30">›</span>
+            <span className="min-w-0 flex-1 truncate text-ink/75" title={product.name}>{product.name}</span>
           </nav>
         </div>
       </section>
