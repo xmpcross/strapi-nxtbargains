@@ -6,6 +6,7 @@ import BestSellerCategoryTabs from '@/components/BestSellerCategoryTabs';
 import {
   BEST_SELLER_MARKETPLACES,
   getBestSellerMarketplace,
+  listAmazonNewReleases,
   listBestSellerCategoryGroupsForMarketplace,
   listBestSellersForMarketplace,
 } from '@/lib/best-sellers';
@@ -37,6 +38,7 @@ export default async function MarketplaceBestSellersPage({ params }: { params: P
   if (!marketplace) notFound();
 
   const items = listBestSellersForMarketplace(marketplace.key);
+  const newReleases = marketplace.key === 'amazon' ? listAmazonNewReleases() : [];
   const categoryGroups = listBestSellerCategoryGroupsForMarketplace(marketplace.key);
   const showCategoryGroups = categoryGroups.length > 1 || categoryGroups[0]?.key !== 'top-products';
 
@@ -174,6 +176,25 @@ export default async function MarketplaceBestSellersPage({ params }: { params: P
           )}
         </div>
       </section>
+
+      {newReleases.length > 0 ? (
+        <section className="border-t border-ink/10 bg-white py-10 sm:py-12" data-testid="amazon-new-releases">
+          <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
+            <div className="flex flex-wrap items-end justify-between gap-3 border border-ink/10 bg-white p-5 sm:p-6">
+              <div>
+                <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">Just launched</p>
+                <h2 className="mt-2 font-display text-2xl font-bold text-ink sm:text-3xl">New on Amazon</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/55">The newest electronics releases on Amazon, refreshed weekly.</p>
+              </div>
+            </div>
+            <div className="mt-5 grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
+              {newReleases.map((item) => (
+                <BestSellerCard key={`newrelease-${item.asin || item.rank}`} item={item} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }

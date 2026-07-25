@@ -192,3 +192,15 @@ export function categoryDescription(key: string, label?: string): string {
     `The best-selling ${(label ?? key).toLowerCase()} on Amazon right now, ranked by real sales with ratings, Prime availability and current deals.`
   );
 }
+
+/** Amazon "New Releases" (OpenWeb Ninja Real-Time E-commerce Data). */
+export function listAmazonNewReleases(): BestSeller[] {
+  try {
+    const path = join(process.cwd(), 'data', 'amazon-new-releases.json');
+    if (!existsSync(path)) return [];
+    const parsed = JSON.parse(readFileSync(path, 'utf8')) as { items?: BestSeller[] };
+    return Array.isArray(parsed.items) ? parsed.items : [];
+  } catch {
+    return [];
+  }
+}
