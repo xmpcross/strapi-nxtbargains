@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     template: `%s · ${SITE.name}`,
   },
   description: clampDescription(SITE.description),
+  other: { 'google-adsense-account': 'ca-pub-2867376862905050' },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   openGraph: {
     type: 'website',
