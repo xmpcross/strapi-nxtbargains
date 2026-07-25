@@ -429,15 +429,16 @@ function couponStoreHref(c: NxtCoupon): string {
 
 // Local coupon-feed caches (written by the sync scripts). Read even before the
 // Strapi collection exists so synced coupons show immediately.
-// NOTE: CouponAPI.org was discontinued; Feedico is the remaining local feed.
+// Primary feed: RapidAPI get-promo-codes (scripts/fetch-coupons-getpromo.mjs).
 const COUPON_FEED_FILES: Record<string, string> = {
+  getpromo: join(process.cwd(), 'data', 'coupons-getpromo.json'),
   feedico: join(process.cwd(), 'data', 'coupons-feedico.json'),
 };
 
 function couponFeedOrder(): string[] {
   const forced = (process.env.COUPON_FEED_SOURCE || '').trim().toLowerCase();
   if (forced && COUPON_FEED_FILES[forced]) return [forced];
-  return ['feedico'];
+  return ['getpromo', 'feedico'];
 }
 
 function readCouponFeedCache(): NxtCoupon[] {
