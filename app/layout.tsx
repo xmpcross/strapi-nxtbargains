@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ClientErrorReporter from '@/components/ClientErrorReporter';
 import { CookieConsentProvider } from '@/components/CookieConsentProvider';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { SITE } from '@/lib/site';
 import { cmsOrigin } from '@/lib/seo';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonld';
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen flex flex-col font-sans font-normal" data-testid="app-shell">
         <CookieConsentProvider>
+          <GoogleAnalytics />
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
