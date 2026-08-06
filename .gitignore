@@ -22,3 +22,6 @@ next-env.d.ts.bak
 data/getpromo-usage.json
 data/openwebninja-usage.json
 !/data/amazon-new-releases.json
+
+# Local npm cache — machine state, not repository content.
+.npm-cache/
