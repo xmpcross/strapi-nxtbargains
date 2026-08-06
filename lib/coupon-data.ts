@@ -1,13 +1,12 @@
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { wrapImpactAffiliate } from './impact-links';
+import { takeadsLinkForUrl } from './takeads-links';
 import { couponStoreSlug } from './coupon-stores';
 import { listNxtCoupons, type NxtCoupon } from './strapi';
 
 const COUPON_REVALIDATE_SECONDS = 86400;
-const GENIUSLINK_CACHE_FILE = join(process.cwd(), 'data', 'geniuslink-cache.json');
 const STORE_COUPON_CACHE_FILE = join(process.cwd(), 'data', 'coupon-store-coupons.json');
-const GENIUSLINK_TIMEOUT_MS = 15000;
 
 export type Coupon = {
   store: string;
@@ -125,37 +124,6 @@ const FALLBACK_RETAILERS: Retailer[] = [
 // AWIN / TradeDoubler — written by the scripts/ fetchers. See README
 // "Coupon source priority".
 
-let geniusCache: Record<string, string> | null = null;
-let geniusDirty = false;
-
-function geniusEnabled() {
-  return Boolean(process.env.GENIUSLINK_API_KEY && process.env.GENIUSLINK_API_SECRET && process.env.GENIUSLINK_GROUP_ID);
-}
-
-function loadGeniusCache() {
-  if (geniusCache) return geniusCache;
-  try {
-    geniusCache = existsSync(GENIUSLINK_CACHE_FILE)
-      ? JSON.parse(readFileSync(GENIUSLINK_CACHE_FILE, 'utf8')) as Record<string, string>
-      : {};
-  } catch {
-    geniusCache = {};
-  }
-  return geniusCache;
-}
-
-export function flushGeniusCache() {
-  if (!geniusDirty || !geniusCache) return;
-  try {
-    // Read-only filesystems (e.g. Netlify/serverless functions) can't persist
-    // the cache — that's fine, it just stays in-memory for this instance.
-    writeFileSync(GENIUSLINK_CACHE_FILE, JSON.stringify(geniusCache, null, 2));
-  } catch {
-    // ignore — no disk persistence available
-  }
-  geniusDirty = false;
-}
-
 function readStoreCouponCache(storeId: number | string) {
   if (!existsSync(STORE_COUPON_CACHE_FILE)) return null;
   try {
@@ -167,61 +135,26 @@ function readStoreCouponCache(storeId: number | string) {
   }
 }
 
-async function geniusWrap(url: string) {
-  if (!url || !url.startsWith('http') || !geniusEnabled()) return url;
-  if (/^https?:\/\/(?:www\.)?geni\.us\//i.test(url)) return url;
-
-  const cache = loadGeniusCache();
-  if (cache[url]) return cache[url];
-
-  const domain = process.env.GENIUSLINK_DOMAIN || 'geni.us';
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-  try {
-    const controller = new AbortController();
-    timeout = setTimeout(() => controller.abort(), GENIUSLINK_TIMEOUT_MS);
-    const res = await fetch('https://api.geni.us/v3/shorturls', {
-      method: 'POST',
-      signal: controller.signal,
-      headers: {
-        'X-Api-Key': process.env.GENIUSLINK_API_KEY ?? '',
-        'X-Api-Secret': process.env.GENIUSLINK_API_SECRET ?? '',
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({
-        url,
-        groupId: Number(process.env.GENIUSLINK_GROUP_ID),
-        domain,
-        linkCreatorSetting: 'Simple',
-      }),
-      next: { revalidate: COUPON_REVALIDATE_SECONDS },
-    });
-    if (!res.ok) return url;
-    const code = (await res.json())?.shortUrl?.code;
-    if (!code) return url;
-    const shortUrl = `https://${domain}/${code}`;
-    cache[url] = shortUrl;
-    geniusDirty = true;
-    return shortUrl;
-  } catch {
-    return url;
-  } finally {
-    if (timeout) clearTimeout(timeout);
-  }
-}
-
+/**
+ * The link chain for a bare URL. Impact first because it holds the direct
+ * advertiser relationships, then Takeads for the long tail. Anything neither
+ * covers goes out unmonetized rather than broken.
+ *
+ * Synchronous under the hood — Takeads is a lookup in a map built by
+ * scripts/fetch-takeads-links.mjs, not a network call — but kept async so the
+ * many call sites do not all have to change.
+ */
 export async function monetizeUrl(url: string) {
   const impactUrl = wrapImpactAffiliate({ id: 0, productUrl: url });
   if (impactUrl) return impactUrl;
-  return geniusWrap(url);
+  return takeadsLinkForUrl(url) ?? url;
 }
 
-async function geniusWrapCoupons(coupons: Coupon[]) {
+async function monetizeCoupons(coupons: Coupon[]) {
   const wrapped: Coupon[] = [];
   for (const coupon of coupons) {
     wrapped.push({ ...coupon, href: await monetizeUrl(coupon.href) });
   }
-  flushGeniusCache();
   return wrapped;
 }
 
@@ -465,7 +398,7 @@ function readCouponFeedCache(): NxtCoupon[] {
 }
 
 // Build coupon page data from a set of NxtCoupon rows (Strapi or Feedico cache).
-// `wrap` = affiliate-wrap the links via GeniusLink; skip for already-tracked
+// `wrap` = affiliate-wrap the links (Impact, then Takeads); skip for already-tracked
 // feed links (e.g. Feedico/Admitad offerUrl).
 async function buildCouponPageData(
   rows: NxtCoupon[],
@@ -499,7 +432,7 @@ async function buildCouponPageData(
     coupons: cps,
   }));
 
-  return { coupons: wrap ? await geniusWrapCoupons(coupons) : coupons, retailers: retailers.slice(0, 12), brandGroups };
+  return { coupons: wrap ? await monetizeCoupons(coupons) : coupons, retailers: retailers.slice(0, 12), brandGroups };
 }
 
 export async function listCouponPageData(): Promise<{ coupons: Coupon[]; retailers: Retailer[]; brandGroups: CouponBrandGroup[] }> {
@@ -526,7 +459,7 @@ export async function listCouponsForStore(
   // Prefer CMS-curated coupons for this store; then the local Feedico cache
   // (already affiliate-tracked → no wrap); then the legacy cache/API.
   const strapiRows = await listNxtCoupons({ store: storeName, storeSlug, pageSize: 48 });
-  if (strapiRows.length > 0) return geniusWrapCoupons(strapiRows.map(couponFromStrapi));
+  if (strapiRows.length > 0) return monetizeCoupons(strapiRows.map(couponFromStrapi));
 
   const slugLc = (storeSlug || '').toLowerCase();
   const nameLc = (storeName || '').toLowerCase();
@@ -538,7 +471,7 @@ export async function listCouponsForStore(
   if (feedicoRows.length > 0) return feedicoRows.map(couponFromStrapi);
 
   const cached = readStoreCouponCache(storeId);
-  if (cached) return geniusWrapCoupons(cached);
+  if (cached) return monetizeCoupons(cached);
 
   // No CMS, feed, or cached coupons for this store.
   return [];

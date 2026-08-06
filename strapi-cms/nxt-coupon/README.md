@@ -42,7 +42,7 @@ read access to `nxt-coupon`.
 | `discount` | string | e.g. "Up to 40% off" |
 | `category` | string | e.g. "Amazon coupons" |
 | `couponType` | enum | `Coupon` \| `Promo code` \| `Sale` |
-| `destinationUrl` | string | Raw merchant URL — auto affiliate-wrapped (GeniusLink/Impact) |
+| `destinationUrl` | string | Raw merchant URL — auto affiliate-wrapped (Impact/Takeads) |
 | `affiliateUrl` | string | Pre-wrapped link; used verbatim if set |
 | `featured` | boolean | Surfaces in "Today's best" + homepage |
 | `isBrand` | boolean | Include in the Brands feed / brand groups |
@@ -53,7 +53,7 @@ read access to `nxt-coupon`.
 | `source` | string | Provenance, e.g. `feedico:cj` (manual entries can leave blank) |
 
 Link handling: the frontend uses `affiliateUrl` if present, else affiliate-wraps
-`destinationUrl` (GeniusLink), else links to the internal `/coupons/{storeSlug}`
+`destinationUrl` (Impact, then Takeads), else links to the internal `/coupons/{storeSlug}`
 page. So you can paste a raw merchant URL and monetization is applied automatically.
 
 ## Automated source: Feedico → this collection
@@ -69,7 +69,7 @@ node scripts/sync-feedico-coupons.mjs --dry      # inspect the field mapping
 node scripts/sync-feedico-coupons.mjs --limit=500
 ```
 
-- **Amazon is skipped** by the sync — keep Amazon Associates + GeniusLink for Amazon.
+- **Amazon is skipped** by the sync — keep Amazon Associates for Amazon.
 - Requires an **API token** with write access to `nxt-coupon` (Settings → API Tokens).
 - Schedule it on a cron (hourly/daily) to keep the feed fresh.
 - Feedico's real field names may differ — adjust `mapFeedicoCoupon()` in the script

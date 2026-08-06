@@ -32,6 +32,7 @@ import {
   type CommerceReview,
 } from '@/lib/strapi';
 import { wrapImpactAffiliate } from '@/lib/impact-links';
+import { wrapTakeadsAffiliate } from '@/lib/takeads-links';
 import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/coupon-data';
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
 import StoreLinkTile from '@/components/StoreLinkTile';
@@ -69,7 +70,15 @@ function buyUrl(offer: CommerceOffer, product?: CommerceProduct): string {
   if (!resolved) return offer.merchant?.websiteUrl ?? '#';
 
   const normalizedOffer: CommerceOffer = { ...offer, productUrl: resolved, affiliateUrl: null };
-  return wrapImpactAffiliate(normalizedOffer) ?? amazonProductUrl(normalizedOffer, product) ?? resolved;
+  // Order matters: Impact and Amazon are direct relationships, so they win.
+  // Takeads covers the long tail of merchants neither of them has, and only
+  // ever substitutes a URL it has actually converted.
+  return (
+    wrapImpactAffiliate(normalizedOffer) ??
+    amazonProductUrl(normalizedOffer, product) ??
+    wrapTakeadsAffiliate(normalizedOffer, product) ??
+    resolved
+  );
 }
 
 function safeAffiliateUrl(offer: CommerceOffer): string | null {
@@ -170,7 +179,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
 
   // Multi-store offers from the data/live-offers.json cache (static snapshot).
   // Only show when the match is confident (2+ stores), so we never display a
-  // mis-matched single offer. Links are already GeniusLink-wrapped at fetch time.
+  // mis-matched single offer. Links are affiliate-wrapped at fetch time.
   let liveOffers: LiveOffer[] = [];
   let liveCapturedAt: string | null = null;
   try {
@@ -1426,7 +1435,7 @@ function timeAgo(iso: string): string {
 }
 
 /* Live multi-store price comparison rows (cheapest first; row #0 is "Best
-   price"). Links are GeniusLink-wrapped at fetch time for auto-affiliation. */
+   price"). Links are affiliate-wrapped at fetch time. */
 function LivePrices({ offers }: { offers: LiveOffer[] }) {
   return (
     <div className="mt-6 overflow-hidden border border-ink/10">

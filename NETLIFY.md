@@ -22,7 +22,7 @@ Set these (the values live in `.env.local` locally, which is git-ignored):
 - `COUPON_FEED_SOURCE` = `couponapi`
 - `COUPONS_API_PAUSED` = `true`
 - `COUPONAPI_KEY`, `RAPIDAPI_KEY`
-- `GENIUSLINK_API_KEY`, `GENIUSLINK_API_SECRET`, `GENIUSLINK_DOMAIN`, `GENIUSLINK_GROUP_ID`
+- `TAKEADS_PUBLIC_KEY`, `TAKEADS_SUB_ID`
 - `IMPACT_ACCOUNT_SID`, `IMPACT_AUTH_TOKEN`, `IMPACT_WALMART_CATALOG_ID`, `IMPACT_TRACKING_TEMPLATE`
 - `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET`, `EBAY_EPN_CAMPAIGN_ID`
 - `AWIN_*`, `TRADEDOUBLER_*`, `FEEDICO_API_TOKEN` (optional / inactive)
@@ -44,7 +44,7 @@ Choose one:
   they ship with the build; `netlify.toml` already bundles `data/**` into the
   functions. Coupons/stores are then a snapshot, refreshed by re-deploying
   (trigger a Netlify build from a scheduled function or after the cron updates
-  the data on the source box + pushes). **Skip `geniuslink-cache.json` (~18 MB)** —
+  the data on the source box + pushes). —
   too large; the app degrades gracefully without it (links wrap live / fall back).
 - **B. Fetch at build time.** Add a `prebuild` step that pulls the data into
   `data/` before `next build` (e.g. run the `scripts/fetch-*` against the APIs).
@@ -57,7 +57,7 @@ Recommended: **A** to get live quickly, then migrate coupons to **C** (Strapi)
 over time.
 
 ## 3. Caveats already handled in code
-- Runtime cache writes (`flushGeniusCache`) are wrapped in try/catch so Netlify's
+- Runtime cache writes are wrapped in try/catch so Netlify's
   read-only FS doesn't crash renders.
 - `included_files = ["data/**"]` in `netlify.toml` bundles committed data into
   the SSR/functions.

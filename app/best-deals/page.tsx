@@ -5,7 +5,7 @@ import path from 'node:path';
 import DealProductCard from '@/components/DealProductCard';
 import { SITE } from '@/lib/site';
 import { bestOffer, collectOfferRows, numericValue, offerPrice, type CommerceOfferRow } from '@/lib/commerce';
-import { flushGeniusCache, monetizeUrl } from '@/lib/coupon-data';
+import { monetizeUrl } from '@/lib/coupon-data';
 import { listCommerceProductsForDeals, type CommerceProduct } from '@/lib/strapi';
 import { collectionPageJsonLd } from '@/lib/jsonld';
 import { JsonLd } from '@/components/JsonLd';
@@ -377,15 +377,13 @@ async function loadRealTimeBestDeals() {
       .slice(0, 36);
     // Replace the Google Shopping link with the merchant's own search URL, then
     // affiliate-wrap it (Impact deep-link when the domain qualifies — e.g.
-    // walmart.com — else a GeniusLink short URL) so clicks land on the actual
-    // retailer, not a Google Shopping results page.
-    // Sequential (not Promise.all) to avoid the geni.us API rate-limiting bursts.
+    // walmart.com — else a Takeads link where the map has one) so clicks land on
+    // the actual retailer, not a Google Shopping results page.
     const monetized: RealTimeBestDeal[] = [];
     for (const item of items) {
       const merchantUrl = merchantDealUrl(item.store, item.title, item.url);
       monetized.push({ ...item, url: await monetizeUrl(merchantUrl) });
     }
-    flushGeniusCache();
     return {
       items: monetized,
       capturedAt: cache.capturedAt,

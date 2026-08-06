@@ -43,15 +43,16 @@ yellow accents) live in `app/globals.css` and `tailwind.config.ts`.
                └───────────┬────────────────────────┘
                            │ outbound clicks
                            ▼
-              GeniusLink / Impact / CJ affiliate links ─► merchants
+              Impact / Takeads / CJ affiliate links ─► merchants
 ```
 
 - **Strapi** is the source of truth for editorial content (blog posts,
   categories) and the commerce catalog (products, offers, merchants, reviews).
 - **Affiliate feeds** (CouponAPI.org, Impact, RapidAPI, etc.) are pulled by the
   `scripts/` and written to `data/*.json`, which `lib/` reads at request time.
-- **Every outbound link is affiliate-monetized** — either the feed already
-  provides a tracked link, or GeniusLink wraps it.
+- **Every outbound link is affiliate-monetized where possible** — either the
+  feed already provides a tracked link, or Takeads has a conversion for it.
+  Anything neither covers goes out unmonetized rather than broken.
 
 ---
 
@@ -113,16 +114,16 @@ The active local feed source is controlled by **`COUPON_FEED_SOURCE`**:
 | **eBay** | `EBAY_CLIENT_ID/SECRET`, `EBAY_EPN_CAMPAIGN_ID` | Buy Browse API (products) + eBay Partner Network |
 | **Awin / Tradedoubler** | `AWIN_*`, `TRADEDOUBLER_*` | Voucher/promotion feeds |
 | **Amazon Associates** | `NEXT_PUBLIC_AMAZON_AFFILIATE_TAG` | Amazon affiliate tag |
-| **GeniusLink** (geni.us) | `GENIUSLINK_*` | Universal link **wrapper** — monetizes links that are *not* already affiliate-tracked (Amazon, Google Shopping best-deals, fallback) |
+| **Takeads** | `TAKEADS_PUBLIC_KEY`, `TAKEADS_SUB_ID` | Long-tail link **converter** — monetizes links no other network covers. Map built ahead of time by `scripts/fetch-takeads-links.mjs` into `data/takeads-links.json`; `lib/takeads-links.ts` reads it at render time |
 
 ### Link handling rules
 - Feed links that are **already affiliate-ready** (CouponAPI's `affiliate_link`,
   Impact `TrackingLink`, Admitad `offerUrl`) are used **verbatim** — never
   double-wrapped.
-- Links **without** tracking (Amazon, Google Shopping, manual coupons) are
-  wrapped by **GeniusLink**. Wrapped shortlinks are cached in
-  `data/geniuslink-cache.json` (not committed; degrades gracefully if absent).
-- **Amazon** always stays on **Amazon Associates + GeniusLink** — it is *not*
+- Links **without** tracking (Google Shopping, manual coupons) fall through to
+  **Takeads**, which is a lookup in a prebuilt map rather than a network call —
+  so nothing sits in the render path. A URL with no entry is left as-is.
+- **Amazon** stays on **Amazon Associates** via its own tag — it is *not*
   sourced from the affiliate networks (they don't carry Amazon).
 
 ---
@@ -236,8 +237,8 @@ EBAY_CLIENT_ID=                EBAY_CLIENT_SECRET=       EBAY_EPN_CAMPAIGN_ID=
 AWIN_API_TOKEN= AWIN_PUBLISHER_ID= AWIN_REGION= AWIN_PROMOTIONS_FEED_URL=
 TRADEDOUBLER_PUBLISHER_ID=     TRADEDOUBLER_VOUCHER_TOKEN=
 
-# GeniusLink (link wrapper)
-GENIUSLINK_API_KEY= GENIUSLINK_API_SECRET= GENIUSLINK_DOMAIN=geni.us GENIUSLINK_GROUP_ID=
+# Takeads (long-tail link converter)
+TAKEADS_PUBLIC_KEY= TAKEADS_SUB_ID=
 ```
 
 ---
@@ -276,8 +277,8 @@ curl -skL --resolve nxt.bargains:443:127.0.0.1 https://nxt.bargains/
 `netlify.toml` + `@netlify/plugin-nextjs` build SSR/ISR/functions. See
 **[NETLIFY.md](NETLIFY.md)** for the full guide. Key points:
 - Set all env vars in the Netlify UI; **do not** set `STRAPI_INTERNAL_URL`.
-- A **data snapshot** of `data/*.json` is committed (except the ~18MB geniuslink
-  cache) so the read-only functions have runtime data; `included_files` bundles
+- A **data snapshot** of `data/*.json` is committed so the read-only functions
+  have runtime data; `included_files` bundles
   it. Refresh by re-committing the data + re-deploying.
 - The `scripts/` cron jobs do **not** run on Netlify — data is a build-time
   snapshot there.
