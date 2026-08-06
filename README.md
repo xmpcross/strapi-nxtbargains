@@ -298,3 +298,57 @@ data/          JSON caches / curated config (snapshot committed for Netlify)
 strapi-cms/    nxt-coupon content-type to add to the Strapi project
 public/        Static assets, logos, fonts
 ```
+
+## Deployment
+
+Hosted on **Netlify**, built from `main` on push. `netlify.toml` carries the
+configuration.
+
+### Why Netlify rather than Vercel or Cloudflare
+
+This is a server-rendered Next.js app that also expects a **filesystem**: twelve
+call sites read `data/*.json` via `join(process.cwd(), …)` at request time,
+around 38 MB in total.
+
+- **Netlify** — already solved. `included_files = ["data/**"]` bundles them.
+- **Vercel** — works, but needs `outputFileTracingIncludes`; the tracer cannot
+  follow computed paths.
+- **Cloudflare** — don't. Workers have no filesystem, so those reads have
+  nowhere to go without rewriting them onto KV or R2.
+
+The Vercel caveat matters because of *how* it fails: the loaders catch their own
+errors and return empty, so a missing bundle gives a green build and a working
+site with silently empty coupons and offers.
+
+### Environment variables
+
+Set in the Netlify UI, not committed:
+
+```text
+NEXT_PUBLIC_STRAPI_URL           CMS the site reads at request time
+STRAPI_API_TOKEN
+NEXT_PUBLIC_GA_MEASUREMENT_ID    analytics, loaded only after consent
+TAKEADS_PUBLIC_KEY               link conversion map, built ahead of the build
+TAKEADS_SUB_ID
+```
+
+### Cost, and why branches matter
+
+Netlify bills in credits: **300/month free, and a production deploy costs 15** —
+roughly 20 releases before sites pause until the next month. Push work to a
+branch (nothing builds) and merge to `main` only when releasing. Opening a pull
+request does trigger a Deploy Preview, so hold off on the PR until you mean it.
+
+### The weekly data jobs
+
+Two cron jobs on the origin server write into `data/` every Sunday:
+
+```cron
+0  3 * * 0  scripts/fetch-openwebninja-store-bestsellers.mjs
+20 3 * * 0  scripts/fetch-openwebninja-amazon-new-releases.mjs
+```
+
+Netlify serves whatever was committed, so **a fetch alone does not update the
+live site** — the refreshed data has to be committed and deployed. Either make
+that a deliberate step or move the jobs into CI.
+
