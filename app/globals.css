@@ -2080,3 +2080,15 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 .review-stars-off { color: rgb(13 27 42 / 0.18); }
 .review-empty { line-height: 1.6; opacity: 0.6; }
 .review-form-wrap { max-width: 640px; }
+
+/* Auto-advancing carousel track (components/AutoCarousel.tsx).
+   The row stays a real scroll container — that is what keeps it swipeable and
+   keyboard-scrollable without JavaScript — so the scrollbar is hidden rather
+   than the overflow being removed. */
+.carousel-track {
+  scrollbar-width: none;            /* Firefox */
+  -ms-overflow-style: none;         /* old Edge */
+}
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
