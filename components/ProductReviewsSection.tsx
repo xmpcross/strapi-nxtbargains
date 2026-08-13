@@ -269,9 +269,18 @@ export default function ProductReviewsSection({
         </div>
       )}
 
-      <div className="mt-8 border-t border-[#dddddd] pt-6" id="write-a-review">
+      {/*
+        The "Write a review" form is hidden on request.
+
+        Left in the tree rather than deleted: ReviewForm and its /api/review
+        route still work, so restoring the section is uncommenting this block.
+        `productDocumentId` is still accepted as a prop for the same reason.
+      */}
+      {/*
+      <div className="mt-8 pt-6" id="write-a-review">
         <ReviewForm productDocumentId={productDocumentId} />
       </div>
+      */}
     </section>
   );
 }
