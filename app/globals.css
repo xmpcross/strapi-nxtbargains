@@ -1891,3 +1891,179 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
   margin-bottom: 0.75rem;
   color: theme('colors.ink');
 }
+
+/* ---------------------------------------------------------------- side peek --
+   Features / Specifications / Additional Info open here instead of expanding
+   inline, so the reference material never pushes prices and price history down
+   the page. Panels stay in the DOM and are hidden with CSS, keeping the content
+   in the served HTML. */
+.product-peek-triggers {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid rgb(13 27 42 / 0.1);
+}
+
+.product-peek-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem 0.25rem;
+  border-bottom: 1px solid rgb(13 27 42 / 0.1);
+  font-family: var(--font-display, inherit);
+  font-weight: 700;
+  text-align: left;
+  background: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.product-peek-trigger:hover { color: var(--color-primary, #0d6efd); }
+.product-peek-trigger-hint { font-weight: 400; opacity: 0.5; font-size: 0.85rem; }
+.product-peek-trigger-chevron { margin-left: auto; font-size: 1.25rem; opacity: 0.4; }
+
+.product-peek-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(13 27 42 / 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 60;
+}
+.product-peek-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+.product-peek-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100dvh;
+  width: min(520px, 100vw);
+  background: #fff;
+  box-shadow: -18px 0 44px rgb(13 27 42 / 0.18);
+  transform: translateX(100%);
+  transition: transform 0.24s ease;
+  z-index: 61;
+  display: flex;
+  flex-direction: column;
+  visibility: hidden;
+}
+.product-peek-panel.is-open { transform: translateX(0); visibility: visible; }
+
+.product-peek-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid rgb(13 27 42 / 0.1);
+}
+
+.product-peek-title { font-family: var(--font-display, inherit); font-weight: 800; font-size: 1.05rem; }
+
+.product-peek-close {
+  font-size: 1.6rem;
+  line-height: 1;
+  padding: 0 0.35rem;
+  cursor: pointer;
+  opacity: 0.55;
+}
+.product-peek-close:hover { opacity: 1; }
+
+.product-peek-body { overflow-y: auto; padding: 1.25rem; flex: 1; }
+
+/* Respect a reduced-motion preference: the drawer still opens, it just does not
+   slide. */
+@media (prefers-reduced-motion: reduce) {
+  .product-peek-panel, .product-peek-backdrop { transition: none; }
+}
+
+/* ------------------------------------------------------------ reviews block --
+   Retailer-style layout: score, distribution and aggregate summary across the
+   top, customer images, then cards four-up. */
+.review-block { display: grid; gap: 2rem; }
+
+.review-head {
+  display: grid;
+  gap: 1.75rem 2.5rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid rgb(13 27 42 / 0.1);
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .review-head { grid-template-columns: minmax(0, 200px) minmax(0, 260px) minmax(0, 1fr); }
+}
+
+.review-score-line { display: flex; align-items: center; gap: 0.5rem; }
+.review-score-star { color: #f5a623; font-size: 1.75rem; line-height: 1; }
+.review-score-value { font-family: var(--font-display, inherit); font-size: 2.75rem; font-weight: 800; line-height: 1; }
+.review-score-count { margin-top: 0.4rem; font-size: 0.9rem; opacity: 0.55; }
+.review-score-note { margin-top: 1rem; font-size: 0.85rem; opacity: 0.8; }
+
+.review-bars { display: grid; gap: 0.4rem; }
+.review-bar-row { display: grid; grid-template-columns: 2.6rem minmax(0, 1fr) 3rem; align-items: center; gap: 0.55rem; }
+.review-bar-label { font-size: 0.8rem; opacity: 0.7; white-space: nowrap; }
+.review-bar-label span { color: #f5a623; }
+.review-bar-track { height: 0.55rem; border-radius: 999px; background: rgb(13 27 42 / 0.08); overflow: hidden; }
+.review-bar-fill { display: block; height: 100%; background: #1f5fd0; border-radius: 999px; }
+.review-bar-count { font-size: 0.78rem; opacity: 0.6; text-align: right; }
+
+.review-saying-title { font-family: var(--font-display, inherit); font-weight: 700; margin-bottom: 0.5rem; }
+.review-saying-body { line-height: 1.6; font-size: 0.925rem; opacity: 0.85; }
+.review-saying-note { margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.5; }
+.review-topics { display: flex; gap: 0.5rem; margin-top: 0.9rem; overflow-x: auto; padding-bottom: 0.35rem; }
+.review-topic {
+  flex: 0 0 auto; font-size: 0.8rem; padding: 0.35rem 0.7rem; border-radius: 999px;
+  background: #eaf7ee; color: #17692f; border: 1px solid #cbe8d3; white-space: nowrap;
+}
+.review-topic.is-negative { background: #fdeceb; color: #8f2018; border-color: #f4cbc7; }
+
+.review-images-title { font-family: var(--font-display, inherit); font-weight: 700; margin-bottom: 0.6rem; }
+.review-images-strip { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.35rem; }
+.review-images-strip li { flex: 0 0 auto; }
+.review-images-strip img { width: 84px; height: 84px; object-fit: cover; border: 1px solid rgb(13 27 42 / 0.1); }
+.review-images-more {
+  width: 84px; height: 84px; display: grid; place-items: center;
+  background: #1b1b1b; color: #fff; font-size: 0.78rem; font-weight: 700;
+}
+
+/* Four per row on wide screens, stepping down rather than squeezing. */
+.review-cards { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px)  { .review-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .review-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .review-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.review-card {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  padding: 1.15rem; border: 1px solid rgb(13 27 42 / 0.12); background: #fff;
+}
+.review-card-title { font-family: var(--font-display, inherit); font-weight: 700; font-size: 0.98rem; }
+.review-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.review-badge {
+  font-size: 0.68rem; padding: 0.15rem 0.45rem; border: 1px solid rgb(13 27 42 / 0.18);
+  opacity: 0.7; white-space: nowrap;
+}
+.review-card-body { line-height: 1.6; opacity: 0.75; font-size: 0.9rem; }
+.review-card-body.is-clamped {
+  display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden;
+}
+.review-see-more {
+  margin-top: 0.35rem; font-size: 0.85rem; color: #1f5fd0; cursor: pointer; background: none;
+}
+.review-see-more:hover { text-decoration: underline; }
+.review-card-photos { display: flex; gap: 0.35rem; margin-top: 0.25rem; }
+.review-card-photos img { width: 52px; height: 52px; object-fit: cover; border: 1px solid rgb(13 27 42 / 0.1); }
+.review-card-meta { margin-top: auto; padding-top: 0.6rem; font-size: 0.76rem; opacity: 0.5; }
+
+.review-actions { display: flex; }
+.review-see-all {
+  display: inline-block; padding: 0.75rem 1.4rem; background: #1f5fd0; color: #fff;
+  font-family: var(--font-display, inherit); font-weight: 700; font-size: 0.9rem;
+}
+.review-see-all:hover { background: #1a51b4; }
+
+.review-stars { font-size: 0.95rem; letter-spacing: 0.05em; }
+.review-stars-on { color: #f5a623; }
+.review-stars-off { color: rgb(13 27 42 / 0.18); }
+.review-empty { line-height: 1.6; opacity: 0.6; }
+.review-form-wrap { max-width: 640px; }

@@ -98,7 +98,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
                 Best deals
               </Link>
               <Link
-                href="/products"
+                href="/all-products"
                 className="inline-flex border border-ink/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-ink/60 transition hover:border-primary hover:text-primary"
               >
                 All products
@@ -152,7 +152,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
           <BrowseCard href="/best-deals" title="Best deals" subtitle="Highest discounts right now" />
           <BrowseCard href="/price-drops" title="Price drops" subtitle="Recently tracked price movements" />
           <BrowseCard href="/coupons" title="Coupons" subtitle="Promo codes and store deals" />
-          <BrowseCard href="/products" title="All products" subtitle="Compare offers across merchants" />
+          <BrowseCard href="/all-products" title="All products" subtitle="Compare offers across merchants" />
         </div>
       </section>
     </main>

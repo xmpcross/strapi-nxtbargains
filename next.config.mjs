@@ -19,6 +19,20 @@ const nextConfig = {
       { protocol: 'https', hostname: 'm.media-amazon.com' },
     ],
   },
+  async redirects() {
+    return [
+      {
+        /*
+         * The catalogue listing moved to /all-products. Only the exact path is
+         * redirected — /products/:slug is still a real route that middleware
+         * rewrites category URLs onto, and must keep working.
+         */
+        source: '/products',
+        destination: '/all-products',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

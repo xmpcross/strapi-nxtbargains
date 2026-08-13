@@ -1,0 +1,111 @@
+'use client';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+export type PeekPanel = {
+  id: string;
+  label: string;
+  /** Rendered on the server and passed down, so the panel bodies stay server
+   *  components — only the open/close behaviour needs the client. */
+  content: React.ReactNode;
+  /** Shown next to the label, e.g. a count. */
+  hint?: string;
+};
+
+/**
+ * Trigger buttons that open their content in a slide-out panel.
+ *
+ * Replaces an inline accordion for the reference material — features,
+ * specifications, additional info. Those sections are long and rarely the
+ * reason someone opened the page, so expanding them inline pushed the prices
+ * and price history far down. In a peek they are one click away and cost no
+ * vertical space until asked for.
+ *
+ * The panels are still rendered into the DOM rather than fetched on open, so
+ * their content remains in the served HTML for crawlers and for anyone with
+ * JavaScript disabled — hidden by CSS, not absent.
+ */
+export default function ProductSidePeek({ panels }: { panels: PeekPanel[] }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const lastTrigger = useRef<HTMLButtonElement | null>(null);
+
+  const close = useCallback(() => {
+    setOpenId(null);
+    // Return focus to whatever opened the peek, or the keyboard user is
+    // stranded at the top of the document.
+    lastTrigger.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!openId) return undefined;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    document.addEventListener('keydown', onKey);
+    // A drawer that leaves the page scrolling behind it feels broken on mobile.
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    panelRef.current?.focus();
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [openId, close]);
+
+  const active = panels.find((p) => p.id === openId) ?? null;
+
+  return (
+    <>
+      <div className="product-peek-triggers">
+        {panels.map((p) => (
+          <button
+            key={p.id}
+            type="button"
+            className="product-peek-trigger"
+            aria-haspopup="dialog"
+            aria-expanded={openId === p.id}
+            onClick={(e) => {
+              lastTrigger.current = e.currentTarget;
+              setOpenId(p.id);
+            }}
+          >
+            <span>{p.label}</span>
+            {p.hint ? <span className="product-peek-trigger-hint">{p.hint}</span> : null}
+            <span aria-hidden="true" className="product-peek-trigger-chevron">›</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Rendered always, hidden with CSS: the content stays crawlable. */}
+      <div
+        className={`product-peek-backdrop${active ? ' is-open' : ''}`}
+        onClick={close}
+        aria-hidden="true"
+      />
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={active?.label ?? 'Product information'}
+        aria-hidden={active ? undefined : true}
+        tabIndex={-1}
+        className={`product-peek-panel${active ? ' is-open' : ''}`}
+      >
+        <div className="product-peek-header">
+          <h3 className="product-peek-title">{active?.label ?? ''}</h3>
+          <button type="button" className="product-peek-close" onClick={close} aria-label="Close">
+            ×
+          </button>
+        </div>
+        <div className="product-peek-body">
+          {panels.map((p) => (
+            <div key={p.id} hidden={p.id !== openId}>
+              {p.content}
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}

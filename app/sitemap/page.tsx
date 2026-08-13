@@ -34,7 +34,7 @@ const LINK_GROUPS: Array<{ title: string; links: Array<{ href: string; label: st
   {
     title: 'Shop',
     links: [
-      { href: '/products', label: 'All Products' },
+      { href: '/all-products', label: 'All Products' },
       { href: '/best-deals', label: 'Best Deals' },
       { href: '/price-drops', label: 'Price Drops' },
       { href: '/coupons', label: 'Coupons' },
@@ -227,7 +227,7 @@ export default async function HtmlSitemapPage() {
                 <Link href="/sitemap.xml" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
                   XML sitemap
                 </Link>
-                <Link href="/products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
+                <Link href="/all-products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
                   All products
                 </Link>
               </div>

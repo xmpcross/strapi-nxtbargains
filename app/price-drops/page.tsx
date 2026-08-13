@@ -125,7 +125,7 @@ export default async function PriceDropsPage() {
               }
             />
             {dropCount > 0 ? (
-              <Link href="/products" className="inline-flex border border-ink/15 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition hover:border-primary hover:text-primary">
+              <Link href="/all-products" className="inline-flex border border-ink/15 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition hover:border-primary hover:text-primary">
                 Compare all products
               </Link>
             ) : null}
@@ -150,7 +150,7 @@ export default async function PriceDropsPage() {
         <div className="mx-auto max-w-[1366px] px-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <BrowseCard href="/best-deals" title="Best deals" subtitle="Highest current merchant discounts" />
-            <BrowseCard href="/products" title="All products" subtitle="Compare offers across merchants" />
+            <BrowseCard href="/all-products" title="All products" subtitle="Compare offers across merchants" />
             <BrowseCard href="/coupons" title="Coupons" subtitle="Promo codes and store deals" />
             <BrowseCard href="/deals" title="Buying guides" subtitle="Editorial deals and roundups" />
           </div>

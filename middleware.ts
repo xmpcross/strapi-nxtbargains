@@ -32,7 +32,18 @@ export function middleware(request: NextRequest) {
    */
   const rewriteUrl = request.nextUrl.clone();
   rewriteUrl.pathname = `/products/${productSlug}`;
-  const response = NextResponse.rewrite(rewriteUrl);
+
+  /*
+   * The flag has to travel on the REQUEST. app/products/[slug]/page.tsx reads it
+   * with headers() and, without it, canonicalises /products/<slug> back to
+   * /<category>/<slug> — which this middleware rewrites again, so the page
+   * redirects to itself forever. Setting it on the response only tells the
+   * browser, never the route.
+   */
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-product-category-route', '1');
+
+  const response = NextResponse.rewrite(rewriteUrl, { request: { headers: requestHeaders } });
   response.headers.set('x-product-category-route', '1');
   return response;
 }

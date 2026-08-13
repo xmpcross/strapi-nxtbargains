@@ -44,6 +44,9 @@ import { breadcrumbJsonLd, productJsonLd } from '@/lib/jsonld';
 import { JsonLd } from '@/components/JsonLd';
 import PriceAlertForm from '@/components/PriceAlertForm';
 import ReviewForm from '@/components/ReviewForm';
+import ProductSidePeek from '@/components/ProductSidePeek';
+import ProductReviewsSection from '@/components/ProductReviewsSection';
+import { localMerchantLogo } from '@/lib/merchant-logos';
 import CommerceProductCard from '@/components/CommerceProductCard';
 import ProductCarousel from '@/components/ProductCarousel';
 
@@ -256,7 +259,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
           <nav className="flex items-center gap-2 overflow-hidden whitespace-nowrap text-sm text-ink/45" aria-label="Breadcrumb">
             <Link href="/" className="shrink-0 text-primary hover:underline">Home</Link>
             <span aria-hidden className="shrink-0 text-ink/40">/</span>
-            <Link href="/products" className="shrink-0 text-primary hover:underline">Products</Link>
+            <Link href="/all-products" className="shrink-0 text-primary hover:underline">Products</Link>
             {category && categorySlug && (
               <>
                 <span aria-hidden className="shrink-0 text-ink/40">/</span>
@@ -407,6 +410,20 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
         </div>
       </section>
 
+      <section className="border-t border-ink/10 bg-white py-12" data-testid="product-reviews">
+        <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
+          {/* The section renders its own "Reviews" heading, as the reference
+              layout does — a second one here would duplicate it. */}
+          <ProductReviewsSection
+            productName={product.name}
+            productDocumentId={product.documentId ?? ''}
+            reviews={reviews}
+            aggregateRating={product.rating != null ? Number(product.rating) : null}
+            aggregateCount={product.ratingCount != null ? Number(product.ratingCount) : null}
+          />
+        </div>
+      </section>
+
       {rows.length > 0 && (
         <section className="border-t border-ink/10 bg-white py-12" data-testid="saved-price-comparison">
           <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
@@ -483,12 +500,15 @@ function ProductInfoTabs({
   retailers: Retailer[];
   brandGroups: CouponBrandGroup[];
 }) {
-  const useGsmarenaSpecsInSpecifications = productHasCategory(product, 'Smart Phones');
-  const hideSpecifications = productHasCategory(product, 'Smart Phones');
-  const featureSpecs = productFeatureSpecs(specs);
-  const additionalInfoEntries = productAdditionalInfoEntries(product);
   const gsmarenaSpecGroups = gsmarenaSpecificationGroups(specs);
-  const specEntries = hideSpecifications && !useGsmarenaSpecsInSpecifications ? [] : productSpecificationEntries(specs);
+  // Phones prefer the GSMArena spec tables, but only where that import actually
+  // ran. Suppressing the generic list unconditionally left a phone sourced from
+  // Google Shopping with an empty Specifications panel while it held dozens of
+  // specs of its own, so the generic list stands in whenever GSMArena is absent.
+  const useGsmarenaSpecsInSpecifications =
+    productHasCategory(product, 'Smart Phones') && gsmarenaSpecGroups.length > 0;
+  const additionalInfoEntries = productAdditionalInfoEntries(product);
+  const specEntries = useGsmarenaSpecsInSpecifications ? [] : productSpecificationEntries(specs);
 
   const accordionId = `product-info-accordion-${productId}`;
 
@@ -511,28 +531,10 @@ function ProductInfoTabs({
               </div>
             </details>
 
-            <details className="product-accordion-item" name={accordionId}>
-              <summary>Features</summary>
-              <div className="product-accordion-panel tab-panel-features">
-                {featureSpecs.length > 0 ? (
-                  <ul className="list-disc space-y-3 pl-5 leading-6 text-ink/70 marker:text-primary">
-                    {featureSpecs.map((feature) => (
-                      <li key={feature} className="pl-1">
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="border border-ink/10 bg-paper p-6 leading-6 text-ink/60">
-                    Product features have not been imported for this item yet.
-                  </div>
-                )}
-              </div>
-            </details>
-
-            <details className="product-accordion-item" name={accordionId}>
-              <summary>Specifications</summary>
-              <div className="product-accordion-panel tab-panel-specifications">
+            <ProductSidePeek
+              panels={[
+                { id: 'specifications', label: 'Specifications', content: (
+                  <>
                 {useGsmarenaSpecsInSpecifications ? (
                   <GsmarenaSpecGroups groups={gsmarenaSpecGroups} />
                 ) : specEntries.length ? (
@@ -542,12 +544,10 @@ function ProductInfoTabs({
                     Product specifications have not been imported for this item yet.
                   </div>
                 )}
-              </div>
-            </details>
-
-            <details className="product-accordion-item" name={accordionId}>
-              <summary>Additional Info</summary>
-              <div className="product-accordion-panel tab-panel-additional-info">
+                  </>
+                ) },
+                { id: 'additional-info', label: 'Additional Info', content: (
+                  <>
                 {additionalInfoEntries.length ? (
                   <dl className="grid overflow-hidden border-0">
                     {additionalInfoEntries.map((entry) => (
@@ -562,39 +562,10 @@ function ProductInfoTabs({
                     Additional product information is not available for this item yet.
                   </div>
                 )}
-              </div>
-            </details>
-
-            <details className="product-accordion-item" name={accordionId}>
-              <summary>Reviews{reviews.length ? ` (${reviews.length})` : ''}</summary>
-              <div className="product-accordion-panel tab-panel-reviews">
-                <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)]">
-                  <div>
-                    {reviews.length === 0 ? (
-                      <p className="leading-6 text-ink/60">No reviews yet — be the first to review {productName}.</p>
-                    ) : (
-                      <ul className="divide-y divide-ink/10">
-                        {reviews.map((r) => (
-                          <li key={r.id} className="py-5 first:pt-0">
-                            <div className="flex items-center gap-3">
-                              <span className="text-sm text-amber-400" aria-label={`${r.rating} out of 5`}>
-                                {'★'.repeat(Math.max(0, Math.min(5, Math.round(r.rating))))}
-                                <span className="text-ink/20">{'★'.repeat(5 - Math.max(0, Math.min(5, Math.round(r.rating))))}</span>
-                              </span>
-                              <span className="font-display text-sm font-bold text-ink">{r.authorName}</span>
-                              <span className="text-xs text-ink/40">{fmtDate(r.createdAt)}</span>
-                            </div>
-                            {r.title && <p className="mt-2 font-display font-bold text-ink">{r.title}</p>}
-                            <p className="mt-1.5 leading-6 text-ink/70">{r.body}</p>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                  <ReviewForm productDocumentId={productDocumentId} />
-                </div>
-              </div>
-            </details>
+                  </>
+                ) },
+              ]}
+            />
           </div>
         </div>
 
@@ -905,7 +876,10 @@ function PriceHistoryChart({ points }: { points: PriceHistoryPoint[] }) {
 
 function CompactOfferRow({ row, className = '' }: { row: CommerceOfferRow; className?: string }) {
   const { offer, product } = row;
-  const logo = mediaUrl(offer.merchant?.logo ?? null);
+  // Strapi media first; a committed local file otherwise. Merchants discovered
+  // via Google Shopping sellers have no uploaded logo, so without the fallback
+  // the price table shows a column of grey initials.
+  const logo = mediaUrl(offer.merchant?.logo ?? null) ?? localMerchantLogo(merchantName(offer));
   const price = offer.price ?? offer.originalPrice;
   const unavailable = offer.availability === 'out_of_stock';
 
@@ -919,9 +893,9 @@ function CompactOfferRow({ row, className = '' }: { row: CommerceOfferRow; class
       >
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt={`${merchantName(offer)} logo`} className="h-4 w-4 shrink-0 object-contain" />
+          <img src={logo} alt={`${merchantName(offer)} logo`} className="h-5 w-auto max-w-[86px] shrink-0 object-contain object-left" />
         ) : (
-          <span className="flex h-4 w-4 shrink-0 items-center justify-center bg-muted text-[10px] font-bold text-ink/45">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center bg-muted text-[10px] font-bold text-ink/45">
             {merchantName(offer).slice(0, 1)}
           </span>
         )}
@@ -979,7 +953,7 @@ function SavedPriceRow({ row, best }: { row: CommerceOfferRow; best: boolean }) 
       <div className="flex min-w-0 items-start gap-3">
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt={`${merchantName(offer)} logo`} className="mt-0.5 h-8 w-8 shrink-0 object-contain" />
+          <img src={logo} alt={`${merchantName(offer)} logo`} className="mt-0.5 h-9 w-auto max-w-[120px] shrink-0 object-contain object-left" />
         ) : (
           <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center bg-muted text-sm font-bold text-ink/45">
             {merchantName(offer).slice(0, 1)}
@@ -1039,7 +1013,8 @@ type SpecificationGroup = {
 
 const PRODUCT_IDENTIFIER_FIELDS = [
   { label: 'MPN', productKey: 'mpn', specKeys: ['MPN', 'mpn'] },
-  { label: 'UPC', productKey: null, specKeys: ['UPC', 'upc'] },
+  { label: 'UPC', productKey: null, specKeys: ['UPC', 'upc', 'UPC Code', 'upcCode'] },
+  { label: 'EAN', productKey: null, specKeys: ['EAN', 'ean', 'EAN Code', 'eanCode'] },
   { label: 'GTIN', productKey: 'gtin', specKeys: ['GTIN', 'gtin'] },
   { label: 'ePID', productKey: null, specKeys: ['ePID', 'EPID', 'epid'] },
   { label: 'ASIN', productKey: 'asin', specKeys: ['ASIN', 'asin', 'amazonAsin'] },
@@ -1071,6 +1046,36 @@ const HIDDEN_SPEC_KEYS = new Set([
   'additionalInfo',
 ]);
 
+/**
+ * Look an identifier up on the product record first, then in `specs`.
+ *
+ * `productSpecificationEntries` deliberately strips identifier keys out of the
+ * Specifications panel so they are not repeated as ordinary rows — but this
+ * panel only read the product's own columns, so a UPC or ASIN that arrived
+ * inside `specs` was hidden from both panels and effectively invisible.
+ */
+function identifierValue(
+  product: CommerceProduct,
+  field: (typeof PRODUCT_IDENTIFIER_FIELDS)[number],
+): string | undefined {
+  if (field.productKey) {
+    const own = formatSpecValue((product as unknown as Record<string, unknown>)[field.productKey]);
+    if (own) return own;
+  }
+  const specs = product.specs;
+  if (!isPlainRecord(specs)) return undefined;
+  const technicalSpecs = isPlainRecord(specs.technicalSpecs) ? specs.technicalSpecs : {};
+  for (const source of [specs, technicalSpecs]) {
+    for (const [key, value] of Object.entries(source)) {
+      if (field.specKeys.some((specKey) => normalizeSpecKey(specKey) === normalizeSpecKey(key))) {
+        const formatted = formatSpecValue(value);
+        if (formatted) return formatted;
+      }
+    }
+  }
+  return undefined;
+}
+
 function productAdditionalInfoEntries(product: CommerceProduct): SpecificationEntry[] {
   const categories = product.categories?.map((category) => category.name).filter(Boolean).join(', ');
   const rating = formatSpecValue(product.rating);
@@ -1079,9 +1084,11 @@ function productAdditionalInfoEntries(product: CommerceProduct): SpecificationEn
     { label: 'Brand', value: product.brandRef?.name || product.brand || undefined },
     { label: 'Category', value: categories || product.category || undefined },
     { label: 'SKU', value: product.sku || undefined },
-    { label: 'MPN', value: product.mpn || undefined },
-    { label: 'GTIN', value: product.gtin || undefined },
-    { label: 'ASIN', value: product.asin || undefined },
+    // ASIN, UPC, EAN, GTIN, MPN, ePID — whichever the product actually carries.
+    ...PRODUCT_IDENTIFIER_FIELDS.map((field) => ({
+      label: field.label,
+      value: identifierValue(product, field),
+    })),
     { label: 'Rating', value: rating && ratingCount ? `${rating} (${ratingCount} reviews)` : rating },
     { label: 'Status', value: product.status || undefined },
     { label: 'Last Updated', value: product.updatedAt ? fmtDate(product.updatedAt) : undefined },
@@ -1111,6 +1118,15 @@ function productSpecificationEntries(specs?: Record<string, unknown> | null): Sp
     .slice(0, 80);
 }
 
+/**
+ * Spec rows that carry plumbing rather than a specification.
+ *
+ * "Image URL" is the source photo the importer pulls from, and it renders as a
+ * raw gsmarena.com link in the middle of the Display or Overview table. It is
+ * data the page uses, not a fact about the product.
+ */
+const HIDDEN_GSMARENA_LABELS = new Set(['image url', 'image', 'source url', 'popularity (hits)']);
+
 function gsmarenaSpecificationGroups(specs?: Record<string, unknown> | null): SpecificationGroup[] {
   if (!isPlainRecord(specs) || !isPlainRecord(specs.gsmarena)) return [];
 
@@ -1125,6 +1141,7 @@ function gsmarenaSpecificationGroups(specs?: Record<string, unknown> | null): Sp
           if (!isPlainRecord(entry)) return null;
           const label = formatSpecValue(entry.name || entry.label);
           const value = formatSpecValue(entry.value);
+          if (!label || HIDDEN_GSMARENA_LABELS.has(label.trim().toLowerCase())) return null;
           return label && value ? { label, value } : null;
         })
         .filter((entry): entry is SpecificationEntry => Boolean(entry));
@@ -1140,19 +1157,6 @@ function isProductIdentifierKey(key: string) {
 
 function normalizeSpecKey(key: string) {
   return key.replace(/[^a-z0-9]/gi, '').toLowerCase();
-}
-
-function productFeatureSpecs(specs?: Record<string, unknown> | null): string[] {
-  if (!isPlainRecord(specs)) return [];
-
-  const technicalSpecs = isPlainRecord(specs.technicalSpecs) ? specs.technicalSpecs : {};
-  const raw = technicalSpecs.Features ?? technicalSpecs.features ?? specs.Features ?? specs.features;
-  const values = Array.isArray(raw) ? raw : raw ? [raw] : [];
-
-  return values
-    .map((value) => formatSpecValue(value))
-    .filter((value): value is string => Boolean(value))
-    .slice(0, 30);
 }
 
 function formatSpecValue(value: unknown): string | undefined {

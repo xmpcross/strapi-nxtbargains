@@ -25,7 +25,7 @@ export default function NotFound() {
           Best deals
         </Link>
         <Link
-          href="/products"
+          href="/all-products"
           className="inline-flex items-center rounded-full border border-ink/15 px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-primary hover:text-primary"
         >
           All products

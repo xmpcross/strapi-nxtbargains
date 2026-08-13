@@ -9,7 +9,7 @@ type FooterItem = FooterLink | { heading: string; children: FooterLink[] };
 
 // Mirrors the top-nav "All Products" menu, incl. the nested "Smart Home" group.
 const shopLinks: FooterItem[] = [
-  { href: '/products', label: 'All Products' },
+  { href: '/all-products', label: 'All Products' },
   { href: '/category/smart-phones', label: 'Smart Phones' },
   { href: '/category/smartwatches', label: 'Smartwatches' },
   { href: '/category/tablets', label: 'Tablets' },
