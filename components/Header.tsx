@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { BLOG_NAV_LINKS, SITE } from '@/lib/site';
-import { listCategories } from '@/lib/strapi';
+import { listCategories, listPosts, mediaUrl } from '@/lib/strapi';
+import { postPath, fmtDate } from '@/lib/format';
+import SearchDialog from './SearchDialog';
 import MobileNav from './MobileNav';
 import StickyHeaderShadow from './StickyHeaderShadow';
 
@@ -71,8 +73,27 @@ function buildNav(blogCategories: Array<{ slug: string; name: string }>): NavIte
 const navTestId = (label: string) => `nav-${label.toLowerCase().replace(/\s+/g, '-')}`;
 
 export default async function Header() {
-  const blogCategories = await listCategories().catch(() => []);
+  /*
+   * Both fetches feed the search dialog as well as the nav, so opening the
+   * dialog costs no extra request. They are independent, so they run together.
+   */
+  const [blogCategories, recentPosts] = await Promise.all([
+    listCategories().catch(() => []),
+    listPosts({ page: 1, pageSize: 3 }).then((r) => r.data).catch(() => []),
+  ]);
   const nav = buildNav(blogCategories);
+
+  const searchChips = blogCategories
+    .filter((category) => category.slug && category.name)
+    .slice(0, 9)
+    .map((category) => ({ label: category.name, slug: category.slug }));
+
+  const searchSuggestions = recentPosts.map((post) => ({
+    title: post.title,
+    href: postPath(post),
+    image: mediaUrl(post.coverImage ?? null),
+    date: post.publishedAt ? fmtDate(post.publishedAt) : null,
+  }));
 
   return (
     <header
@@ -183,29 +204,13 @@ export default async function Header() {
           </ul>
         </nav>
 
-        {/* Desktop right side: search icon */}
+        {/* Desktop right side: search */}
         <div className="hidden items-center gap-2 md:flex">
-          <Link
-            href="/search"
-            aria-label={`Search ${SITE.name}`}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-ink/15 bg-white text-ink/60 transition hover:border-primary hover:text-primary"
-            data-testid="header-search"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-[18px] w-[18px]"
-              aria-hidden
-            >
-              <circle cx="11" cy="11" r="7" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-          </Link>
+          <SearchDialog
+            chips={searchChips}
+            suggestions={searchSuggestions}
+            label={`Search ${SITE.name}`}
+          />
         </div>
 
         {/* Mobile: hamburger */}
