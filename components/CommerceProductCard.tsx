@@ -44,7 +44,7 @@ export default function CommerceProductCard({
     <article
       className={`group flex h-full flex-col bg-white ${
         catalogLayout
-          ? 'rounded-2xl border border-ink/10 p-[18px] transition hover:-translate-y-1 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]'
+          ? 'rounded-[8px] border border-ink/10 p-[18px] transition hover:-translate-y-1 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]'
           : 'border border-ink/10'
       }`}
       data-testid={`commerce-product-${product.slug}`}

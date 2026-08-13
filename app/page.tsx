@@ -357,7 +357,7 @@ function OfferComparison({ product }: { product: CommerceProduct }) {
 
 function DealCard({ deal }: { deal: Deal }) {
   return (
-    <Link href={deal.href} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]" data-testid={`pricedrop-${deal.product.slug}`}>
+    <Link href={deal.href} className="group flex h-full flex-col overflow-hidden rounded-[8px] border border-ink/10 bg-white transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]" data-testid={`pricedrop-${deal.product.slug}`}>
       <div className="price-drop-image-box uniform-product-image-box relative grid aspect-square w-full place-items-center overflow-hidden bg-white p-4 sm:p-5">
         {deal.pct > 0 && (
           <span className="absolute left-2.5 top-2.5 z-10 rounded-[7px] bg-primary px-[9px] py-1 font-display text-[0.74rem] font-bold text-white">-{deal.pct}%</span>
@@ -531,7 +531,7 @@ function TrendingCard({ product }: { product: CommerceProduct }) {
   return (
     <Link
       href={href}
-      className="group flex flex-col rounded-2xl border border-ink/10 bg-white p-[18px] transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]"
+      className="group flex flex-col rounded-[8px] border border-ink/10 bg-white p-[18px] transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]"
       data-testid={`trending-${product.slug}`}
     >
       <div className="trending-image-box mb-3.5 grid aspect-square place-items-center overflow-hidden rounded-[11px] bg-white">
