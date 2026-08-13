@@ -42,9 +42,12 @@ export default function CommerceProductCard({
 
   return (
     <article
-      className={`group flex h-full flex-col bg-white ${
+      /* The radius sits on the shared base rather than the catalogLayout
+         branch: the other variant carried none, so the same card rendered with
+         8px corners on one page and square corners on another. */
+      className={`group flex h-full flex-col overflow-hidden rounded-[8px] bg-white ${
         catalogLayout
-          ? 'rounded-[8px] border border-ink/10 p-[18px] transition hover:-translate-y-1 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]'
+          ? 'border border-ink/10 p-[18px] transition hover:-translate-y-1 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]'
           : 'border border-ink/10'
       }`}
       data-testid={`commerce-product-${product.slug}`}
