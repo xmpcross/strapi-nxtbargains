@@ -54,7 +54,13 @@ type SearchParams = {
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams;
   const page = Math.max(1, Number(sp.page) || 1);
-  const filters = productFiltersFromSearchParams(sp);
+  /*
+   * The catalogue defaults to a shuffled order rather than newest-first, so the
+   * same handful of recently-updated products do not permanently own the first
+   * page. Any explicit ?sort= still wins.
+   */
+  const requestedFilters = productFiltersFromSearchParams(sp);
+  const filters = { ...requestedFilters, sort: requestedFilters.sort || 'random' };
 
   const [res, categories] = await Promise.all([
     listCommerceProducts({ page: 1, pageSize: CATALOG_PAGE_SIZE }).catch(() => null),

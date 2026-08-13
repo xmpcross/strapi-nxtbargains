@@ -24,7 +24,7 @@ import { pageOpenGraph } from '@/lib/seo';
 export const revalidate = 300;
 export const dynamicParams = true;
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 16;
 
 type Params = { slug: string };
 type SearchParams = {
