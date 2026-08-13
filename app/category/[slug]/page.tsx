@@ -104,7 +104,7 @@ export default async function ProductCategoryPage({
   return (
     <main data-testid={`product-category-${category.slug}`}>
       <section
-        className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white"
+        className="relative overflow-hidden border-b border-ink/10 bg-gradient-to-br from-[#f7f9fc] via-[#eef3fa] to-[#e9eef7] text-ink"
         data-testid="product-category-header"
       >
         <div
@@ -112,39 +112,39 @@ export default async function ProductCategoryPage({
           className="pointer-events-none absolute inset-0 opacity-80"
           style={{
             background:
-              'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
+              'radial-gradient(at 80% 20%, rgba(0,70,190,0.10) 0%, transparent 55%), radial-gradient(at 15% 85%, rgba(255,224,0,0.16) 0%, transparent 55%)',
           }}
         />
         <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45" aria-label="Breadcrumb">
-            <Link href="/" className="transition hover:text-white">Home</Link>
+          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink/50" aria-label="Breadcrumb">
+            <Link href="/" className="transition hover:text-ink">Home</Link>
             <span aria-hidden>/</span>
-            <Link href="/category" className="transition hover:text-white">Categories</Link>
+            <Link href="/category" className="transition hover:text-ink">Categories</Link>
             <span aria-hidden>/</span>
-            <span className="text-[#ffe000]">{category.name}</span>
+            <span className="text-primary">{category.name}</span>
           </nav>
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">{SITE.name} catalog</p>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">{SITE.name} catalog</p>
               <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
                 {category.name}
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
+              <p className="mt-4 max-w-2xl text-base leading-7 text-ink/70 sm:text-lg">
                 {categoryPageDescription(category)}
               </p>
 
-              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
+              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-ink/70 sm:text-base">
                 <li className="flex gap-3">
-                  <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                  <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
                   <span>Side-by-side prices from Amazon, eBay, Walmart, Newegg, and Best Buy.</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                  <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
                   <span>Filter by brand, store, availability, condition, and price range.</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                  <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
                   <span>See the lowest current offer before you leave {SITE.name}.</span>
                 </li>
               </ul>
@@ -153,22 +153,22 @@ export default async function ProductCategoryPage({
                 <a href="#catalog" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
                   Browse {category.name.toLowerCase()}
                 </a>
-                <Link href="/all-products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
+                <Link href="/all-products" className="inline-flex border border-ink/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-ink/40 hover:text-ink">
                   All products
                 </Link>
-                <Link href="/best-deals" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
+                <Link href="/best-deals" className="inline-flex border border-ink/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-ink/40 hover:text-ink">
                   Best deals
                 </Link>
               </div>
             </div>
 
-            <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label={`${category.name} statistics`}>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
-              <p className="mt-3 text-sm leading-6 text-white/70">
+            <aside className="border border-ink/12 bg-white/70 p-5 backdrop-blur sm:p-6" aria-label={`${category.name} statistics`}>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">At a glance</p>
+              <p className="mt-3 text-sm leading-6 text-ink/70">
                 A live snapshot of {category.name} on {SITE.name} — compare prices and current merchant
                 offers side by side before you buy.
               </p>
-              <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
+              <div className="mt-5 grid grid-cols-2 gap-4 border-t border-ink/10 pt-5">
                 <Stat label="Products" value={String(allProducts.length)} />
                 <Stat label="Showing" value={String(total)} />
                 <Stat label="Brands" value={String(filterOptions.brands.length)} />
@@ -252,8 +252,8 @@ export default async function ProductCategoryPage({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="font-display text-2xl font-bold text-white">{value}</p>
-      <p className="mt-1 text-sm text-white/55">{label}</p>
+      <p className="font-display text-2xl font-bold text-ink">{value}</p>
+      <p className="mt-1 text-sm text-ink/55">{label}</p>
     </div>
   );
 }

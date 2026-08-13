@@ -287,48 +287,48 @@ function ProductsHero({
   activeCategory?: string;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white" data-testid="products-page-header">
+    <section className="relative overflow-hidden border-b border-ink/10 bg-gradient-to-br from-[#f7f9fc] via-[#eef3fa] to-[#e9eef7] text-ink" data-testid="products-page-header">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-80"
         style={{
           background:
-            'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
+            'radial-gradient(at 80% 20%, rgba(0,70,190,0.10) 0%, transparent 55%), radial-gradient(at 15% 85%, rgba(255,224,0,0.16) 0%, transparent 55%)',
         }}
       />
       <div className="products-page-header-inner relative mx-auto px-4 py-10 sm:px-6 sm:py-14">
-        <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
-          <Link href="/" className="transition hover:text-white">Home</Link>
+        <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink/50">
+          <Link href="/" className="transition hover:text-ink">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-[#ffe000]">All products</span>
+          <span className="text-primary">All products</span>
         </nav>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">NXT.Bargains catalog</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">NXT.Bargains catalog</p>
             <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
               Every product. Every marketplace. One place to compare.
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-ink/70 sm:text-lg">
               Search the full catalog, filter by category, brand, store, or price range, and see current offers from major retailers side by side.
               {activeCategory ? ` Currently browsing ${activeCategory}.` : ''}
             </p>
 
-            <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
+            <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-ink/70 sm:text-base">
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
                 <span>Side-by-side prices from Amazon, eBay, Walmart, Newegg, and Best Buy.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
                 <span>Filter by category, brand, store, availability, condition, and price range.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
                 <span>See the lowest current offer before you leave NXT.Bargains.</span>
               </li>
               <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
+                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
                 <span>Free to browse — no signup required.</span>
               </li>
             </ul>
@@ -337,28 +337,28 @@ function ProductsHero({
               <a href="#catalog" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
                 Browse catalog
               </a>
-              <Link href="/category" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
+              <Link href="/category" className="inline-flex border border-ink/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-ink/40 hover:text-ink">
                 Categories
               </Link>
-              <Link href="/best-deals" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
+              <Link href="/best-deals" className="inline-flex border border-ink/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-ink/40 hover:text-ink">
                 Best deals
               </Link>
             </div>
           </div>
 
-          <aside className="products-hero-panel border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="Product catalog statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
-            <p className="mt-3 text-sm leading-6 text-white/70">
+          <aside className="products-hero-panel border border-ink/12 bg-white/70 p-5 backdrop-blur sm:p-6" aria-label="Product catalog statistics">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">At a glance</p>
+            <p className="mt-3 text-sm leading-6 text-ink/70">
               A live snapshot of the NXT.Bargains product catalog — updated as new products and merchant offers are added across major marketplaces.
             </p>
-            <p className="mt-3 text-sm leading-6 text-white/60">
+            <p className="mt-3 text-sm leading-6 text-ink/60">
               {activeCategory
                 ? `Browsing ${activeCategory} with ${showing} product${showing === 1 ? '' : 's'} currently visible from ${totalProducts} in the full catalog.`
                 : showing !== totalProducts
                   ? `Showing ${showing} of ${totalProducts} products after your current filters. Clear filters to view the full catalog.`
                   : `Browse ${totalProducts} products across ${categoryCount} categories and ${storeCount} stores, then compare offers before you buy.`}
             </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
+            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-ink/10 pt-5">
               <Stat label="In catalog" value={String(totalProducts)} compact />
               <Stat label="Showing" value={String(showing)} compact />
               <Stat label="Categories" value={String(categoryCount)} compact />
@@ -374,8 +374,8 @@ function ProductsHero({
 function Stat({ label, value, compact = false }: { label: string; value: string; compact?: boolean }) {
   return (
     <div>
-      <p className={`font-display font-bold text-white ${compact ? 'text-2xl' : 'text-3xl'}`}>{value}</p>
-      <p className="mt-1 text-sm text-white/55">{label}</p>
+      <p className={`font-display font-bold text-ink ${compact ? 'text-2xl' : 'text-3xl'}`}>{value}</p>
+      <p className="mt-1 text-sm text-ink/55">{label}</p>
     </div>
   );
 }
