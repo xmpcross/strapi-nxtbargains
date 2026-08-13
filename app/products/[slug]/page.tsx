@@ -553,7 +553,10 @@ function ProductInfoTabs({
                     {additionalInfoEntries.map((entry) => (
                       <div key={entry.label} className="grid gap-2 border-b border-ink/10 px-4 py-3 last:border-b-0 sm:grid-cols-[190px_minmax(0,1fr)]">
                         <dt className="font-bold text-ink/55">{entry.label}</dt>
-                        <dd className="text-ink">{entry.value}</dd>
+                        {/* break-words: the restored Image URL row is a single
+                            unbroken 200-character string with no spaces to wrap
+                            at, and would otherwise run past the table. */}
+                        <dd className="break-words text-ink">{entry.value}</dd>
                       </div>
                     ))}
                   </dl>
@@ -1121,11 +1124,12 @@ function productSpecificationEntries(specs?: Record<string, unknown> | null): Sp
 /**
  * Spec rows that carry plumbing rather than a specification.
  *
- * "Image URL" is the source photo the importer pulls from, and it renders as a
- * raw gsmarena.com link in the middle of the Display or Overview table. It is
- * data the page uses, not a fact about the product.
+ * "Image URL" was hidden here too, as the source photo the importer pulls from.
+ * It is shown again on request: it is the only place the source of a product
+ * photo is visible from the page, which matters while the image imports are
+ * still being worked through.
  */
-const HIDDEN_GSMARENA_LABELS = new Set(['image url', 'image', 'source url', 'popularity (hits)']);
+const HIDDEN_GSMARENA_LABELS = new Set(['image', 'source url', 'popularity (hits)']);
 
 function gsmarenaSpecificationGroups(specs?: Record<string, unknown> | null): SpecificationGroup[] {
   if (!isPlainRecord(specs) || !isPlainRecord(specs.gsmarena)) return [];
