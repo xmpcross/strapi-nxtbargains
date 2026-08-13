@@ -46,12 +46,42 @@ export const metadata: Metadata = {
   },
 };
 
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const cms = cmsOrigin();
 
   return (
     <html lang="en">
       <head>
+        {/*
+          GA4 emitted server-side, straight into <head>.
+
+          It lived in <GoogleAnalytics /> using next/script, but afterInteractive
+          scripts are injected by the client runtime after hydration, so they are
+          absent from the initial HTML — which is all Google's tag detection
+          reads. That is why it reported "Your Google tag wasn't detected".
+
+          Consent Mode keeps this honest: the defaults below deny every storage
+          type before gtag loads, so no cookies or identifiers are set for a
+          visitor who has not accepted. <GoogleAnalytics /> pushes a
+          `consent update` when they do.
+        */}
+        {GA_MEASUREMENT_ID ? (
+          <>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted',wait_for_update:500});`,
+              }}
+            />
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}');`,
+              }}
+            />
+          </>
+        ) : null}
         <link rel="preconnect" href={cms} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={cms} />
         <JsonLd graph={[organizationJsonLd(), websiteJsonLd()]} />
