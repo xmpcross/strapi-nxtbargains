@@ -1182,9 +1182,13 @@ main[data-testid^="product-price-"] .product-offer-list .product-offer-row-extra
 
 /* Reveal via the classic checked-checkbox sibling combinator (the toggle input
    is the first child of .product-offer-list, so it precedes every row/footer).
-   Avoids :has(), which older browsers don't support — that broke "Show all". */
+   Avoids :has(), which older browsers don't support — that broke "Show all".
+   The descendant step matters: the rows now sit inside a wrapper div rather
+   than being direct siblings of the input, so `~ .product-offer-row-extra`
+   alone would never match and "Show all" would do nothing. */
+main[data-testid^="product-price-"] .product-offer-toggle:checked ~ * .product-offer-row-extra,
 main[data-testid^="product-price-"] .product-offer-toggle:checked ~ .product-offer-row-extra {
-  display: grid;
+  display: flex;
 }
 
 main[data-testid^="product-price-"] .product-offer-list .show-less-offers {
