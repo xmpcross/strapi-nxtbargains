@@ -42,7 +42,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
       'Clear winner signals without wading through long spec sheets on your own.',
       'Built to help you decide faster before checking live marketplace prices.',
     ],
-    primaryCta: { href: '/products', label: 'Compare products' },
+    primaryCta: { href: '/all-products', label: 'Compare products' },
     secondaryCta: { href: '/product-reviews', label: 'Read reviews' },
     glanceDescription:
       'Head-to-head comparison articles from the NXT.Bargains editorial team — built for shoppers who want the differences spelled out plainly.',
@@ -70,7 +70,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
       'Practical verdicts with the caveats that matter before you buy.',
       'Updated editorial coverage across phones, laptops, audio, and smart home gear.',
     ],
-    primaryCta: { href: '/products', label: 'Shop compared' },
+    primaryCta: { href: '/all-products', label: 'Shop compared' },
     secondaryCta: { href: '/product-comparisons', label: 'See comparisons' },
     glanceDescription:
       'Honest product reviews from NXT.Bargains — focused on real-world use, value, and whether the product earns a recommendation.',
@@ -126,7 +126,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
       'Practical instructions for getting more from the gear you already own.',
       'Written to save time when manuals and forums leave you guessing.',
     ],
-    primaryCta: { href: '/products', label: 'Find products' },
+    primaryCta: { href: '/all-products', label: 'Find products' },
     secondaryCta: { href: '/nxt-bargains-informative-articles', label: 'Read explainers' },
     glanceDescription:
       'Actionable how-to guides from NXT.Bargains — setup help, fixes, and smarter ways to use your tech.',

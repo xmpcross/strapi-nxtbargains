@@ -24,7 +24,7 @@ function buildNav(blogCategories: Array<{ slug: string; name: string }>): NavIte
 
   return [
   {
-    href: '/products',
+    href: '/all-products',
     label: 'All Products',
     children: [
       { href: '/category/smart-phones', label: 'Smart Phones' },

@@ -66,6 +66,9 @@ const SUB_ID = process.env.TAKEADS_SUB_ID || null;
  * an existing affiliate link or hand another network's commission away.
  */
 const ALREADY_AFFILIATED = [
+  'tatrck.com',                      // Takeads' own tracking domain — a link we
+                                     // already converted must never be sent back
+                                     // through the converter and wrapped twice
   'geni.us', 'buy.geni.us',          // Geniuslink (client-side, Amazon)
   'goto.walmart.com', 'linksynergy.com', 'go.skimresources.com',
   'prf.hn', 'imp.i',                  // Impact deep links
@@ -73,7 +76,37 @@ const ALREADY_AFFILIATED = [
   'awin1.com', 'tradedoubler.com', 'admitad.com',
 ];
 
-const isAffiliated = (url) => ALREADY_AFFILIATED.some((h) => url.includes(h));
+const isAffiliatedHost = (url) => ALREADY_AFFILIATED.some((h) => url.includes(h));
+
+/*
+ * Amazon is monetised by our own Associates tag, so it must never be handed to
+ * Takeads. The header above always claimed this was skipped, but no check
+ * existed: a first run converted 20 tagged amazon.com URLs, which would have
+ * routed clicks on our best-earning merchant through Takeads and dropped
+ * `tag=unitradeco-20` on the way.
+ *
+ * Any amazon host is refused, tagged or not — an untagged Amazon URL is a bug
+ * to fix in the tag logic, not a URL to sell to another network.
+ */
+const isAmazon = (url) => /(^|\.)amazon\.[a-z.]+/i.test((() => {
+  try { return new URL(url).hostname; } catch { return ''; }
+})());
+
+/*
+ * Takeads monetises a merchant product page. The offer feeds also hold Google
+ * Shopping *search* URLs (google.com/search?ibp=oshop&prds=catalogid:...),
+ * which are not a merchant destination and are rejected with HTTP 400 — and
+ * because the API is called in batches, one of them fails the whole batch.
+ * That is what made batches 1 and 2 fail on every run while the rest succeeded.
+ */
+const isNonMerchant = (url) => {
+  try {
+    const h = new URL(url).hostname.replace(/^www\./, '');
+    return h === 'google.com' || h.endsWith('.google.com');
+  } catch { return true; }
+};
+
+const isAffiliated = (url) => isAffiliatedHost(url) || isAmazon(url) || isNonMerchant(url);
 
 function readCache() {
   try {

@@ -15,6 +15,7 @@ import {
 import {
   getCommerceCategory,
   listCommerceCategories,
+  listCommerceCategoriesForSite,
   listCommerceProducts,
 } from '@/lib/strapi';
 import { SITE } from '@/lib/site';
@@ -81,8 +82,14 @@ export default async function ProductCategoryPage({
   const res = await listCommerceProducts({
     category: category.slug,
     page: 1,
-    pageSize: 240,
+    // Same reason as /products: filters run over the fetched array, so a cap
+    // here silently hides products from a large category.
+    pageSize: 1000,
   }).catch(() => null);
+
+  // Categories this storefront actually sells into, with counts, so the sidebar
+  // can list them with the current one marked.
+  const allCategories = await listCommerceCategoriesForSite().catch(() => []);
 
   const allProducts = res?.data ?? [];
   const filterOptions = buildFilterOptions(allProducts);
@@ -146,7 +153,7 @@ export default async function ProductCategoryPage({
                 <a href="#catalog" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
                   Browse {category.name.toLowerCase()}
                 </a>
-                <Link href="/products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
+                <Link href="/all-products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
                   All products
                 </Link>
                 <Link href="/best-deals" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
@@ -178,8 +185,14 @@ export default async function ProductCategoryPage({
             <ProductFiltersSidebar
               action={`/category/${category.slug}`}
               clearHref={`/category/${category.slug}`}
-              filters={filters}
+              filters={{ ...filters, category: category.slug }}
               filterOptions={filterOptions}
+              /* The category list is the point of this sidebar — it is how a
+                 reader moves between categories, with the current one marked. */
+              categories={allCategories.map((item) => ({
+                label: item.name, value: item.slug, count: item.productCount,
+              }))}
+              categoryMode="list"
               totalItems={allProducts.length}
               activeFilterCount={activeFilterCount}
               searchPlaceholder="Search this category"
@@ -194,7 +207,7 @@ export default async function ProductCategoryPage({
                   </h4>
                 </div>
                 <Link
-                  href="/products"
+                  href="/all-products"
                   className="border border-ink/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-ink/60 transition hover:border-primary hover:text-primary"
                 >
                   All products

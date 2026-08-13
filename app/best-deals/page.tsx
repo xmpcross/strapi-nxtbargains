@@ -198,7 +198,7 @@ export default async function BestDealsPage() {
         <div className="mx-auto max-w-[1366px] px-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <BrowseCard href="/price-drops" title="Price drops" subtitle="Recently tracked price movements" />
-            <BrowseCard href="/products" title="All products" subtitle="Compare offers across merchants" />
+            <BrowseCard href="/all-products" title="All products" subtitle="Compare offers across merchants" />
             <BrowseCard href="/coupons" title="Coupons" subtitle="Promo codes and store deals" />
             <BrowseCard href="/deals" title="Buying guides" subtitle="Editorial deals and roundups" />
           </div>
@@ -275,7 +275,7 @@ function Hero({
               <Link href="/price-drops" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
                 Price drops
               </Link>
-              <Link href="/products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
+              <Link href="/all-products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
                 All products
               </Link>
             </div>

@@ -196,13 +196,35 @@ export function collectOfferRows(product: CommerceProduct, similarProducts: Comm
     }
   }
 
-  return rows.sort((a, b) => {
+  const sorted = rows.sort((a, b) => {
     const aPrice = offerPrice(a.offer);
     const bPrice = offerPrice(b.offer);
     if (aPrice !== null && bPrice !== null && aPrice !== bPrice) return aPrice - bPrice;
     if (aPrice !== null) return -1;
     if (bPrice !== null) return 1;
     return merchantName(a.offer).localeCompare(merchantName(b.offer));
+  });
+
+  /*
+   * One row per merchant: the cheapest, since the sort above is price-ascending.
+   *
+   * A product routinely carries several offers from the same store — four eBay
+   * listings from different sellers, or two Amazon entries for different
+   * variants. Showing them all makes the comparison table repeat a merchant
+   * with conflicting prices, which reads as a data error rather than choice.
+   *
+   * Keyed on the merchant's documentId where present, falling back to its name;
+   * offers with no merchant at all fall back to the offer key so they are never
+   * collapsed into a single anonymous row.
+   */
+  const perMerchant = new Set<string>();
+  return sorted.filter((row) => {
+    const key = row.offer.merchant?.documentId
+      ?? row.offer.merchant?.name
+      ?? `offer:${row.offer.documentId ?? row.offer.id}`;
+    if (perMerchant.has(key)) return false;
+    perMerchant.add(key);
+    return true;
   });
 }
 

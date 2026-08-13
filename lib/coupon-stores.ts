@@ -52,6 +52,8 @@ const SOURCE_STORE_LOGOS: Array<[RegExp, string]> = [
   [/target/, '/logos/target-logo.svg'],
   [/nike/, '/logos/nike-logo.svg'],
   [/argos/, '/logos/argos-logo.svg'],
+  [/micro\s*center/, '/logos/micro-center-logo.svg'],
+  [/oneplus/, '/logos/oneplus-logo.png'],
 ];
 
 export function listCouponStores(): CouponStoreCache {

@@ -167,7 +167,7 @@ export default async function HomePage() {
       {priceDrops.length >= 3 && (
         <section className="py-14 sm:py-[72px]" data-testid="home-price-drops">
           <div className="mx-auto max-w-[1366px] px-6">
-            <SectionHead eyebrow="● Live now" title="This week's biggest price drop" intro="The steepest discount we're tracking across marketplaces this week." cta={{ href: '/products', label: 'All products' }} />
+            <SectionHead eyebrow="● Live now" title="This week's biggest price drop" intro="The steepest discount we're tracking across marketplaces this week." cta={{ href: '/all-products', label: 'All products' }} />
             <div className="mt-9 grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-6">
               {priceDrops.map((d) => <DealCard key={d.product.id} deal={d} />)}
             </div>
@@ -212,7 +212,7 @@ export default async function HomePage() {
       {trending.length > 0 && (
         <section className="pb-14 sm:pb-[72px]" data-testid="home-trending">
           <div className="mx-auto max-w-[1366px] px-6">
-            <SectionHead eyebrow="Most compared" title="Trending products" intro="Popular picks shoppers are comparing across Amazon, eBay and more." cta={{ href: '/products', label: 'Browse all' }} />
+            <SectionHead eyebrow="Most compared" title="Trending products" intro="Popular picks shoppers are comparing across Amazon, eBay and more." cta={{ href: '/all-products', label: 'Browse all' }} />
             <div className="mt-9 grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-6">
               {trending.map((p) => <TrendingCard key={p.id} product={p} />)}
             </div>

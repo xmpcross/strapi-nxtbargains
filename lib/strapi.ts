@@ -195,6 +195,9 @@ export type CommerceProduct = {
   sku?: string | null;
   rating?: number | string | null;
   ratingCount?: number | null;
+  reviewSummary?: string | null;
+  reviewTopics?: { label: string; count?: number; sentiment?: 'positive' | 'negative' }[] | null;
+  recommendPercent?: number | null;
   status?: 'active' | 'draft' | 'archived';
   offers?: CommerceOffer[];
   publishedAt?: string;
@@ -341,6 +344,37 @@ export async function listCommerceCategories(): Promise<CommerceCategory[]> {
     pagination: { pageSize: 100 },
   });
   return res.data.filter(isVisibleCommerceCategory);
+}
+
+/**
+ * The categories this storefront actually sells into, with product counts.
+ *
+ * commerce-categories is a shared taxonomy: it also holds bestlooking.skin's
+ * skincare categories and nxtsmarthome's " AU" ones. Listing it verbatim put
+ * "Climate & Comfort AU" in the nxt.bargains sidebar, linking to a category with
+ * nothing in it. A category earns its place by containing at least one product
+ * tagged for this site, which also yields the counts the sidebar displays.
+ */
+export async function listCommerceCategoriesForSite(): Promise<
+  Array<CommerceCategory & { productCount: number }>
+> {
+  const [categories, products] = await Promise.all([
+    listCommerceCategories(),
+    // One page wide enough for the whole catalogue; counts would under-report
+    // past this, so raise it alongside the catalogue rather than paginating.
+    listCommerceProducts({ pageSize: 500 }).then((r) => r.data).catch(() => [] as CommerceProduct[]),
+  ]);
+
+  const counts = new Map<string, number>();
+  for (const product of products) {
+    for (const category of product.categories ?? []) {
+      if (category?.slug) counts.set(category.slug, (counts.get(category.slug) ?? 0) + 1);
+    }
+  }
+
+  return categories
+    .map((category) => ({ ...category, productCount: counts.get(category.slug) ?? 0 }))
+    .filter((category) => category.productCount > 0);
 }
 
 export async function getCommerceCategory(slug: string): Promise<CommerceCategory | null> {
@@ -546,6 +580,16 @@ export type CommerceReview = {
   title?: string | null;
   body: string;
   createdAt: string;
+  /* Trust badges. Only ever set from a source that confirms the claim — a
+     "Verified Purchaser" badge on an unverified review is a lie to the reader. */
+  verifiedPurchase?: boolean | null;
+  incentivized?: boolean | null;
+  ownershipDuration?: string | null;
+  helpfulCount?: number | null;
+  images?: StrapiImage[] | null;
+  /* Where a syndicated review came from, e.g. "walmart.com". Shown so a reader
+     can tell an imported retailer review from one written on this site. */
+  source?: string | null;
 };
 
 export type NxtComment = {
@@ -565,6 +609,9 @@ export async function listPostComments(postDocumentId: string): Promise<NxtComme
         commentStatus: { $eq: 'approved' },
       },
       sort: ['createdAt:desc'],
+      // Badges and customer photos are opt-in fields; without populate they come
+      // back undefined and the card silently loses them.
+      populate: { images: true },
       pagination: { pageSize: 50 },
     });
     return res.data;
@@ -583,6 +630,9 @@ export async function listProductReviews(productDocumentId: string): Promise<Com
         reviewStatus: { $eq: 'approved' },
       },
       sort: ['createdAt:desc'],
+      // Badges and customer photos are opt-in fields; without populate they come
+      // back undefined and the card silently loses them.
+      populate: { images: true },
       pagination: { pageSize: 50 },
     });
     return res.data;

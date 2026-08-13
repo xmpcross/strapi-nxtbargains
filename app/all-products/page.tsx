@@ -27,11 +27,17 @@ export const metadata: Metadata = {
   title: 'All Products — Compare Prices Across Marketplaces',
   description:
     'Browse every product on NXT.Bargains and compare live prices from Amazon, eBay, Walmart, and more. Filter by category, brand, store, and price to find the best deal before you buy.',
-  alternates: { canonical: '/products' },
+  alternates: { canonical: '/all-products' },
 };
 
 const PAGE_SIZE = 24;
-const CATALOG_PAGE_SIZE = 240;
+/*
+ * Filtering, sorting and faceting all run over the fetched array, so this has to
+ * cover the whole catalogue — at 240 it silently hid two thirds of the products
+ * and reported the fetch size as the catalogue total. Strapi imposes no ceiling
+ * of its own, so the guard is the assertion below rather than this number.
+ */
+const CATALOG_PAGE_SIZE = 1000;
 
 type SearchParams = {
   q?: string;
@@ -56,6 +62,18 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   ]);
 
   const allProducts = res?.data ?? [];
+  /*
+   * The real catalogue size, straight from Strapi. Reporting allProducts.length
+   * instead made the page claim exactly CATALOG_PAGE_SIZE products once the
+   * catalogue outgrew it — a number that looked plausible and was wrong.
+   */
+  const catalogTotal = res?.meta?.pagination?.total ?? allProducts.length;
+  if (catalogTotal > allProducts.length) {
+    console.warn(
+      `[/products] catalogue has ${catalogTotal} products but only ${allProducts.length} were fetched; ` +
+      'raise CATALOG_PAGE_SIZE or move filtering server-side.',
+    );
+  }
   const filterOptions = buildFilterOptions(allProducts);
   const categoryOptions = categories.map((category) => ({
     label: category.name,
@@ -96,7 +114,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       <JsonLd graph={[pageJsonLd, breadcrumbLd, itemListLd]} />
 
       <ProductsHero
-        totalProducts={allProducts.length}
+        totalProducts={catalogTotal}
         showing={total}
         categoryCount={categories.length}
         storeCount={filterOptions.merchants.length}
@@ -136,13 +154,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[minmax(240px,24%)_minmax(0,76%)] lg:items-start">
             <ProductFiltersSidebar
-              action="/products"
-              clearHref="/products"
+              action="/all-products"
+              clearHref="/all-products"
               filters={filters}
               filterOptions={filterOptions}
               categories={categoryOptions}
               categoryMode="list"
-              totalItems={allProducts.length}
+              totalItems={catalogTotal}
               activeFilterCount={activeFilterCount}
               searchPlaceholder="Search Apple iPhone 16..."
               className="products-filters-panel"
@@ -193,7 +211,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                     </Link>
                   ))}
                   <Link
-                    href="/products"
+                    href="/all-products"
                     className="text-xs font-bold uppercase tracking-[0.12em] text-primary underline underline-offset-4"
                   >
                     Clear all
@@ -219,7 +237,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                     Try adjusting your filters, choosing another category, or searching with a different keyword.
                   </p>
                   <Link
-                    href="/products"
+                    href="/all-products"
                     className="mt-5 inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis"
                   >
                     Reset filters
