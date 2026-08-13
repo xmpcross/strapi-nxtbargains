@@ -90,6 +90,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }}
           />
         ) : null}
+        {/*
+          Ahrefs Web Analytics. Loaded unconditionally rather than behind the
+          cookie banner because it is cookieless by design — it sets no cookies
+          and stores no identifiers, so there is nothing for the analytics
+          consent category to gate. Gate it alongside GA if that position ever
+          changes.
+        */}
+        <script
+          src="https://analytics.ahrefs.com/analytics.js"
+          data-key="PBSJJN11LqDfvMtPZoRKXQ"
+          async
+        />
         <link rel="preconnect" href={cms} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={cms} />
         <JsonLd graph={[organizationJsonLd(), websiteJsonLd()]} />
