@@ -170,8 +170,19 @@ const priceDrops = deals.filter((d) => d.pct > 0).sort((a, b) => b.pct - a.pct).
         <section className="py-14 sm:py-[72px]" data-testid="home-price-drops">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead eyebrow="● Live now" title="This week's biggest price drop" intro="The steepest discount we're tracking across marketplaces this week." cta={{ href: '/all-products', label: 'All products' }} />
-            <div className="mt-9 grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-6">
-              {priceDrops.map((d) => <DealCard key={d.product.id} deal={d} />)}
+            <div className="mt-9">
+              <AutoCarousel label="This week's biggest price drops">
+                {priceDrops.map((d) => (
+                  /* The slide width decides how many fit a view: five at xl,
+                     stepping down so a card never gets too narrow to read. */
+                  <div
+                    key={d.product.id}
+                    className="w-[62%] shrink-0 snap-start sm:w-[45%] md:w-[31%] lg:w-[23.5%] xl:w-[calc((100%-4*18px)/5)]"
+                  >
+                    <DealCard deal={d} />
+                  </div>
+                ))}
+              </AutoCarousel>
             </div>
           </div>
         </section>
