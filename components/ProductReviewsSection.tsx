@@ -24,8 +24,8 @@ import ReviewForm from '@/components/ReviewForm';
  */
 
 const REVIEW_CLAMP = 260;
-/* Three fills exactly one row on desktop, matching the reference layout. */
-const INITIAL_CARDS = 3;
+/* One full row at the widest breakpoint, so the grid never opens half-empty. */
+const INITIAL_CARDS = 4;
 
 function Stars({ rating }: { rating: number }) {
   const filled = Math.max(0, Math.min(5, Math.round(rating)));
@@ -67,7 +67,10 @@ function ReviewCard({ review }: { review: CommerceReview }) {
         <h3 className="mt-2 text-base font-bold leading-snug text-[#1d252c]">{review.title}</h3>
       ) : null}
 
-      {(review.verifiedPurchase || review.incentivized || review.ownershipDuration || review.source) ? (
+      {/* `source` is deliberately not in this test any more — it moved to the
+          provenance line below, and leaving it here rendered an empty badge
+          list for any review that carried only a source. */}
+      {(review.verifiedPurchase || review.incentivized || review.ownershipDuration) ? (
         <ul className="mt-2 flex flex-wrap gap-1.5">
           {review.verifiedPurchase ? (
             <li className="rounded-[0.25rem] border border-[#c5cbd5] px-2 py-0.5 text-[0.6875rem] text-[#55555a]">
@@ -82,11 +85,6 @@ function ReviewCard({ review }: { review: CommerceReview }) {
           {review.ownershipDuration ? (
             <li className="rounded-[0.25rem] border border-[#c5cbd5] px-2 py-0.5 text-[0.6875rem] text-[#55555a]">
               {review.ownershipDuration}
-            </li>
-          ) : null}
-          {review.source ? (
-            <li className="rounded-[0.25rem] border border-[#c5cbd5] px-2 py-0.5 text-[0.6875rem] text-[#55555a]">
-              via {review.source}
             </li>
           ) : null}
         </ul>
@@ -113,12 +111,23 @@ function ReviewCard({ review }: { review: CommerceReview }) {
         </ul>
       ) : null}
 
-      {when || review.authorName ? (
-        <p className="mt-auto pt-3 text-[0.6875rem] text-[#55555a]">
-          {when ? `Posted ${when}` : ''}
-          {review.authorName ? `${when ? ' ' : ''}by ${review.authorName}` : ''}
-        </p>
-      ) : null}
+      {/* Provenance sits on its own line above the byline, as the reference
+          does, rather than as another badge. It is plain text, not a link: the
+          retailer is recorded but the URL of the individual review is not, and
+          a link that guesses where it came from would be worse than none. */}
+      <div className="mt-auto pt-3">
+        {review.source ? (
+          <p className="text-[0.6875rem] text-[#55555a]">
+            This review is from <span className="font-semibold">{review.source}</span>
+          </p>
+        ) : null}
+        {when || review.authorName ? (
+          <p className="mt-1 text-[0.6875rem] text-[#55555a]">
+            {when ? `Posted ${when}` : ''}
+            {review.authorName ? `${when ? ' ' : ''}by ${review.authorName}` : ''}
+          </p>
+        ) : null}
+      </div>
     </article>
   );
 }
@@ -227,7 +236,9 @@ export default function ProductReviewsSection({
 
       {reviews.length ? (
         <>
-          <div className="mt-6 grid gap-4 border-t border-[#e0e0e0] pt-5 md:grid-cols-2 xl:grid-cols-3">
+          {/* Four across at the widest breakpoint, as the reference does, stepping
+              down so a card never gets too narrow to read on a laptop or tablet. */}
+          <div className="mt-6 grid gap-4 border-t border-[#e0e0e0] pt-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {visible.map((review) => (
               <ReviewCard key={review.id} review={review} />
             ))}
