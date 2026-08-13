@@ -54,17 +54,22 @@ function fmtWhen(iso?: string | null) {
 function ReviewCard({ review }: { review: CommerceReview }) {
   const [expanded, setExpanded] = useState(false);
   const text = review.body ?? '';
+  /*
+   * The clamp is CSS (line-clamp-5) rather than a character slice, so the cut
+   * lands on a rendered line boundary at whatever width the card happens to be.
+   * REVIEW_CLAMP now only decides whether "See more" is worth offering, since
+   * the real overflow is not knowable server-side.
+   */
   const isLong = text.length > REVIEW_CLAMP;
-  const body = expanded || !isLong ? text : `${text.slice(0, REVIEW_CLAMP).trimEnd()}…`;
   const when = fmtWhen(review.createdAt);
   const photos = (review.images ?? []).map(mediaUrl).filter(Boolean) as string[];
 
   return (
-    <article className="flex flex-col rounded-[4px] border border-[#e0e0e0] p-4">
+    <article className="flex flex-col rounded-[4px] border border-solid border-[#dddddd] p-4">
       <Stars rating={Number(review.rating) || 0} />
 
       {review.title ? (
-        <h3 className="mt-2 text-base font-bold leading-snug text-[#1d252c]">{review.title}</h3>
+        <h3 className="mt-2 line-clamp-1 text-base font-bold leading-snug text-[#1d252c]" title={review.title}>{review.title}</h3>
       ) : null}
 
       {/* `source` is deliberately not in this test any more — it moved to the
@@ -90,7 +95,7 @@ function ReviewCard({ review }: { review: CommerceReview }) {
         </ul>
       ) : null}
 
-      <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-[#55555a]">{body}</p>
+      <p className={`mt-3 whitespace-pre-line text-sm leading-relaxed text-[#55555a] ${expanded ? '' : 'line-clamp-5'}`}>{text}</p>
 
       {isLong ? (
         <button
@@ -238,7 +243,7 @@ export default function ProductReviewsSection({
         <>
           {/* Four across at the widest breakpoint, as the reference does, stepping
               down so a card never gets too narrow to read on a laptop or tablet. */}
-          <div className="mt-6 grid gap-4 border-t border-[#e0e0e0] pt-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mt-6 grid gap-4 border-t border-[#dddddd] pt-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {visible.map((review) => (
               <ReviewCard key={review.id} review={review} />
             ))}
@@ -257,14 +262,14 @@ export default function ProductReviewsSection({
           ) : null}
         </>
       ) : (
-        <div className="mt-6 border-t border-[#e0e0e0] pt-5">
+        <div className="mt-6 border-t border-[#dddddd] pt-5">
           <p className="text-sm text-[#55555a]">
             No customer reviews have been published for {productName} yet.
           </p>
         </div>
       )}
 
-      <div className="mt-8 border-t border-[#e0e0e0] pt-6" id="write-a-review">
+      <div className="mt-8 border-t border-[#dddddd] pt-6" id="write-a-review">
         <ReviewForm productDocumentId={productDocumentId} />
       </div>
     </section>
