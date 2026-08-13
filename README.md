@@ -262,9 +262,16 @@ npm run lint
 
 ## 9. Deployment
 
-### A. Native (current production)
-Served by the **`nxt-bargains.service`** systemd unit (`next start` on
-`127.0.0.1:3008`, behind nginx for `https://nxt.bargains`).
+### A. Native (RETIRED — no longer production)
+Formerly served by the **`nxt-bargains.service`** systemd unit (`next start` on
+`127.0.0.1:3008`, behind nginx for `https://nxt.bargains`). That host is gone:
+production is Netlify, built from `main` (see NETLIFY.md).
+
+Nothing may assume `127.0.0.1:3008` is reachable. `middleware.ts` defaulted an
+internal origin to it and every product page 500'd with "tcp connect error:
+Connection refused" once the site moved, because the rewrite proxied to a port
+that no longer exists. Anything internal-origin-shaped is a migration hazard —
+the same trap NETLIFY.md documents for `STRAPI_INTERNAL_URL`.
 
 ```bash
 npm run build
