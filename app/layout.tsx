@@ -68,19 +68,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `consent update` when they do.
         */}
         {GA_MEASUREMENT_ID ? (
-          <>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted',wait_for_update:500});`,
-              }}
-            />
-            <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}');`,
-              }}
-            />
-          </>
+          <script
+            dangerouslySetInnerHTML={{
+              __html:
+                `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}` +
+                `gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',` +
+                `ad_personalization:'denied',analytics_storage:'denied',` +
+                `functionality_storage:'denied',personalization_storage:'denied',` +
+                `security_storage:'granted',wait_for_update:500});` +
+                `gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}');` +
+                // The library is injected from here rather than written as its own
+                // <script async src>. React hoists async script elements ahead of
+                // sibling inline scripts, which put gtag.js before the consent
+                // defaults in the emitted HTML -- an async script can execute as
+                // soon as it downloads, so gtag could initialise unconsented and
+                // set cookies. Injecting it after the defaults are queued removes
+                // that race entirely.
+                `(function(){var s=document.createElement('script');s.async=true;` +
+                `s.src='https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}';` +
+                `document.head.appendChild(s);})();`,
+            }}
+          />
         ) : null}
         <link rel="preconnect" href={cms} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={cms} />
