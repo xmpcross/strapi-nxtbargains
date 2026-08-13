@@ -333,14 +333,17 @@ function OfferComparison({ product }: { product: CommerceProduct }) {
         {tiles.map((o) => (
           <div
             key={o.name}
-            className="flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-[9px] border border-ink/10 bg-white px-1 py-1.5 text-center"
+            className="flex min-h-[68px] flex-col items-center justify-center gap-1.5 rounded-[9px] border border-ink/10 bg-white px-1.5 py-2 text-center"
           >
             <span className="font-display text-[0.78rem] font-bold text-ink">{formatMoney(o.price, currency)}</span>
             {o.logo ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={o.logo} alt={o.name} loading="lazy" referrerPolicy="no-referrer" className="h-3.5 max-w-[54px] object-contain" />
+              /* Was h-3.5 (14px), which rendered a wordmark like "appliances
+                   online" as an illegible smear. h-6 with a wider cap lets the
+                   mark read at the width the tile actually has. */
+                <img src={o.logo} alt={o.name} loading="lazy" referrerPolicy="no-referrer" className="h-6 max-w-[68px] object-contain" />
             ) : (
-              <span className="line-clamp-1 text-[0.58rem] font-semibold uppercase tracking-wide text-ink/55">{o.name}</span>
+              <span className="line-clamp-1 text-[0.62rem] font-semibold uppercase tracking-wide text-ink/55">{o.name}</span>
             )}
           </div>
         ))}
