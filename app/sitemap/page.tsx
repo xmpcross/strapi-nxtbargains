@@ -123,7 +123,7 @@ export default async function HtmlSitemapPage() {
   }
   const readGroup = {
     title: 'Read',
-    links: [{ href: '/posts', label: 'All Articles' }, ...articleCategoryLinks],
+    links: [{ href: '/all-posts', label: 'All Articles' }, ...articleCategoryLinks],
   };
   const linkGroups = [LINK_GROUPS[0], readGroup, ...LINK_GROUPS.slice(1)];
 

@@ -31,6 +31,15 @@ const nextConfig = {
         destination: '/all-products',
         permanent: true,
       },
+      {
+        /*
+         * Same move for the article index. As with /products, only the exact
+         * path: posts themselves live at /:category/:slug, not under /posts.
+         */
+        source: '/posts',
+        destination: '/all-posts',
+        permanent: true,
+      },
     ];
   },
   async headers() {

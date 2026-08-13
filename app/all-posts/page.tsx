@@ -16,11 +16,11 @@ type SearchParams = { page?: string };
 export const metadata: Metadata = {
   title: 'All Articles',
   description: `Browse every article from ${SITE.name} — product comparisons, reviews, roundups, how-to guides and buying advice, organised by category.`,
-  alternates: { canonical: '/posts' },
+  alternates: { canonical: '/all-posts' },
   ...pageOpenGraph({
     title: 'All Articles',
     description: `Browse every article from ${SITE.name}, organised by category.`,
-    path: '/posts',
+    path: '/all-posts',
   }),
 };
 
@@ -125,7 +125,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
             >
               {page > 1 && (
                 <Link
-                  href={`/posts?page=${page - 1}`}
+                  href={`/all-posts?page=${page - 1}`}
                   className="inline-flex min-h-11 items-center justify-center border border-ink/15 bg-white px-6 py-3 text-sm font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-primary hover:text-primary"
                 >
                   Previous
@@ -136,7 +136,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
               </span>
               {page < pageCount && (
                 <Link
-                  href={`/posts?page=${page + 1}`}
+                  href={`/all-posts?page=${page + 1}`}
                   className="inline-flex min-h-11 items-center justify-center bg-ink px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white transition hover:bg-primary"
                 >
                   Next
