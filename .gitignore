@@ -25,3 +25,6 @@ data/openwebninja-usage.json
 
 # Local npm cache — machine state, not repository content.
 .npm-cache/
+
+# Python bytecode from scripts/
+__pycache__/
