@@ -5,35 +5,51 @@ import { useState } from 'react';
 const CONTACT_EMAIL = 'hello@nxt.bargains';
 
 /**
- * Client-side contact form. On submit it composes a mailto: URL with the
- * fields encoded into subject + body and opens the user's mail client.
- * Pure client-side — no backend or third-party service needed.
+ * Contact form. Posts to /api/contact, which sends through Brevo.
+ *
+ * It used to build a `mailto:` URL and set window.location. That silently does
+ * nothing wherever no mail client is registered — most phones, and any desktop
+ * where the handler is unset — so the visitor pressed send and the message was
+ * simply lost, with the UI claiming success.
  */
 export default function ContactForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const [opened, setOpened] = useState(false);
+  /* Filled only by bots; the field is hidden from people and assistive tech. */
+  const [company, setCompany] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [error, setError] = useState('');
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const body = [
-      `Name: ${name}`,
-      `Email: ${email}`,
-      '',
-      message,
-    ].join('\n');
-    const subj = subject || `Contact from ${name || 'NXT.Bargains visitor'}`;
-    const url = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
-    window.location.href = url;
-    setOpened(true);
+    setStatus('sending');
+    setError('');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name, email, subject, message, company }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.message || 'We could not send that. Please try again shortly.');
+        setStatus('error');
+        return;
+      }
+      setStatus('sent');
+      setName(''); setEmail(''); setSubject(''); setMessage('');
+    } catch {
+      setError('We could not reach the server. Please check your connection and try again.');
+      setStatus('error');
+    }
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5"
+      className="relative space-y-5"
       data-testid="contact-form"
       aria-label="Contact form"
     >
@@ -83,27 +99,43 @@ export default function ContactForm() {
         />
       </Field>
 
+      {/* Honeypot: off-screen rather than display:none, which some bots skip. */}
+      <div aria-hidden className="absolute left-[-9999px] h-px w-px overflow-hidden">
+        <label htmlFor="contact-company">Company</label>
+        <input
+          id="contact-company"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={company}
+          onChange={(e) => setCompany(e.target.value)}
+        />
+      </div>
+
       <div className="flex flex-wrap items-center gap-4">
         <button
           type="submit"
           className="inline-flex items-center rounded-full bg-primary px-6 py-3 font-display text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-emphasis disabled:opacity-50"
-          disabled={!name || !email || !message}
+          disabled={!name || !email || !message || status === 'sending'}
         >
-          Send message
+          {status === 'sending' ? 'Sending…' : 'Send message'}
         </button>
-        {opened && (
-          <p className="text-sm text-ink/65" role="status">
-            Opening your email client… If nothing happens, write to{' '}
+        {status === 'sent' && (
+          <p className="text-sm font-semibold text-emerald-700" role="status">
+            Thanks — your message is on its way. We usually reply within a couple of days.
+          </p>
+        )}
+        {status === 'error' && (
+          <p className="text-sm text-red-700" role="alert">
+            {error}{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-primary hover:underline">
               {CONTACT_EMAIL}
             </a>
-            .
           </p>
         )}
       </div>
       <p className="text-xs leading-5 text-ink/45">
-        Submitting this form opens your default email app with the message pre-filled — your address
-        is only used to reply to you.
+        Your message is sent straight to our inbox. Your address is only used to reply to you.
       </p>
     </form>
   );

@@ -61,7 +61,7 @@ function buildNav(blogCategories: Array<{ slug: string; name: string }>): NavIte
   },
   { href: '/price-drops', label: 'Price Drops' },
   {
-    href: '/posts',
+    href: '/all-posts',
     label: 'All Articles',
     children: [
       ...blogLinks,

@@ -36,6 +36,7 @@ import { wrapTakeadsAffiliate } from '@/lib/takeads-links';
 import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/coupon-data';
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
 import StoreLinkTile from '@/components/StoreLinkTile';
+import ProductHighlights from '@/components/ProductHighlights';
 import { productCanonicalPath, primaryCategorySlug } from '@/lib/product-url';
 import { clampDescription, fmtDate } from '@/lib/format';
 import { SITE } from '@/lib/site';
@@ -341,33 +342,63 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                   </div>
 
                   <aside className="self-center p-5 sm:p-7">
-                    <div className="mb-4 text-right text-xs font-medium text-[#149a43]">
-                      Set Lowest Price Alert
-                    </div>
                     {rows.length > 0 ? (
-                      <div className="product-offer-list border border-ink/10">
+                      <div className="product-offer-list rounded-[10px] border border-[#e5e7eb] bg-white p-5">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink/45">
+                          Lowest price
+                        </p>
+                        <p className="mt-1 font-display text-[2.35rem] font-bold leading-none tracking-tight text-ink">
+                          {best
+                            ? formatMoney(best.offer.price ?? best.offer.originalPrice, best.offer.currency ?? 'USD')
+                            : 'Check price'}
+                        </p>
+                        <p className="mt-2 text-[13px] text-ink/50">
+                          {best ? `at ${merchantName(best.offer)} · ` : ''}
+                          {rows.length} retailer{rows.length === 1 ? '' : 's'} compared
+                        </p>
+
+                        {/* Extra rows stay behind the existing CSS-only toggle, so
+                            the list opens at four as the reference does without
+                            needing client JavaScript. */}
                         <input id={offerToggleId} type="checkbox" className="product-offer-toggle sr-only" />
-                        {rows.map((row, index) => (
-                          <CompactOfferRow
-                            key={row.offer.documentId ?? row.offer.id}
-                            row={row}
-                            className={index >= initialVisibleOfferCount ? 'product-offer-row-extra' : ''}
-                          />
-                        ))}
-                        <div className="flex items-center justify-between border-t border-ink/10 px-3 py-3 text-xs">
-                          {hiddenOfferCount > 0 ? (
-                            <label htmlFor={offerToggleId} className="cursor-pointer font-medium text-red-600">
-                              <span className="show-more-offers">Show all +</span>
-                              <span className="show-less-offers">Show less</span>
-                            </label>
-                          ) : (
-                            <span className="font-medium text-red-600">Show all +</span>
-                          )}
-                          <span className="text-ink/70">Price history</span>
+                        <div className="mt-4 grid gap-2">
+                          {rows.map((row, index) => (
+                            <CompactOfferRow
+                              key={row.offer.documentId ?? row.offer.id}
+                              row={row}
+                              className={index >= initialVisibleOfferCount ? 'product-offer-row-extra' : ''}
+                            />
+                          ))}
                         </div>
+
+                        {hiddenOfferCount > 0 ? (
+                          <label htmlFor={offerToggleId} className="mt-3 block cursor-pointer text-[12px] font-semibold text-[#c9636b]">
+                            <span className="show-more-offers">Show all {rows.length} retailers +</span>
+                            <span className="show-less-offers">Show fewer</span>
+                          </label>
+                        ) : null}
+
+                        <p className="mt-4 text-[12px] text-ink/45">
+                          Last price update was: {updatedLabel}
+                        </p>
+
+                        {best ? (
+                          <a
+                            href={buyUrl(best.offer, best.product)}
+                            target="_blank"
+                            rel="nofollow sponsored noopener noreferrer"
+                            className="mt-4 block rounded-[8px] bg-[#ffe000] px-4 py-3.5 text-center font-display text-[15px] font-bold text-ink transition hover:brightness-95"
+                          >
+                            Buy at {merchantName(best.offer)}
+                          </a>
+                        ) : null}
+
+                        <p className="mt-4 text-center text-[12px] leading-5 text-[#5b7bb5]">
+                          We may earn a commission from links on this page, at no extra cost to you.
+                        </p>
                       </div>
                     ) : (
-                      <div className="border border-ink/10 bg-paper p-6">
+                      <div className="rounded-[10px] border border-[#e5e7eb] bg-white p-6">
                         <h2 className="font-display text-xl font-bold text-ink">No merchant prices yet</h2>
                         <p className="mt-3 text-sm leading-6 text-ink/60">
                           This product is in the catalog, but it does not have active merchant offers attached yet.
@@ -511,12 +542,17 @@ function ProductInfoTabs({
   const specEntries = useGsmarenaSpecsInSpecifications ? [] : productSpecificationEntries(specs);
 
   const accordionId = `product-info-accordion-${productId}`;
+  // Watches carry both a GSMArena import and their own generic specs; the
+  // generic ones are the short, tile-sized values, so they lead.
+  const highlights = productHighlightEntries(
+    specEntries.length ? specEntries : gsmarenaHighlightEntries(gsmarenaSpecGroups),
+  );
 
   return (
     <div className="product-info-section">
-      <h2 className="product-info-section-title">About this item</h2>
       <div className="product-info-layout">
         <div className="product-info-main">
+          <ProductHighlights entries={highlights} />
           <div className="product-info-accordion bg-white" id={accordionId}>
             <details className="product-accordion-item" name={accordionId} open>
               <summary>Product details</summary>
@@ -553,7 +589,10 @@ function ProductInfoTabs({
                     {additionalInfoEntries.map((entry) => (
                       <div key={entry.label} className="grid gap-2 border-b border-ink/10 px-4 py-3 last:border-b-0 sm:grid-cols-[190px_minmax(0,1fr)]">
                         <dt className="font-bold text-ink/55">{entry.label}</dt>
-                        <dd className="text-ink">{entry.value}</dd>
+                        {/* break-words: the restored Image URL row is a single
+                            unbroken 200-character string with no spaces to wrap
+                            at, and would otherwise run past the table. */}
+                        <dd className="break-words text-ink">{entry.value}</dd>
                       </div>
                     ))}
                   </dl>
@@ -884,35 +923,37 @@ function CompactOfferRow({ row, className = '' }: { row: CommerceOfferRow; class
   const unavailable = offer.availability === 'out_of_stock';
 
   return (
-    <div className={`product-offer-row grid min-h-[48px] grid-cols-[minmax(0,1fr)_108px_82px] border-b border-ink/10 text-sm last:border-b-0 ${className}`}>
+    <div className={`product-offer-row flex items-center gap-3 rounded-[8px] bg-[#f5f6f7] p-2.5 text-sm ${className}`}>
+      {/* The logo sits on its own white tile, as in the reference: merchant
+          marks are drawn for a white ground and lose contrast on the grey. */}
       <a
         href={buyUrl(offer, product)}
         target="_blank"
         rel="nofollow sponsored noopener noreferrer"
-        className="flex min-w-0 items-center gap-2 px-3 py-2 text-ink transition hover:text-primary"
+        aria-label={merchantName(offer)}
+        className="flex h-9 w-[92px] shrink-0 items-center justify-center rounded-[6px] bg-white px-2"
       >
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt={`${merchantName(offer)} logo`} className="h-5 w-auto max-w-[86px] shrink-0 object-contain object-left" />
+          <img src={logo} alt={`${merchantName(offer)} logo`} className="max-h-6 max-w-full object-contain" />
         ) : (
-          <span className="flex h-5 w-5 shrink-0 items-center justify-center bg-muted text-[10px] font-bold text-ink/45">
-            {merchantName(offer).slice(0, 1)}
-          </span>
+          <span className="truncate text-[11px] font-bold text-ink/60">{merchantName(offer)}</span>
         )}
-        <span className="truncate">{merchantName(offer)}</span>
       </a>
-      <div className="bg-[#f7fbf2] px-3 py-2 text-center">
+
+      <div className="ml-auto text-right">
         <p className="font-bold text-ink">{formatMoney(price, offer.currency ?? 'USD')}</p>
         {unavailable && <p className="mt-0.5 text-[10px] font-bold text-red-600">out of stock</p>}
       </div>
+
       <a
         href={buyUrl(offer, product)}
         target="_blank"
         rel="nofollow sponsored noopener noreferrer"
         aria-label={`See offer for ${offer.title || product.name} at ${merchantName(offer)}`}
-        className="flex items-center justify-center bg-primary px-3 py-2 text-sm font-bold text-white transition hover:bg-primary-emphasis"
+        className="shrink-0 rounded-[6px] bg-[#fdeced] px-3.5 py-2 text-[13px] font-semibold text-[#c9636b] transition hover:bg-[#fbdcde]"
       >
-        See it
+        View
       </a>
     </div>
   );
@@ -1111,7 +1152,7 @@ function productSpecificationEntries(specs?: Record<string, unknown> | null): Sp
   return Object.entries(source)
     .filter(([key]) => !HIDDEN_SPEC_KEYS.has(key) && !isProductIdentifierKey(key) && !/^features?$/i.test(key))
     .map(([key, value]) => ({
-      label: key,
+      label: cleanSpecLabel(key),
       value: formatSpecValue(value),
     }))
     .filter((entry): entry is SpecificationEntry => Boolean(entry.value))
@@ -1119,13 +1160,96 @@ function productSpecificationEntries(specs?: Record<string, unknown> | null): Sp
 }
 
 /**
+ * Some scraped spec keys carry the source page's markup — `Pan <wbr>/<wbr> Tilt`
+ * is the common one, and React escapes it, so the tags render as literal text.
+ */
+function cleanSpecLabel(key: string) {
+  return key.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Labels worth surfacing as a Highlight when a product has one, most useful
+ * first. Everything else falls in behind them in the order the source lists it,
+ * which is what carries the categories no fixed list can anticipate.
+ */
+const HIGHLIGHT_LABEL_PRIORITY = [
+  'brand', 'model', 'field of view', 'night vision', 'motion sensing', 'with audio', 'pan / tilt',
+  'display', 'chipset', 'storage', 'card slot', 'battery', 'charging', 'os', 'weight', 'resolution',
+  'size', 'nfc', 'headphone jack', 'announced', 'colors', 'color', 'wireless', 'with wi-fi',
+  'assistant support', 'connectivity', 'use',
+];
+
+/**
+ * Which GSMArena rows make a highlight, and what to call one.
+ *
+ * A flattened GSMArena table can't be used as-is: the names repeat across groups
+ * — `Type` is the display panel, the battery and the storage — and the first
+ * groups are radio bands, which is not what anyone scans a phone page for. Keyed
+ * by `group|name` so the group disambiguates, and the value is the tile label.
+ */
+const GSMARENA_HIGHLIGHT_LABELS: Record<string, string> = {
+  'Display|Size': 'Display',
+  'Display|Type': 'Display type',
+  'Display|Resolution': 'Resolution',
+  'Platform|Chipset': 'Chipset',
+  'Platform|OS': 'OS',
+  'Memory|Internal': 'Storage',
+  'Memory|Card slot': 'Card slot',
+  'Battery|Type': 'Battery',
+  'Battery|Charging': 'Charging',
+  'Body|Weight': 'Weight',
+  'Body|Build': 'Build',
+  'Comms|NFC': 'NFC',
+  'Sound|3.5mm jack': 'Headphone jack',
+  'Launch|Announced': 'Announced',
+  'Misc|Colors': 'Colors',
+};
+
+function gsmarenaHighlightEntries(groups: SpecificationGroup[]): SpecificationEntry[] {
+  return groups.flatMap((group) =>
+    group.specifications
+      .map((entry) => {
+        const label = GSMARENA_HIGHLIGHT_LABELS[`${group.category}|${entry.label}`];
+        return label ? { label, value: entry.value } : null;
+      })
+      .filter((entry): entry is SpecificationEntry => Boolean(entry)),
+  );
+}
+
+/**
+ * The tiles read at a glance, so a value that needs a second line is not a
+ * highlight — the full row is a click away in Specifications either way.
+ */
+function productHighlightEntries(entries: SpecificationEntry[], limit = 8): SpecificationEntry[] {
+  const seen = new Set<string>();
+  const short = entries.filter((entry) => {
+    const key = entry.label.toLowerCase();
+    if (entry.value.length > 42 || entry.label.length > 30 || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  const rank = (entry: SpecificationEntry) => {
+    const index = HIGHLIGHT_LABEL_PRIORITY.indexOf(entry.label.toLowerCase());
+    return index === -1 ? HIGHLIGHT_LABEL_PRIORITY.length : index;
+  };
+
+  return short
+    .map((entry, index) => ({ entry, index }))
+    .sort((a, b) => rank(a.entry) - rank(b.entry) || a.index - b.index)
+    .slice(0, limit)
+    .map(({ entry }) => entry);
+}
+
+/**
  * Spec rows that carry plumbing rather than a specification.
  *
- * "Image URL" is the source photo the importer pulls from, and it renders as a
- * raw gsmarena.com link in the middle of the Display or Overview table. It is
- * data the page uses, not a fact about the product.
+ * "Image URL" was hidden here too, as the source photo the importer pulls from.
+ * It is shown again on request: it is the only place the source of a product
+ * photo is visible from the page, which matters while the image imports are
+ * still being worked through.
  */
-const HIDDEN_GSMARENA_LABELS = new Set(['image url', 'image', 'source url', 'popularity (hits)']);
+const HIDDEN_GSMARENA_LABELS = new Set(['image', 'source url', 'popularity (hits)']);
 
 function gsmarenaSpecificationGroups(specs?: Record<string, unknown> | null): SpecificationGroup[] {
   if (!isPlainRecord(specs) || !isPlainRecord(specs.gsmarena)) return [];
