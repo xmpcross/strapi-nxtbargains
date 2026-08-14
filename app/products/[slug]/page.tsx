@@ -36,6 +36,7 @@ import { wrapTakeadsAffiliate } from '@/lib/takeads-links';
 import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/coupon-data';
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
 import StoreLinkTile from '@/components/StoreLinkTile';
+import ProductHighlights from '@/components/ProductHighlights';
 import { productCanonicalPath, primaryCategorySlug } from '@/lib/product-url';
 import { clampDescription, fmtDate } from '@/lib/format';
 import { SITE } from '@/lib/site';
@@ -541,12 +542,17 @@ function ProductInfoTabs({
   const specEntries = useGsmarenaSpecsInSpecifications ? [] : productSpecificationEntries(specs);
 
   const accordionId = `product-info-accordion-${productId}`;
+  // Watches carry both a GSMArena import and their own generic specs; the
+  // generic ones are the short, tile-sized values, so they lead.
+  const highlights = productHighlightEntries(
+    specEntries.length ? specEntries : gsmarenaHighlightEntries(gsmarenaSpecGroups),
+  );
 
   return (
     <div className="product-info-section">
-      <h2 className="product-info-section-title">About this item</h2>
       <div className="product-info-layout">
         <div className="product-info-main">
+          <ProductHighlights entries={highlights} />
           <div className="product-info-accordion bg-white" id={accordionId}>
             <details className="product-accordion-item" name={accordionId} open>
               <summary>Product details</summary>
@@ -1146,11 +1152,93 @@ function productSpecificationEntries(specs?: Record<string, unknown> | null): Sp
   return Object.entries(source)
     .filter(([key]) => !HIDDEN_SPEC_KEYS.has(key) && !isProductIdentifierKey(key) && !/^features?$/i.test(key))
     .map(([key, value]) => ({
-      label: key,
+      label: cleanSpecLabel(key),
       value: formatSpecValue(value),
     }))
     .filter((entry): entry is SpecificationEntry => Boolean(entry.value))
     .slice(0, 80);
+}
+
+/**
+ * Some scraped spec keys carry the source page's markup — `Pan <wbr>/<wbr> Tilt`
+ * is the common one, and React escapes it, so the tags render as literal text.
+ */
+function cleanSpecLabel(key: string) {
+  return key.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Labels worth surfacing as a Highlight when a product has one, most useful
+ * first. Everything else falls in behind them in the order the source lists it,
+ * which is what carries the categories no fixed list can anticipate.
+ */
+const HIGHLIGHT_LABEL_PRIORITY = [
+  'brand', 'model', 'field of view', 'night vision', 'motion sensing', 'with audio', 'pan / tilt',
+  'display', 'chipset', 'storage', 'card slot', 'battery', 'charging', 'os', 'weight', 'resolution',
+  'size', 'nfc', 'headphone jack', 'announced', 'colors', 'color', 'wireless', 'with wi-fi',
+  'assistant support', 'connectivity', 'use',
+];
+
+/**
+ * Which GSMArena rows make a highlight, and what to call one.
+ *
+ * A flattened GSMArena table can't be used as-is: the names repeat across groups
+ * — `Type` is the display panel, the battery and the storage — and the first
+ * groups are radio bands, which is not what anyone scans a phone page for. Keyed
+ * by `group|name` so the group disambiguates, and the value is the tile label.
+ */
+const GSMARENA_HIGHLIGHT_LABELS: Record<string, string> = {
+  'Display|Size': 'Display',
+  'Display|Type': 'Display type',
+  'Display|Resolution': 'Resolution',
+  'Platform|Chipset': 'Chipset',
+  'Platform|OS': 'OS',
+  'Memory|Internal': 'Storage',
+  'Memory|Card slot': 'Card slot',
+  'Battery|Type': 'Battery',
+  'Battery|Charging': 'Charging',
+  'Body|Weight': 'Weight',
+  'Body|Build': 'Build',
+  'Comms|NFC': 'NFC',
+  'Sound|3.5mm jack': 'Headphone jack',
+  'Launch|Announced': 'Announced',
+  'Misc|Colors': 'Colors',
+};
+
+function gsmarenaHighlightEntries(groups: SpecificationGroup[]): SpecificationEntry[] {
+  return groups.flatMap((group) =>
+    group.specifications
+      .map((entry) => {
+        const label = GSMARENA_HIGHLIGHT_LABELS[`${group.category}|${entry.label}`];
+        return label ? { label, value: entry.value } : null;
+      })
+      .filter((entry): entry is SpecificationEntry => Boolean(entry)),
+  );
+}
+
+/**
+ * The tiles read at a glance, so a value that needs a second line is not a
+ * highlight — the full row is a click away in Specifications either way.
+ */
+function productHighlightEntries(entries: SpecificationEntry[], limit = 8): SpecificationEntry[] {
+  const seen = new Set<string>();
+  const short = entries.filter((entry) => {
+    const key = entry.label.toLowerCase();
+    if (entry.value.length > 42 || entry.label.length > 30 || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  const rank = (entry: SpecificationEntry) => {
+    const index = HIGHLIGHT_LABEL_PRIORITY.indexOf(entry.label.toLowerCase());
+    return index === -1 ? HIGHLIGHT_LABEL_PRIORITY.length : index;
+  };
+
+  return short
+    .map((entry, index) => ({ entry, index }))
+    .sort((a, b) => rank(a.entry) - rank(b.entry) || a.index - b.index)
+    .slice(0, limit)
+    .map(({ entry }) => entry);
 }
 
 /**

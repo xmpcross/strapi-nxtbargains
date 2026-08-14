@@ -37,6 +37,19 @@ export default function ProductSidePeek({ panels }: { panels: PeekPanel[] }) {
     lastTrigger.current?.focus();
   }, []);
 
+  // Opened from outside the accordion — the Highlights tiles above it, which
+  // sit in a different branch of the tree and can only reach the peek this way.
+  useEffect(() => {
+    const onOpen = (event: Event) => {
+      const detail = (event as CustomEvent<{ id?: string; trigger?: HTMLButtonElement }>).detail;
+      if (!detail?.id || !panels.some((p) => p.id === detail.id)) return;
+      lastTrigger.current = detail.trigger ?? null;
+      setOpenId(detail.id);
+    };
+    window.addEventListener('product-peek:open', onOpen);
+    return () => window.removeEventListener('product-peek:open', onOpen);
+  }, [panels]);
+
   useEffect(() => {
     if (!openId) return undefined;
     const onKey = (e: KeyboardEvent) => {
