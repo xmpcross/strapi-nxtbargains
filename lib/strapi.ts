@@ -347,6 +347,52 @@ export async function listCommerceCategories(): Promise<CommerceCategory[]> {
 }
 
 /**
+ * How many products this site has in each category, keyed by category slug.
+ *
+ * This used to reuse listCommerceProducts({ pageSize: 500 }), which returns the
+ * full product shape -- images, gallery, brand, and offers with their merchant
+ * and merchant logo. That is a 3.8MB response, and Next refuses to store
+ * anything over 2MB in its data cache, so the fetch was re-issued on *every*
+ * render rather than once per revalidate window. A crawler working through the
+ * listing pages therefore kept Strapi at ~80% of a core, 58 identical 1.1s
+ * queries a minute.
+ *
+ * Only the category slug is read, so only the category slug is requested. The
+ * payload drops by about two orders of magnitude and fits in the data cache,
+ * which is what makes the revalidate window mean anything.
+ *
+ * Paginated rather than one wide page: the previous 500 was already below the
+ * catalogue size, so counts had begun to under-report.
+ */
+async function countProductsPerCategory(): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+
+  for (let page = 1; ; page += 1) {
+    const res = await strapiFetch<ListResponse<{ categories?: Array<{ slug?: string }> }>>(
+      'commerce-products',
+      {
+        filters: { productStatus: { $eq: 'active' }, tags: { $containsi: SITE_PRODUCT_TAG } },
+        fields: ['id'],
+        populate: { categories: { fields: ['slug'] } },
+        pagination: { page, pageSize: 500 },
+      },
+      300,
+    );
+
+    for (const product of res.data) {
+      for (const category of product.categories ?? []) {
+        if (category?.slug) counts.set(category.slug, (counts.get(category.slug) ?? 0) + 1);
+      }
+    }
+
+    const pageCount = res.meta?.pagination?.pageCount ?? 1;
+    if (page >= pageCount || !res.data.length) break;
+  }
+
+  return counts;
+}
+
+/**
  * The categories this storefront actually sells into, with product counts.
  *
  * commerce-categories is a shared taxonomy: it also holds bestlooking.skin's
@@ -358,19 +404,10 @@ export async function listCommerceCategories(): Promise<CommerceCategory[]> {
 export async function listCommerceCategoriesForSite(): Promise<
   Array<CommerceCategory & { productCount: number }>
 > {
-  const [categories, products] = await Promise.all([
+  const [categories, counts] = await Promise.all([
     listCommerceCategories(),
-    // One page wide enough for the whole catalogue; counts would under-report
-    // past this, so raise it alongside the catalogue rather than paginating.
-    listCommerceProducts({ pageSize: 500 }).then((r) => r.data).catch(() => [] as CommerceProduct[]),
+    countProductsPerCategory().catch(() => new Map<string, number>()),
   ]);
-
-  const counts = new Map<string, number>();
-  for (const product of products) {
-    for (const category of product.categories ?? []) {
-      if (category?.slug) counts.set(category.slug, (counts.get(category.slug) ?? 0) + 1);
-    }
-  }
 
   return categories
     .map((category) => ({ ...category, productCount: counts.get(category.slug) ?? 0 }))

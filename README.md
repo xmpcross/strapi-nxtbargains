@@ -148,6 +148,20 @@ reads at request time:
 `data/high-intent-coupon-stores.json` is **curated config** (which stores are
 featured/indexable), not a pure cache.
 
+### One-shot catalog imports
+
+`scripts/import-gsmarena-specs.py` writes GSMArena specification tables from a
+filled workbook straight into `commerce-products.specs.gsmarena` — the shape
+`app/products/[slug]/page.tsx` renders as the GSMArena spec panel. It merges
+into `specs` rather than replacing it, skips rows whose spec text says
+`NOT FOUND ON GSMARENA` (Garmin/Amazfit watches have no GSMArena page), and
+leaves an already-populated `specs.gsmarena` alone unless `--force`.
+
+```bash
+python3 scripts/import-gsmarena-specs.py --dry     # report, no writes
+python3 scripts/import-gsmarena-specs.py           # write to Strapi
+```
+
 ---
 
 ## 6. Routes overview

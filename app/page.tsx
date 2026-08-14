@@ -21,6 +21,7 @@ import {
   offerPrice,
   productImageUrl,
 } from '@/lib/commerce';
+import AutoCarousel from '@/components/AutoCarousel';
 import Hero from '@/components/Hero';
 import MarketplaceBestSellers from '@/components/MarketplaceBestSellers';
 import BestSellerCard from '@/components/BestSellerCard';
@@ -130,7 +131,8 @@ export default async function HomePage() {
     return { name, logo: match?.logo ?? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` };
   });
   const deals = dealProducts.map(toDeal).filter((d): d is Deal => d !== null);
-  const priceDrops = deals.filter((d) => d.pct > 0).sort((a, b) => b.pct - a.pct).slice(0, 6);
+  /* Ten, shown five at a time by the auto-advancing carousel below. */
+const priceDrops = deals.filter((d) => d.pct > 0).sort((a, b) => b.pct - a.pct).slice(0, 10);
   const trending = products.slice(0, 6);
 
   // Best Sellers — one daily JSON cache per marketplace (scripts/fetch-*.mjs).
@@ -168,8 +170,19 @@ export default async function HomePage() {
         <section className="py-14 sm:py-[72px]" data-testid="home-price-drops">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead eyebrow="● Live now" title="This week's biggest price drop" intro="The steepest discount we're tracking across marketplaces this week." cta={{ href: '/all-products', label: 'All products' }} />
-            <div className="mt-9 grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-6">
-              {priceDrops.map((d) => <DealCard key={d.product.id} deal={d} />)}
+            <div className="mt-9">
+              <AutoCarousel label="This week's biggest price drops">
+                {priceDrops.map((d) => (
+                  /* The slide width decides how many fit a view: five at xl,
+                     stepping down so a card never gets too narrow to read. */
+                  <div
+                    key={d.product.id}
+                    className="w-[62%] shrink-0 snap-start sm:w-[45%] md:w-[31%] lg:w-[23.5%] xl:w-[calc((100%-4*18px)/5)]"
+                  >
+                    <DealCard deal={d} />
+                  </div>
+                ))}
+              </AutoCarousel>
             </div>
           </div>
         </section>
@@ -290,7 +303,7 @@ function OfferComparison({ product }: { product: CommerceProduct }) {
 
   if (priced.length === 0) {
     return (
-      <span className="mt-3 block rounded-[10px] bg-primary px-4 py-2.5 text-center font-display text-[0.85rem] font-bold text-white transition group-hover:bg-primary-emphasis">
+      <span className="mt-3 block rounded-[10px] bg-[#2ba24b] px-4 py-2.5 text-center font-display text-[0.85rem] font-bold text-white transition group-hover:bg-[#238a3f]">
         Compare prices
       </span>
     );
@@ -315,24 +328,27 @@ function OfferComparison({ product }: { product: CommerceProduct }) {
       <div className="text-center font-display text-[1.05rem] font-extrabold text-ink">
         {min === max ? formatMoney(min, currency) : `${formatMoney(min, currency)} – ${formatMoney(max, currency)}`}
       </div>
-      <p className="mt-1 text-center text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink/40">Promoted</p>
+      <p className="mt-1 text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink/40">Promoted</p>
       <div className="mt-2 grid grid-cols-3 gap-1.5">
         {tiles.map((o) => (
           <div
             key={o.name}
-            className="flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-[9px] border border-ink/10 bg-white px-1 py-1.5 text-center"
+            className="flex min-h-[68px] flex-col items-center justify-center gap-1.5 rounded-[9px] border border-ink/10 bg-white px-1.5 py-2 text-center"
           >
             <span className="font-display text-[0.78rem] font-bold text-ink">{formatMoney(o.price, currency)}</span>
             {o.logo ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={o.logo} alt={o.name} loading="lazy" referrerPolicy="no-referrer" className="h-3.5 max-w-[54px] object-contain" />
+              /* Was h-3.5 (14px), which rendered a wordmark like "appliances
+                   online" as an illegible smear. h-6 with a wider cap lets the
+                   mark read at the width the tile actually has. */
+                <img src={o.logo} alt={o.name} loading="lazy" referrerPolicy="no-referrer" className="h-6 max-w-[68px] object-contain" />
             ) : (
-              <span className="line-clamp-1 text-[0.58rem] font-semibold uppercase tracking-wide text-ink/55">{o.name}</span>
+              <span className="line-clamp-1 text-[0.62rem] font-semibold uppercase tracking-wide text-ink/55">{o.name}</span>
             )}
           </div>
         ))}
       </div>
-      <span className="mt-2.5 block rounded-[10px] bg-primary px-4 py-2.5 text-center font-display text-[0.85rem] font-bold text-white transition group-hover:bg-primary-emphasis">
+      <span className="mt-2.5 block rounded-[10px] bg-[#2ba24b] px-4 py-2.5 text-center font-display text-[0.85rem] font-bold text-white transition group-hover:bg-[#238a3f]">
         Compare {count} price{count === 1 ? '' : 's'}
       </span>
     </div>
@@ -341,7 +357,7 @@ function OfferComparison({ product }: { product: CommerceProduct }) {
 
 function DealCard({ deal }: { deal: Deal }) {
   return (
-    <Link href={deal.href} className="group flex flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]" data-testid={`pricedrop-${deal.product.slug}`}>
+    <Link href={deal.href} className="group flex h-full flex-col overflow-hidden rounded-[8px] border border-ink/10 bg-white transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]" data-testid={`pricedrop-${deal.product.slug}`}>
       <div className="price-drop-image-box uniform-product-image-box relative grid aspect-square w-full place-items-center overflow-hidden bg-white p-4 sm:p-5">
         {deal.pct > 0 && (
           <span className="absolute left-2.5 top-2.5 z-10 rounded-[7px] bg-primary px-[9px] py-1 font-display text-[0.74rem] font-bold text-white">-{deal.pct}%</span>
@@ -515,7 +531,7 @@ function TrendingCard({ product }: { product: CommerceProduct }) {
   return (
     <Link
       href={href}
-      className="group flex flex-col rounded-2xl border border-ink/10 bg-white p-[18px] transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]"
+      className="group flex flex-col rounded-[8px] border border-ink/10 bg-white p-[18px] transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]"
       data-testid={`trending-${product.slug}`}
     >
       <div className="trending-image-box mb-3.5 grid aspect-square place-items-center overflow-hidden rounded-[11px] bg-white">
