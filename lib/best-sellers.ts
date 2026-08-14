@@ -20,37 +20,37 @@ export const BEST_SELLER_MARKETPLACES: BestSellerMarketplace[] = [
     key: 'amazon',
     label: 'Amazon',
     file: 'best-sellers.json',
-    description: 'Amazon best-selling products from the refreshed marketplace cache.',
+    description: 'The Amazon listings ranking highest for each category, refreshed daily.',
   },
   {
     key: 'ebay',
     label: 'eBay',
     file: 'best-sellers-ebay.json',
-    description: 'Popular eBay products from the refreshed marketplace cache.',
+    description: 'The eBay listings ranking highest for each category, refreshed daily.',
   },
   {
     key: 'walmart',
     label: 'Walmart',
     file: 'best-sellers-walmart.json',
-    description: 'Walmart electronics deal picks from the refreshed marketplace cache.',
+    description: 'Walmart electronics surfacing most across Google Shopping, refreshed daily.',
   },
   {
     key: 'target',
     label: 'Target',
     file: 'best-sellers-target.json',
-    description: 'Target product picks from the refreshed marketplace cache.',
+    description: 'Target products surfacing most across Google Shopping, refreshed daily.',
   },
   {
     key: 'bestbuy',
     label: 'Best Buy',
     file: 'best-sellers-bestbuy.json',
-    description: 'Best Buy product picks from the refreshed marketplace cache.',
+    description: 'Best Buy products surfacing most across Google Shopping, refreshed daily.',
   },
   {
     key: 'newegg',
     label: 'Newegg',
     file: 'best-sellers-newegg.json',
-    description: 'Newegg product picks from the refreshed marketplace cache.',
+    description: 'Newegg products surfacing most across Google Shopping, refreshed daily.',
   },
 ];
 
@@ -165,31 +165,36 @@ function marketplaceSearchUrl(marketplace: Marketplace, title: string) {
   return '';
 }
 
-// SEO-friendly blurbs shown under each Amazon best-seller category tab.
+// SEO blurbs under each Amazon category tab.
+//
+// These used to say "ranked by real sales" and "what people are actually
+// buying". No feed behind this page has ever carried a sales figure — it was
+// Google Shopping before and is DataForSEO now — so the claim was invented.
+// Prominence is what the data supports, and that is what these say.
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   'smart-phones':
-    "Amazon's best-selling smartphones right now — unlocked flagships and budget picks ranked by real sales, with ratings, Prime availability and current deals so you can compare before you buy.",
+    "The smartphones ranking highest on Amazon right now — unlocked flagships and budget picks, with ratings and prices so you can compare before you buy.",
   laptops:
-    'The top-selling laptops on Amazon, from lightweight ultrabooks to gaming machines — ranked by popularity so you can see exactly which models shoppers are buying most.',
+    'The laptops ranking highest on Amazon, from lightweight ultrabooks to gaming machines — the models surfacing most for shoppers searching today.',
   tablets:
-    "Amazon's most popular tablets — iPads, Android slates and e-readers — ranked by sales, with star ratings and prices at a glance.",
+    "Amazon's most prominent tablets — iPads, Android slates and e-readers — with star ratings and prices at a glance.",
   smartwatches:
-    'Best-selling smartwatches and fitness trackers on Amazon, ranked by sales — compare health features, battery life, ratings and price in one place.',
+    'The smartwatches and fitness trackers ranking highest on Amazon — compare health features, battery life, ratings and price in one place.',
   headphones:
-    'The top-selling headphones and earbuds on Amazon — noise-cancelling over-ears, true-wireless buds and workout pairs — ranked by what people are actually buying.',
+    'The headphones and earbuds ranking highest on Amazon — noise-cancelling over-ears, true-wireless buds and workout pairs.',
   'smart-tvs':
-    "Amazon's best-selling smart TVs ranked by sales — 4K, QLED, OLED and budget models with ratings and the latest deals.",
+    "Amazon's most prominent smart TVs — 4K, QLED, OLED and budget models with ratings and current prices.",
   'smart-home':
-    'The most popular smart home devices on Amazon — smart plugs, cameras, video doorbells, lights, locks and hubs — ranked by current demand.',
+    'The smart home devices surfacing most on Amazon — smart plugs, cameras, video doorbells, lights, locks and hubs.',
   'smart-electronics':
-    'Top-selling smart electronics and connected gadgets on Amazon, ranked by popularity — the trending tech worth a look.',
+    'The smart electronics and connected gadgets ranking highest on Amazon — the trending tech worth a look.',
 };
 
 /** A category blurb for the best-seller tabs, with a sensible generated fallback. */
 export function categoryDescription(key: string, label?: string): string {
   return (
     CATEGORY_DESCRIPTIONS[key] ??
-    `The best-selling ${(label ?? key).toLowerCase()} on Amazon right now, ranked by real sales with ratings, Prime availability and current deals.`
+    `The ${(label ?? key).toLowerCase()} ranking highest on Amazon right now, with ratings and current prices.`
   );
 }
 

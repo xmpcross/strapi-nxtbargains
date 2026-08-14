@@ -6,9 +6,9 @@ import { BEST_SELLER_MARKETPLACES, listBestSellersForMarketplace } from '@/lib/b
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: 'Best Sellers — Top Products Across Every Marketplace',
+  title: 'Popular Right Now — Top Products Across Every Marketplace',
   description:
-    'The best-selling products on Amazon, eBay, Walmart, Target, Best Buy and Newegg — ranked and refreshed daily. Compare top sellers across marketplaces in one place.',
+    'The products showing up most across Amazon, eBay, Walmart, Target, Best Buy and Newegg, refreshed daily. Compare what is popular across marketplaces in one place.',
   alternates: { canonical: '/best-sellers' },
 };
 
@@ -43,18 +43,22 @@ export default function BestSellersIndexPage() {
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-start">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">NXT.Bargains best sellers</p>
+              {/* Wording deliberately claims prominence, not sales rank. No feed
+                  behind this page has ever reported units sold — the old one was
+                  Google Shopping and so is the current one — and "best-selling"
+                  asserted a number nobody here can see. */}
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">NXT.Bargains popular right now</p>
               <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
-                The top-selling products across every marketplace.
+                The products everyone is shopping for right now.
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-                See what&apos;s actually selling right now on Amazon, eBay, Walmart, Target, Best Buy and Newegg — ranked
-                by popularity and refreshed daily, so you can spot the products worth buying before you shop.
+                The products surfacing most often across Amazon, eBay, Walmart, Target, Best Buy and Newegg — refreshed
+                daily, so you can see what is in demand before you shop.
               </p>
 
               <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
-                <li className="flex gap-3"><span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span><span>Live best-seller rankings pulled straight from each marketplace.</span></li>
-                <li className="flex gap-3"><span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span><span>Ratings, review counts, and Prime / deal badges at a glance.</span></li>
+                <li className="flex gap-3"><span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span><span>The products ranking highest across each marketplace, refreshed daily.</span></li>
+                <li className="flex gap-3"><span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span><span>Prices, ratings and review counts at a glance.</span></li>
                 <li className="flex gap-3"><span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span><span>Amazon broken out by category — phones, laptops, smart home and more.</span></li>
                 <li className="flex gap-3"><span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span><span>Free to browse — no signup required.</span></li>
               </ul>
@@ -158,7 +162,7 @@ export default function BestSellersIndexPage() {
           </h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-3">
             {[
-              { t: 'Pulled from each marketplace', s: 'We read the live best-seller and top-product lists from Amazon and other major retailers, so the rankings reflect what people are actually buying now.' },
+              { t: 'Pulled from each marketplace', s: 'We read the products ranking highest across Amazon and the other major retailers, so the list reflects what is surfacing for shoppers right now.' },
               { t: 'Ranked with the details that matter', s: 'Every product shows its rank position, star rating, review count, and any Prime, coupon, or deal badges — so you can judge it at a glance.' },
               { t: 'Updated every day', s: 'A daily refresh keeps the lists current as products rise and fall, so you are never looking at last month’s winners.' },
             ].map((card) => (
