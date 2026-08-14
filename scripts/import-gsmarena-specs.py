@@ -1,22 +1,36 @@
 #!/usr/bin/env python3
-"""Import GSMArena specifications from a filled workbook into Strapi commerce-products.
+"""Import product specifications from a filled workbook into Strapi commerce-products.
 
     python3 scripts/import-gsmarena-specs.py --dry     # report only, no writes
     python3 scripts/import-gsmarena-specs.py           # write to Strapi
     python3 scripts/import-gsmarena-specs.py --slug samsung-galaxy-s25-fe-256gb
+    python3 scripts/import-gsmarena-specs.py --brand Garmin --brand Amazfit
 
-Input is the "Products" sheet of a workbook whose `gsmarena_specifications`
-column holds the flattened GSMArena spec table as text:
+Input is the "Products" sheet of a workbook whose spec columns hold a flattened
+spec table as text:
 
     [Body]
     Dimensions: 160.6 x 75.6 x 9 mm
     : IP68 rating (1.5m/30 min)
 
-Written to `specs.gsmarena` in the shape `app/products/[slug]/page.tsx`
-already renders (`gsmarenaSpecificationGroups`), so imported products pick up
-the GSMArena panel with no frontend change:
+Two columns can carry that table, and they are written to two different keys
+because they are two different sources:
 
-    { "gsmarena": { "sourceUrl": …, "specifications": [
+  `gsmarena_specifications`  → `specs.gsmarena`      (source: GSMArena)
+  `fallback_specifications`  → `specs.manufacturer`  (source: per `fallback_source`,
+                                                      e.g. Garmin's or Amazfit's
+                                                      own product page)
+
+GSMArena has no device page for most Garmin/Amazfit watches, so those rows say
+NOT FOUND ON GSMARENA in the GSMArena column and carry the manufacturer's specs
+in the fallback column instead. Keeping them apart is the point: the workbook
+stamps every fallback table `[Source: … — NOT GSMArena]`, and filing it under
+`specs.gsmarena` would record a provenance the data itself denies.
+
+Both go in the shape `app/products/[slug]/page.tsx` renders
+(`structuredSpecificationGroups`):
+
+    { "manufacturer": { "source": "Garmin", "sourceUrl": …, "specifications": [
         { "category": "Body", "specifications": [ { "name": …, "value": … } ] } ] } }
 
 Why Python and not another .mjs like its neighbours: those scripts poll
@@ -24,12 +38,11 @@ affiliate HTTP feeds on a cron, this one reads a spreadsheet once. openpyxl is
 already on the box; a Node xlsx reader would be a new dependency for a
 one-shot job.
 
-Rows whose spec text says NOT FOUND ON GSMARENA are skipped, not written —
-GSMArena has no page for most Garmin/Amazfit watches, and a placeholder in
-`specs` would render as a real spec panel.
+A row with neither a real GSMArena table nor a fallback is skipped, not written
+with its placeholder text — that would render as a real spec panel.
 
 The write merges: existing `specs` keys (the dataforseo-product-info fields)
-are preserved and only `specs.gsmarena` is replaced.
+are preserved and only the target key is replaced.
 
 Env (.env.local): STRAPI_INTERNAL_URL or NEXT_PUBLIC_STRAPI_URL, plus
 STRAPI_WRITE_TOKEN if set, else STRAPI_API_TOKEN.
@@ -64,6 +77,17 @@ def load_env():
             os.environ[m.group(1)] = m.group(2)
 
 
+def parse_source(fallback_source):
+    """Split `Garmin: https://www.garmin.com/en-US/p/1611937/` into name and URL."""
+    text = (fallback_source or "").strip()
+    if not text:
+        return "", ""
+    name, sep, url = text.partition(": ")
+    if sep and url.strip().startswith("http"):
+        return name.strip(), url.strip()
+    return ("", text) if text.startswith("http") else (text, "")
+
+
 def parse_specifications(blob, category_name):
     """Turn the flattened `[Group]` / `key: value` text into Strapi spec groups.
 
@@ -71,6 +95,10 @@ def parse_specifications(blob, category_name):
     (an IP rating under Body, the storage type under Memory). The renderer drops
     any entry without a label, so they are labelled with their group name rather
     than a made-up attribute name — it keeps the fact and invents nothing.
+
+    A `[Source: …]` banner heads every fallback table. It names the provenance,
+    which is carried in the metadata instead, so it never becomes a spec group —
+    it has no rows under it and drops out with the other empty groups.
     """
     groups = []
     current = None
@@ -98,7 +126,7 @@ def read_rows(workbook_path):
     rows = wb[SHEET].iter_rows(values_only=True)
     header = [str(c).strip() if c else "" for c in next(rows)]
     idx = {name: i for i, name in enumerate(header)}
-    required = ["slug", "category", "gsmarena_title", "gsmarena_url", "gsmarena_specifications"]
+    required = ["slug", "brand", "category", "gsmarena_title", "gsmarena_url", "gsmarena_specifications"]
     missing = [c for c in required if c not in idx]
     if missing:
         sys.exit(f"{workbook_path}: '{SHEET}' sheet is missing column(s): {', '.join(missing)}")
@@ -146,6 +174,7 @@ def main():
     ap.add_argument("--workbook", default=DEFAULT_WORKBOOK, help=f"xlsx to import (default: {DEFAULT_WORKBOOK})")
     ap.add_argument("--dry", action="store_true", help="report what would change, write nothing")
     ap.add_argument("--slug", action="append", help="only this slug (repeatable)")
+    ap.add_argument("--brand", action="append", help="only this brand, case-insensitive (repeatable)")
     ap.add_argument("--limit", type=int, help="stop after N products")
     ap.add_argument("--force", action="store_true", help="overwrite a specs.gsmarena that is already populated")
     ap.add_argument("--report", help="write a JSON report of the run to this path")
@@ -165,25 +194,52 @@ def main():
         rows = [r for r in rows if r["slug"] in wanted]
         for slug in sorted(wanted - {r["slug"] for r in rows}):
             print(f"  ?  {slug}: not in the workbook")
+    if args.brand:
+        brands = {b.strip().lower() for b in args.brand}
+        rows = [r for r in rows if (r.get("brand") or "").strip().lower() in brands]
 
     report = {"updated": [], "skipped_not_found": [], "skipped_existing": [], "missing_in_strapi": [], "unchanged": []}
     print(f"{'DRY RUN — ' if args.dry else ''}{len(rows)} row(s) from {args.workbook} → {base}\n")
 
     for row in rows:
         slug = row["slug"]
-        blob = row.get("gsmarena_specifications") or ""
+        gsmarena_blob = row.get("gsmarena_specifications") or ""
+        fallback_blob = row.get("fallback_specifications") or ""
         if args.limit and len(report["updated"]) >= args.limit:
             break
 
-        if NOT_FOUND_MARKER in blob:
+        # GSMArena first: it is the consistent source across the catalogue, and
+        # the fallback column is only filled where GSMArena has no page at all.
+        if NOT_FOUND_MARKER not in gsmarena_blob and parse_specifications(gsmarena_blob, row.get("category")):
+            key = "gsmarena"
+            groups = parse_specifications(gsmarena_blob, row.get("category"))
+            title = (row.get("gsmarena_title") or "").strip()
+            url = (row.get("gsmarena_url") or "").strip()
+            meta = {
+                "url": url,
+                "source": "GSMArena",
+                "sourceUrl": url,
+                "cleanModel": title,
+                "sourceTitle": title,
+                "sourceImage": "",
+                "matchStatus": "matched",
+                "matchConfidence": "manual",
+            }
+        elif parse_specifications(fallback_blob, row.get("category")):
+            key = "manufacturer"
+            groups = parse_specifications(fallback_blob, row.get("category"))
+            source_name, url = parse_source(row.get("fallback_source"))
+            meta = {
+                "url": url,
+                "source": source_name or (row.get("brand") or "").strip(),
+                "sourceUrl": url,
+                "sourceTitle": (row.get("original_title") or "").strip(),
+                "matchStatus": "matched",
+                "matchConfidence": "manual",
+            }
+        else:
             report["skipped_not_found"].append(slug)
-            print(f"  –  {slug}: no GSMArena page, skipped")
-            continue
-
-        groups = parse_specifications(blob, row.get("category"))
-        if not groups:
-            report["skipped_not_found"].append(slug)
-            print(f"  –  {slug}: no parseable specifications, skipped")
+            print(f"  –  {slug}: no specifications in either column, skipped")
             continue
 
         product = strapi.get_product(slug)
@@ -194,35 +250,24 @@ def main():
 
         specs = product.get("specs")
         specs = dict(specs) if isinstance(specs, dict) else {}
-        if isinstance(specs.get("gsmarena"), dict) and specs["gsmarena"].get("specifications") and not args.force:
+        if isinstance(specs.get(key), dict) and specs[key].get("specifications") and not args.force:
             report["skipped_existing"].append(slug)
-            print(f"  =  {slug}: already has specs.gsmarena, left alone (--force to replace)")
+            print(f"  =  {slug}: already has specs.{key}, left alone (--force to replace)")
             continue
 
-        title = (row.get("gsmarena_title") or "").strip()
-        url = (row.get("gsmarena_url") or "").strip()
-        specs["gsmarena"] = {
-            "url": url,
-            "source": "GSMArena",
-            "sourceUrl": url,
-            "cleanModel": title,
-            "sourceTitle": title,
-            "sourceImage": "",
-            "matchStatus": "matched",
-            "matchConfidence": "manual",
-            "extractedAt": extracted_at,
-            "specifications": groups,
-        }
+        specs[key] = {**meta, "extractedAt": extracted_at, "specifications": groups}
 
         rows_count = sum(len(g["specifications"]) for g in groups)
         if not args.dry:
             strapi.update_specs(product["documentId"], specs)
-        report["updated"].append({"slug": slug, "groups": len(groups), "rows": rows_count, "url": url})
-        print(f"  {'·' if args.dry else '✓'}  {slug}: {len(groups)} group(s), {rows_count} spec rows")
+        report["updated"].append(
+            {"slug": slug, "key": key, "source": meta["source"], "groups": len(groups), "rows": rows_count, "url": meta["url"]}
+        )
+        print(f"  {'·' if args.dry else '✓'}  {slug}: {len(groups)} group(s), {rows_count} rows → specs.{key} ({meta['source']})")
 
     print(
         f"\n{'Would update' if args.dry else 'Updated'}: {len(report['updated'])}"
-        f" · no GSMArena page: {len(report['skipped_not_found'])}"
+        f" · no specifications: {len(report['skipped_not_found'])}"
         f" · already populated: {len(report['skipped_existing'])}"
         f" · not in Strapi: {len(report['missing_in_strapi'])}"
     )

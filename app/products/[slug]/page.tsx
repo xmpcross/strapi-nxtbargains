@@ -531,21 +531,27 @@ function ProductInfoTabs({
   retailers: Retailer[];
   brandGroups: CouponBrandGroup[];
 }) {
-  const gsmarenaSpecGroups = gsmarenaSpecificationGroups(specs);
-  // Phones prefer the GSMArena spec tables, but only where that import actually
-  // ran. Suppressing the generic list unconditionally left a phone sourced from
-  // Google Shopping with an empty Specifications panel while it held dozens of
-  // specs of its own, so the generic list stands in whenever GSMArena is absent.
-  const useGsmarenaSpecsInSpecifications =
-    productHasCategory(product, 'Smart Phones') && gsmarenaSpecGroups.length > 0;
+  const structuredSpecGroups = structuredSpecificationGroups(specs);
+  const genericSpecEntries = productSpecificationEntries(specs);
+  /*
+   * Any product with an imported spec table shows it, and the generic list
+   * stands in whenever there isn't one — a phone sourced from Google Shopping
+   * holds dozens of specs of its own and would otherwise get an empty panel.
+   *
+   * This used to also require the Smart Phones category. That left every
+   * smartwatch import invisible: the tables were in the database, and the panel
+   * rendered the thin generic specs over the top of them.
+   */
+  const useStructuredSpecs = structuredSpecGroups.length > 0;
   const additionalInfoEntries = productAdditionalInfoEntries(product);
-  const specEntries = useGsmarenaSpecsInSpecifications ? [] : productSpecificationEntries(specs);
+  const specEntries = useStructuredSpecs ? [] : genericSpecEntries;
 
   const accordionId = `product-info-accordion-${productId}`;
-  // Watches carry both a GSMArena import and their own generic specs; the
-  // generic ones are the short, tile-sized values, so they lead.
+  // Watches carry both an imported table and their own generic specs; the
+  // generic ones are the short, tile-sized values, so they lead — independently
+  // of which of the two the Specifications panel ends up showing.
   const highlights = productHighlightEntries(
-    specEntries.length ? specEntries : gsmarenaHighlightEntries(gsmarenaSpecGroups),
+    genericSpecEntries.length ? genericSpecEntries : structuredHighlightEntries(structuredSpecGroups),
   );
 
   return (
@@ -571,8 +577,8 @@ function ProductInfoTabs({
               panels={[
                 { id: 'specifications', label: 'Specifications', content: (
                   <>
-                {useGsmarenaSpecsInSpecifications ? (
-                  <GsmarenaSpecGroups groups={gsmarenaSpecGroups} />
+                {useStructuredSpecs ? (
+                  <StructuredSpecGroups groups={structuredSpecGroups} />
                 ) : specEntries.length ? (
                   <KeySpecsList entries={specEntries} className="mt-0" />
                 ) : (
@@ -666,7 +672,7 @@ function KeySpecsList({ entries, className = 'mt-5' }: { entries: SpecificationE
   );
 }
 
-function GsmarenaSpecGroups({ groups }: { groups: SpecificationGroup[] }) {
+function StructuredSpecGroups({ groups }: { groups: SpecificationGroup[] }) {
   if (!groups.length) {
     return null;
   }
@@ -1084,6 +1090,7 @@ const HIDDEN_SPEC_KEYS = new Set([
   'specImportedAt',
   'gsmarena',
   'gsmarenaImportedAt',
+  'manufacturer',
   'additionalInfo',
 ]);
 
@@ -1138,11 +1145,6 @@ function productAdditionalInfoEntries(product: CommerceProduct): SpecificationEn
   return entries.filter((entry): entry is SpecificationEntry => Boolean(entry.value));
 }
 
-function productHasCategory(product: CommerceProduct, categoryName: string) {
-  const expected = categoryName.trim().toLowerCase();
-  return product.categories?.some((category) => category.name.trim().toLowerCase() === expected || category.slug.trim().toLowerCase() === expected.replace(/\s+/g, '-')) ?? false;
-}
-
 function productSpecificationEntries(specs?: Record<string, unknown> | null): SpecificationEntry[] {
   if (!isPlainRecord(specs)) return [];
 
@@ -1180,14 +1182,20 @@ const HIGHLIGHT_LABEL_PRIORITY = [
 ];
 
 /**
- * Which GSMArena rows make a highlight, and what to call one.
+ * Which rows of an imported table make a highlight, and what to call one.
  *
- * A flattened GSMArena table can't be used as-is: the names repeat across groups
- * — `Type` is the display panel, the battery and the storage — and the first
- * groups are radio bands, which is not what anyone scans a phone page for. Keyed
- * by `group|name` so the group disambiguates, and the value is the tile label.
+ * A flattened spec table can't be used as-is: the names repeat across groups —
+ * `Type` is the display panel, the battery and the storage — and GSMArena leads
+ * with radio bands, which is not what anyone scans a phone page for. Keyed by
+ * `group|name` so the group disambiguates, and the value is the tile label.
+ *
+ * Only reached by a product with no generic specs of its own, which is why the
+ * manufacturer entries below are thin: every watch imported from a brand site
+ * so far also carries a generic set, and those lead.
  */
-const GSMARENA_HIGHLIGHT_LABELS: Record<string, string> = {
+const STRUCTURED_HIGHLIGHT_LABELS: Record<string, string> = {
+  'Body|Case Size': 'Case size',
+  'Body|Water Rating': 'Water rating',
   'Display|Size': 'Display',
   'Display|Type': 'Display type',
   'Display|Resolution': 'Resolution',
@@ -1205,11 +1213,11 @@ const GSMARENA_HIGHLIGHT_LABELS: Record<string, string> = {
   'Misc|Colors': 'Colors',
 };
 
-function gsmarenaHighlightEntries(groups: SpecificationGroup[]): SpecificationEntry[] {
+function structuredHighlightEntries(groups: SpecificationGroup[]): SpecificationEntry[] {
   return groups.flatMap((group) =>
     group.specifications
       .map((entry) => {
-        const label = GSMARENA_HIGHLIGHT_LABELS[`${group.category}|${entry.label}`];
+        const label = STRUCTURED_HIGHLIGHT_LABELS[`${group.category}|${entry.label}`];
         return label ? { label, value: entry.value } : null;
       })
       .filter((entry): entry is SpecificationEntry => Boolean(entry)),
@@ -1251,10 +1259,25 @@ function productHighlightEntries(entries: SpecificationEntry[], limit = 8): Spec
  */
 const HIDDEN_GSMARENA_LABELS = new Set(['image', 'source url', 'popularity (hits)']);
 
-function gsmarenaSpecificationGroups(specs?: Record<string, unknown> | null): SpecificationGroup[] {
-  if (!isPlainRecord(specs) || !isPlainRecord(specs.gsmarena)) return [];
+/**
+ * The imported spec table, whichever source it came from.
+ *
+ * `gsmarena` is the catalogue-wide source and wins where it exists.
+ * `manufacturer` holds tables taken from a brand's own product page, imported
+ * for the devices GSMArena has no page for at all — most Garmin and Amazfit
+ * watches. They are separate keys because they are separate provenances, but
+ * they carry the same shape and render identically.
+ */
+function structuredSpecificationGroups(specs?: Record<string, unknown> | null): SpecificationGroup[] {
+  if (!isPlainRecord(specs)) return [];
+  const source = isPlainRecord(specs.gsmarena)
+    ? specs.gsmarena
+    : isPlainRecord(specs.manufacturer)
+      ? specs.manufacturer
+      : null;
+  if (!source) return [];
 
-  const rawGroups = Array.isArray(specs.gsmarena.specifications) ? specs.gsmarena.specifications : [];
+  const rawGroups = Array.isArray(source.specifications) ? source.specifications : [];
   return rawGroups
     .map((group): SpecificationGroup | null => {
       if (!isPlainRecord(group)) return null;
