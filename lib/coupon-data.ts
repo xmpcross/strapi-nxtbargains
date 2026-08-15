@@ -4,6 +4,7 @@ import { wrapImpactAffiliate } from './impact-links';
 import { takeadsLinkForUrl } from './takeads-links';
 import { couponStoreSlug } from './coupon-stores';
 import { listNxtCoupons, type NxtCoupon } from './strapi';
+import { trackedUrl } from './click-tracking';
 
 const COUPON_REVALIDATE_SECONDS = 86400;
 const STORE_COUPON_CACHE_FILE = join(process.cwd(), 'data', 'coupon-store-coupons.json');
@@ -145,9 +146,26 @@ function readStoreCouponCache(storeId: number | string) {
  * many call sites do not all have to change.
  */
 export async function monetizeUrl(url: string) {
+  // Merchant is read off the original destination, before wrapping: afterwards
+  // the host belongs to Impact or Takeads and every click looks like the same
+  // merchant.
+  const merchant = merchantHost(url);
+
   const impactUrl = wrapImpactAffiliate({ id: 0, productUrl: url });
-  if (impactUrl) return impactUrl;
-  return takeadsLinkForUrl(url) ?? url;
+  if (impactUrl) return trackedUrl(impactUrl, { merchant, network: 'impact' });
+
+  const takeadsUrl = takeadsLinkForUrl(url);
+  if (takeadsUrl) return trackedUrl(takeadsUrl, { merchant, network: 'takeads' });
+
+  return trackedUrl(url, { merchant, network: 'direct' });
+}
+
+function merchantHost(url: string): string | null {
+  try {
+    return new URL(url).host.replace(/^www\./, '');
+  } catch {
+    return null;
+  }
 }
 
 async function monetizeCoupons(coupons: Coupon[]) {

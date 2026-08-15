@@ -33,6 +33,7 @@ import {
 } from '@/lib/strapi';
 import { wrapImpactAffiliate } from '@/lib/impact-links';
 import { wrapTakeadsAffiliate } from '@/lib/takeads-links';
+import { trackedUrl } from '@/lib/click-tracking';
 import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/coupon-data';
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
 import StoreLinkTile from '@/components/StoreLinkTile';
@@ -58,6 +59,25 @@ type Params = { slug: string };
 // Outbound buy link: Impact deep-link if the merchant matches an approved Impact
 // campaign (e.g. Whatnot), otherwise the offer's own affiliate/product URL.
 function buyUrl(offer: CommerceOffer, product?: CommerceProduct): string {
+  const { url, network } = buyDestination(offer, product);
+  if (!url || url === '#') return '#';
+
+  return trackedUrl(url, {
+    merchant: offer.merchant?.slug ?? offer.merchant?.name ?? null,
+    network,
+    offerDocumentId: offer.documentId ?? null,
+    productDocumentId: product?.documentId ?? null,
+  });
+}
+
+/* The destination itself, and which relationship produced it. Split out from
+   buyUrl so the tracking wrapper has one place to sit and the choice of network
+   is recorded rather than guessed from the final host — after wrapping, every
+   Impact link looks like Impact. */
+function buyDestination(
+  offer: CommerceOffer,
+  product?: CommerceProduct,
+): { url: string | null; network: string } {
   const affiliate = sanitizeOfferUrl(offer.affiliateUrl);
   const resolved = resolveOfferDestination(offer, product);
 
@@ -67,21 +87,26 @@ function buyUrl(offer: CommerceOffer, product?: CommerceProduct): string {
       affiliateUrl: affiliate,
       productUrl: resolved ?? offer.productUrl,
     };
-    return wrapImpactAffiliate(normalizedOffer) ?? affiliate;
+    const impact = wrapImpactAffiliate(normalizedOffer);
+    return impact ? { url: impact, network: 'impact' } : { url: affiliate, network: 'offer-affiliate' };
   }
 
-  if (!resolved) return offer.merchant?.websiteUrl ?? '#';
+  if (!resolved) return { url: offer.merchant?.websiteUrl ?? '#', network: 'merchant-home' };
 
   const normalizedOffer: CommerceOffer = { ...offer, productUrl: resolved, affiliateUrl: null };
   // Order matters: Impact and Amazon are direct relationships, so they win.
   // Takeads covers the long tail of merchants neither of them has, and only
   // ever substitutes a URL it has actually converted.
-  return (
-    wrapImpactAffiliate(normalizedOffer) ??
-    amazonProductUrl(normalizedOffer, product) ??
-    wrapTakeadsAffiliate(normalizedOffer, product) ??
-    resolved
-  );
+  const impact = wrapImpactAffiliate(normalizedOffer);
+  if (impact) return { url: impact, network: 'impact' };
+
+  const amazon = amazonProductUrl(normalizedOffer, product);
+  if (amazon) return { url: amazon, network: 'amazon' };
+
+  const takeads = wrapTakeadsAffiliate(normalizedOffer, product);
+  if (takeads) return { url: takeads, network: 'takeads' };
+
+  return { url: resolved, network: 'direct' };
 }
 
 function safeAffiliateUrl(offer: CommerceOffer): string | null {
