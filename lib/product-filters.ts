@@ -27,6 +27,7 @@ export const PRICE_FILTERS: FilterOption[] = [
 ];
 
 export const SORT_OPTIONS: FilterOption[] = [
+  { label: 'Featured', value: 'random' },
   { label: 'Newest', value: 'newest' },
   { label: 'Price: Low to High', value: 'price-asc' },
   { label: 'Price: High to Low', value: 'price-desc' },
@@ -117,8 +118,43 @@ export function applyProductFilters(products: CommerceProduct[], filters: Produc
   });
 }
 
+/**
+ * Shuffle that is random between renders but stable within one.
+ *
+ * A plain Math.random() shuffle breaks pagination: page 1 and page 2 are
+ * separate renders, so each would reshuffle and the visitor would see some
+ * products twice and never see others. Seeding from a time bucket means every
+ * page rendered in the same window agrees on the order, while the order still
+ * changes from window to window.
+ *
+ * The bucket matches the page's revalidate window, so the order changes exactly
+ * as often as the page is rebuilt anyway — no cache is invalidated for this.
+ */
+const SHUFFLE_BUCKET_MS = 60_000;
+
+function seededShuffle<T>(items: T[], seed: number): T[] {
+  const out = [...items];
+  // Mulberry32 — small, fast, and good enough for display ordering.
+  let state = seed >>> 0;
+  const random = () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  for (let i = out.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 export function sortProducts(products: CommerceProduct[], sort: string) {
   const sorted = [...products];
+  if (sort === 'random') {
+    return seededShuffle(sorted, Math.floor(Date.now() / SHUFFLE_BUCKET_MS));
+  }
   if (sort === 'price-asc') {
     sorted.sort((a, b) => (bestProductPrice(a) ?? Number.POSITIVE_INFINITY) - (bestProductPrice(b) ?? Number.POSITIVE_INFINITY));
   } else if (sort === 'price-desc') {

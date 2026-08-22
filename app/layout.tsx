@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     // copy one between domains.
     'commission-factory-verification': '5d13ca7a84ea4df99d61ce39c158c8e5',
     'mitgo-verification': '48ad5287-a158-49d1-9ce1-184d93249a75',
+    'verify-admitad': '3c0ecfaba7',
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   openGraph: {

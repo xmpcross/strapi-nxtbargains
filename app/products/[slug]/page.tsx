@@ -33,6 +33,7 @@ import {
 } from '@/lib/strapi';
 import { wrapImpactAffiliate } from '@/lib/impact-links';
 import { wrapTakeadsAffiliate } from '@/lib/takeads-links';
+import { trackedUrl } from '@/lib/click-tracking';
 import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/coupon-data';
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
 import StoreLinkTile from '@/components/StoreLinkTile';
@@ -58,6 +59,25 @@ type Params = { slug: string };
 // Outbound buy link: Impact deep-link if the merchant matches an approved Impact
 // campaign (e.g. Whatnot), otherwise the offer's own affiliate/product URL.
 function buyUrl(offer: CommerceOffer, product?: CommerceProduct): string {
+  const { url, network } = buyDestination(offer, product);
+  if (!url || url === '#') return '#';
+
+  return trackedUrl(url, {
+    merchant: offer.merchant?.slug ?? offer.merchant?.name ?? null,
+    network,
+    offerDocumentId: offer.documentId ?? null,
+    productDocumentId: product?.documentId ?? null,
+  });
+}
+
+/* The destination itself, and which relationship produced it. Split out from
+   buyUrl so the tracking wrapper has one place to sit and the choice of network
+   is recorded rather than guessed from the final host — after wrapping, every
+   Impact link looks like Impact. */
+function buyDestination(
+  offer: CommerceOffer,
+  product?: CommerceProduct,
+): { url: string | null; network: string } {
   const affiliate = sanitizeOfferUrl(offer.affiliateUrl);
   const resolved = resolveOfferDestination(offer, product);
 
@@ -67,21 +87,26 @@ function buyUrl(offer: CommerceOffer, product?: CommerceProduct): string {
       affiliateUrl: affiliate,
       productUrl: resolved ?? offer.productUrl,
     };
-    return wrapImpactAffiliate(normalizedOffer) ?? affiliate;
+    const impact = wrapImpactAffiliate(normalizedOffer);
+    return impact ? { url: impact, network: 'impact' } : { url: affiliate, network: 'offer-affiliate' };
   }
 
-  if (!resolved) return offer.merchant?.websiteUrl ?? '#';
+  if (!resolved) return { url: offer.merchant?.websiteUrl ?? '#', network: 'merchant-home' };
 
   const normalizedOffer: CommerceOffer = { ...offer, productUrl: resolved, affiliateUrl: null };
   // Order matters: Impact and Amazon are direct relationships, so they win.
   // Takeads covers the long tail of merchants neither of them has, and only
   // ever substitutes a URL it has actually converted.
-  return (
-    wrapImpactAffiliate(normalizedOffer) ??
-    amazonProductUrl(normalizedOffer, product) ??
-    wrapTakeadsAffiliate(normalizedOffer, product) ??
-    resolved
-  );
+  const impact = wrapImpactAffiliate(normalizedOffer);
+  if (impact) return { url: impact, network: 'impact' };
+
+  const amazon = amazonProductUrl(normalizedOffer, product);
+  if (amazon) return { url: amazon, network: 'amazon' };
+
+  const takeads = wrapTakeadsAffiliate(normalizedOffer, product);
+  if (takeads) return { url: takeads, network: 'takeads' };
+
+  return { url: resolved, network: 'direct' };
 }
 
 function safeAffiliateUrl(offer: CommerceOffer): string | null {
@@ -341,33 +366,63 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                   </div>
 
                   <aside className="self-center p-5 sm:p-7">
-                    <div className="mb-4 text-right text-xs font-medium text-[#149a43]">
-                      Set Lowest Price Alert
-                    </div>
                     {rows.length > 0 ? (
-                      <div className="product-offer-list border border-ink/10">
+                      <div className="product-offer-list rounded-[10px] border border-[#e5e7eb] bg-white p-5">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink/45">
+                          Lowest price
+                        </p>
+                        <p className="mt-1 font-display text-[2.35rem] font-bold leading-none tracking-tight text-ink">
+                          {best
+                            ? formatMoney(best.offer.price ?? best.offer.originalPrice, best.offer.currency ?? 'USD')
+                            : 'Check price'}
+                        </p>
+                        <p className="mt-2 text-[13px] text-ink/50">
+                          {best ? `at ${merchantName(best.offer)} · ` : ''}
+                          {rows.length} retailer{rows.length === 1 ? '' : 's'} compared
+                        </p>
+
+                        {/* Extra rows stay behind the existing CSS-only toggle, so
+                            the list opens at four as the reference does without
+                            needing client JavaScript. */}
                         <input id={offerToggleId} type="checkbox" className="product-offer-toggle sr-only" />
-                        {rows.map((row, index) => (
-                          <CompactOfferRow
-                            key={row.offer.documentId ?? row.offer.id}
-                            row={row}
-                            className={index >= initialVisibleOfferCount ? 'product-offer-row-extra' : ''}
-                          />
-                        ))}
-                        <div className="flex items-center justify-between border-t border-ink/10 px-3 py-3 text-xs">
-                          {hiddenOfferCount > 0 ? (
-                            <label htmlFor={offerToggleId} className="cursor-pointer font-medium text-red-600">
-                              <span className="show-more-offers">Show all +</span>
-                              <span className="show-less-offers">Show less</span>
-                            </label>
-                          ) : (
-                            <span className="font-medium text-red-600">Show all +</span>
-                          )}
-                          <span className="text-ink/70">Price history</span>
+                        <div className="mt-4 grid gap-2">
+                          {rows.map((row, index) => (
+                            <CompactOfferRow
+                              key={row.offer.documentId ?? row.offer.id}
+                              row={row}
+                              className={index >= initialVisibleOfferCount ? 'product-offer-row-extra' : ''}
+                            />
+                          ))}
                         </div>
+
+                        {hiddenOfferCount > 0 ? (
+                          <label htmlFor={offerToggleId} className="mt-3 block cursor-pointer text-[12px] font-semibold text-[#c9636b]">
+                            <span className="show-more-offers">Show all {rows.length} retailers +</span>
+                            <span className="show-less-offers">Show fewer</span>
+                          </label>
+                        ) : null}
+
+                        <p className="mt-4 text-[12px] text-ink/45">
+                          Last price update was: {updatedLabel}
+                        </p>
+
+                        {best ? (
+                          <a
+                            href={buyUrl(best.offer, best.product)}
+                            target="_blank"
+                            rel="nofollow sponsored noopener noreferrer"
+                            className="mt-4 block rounded-[8px] bg-[#ffe000] px-4 py-3.5 text-center font-display text-[15px] font-bold text-ink transition hover:brightness-95"
+                          >
+                            Buy at {merchantName(best.offer)}
+                          </a>
+                        ) : null}
+
+                        <p className="mt-4 text-center text-[12px] leading-5 text-[#5b7bb5]">
+                          We may earn a commission from links on this page, at no extra cost to you.
+                        </p>
                       </div>
                     ) : (
-                      <div className="border border-ink/10 bg-paper p-6">
+                      <div className="rounded-[10px] border border-[#e5e7eb] bg-white p-6">
                         <h2 className="font-display text-xl font-bold text-ink">No merchant prices yet</h2>
                         <p className="mt-3 text-sm leading-6 text-ink/60">
                           This product is in the catalog, but it does not have active merchant offers attached yet.
@@ -553,7 +608,10 @@ function ProductInfoTabs({
                     {additionalInfoEntries.map((entry) => (
                       <div key={entry.label} className="grid gap-2 border-b border-ink/10 px-4 py-3 last:border-b-0 sm:grid-cols-[190px_minmax(0,1fr)]">
                         <dt className="font-bold text-ink/55">{entry.label}</dt>
-                        <dd className="text-ink">{entry.value}</dd>
+                        {/* break-words: the restored Image URL row is a single
+                            unbroken 200-character string with no spaces to wrap
+                            at, and would otherwise run past the table. */}
+                        <dd className="break-words text-ink">{entry.value}</dd>
                       </div>
                     ))}
                   </dl>
@@ -884,35 +942,37 @@ function CompactOfferRow({ row, className = '' }: { row: CommerceOfferRow; class
   const unavailable = offer.availability === 'out_of_stock';
 
   return (
-    <div className={`product-offer-row grid min-h-[48px] grid-cols-[minmax(0,1fr)_108px_82px] border-b border-ink/10 text-sm last:border-b-0 ${className}`}>
+    <div className={`product-offer-row flex items-center gap-3 rounded-[8px] bg-[#f5f6f7] p-2.5 text-sm ${className}`}>
+      {/* The logo sits on its own white tile, as in the reference: merchant
+          marks are drawn for a white ground and lose contrast on the grey. */}
       <a
         href={buyUrl(offer, product)}
         target="_blank"
         rel="nofollow sponsored noopener noreferrer"
-        className="flex min-w-0 items-center gap-2 px-3 py-2 text-ink transition hover:text-primary"
+        aria-label={merchantName(offer)}
+        className="flex h-9 w-[92px] shrink-0 items-center justify-center rounded-[6px] bg-white px-2"
       >
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt={`${merchantName(offer)} logo`} className="h-5 w-auto max-w-[86px] shrink-0 object-contain object-left" />
+          <img src={logo} alt={`${merchantName(offer)} logo`} className="max-h-6 max-w-full object-contain" />
         ) : (
-          <span className="flex h-5 w-5 shrink-0 items-center justify-center bg-muted text-[10px] font-bold text-ink/45">
-            {merchantName(offer).slice(0, 1)}
-          </span>
+          <span className="truncate text-[11px] font-bold text-ink/60">{merchantName(offer)}</span>
         )}
-        <span className="truncate">{merchantName(offer)}</span>
       </a>
-      <div className="bg-[#f7fbf2] px-3 py-2 text-center">
+
+      <div className="ml-auto text-right">
         <p className="font-bold text-ink">{formatMoney(price, offer.currency ?? 'USD')}</p>
         {unavailable && <p className="mt-0.5 text-[10px] font-bold text-red-600">out of stock</p>}
       </div>
+
       <a
         href={buyUrl(offer, product)}
         target="_blank"
         rel="nofollow sponsored noopener noreferrer"
         aria-label={`See offer for ${offer.title || product.name} at ${merchantName(offer)}`}
-        className="flex items-center justify-center bg-primary px-3 py-2 text-sm font-bold text-white transition hover:bg-primary-emphasis"
+        className="shrink-0 rounded-[6px] bg-[#fdeced] px-3.5 py-2 text-[13px] font-semibold text-[#c9636b] transition hover:bg-[#fbdcde]"
       >
-        See it
+        View
       </a>
     </div>
   );
@@ -1121,11 +1181,12 @@ function productSpecificationEntries(specs?: Record<string, unknown> | null): Sp
 /**
  * Spec rows that carry plumbing rather than a specification.
  *
- * "Image URL" is the source photo the importer pulls from, and it renders as a
- * raw gsmarena.com link in the middle of the Display or Overview table. It is
- * data the page uses, not a fact about the product.
+ * "Image URL" was hidden here too, as the source photo the importer pulls from.
+ * It is shown again on request: it is the only place the source of a product
+ * photo is visible from the page, which matters while the image imports are
+ * still being worked through.
  */
-const HIDDEN_GSMARENA_LABELS = new Set(['image url', 'image', 'source url', 'popularity (hits)']);
+const HIDDEN_GSMARENA_LABELS = new Set(['image', 'source url', 'popularity (hits)']);
 
 function gsmarenaSpecificationGroups(specs?: Record<string, unknown> | null): SpecificationGroup[] {
   if (!isPlainRecord(specs) || !isPlainRecord(specs.gsmarena)) return [];

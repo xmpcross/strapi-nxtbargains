@@ -242,10 +242,19 @@ main[data-testid^="product-price-"] h2 {
   font-size: 22px !important;
 }
 
-/* Global borderless surface treatment for sections, cards, and boxed content. */
+/* Global borderless surface treatment for sections, cards, and boxed content.
+ *
+ * `border: 0` rather than a transparent colour: a transparent border still
+ * occupies its width, so every bordered card kept a 1px ring of dead space and
+ * sat 2px larger than its content in both axes. Removing the border outright
+ * collapses that.
+ *
+ * This is deliberately broad and beats utility classes via !important, so any
+ * border that is genuinely wanted has to be re-stated below this rule with the
+ * same weight — see the review cards and the price sidebar. */
 :where(section, article, aside, header, footer, nav, div, a, span, li)[class*="border"],
 :where(section, article, aside, header, footer, nav, div, a, span, li)[class*="divide-"] > :not([hidden]) ~ :not([hidden]) {
-  border-color: transparent !important;
+  border: 0 !important;
 }
 
 [data-testid="site-header"][data-sticky-active="true"] {
@@ -1182,9 +1191,13 @@ main[data-testid^="product-price-"] .product-offer-list .product-offer-row-extra
 
 /* Reveal via the classic checked-checkbox sibling combinator (the toggle input
    is the first child of .product-offer-list, so it precedes every row/footer).
-   Avoids :has(), which older browsers don't support — that broke "Show all". */
+   Avoids :has(), which older browsers don't support — that broke "Show all".
+   The descendant step matters: the rows now sit inside a wrapper div rather
+   than being direct siblings of the input, so `~ .product-offer-row-extra`
+   alone would never match and "Show all" would do nothing. */
+main[data-testid^="product-price-"] .product-offer-toggle:checked ~ * .product-offer-row-extra,
 main[data-testid^="product-price-"] .product-offer-toggle:checked ~ .product-offer-row-extra {
-  display: grid;
+  display: flex;
 }
 
 main[data-testid^="product-price-"] .product-offer-list .show-less-offers {
@@ -2067,3 +2080,15 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 .review-stars-off { color: rgb(13 27 42 / 0.18); }
 .review-empty { line-height: 1.6; opacity: 0.6; }
 .review-form-wrap { max-width: 640px; }
+
+/* Auto-advancing carousel track (components/AutoCarousel.tsx).
+   The row stays a real scroll container — that is what keeps it swipeable and
+   keyboard-scrollable without JavaScript — so the scrollbar is hidden rather
+   than the overflow being removed. */
+.carousel-track {
+  scrollbar-width: none;            /* Firefox */
+  -ms-overflow-style: none;         /* old Edge */
+}
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}

@@ -157,7 +157,9 @@ export default function PostCard({
       <div className="mt-4">
         {cat && <p className="text-[11px] font-bold uppercase tracking-wider text-primary">{cat.name}</p>}
         <Link href={href}>
-          <Title className={`mt-2 line-clamp-2 font-display text-lg font-bold leading-snug text-ink transition group-hover:text-primary ${titleClassName}`}>
+          {/* Pinned with the important modifier so surrounding typography rules
+              cannot re-scale the card heading, as with Filter Products. */}
+          <Title className={`mt-2 line-clamp-2 font-display !text-[1rem] font-bold leading-snug text-ink transition group-hover:text-primary ${titleClassName}`}>
             {post.title}
           </Title>
         </Link>
