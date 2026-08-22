@@ -25,3 +25,7 @@ data/openwebninja-usage.json
 
 # Local npm cache — machine state, not repository content.
 .npm-cache/
+
+# Backups of the env file — these hold live secrets and this repo is public.
+.env*.bak
+.env*.bak-*

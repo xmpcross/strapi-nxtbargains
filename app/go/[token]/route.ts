@@ -22,13 +22,19 @@ const STRAPI = (process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAP
 const WRITE_TOKEN = process.env.STRAPI_WRITE_TOKEN || process.env.STRAPI_API_TOKEN || '';
 const SITE_SLUG = process.env.NEXT_PUBLIC_SITE_SLUG || 'nxt-bargains';
 
-/** Our own path the click came from. Query string dropped — it can carry search terms. */
-function referrerPath(referer: string | null): string | null {
+/**
+ * Our own path the click came from. Query string dropped — it can carry search
+ * terms.
+ *
+ * "Our own" is judged against the host this request actually arrived on, not
+ * against NEXT_PUBLIC_SITE_URL. That variable is a build-time constant and has
+ * been wrong before; the request host is the ground truth and cannot drift.
+ */
+function referrerPath(referer: string | null, selfHost: string): string | null {
   if (!referer) return null;
   try {
     const url = new URL(referer);
-    const own = process.env.NEXT_PUBLIC_SITE_URL || '';
-    if (own && new URL(own).host !== url.host) return null;
+    if (selfHost && url.host !== selfHost) return null;
     return url.pathname.slice(0, 300);
   } catch {
     return null;
@@ -62,15 +68,24 @@ async function record(payload: Record<string, unknown>) {
 
 export async function GET(request: Request, context: { params: Promise<{ token: string }> }) {
   const { token } = await context.params;
+  const headers = request.headers;
+
+  /* The public host, taken from the proxy's headers. request.url is the
+     internal address behind nginx — 127.0.0.1:3008 — so using it would bounce
+     visitors to localhost and make every genuine referrer look foreign. nginx
+     here sets Host but no X-Forwarded-Host, and blanks X-Forwarded-Proto, so
+     Host is the ground truth and https is the only sensible scheme. */
+  const selfHost =
+    headers.get('x-forwarded-host') || headers.get('host') || new URL(request.url).host;
+  const selfOrigin = `https://${selfHost}`;
+
   const click = verifyClickToken(token);
 
   if (!click) {
     // An unsigned or tampered token gets no redirect at all — this endpoint
     // must never forward to a URL it did not itself produce.
-    return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_SITE_URL || request.url), 302);
+    return NextResponse.redirect(`${selfOrigin}/`, 302);
   }
-
-  const headers = request.headers;
   const country =
     headers.get('cf-ipcountry') ||
     headers.get('x-vercel-ip-country') ||
@@ -86,7 +101,7 @@ export async function GET(request: Request, context: { params: Promise<{ token: 
     offerDocumentId: click.offerDocumentId ?? null,
     productDocumentId: click.productDocumentId ?? null,
     country: country && /^[A-Za-z]{2}$/.test(country) ? country.toUpperCase() : null,
-    referrerPath: referrerPath(headers.get('referer')),
+    referrerPath: referrerPath(headers.get('referer'), selfHost),
     siteSlug: SITE_SLUG,
   });
 
