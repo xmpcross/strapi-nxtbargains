@@ -2270,7 +2270,8 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   gap: 0.35rem;
 }
 
-.product-title-star { color: #f5a623; font-size: 15px; line-height: 1; }
+.product-title-star { color: #f5a623; font-size: 15px; line-height: 1; letter-spacing: 0.02em; }
+.product-title-star-off { color: rgb(13 27 42 / 0.2); }
 .product-title-rating-value { font-weight: 700; color: #111111; }
 .product-title-rating-count { color: rgb(13 27 42 / 0.55); }
 

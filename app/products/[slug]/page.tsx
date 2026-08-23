@@ -275,12 +275,22 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                   {titleRating != null || (category && categorySlug) ? (
                     <div className="product-title-meta">
                       {titleRating != null ? (
-                        <span className="product-title-rating">
-                          <span aria-hidden="true" className="product-title-star">★</span>
+                        <span
+                          className="product-title-rating"
+                          aria-label={`${titleRating.toFixed(1)} out of 5 stars${titleRatingCount ? ` from ${titleRatingCount.toLocaleString()} reviews` : ''}`}
+                        >
+                          {/* Five stars filled to the rounded rating, rather
+                              than one star beside the number. */}
+                          <span aria-hidden="true" className="product-title-star">
+                            {'★'.repeat(Math.round(Math.min(5, Math.max(0, titleRating))))}
+                            <span className="product-title-star-off">
+                              {'★'.repeat(5 - Math.round(Math.min(5, Math.max(0, titleRating))))}
+                            </span>
+                          </span>
                           <span className="product-title-rating-value">{titleRating.toFixed(1)}</span>
                           {titleRatingCount ? (
                             <span className="product-title-rating-count">
-                              ({titleRatingCount.toLocaleString()} {titleRatingCount === 1 ? 'review' : 'reviews'})
+                              ({titleRatingCount.toLocaleString()})
                             </span>
                           ) : null}
                         </span>
