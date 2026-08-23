@@ -65,8 +65,10 @@ export default function PriceAlertForm({
   }
 
   // Shared sizing so the two buttons are identical in width + height.
+  /* h-10 rather than vertical padding: both buttons are then exactly 40px
+     whatever their label wraps to, so the pair stays level. */
   const btnBase =
-    'inline-flex flex-1 basis-0 min-w-[130px] items-center justify-center gap-1.5 rounded-md px-3 py-2 font-display text-[11px] font-bold uppercase tracking-wider transition';
+    'inline-flex h-10 flex-1 basis-0 min-w-[130px] items-center justify-center gap-1.5 rounded-md px-3 font-display text-[11px] font-bold uppercase tracking-wider transition';
 
   return (
     <div className="mt-4">
