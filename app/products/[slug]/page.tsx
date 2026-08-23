@@ -677,8 +677,9 @@ function ProductGallery({ images, name }: { images: string[]; name: string }) {
     // 30px clear of the Additional Info row above it.
     <div className="mb-6 pt-[30px]">
       <ProductCarousel
-        perView={3}
+        perView={4}
         interval={4000}
+        gapPx={15}
         items={images.map((src, index) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img

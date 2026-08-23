@@ -53,12 +53,16 @@ export default function ProductCarousel({
   const desktopBasis = compactGap
     ? perView === 6
       ? 'lg:basis-[calc((100%_-_75px)/6)]'
-      : perView === 3
-        ? 'lg:basis-[calc((100%_-_30px)/3)]'
-        : 'lg:basis-[calc((100%_-_60px)/5)]'
+      : perView === 4
+        ? 'lg:basis-[calc((100%_-_45px)/4)]'
+        : perView === 3
+          ? 'lg:basis-[calc((100%_-_30px)/3)]'
+          : 'lg:basis-[calc((100%_-_60px)/5)]'
     : perView === 6
       ? 'lg:basis-[calc((100%_-_6.25rem)/6)]'
-      : perView === 3
+      : perView === 4
+        ? 'lg:basis-[calc((100%_-_3.75rem)/4)]'
+        : perView === 3
         ? 'lg:basis-[calc((100%_-_2.5rem)/3)]'
         : 'lg:basis-[calc((100%_-_5rem)/5)]';
 
