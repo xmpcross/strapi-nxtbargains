@@ -266,3 +266,50 @@ export function moveCarouselBeforeSection(html: string, sectionIndex = 3): strin
 
   return `${rest.slice(0, at)}${block}\n${rest.slice(at)}`;
 }
+
+/**
+ * Split an HTML body immediately after the first element carrying `className`.
+ *
+ * Used to lift a lead block — the Content Egg offers grid on the informative
+ * posts — out of the article column so it can run full width, with the columned
+ * layout starting beneath it.
+ *
+ * Returns null when the class is absent or its element is unbalanced.
+ */
+export function splitAfterContainer(html: string, className: string): [string, string] | null {
+  const text = String(html || '');
+  const open = text.search(new RegExp(`<(\\w+)[^>]*class="[^"]*\\b${className}\\b[^"]*"`, 'i'));
+  if (open < 0) return null;
+
+  const tagMatch = /^<(\w+)/.exec(text.slice(open));
+  if (!tagMatch) return null;
+  const tag = tagMatch[1];
+
+  // Walk to the matching close, allowing for nesting of the same tag.
+  const opener = new RegExp(`<${tag}\\b`, 'gi');
+  const closer = new RegExp(`</${tag}>`, 'gi');
+  opener.lastIndex = open + 1;
+  closer.lastIndex = open + 1;
+
+  let depth = 0;
+  let cursor = open;
+  while (cursor < text.length) {
+    opener.lastIndex = cursor + 1;
+    closer.lastIndex = cursor + 1;
+    const o = opener.exec(text);
+    const c = closer.exec(text);
+    if (!c) return null;
+    if (o && o.index < c.index) {
+      depth += 1;
+      cursor = o.index;
+    } else {
+      if (depth === 0) {
+        const end = c.index + `</${tag}>`.length;
+        return [text.slice(0, end), text.slice(end)];
+      }
+      depth -= 1;
+      cursor = c.index;
+    }
+  }
+  return null;
+}

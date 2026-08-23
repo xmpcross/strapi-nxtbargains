@@ -4209,8 +4209,9 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   padding: 0;
   border: 0;
   gap: 2.5rem;
-  /* Even split — image left, details right. */
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  /* Same column sizing as the editorial header (1fr + 612px): flexible first
+     column, fixed second. Here that is the image left, details right. */
+  grid-template-columns: minmax(0, 1fr) 612px;
 }
 
 /* The image well carries its own border and padding further down the article;
@@ -4230,7 +4231,9 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   max-height: 320px;
 }
 
-@media (max-width: 768px) {
+/* The editorial header drops to one column under 1024px; the fixed 612px track
+   cannot survive below that either. */
+@media (max-width: 1023px) {
   .bestseller-card-full .nxt-product-card {
     grid-template-columns: 1fr;
     gap: 1.25rem;
@@ -4281,3 +4284,7 @@ img.read-next-avatar {
   object-fit: cover;
   background: #ebedf5;
 }
+
+/* Lead block lifted above the columns (the Content Egg offers grid). Runs the
+   full container width; the columned layout starts under it. */
+.post-lead-block { margin-top: 2rem; }

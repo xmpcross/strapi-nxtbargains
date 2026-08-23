@@ -20,6 +20,7 @@ import {
   extractHeadings,
   isMarkdownContent,
   moveCarouselBeforeSection,
+  splitAfterContainer,
   splitBodyAtSection,
 } from '@/lib/post-headings';
 import ReadAlso from '@/components/ReadAlso';
@@ -87,10 +88,10 @@ const RECAP_LAYOUT_EXCLUDED = new Set(['best-sellers-articles']);
 
 /**
  * Categories that drop the left contents rail and run two columns instead.
- * Independent of the editorial layout — Best Sellers is not on that layout but
- * still gets a rail.
+ * Empty at present — kept because it is the one switch for that decision, and
+ * the alternative is scattering category checks through the template again.
  */
-const METABAR_EXCLUDED = new Set(['nxt-bargains-informative-articles']);
+const METABAR_EXCLUDED = new Set<string>();
 
 function recentPostDate(iso?: string): string {
   if (!iso) return '';
@@ -380,6 +381,19 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     && Boolean(cover)
     && !(leadImage && sameFile(cover as string, leadImage));
 
+  // The Content Egg offers grid sits right under the intro on the informative
+  // posts. Lifted out so it runs full width, with the columned layout — and so
+  // the contents rail — starting beneath it. Done after the heading ids are
+  // assigned above, so anchors in the lead still resolve.
+  let leadBlock: string | null = null;
+  if (showMetabar && !isMarkdownContent(postContent)) {
+    const split = splitAfterContainer(postContent, 'cegg5-container');
+    if (split) {
+      leadBlock = split[0];
+      postContent = split[1];
+    }
+  }
+
   const readAlso =
     readAlsoPosts.length > 0 ? (
       <ReadAlso items={readAlsoPosts.map((rp, i) => ({ post: rp, commentCount: readAlsoCounts[i] ?? 0 }))} />
@@ -495,6 +509,14 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               shareTitle={post.title}
             />
           </div>
+        ) : null}
+
+        {leadBlock ? (
+          <div
+            className="post-content post-lead-block"
+            data-testid="post-lead-block"
+            dangerouslySetInnerHTML={{ __html: leadBlock }}
+          />
         ) : null}
 
         <div
