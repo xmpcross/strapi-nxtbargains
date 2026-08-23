@@ -3818,7 +3818,14 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   background: #f1f2f6;
 }
 
-.post-prevnext-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.post-prevnext-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Contained rather than cropped — these are product shots, and a square crop
+     cuts the product rather than trimming background. */
+  object-fit: contain;
+}
 
 .post-prevnext-title {
   display: -webkit-box;
