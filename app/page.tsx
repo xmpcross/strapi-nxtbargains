@@ -233,15 +233,15 @@ const priceDrops = deals.filter((d) => d.pct > 0).sort((a, b) => b.pct - a.pct).
         </section>
       )}
 
-      {/* ---------- BUYING GUIDES & REVIEWS (originfacts Car Rentals layout) ---------- */}
+      {/* ---------- BUYING GUIDES & REVIEWS ----------- */}
       {guideFeature && (
-        <section className="py-14 sm:py-[72px]" data-testid="home-guides">
-          <div className="mx-auto max-w-[1366px] px-6">
+        <section className="border-y border-ink/10 bg-[#f4f7ee] py-14 sm:py-[76px]" data-testid="home-guides">
+          <div className="guide-shell mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Read first"
               title="Buying guides & reviews"
-              intro="Honest comparisons, reviews, and roundups to help you buy with confidence."
-              cta={{ href: '/deals', label: 'All guides' }}
+              intro="Shortlists, spec checks, and plain-English reviews before you compare live prices."
+              cta={{ href: '/buying-guides', label: 'Browse guides' }}
             />
             <GuidesEditorialSection feature={guideFeature} sidebarPosts={guideSidebarPosts} />
           </div>
@@ -430,15 +430,19 @@ function GuidesEditorialSection({
 }) {
   return (
     <div
-      className="guide-editorial-grid mt-10 grid gap-[15px] lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.9fr)] lg:items-stretch"
+      className="guide-editorial-grid mt-9 grid gap-4 rounded-[8px] border border-ink/10 bg-[#fbfcf7] p-3 shadow-[0_28px_70px_-52px_rgba(13,27,42,0.58)] lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] lg:items-stretch lg:p-4"
       data-testid="home-guides-editorial"
     >
       <GuideFeatureArticle post={feature} />
       {sidebarPosts.length > 0 ? (
         <div
-          className="guide-list-panel flex h-full min-h-0 flex-col divide-y divide-ink/12 border-y border-ink/12"
+          className="guide-list-panel flex h-full min-h-0 flex-col overflow-hidden rounded-[8px] border border-ink/10 bg-white"
           data-testid="home-guides-list"
         >
+          <div className="guide-list-header border-b border-ink/10 px-4 py-3 sm:px-5">
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-primary">More research</p>
+            <p className="mt-1 text-sm leading-5 text-ink/60">Fresh reads for comparing features, trade-offs, and real buying value.</p>
+          </div>
           {sidebarPosts.map((post) => (
             <GuideCompactRow key={post.id} post={post} />
           ))}
@@ -453,8 +457,11 @@ function GuideFeatureArticle({ post }: { post: NxtPost }) {
   const href = postPath(post);
 
   return (
-    <article className="group" data-testid={`guide-feature-${post.slug}`}>
-      <Link href={href} className="guide-feature-image-box block overflow-hidden rounded bg-white">
+    <article className="guide-feature-card group flex h-full flex-col overflow-hidden rounded-[8px] border border-ink/10 bg-white" data-testid={`guide-feature-${post.slug}`}>
+      <Link href={href} className="guide-feature-image-box relative block overflow-hidden bg-[#edf3e4]">
+        <span className="guide-feature-badge absolute left-4 top-4 z-10 rounded-[7px] bg-ink px-3 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.13em] text-white">
+          Editor pick
+        </span>
         {img ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -469,7 +476,7 @@ function GuideFeatureArticle({ post }: { post: NxtPost }) {
           </div>
         )}
       </Link>
-      <div className="mt-5">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
         <GuideCategoryLabel post={post} />
         <Link href={href}>
           <h3 className="guide-feature-title mt-3 font-display text-xl font-bold leading-tight text-ink transition group-hover:text-primary sm:text-2xl">
@@ -481,7 +488,9 @@ function GuideFeatureArticle({ post }: { post: NxtPost }) {
             {post.excerpt}
           </p>
         ) : null}
-        <GuideArticleMeta post={post} />
+        <div className="mt-auto pt-5">
+          <GuideArticleMeta post={post} />
+        </div>
       </div>
     </article>
   );
@@ -492,12 +501,12 @@ function GuideCompactRow({ post }: { post: NxtPost }) {
   const href = postPath(post);
 
   return (
-    <article className="guide-compact-row group min-h-0 flex-1 py-3 lg:py-0" data-testid={`guide-compact-${post.slug}`}>
+    <article className="guide-compact-row group min-h-0 flex-1" data-testid={`guide-compact-${post.slug}`}>
       <Link
         href={href}
-        className="guide-compact-row-link grid h-full min-h-0 w-full grid-cols-[56px_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[64px_minmax(0,1fr)] lg:grid-cols-[minmax(0,4.25rem)_minmax(0,1fr)] lg:gap-3.5"
+        className="guide-compact-row-link grid h-full min-h-0 w-full grid-cols-[64px_minmax(0,1fr)] items-center gap-3 px-4 py-3.5 transition hover:bg-[#f4f7ee] sm:grid-cols-[72px_minmax(0,1fr)] sm:px-5 lg:grid-cols-[minmax(0,5rem)_minmax(0,1fr)] lg:gap-4"
       >
-        <div className="guide-compact-thumb h-full max-h-[56px] overflow-hidden rounded bg-white sm:max-h-[64px] lg:max-h-none lg:h-[72%] lg:w-auto lg:aspect-square">
+        <div className="guide-compact-thumb h-full max-h-[64px] overflow-hidden rounded-[8px] border border-ink/10 bg-[#f7f9f2] sm:max-h-[72px] lg:aspect-square lg:h-[76%] lg:w-auto lg:max-h-none">
           {img ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

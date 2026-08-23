@@ -343,7 +343,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                     </p>
                   </div>
 
-                  <aside className="self-center p-5 sm:p-7">
+                  <aside className="self-center">
                     {rows.length > 0 ? (
                       <div className="product-offer-list rounded-[10px] border border-[#e5e7eb] bg-white p-5">
                         {/* The "Lowest price / $x / at N retailers" header is

@@ -791,7 +791,7 @@ main[data-testid^="product-category-"] .product-category-grid article {
   height: 100%;
 }
 
-/* Buying guides editorial block (originfacts Car Rentals layout). */
+/* Buying guides editorial block. */
 [data-testid="home-guides"] .guide-feature-image-box,
 [data-testid="home-guides"] .guide-compact-thumb {
   display: grid;
@@ -800,22 +800,17 @@ main[data-testid^="product-category-"] .product-category-grid article {
 
 [data-testid="home-guides"] .guide-feature-image,
 [data-testid="home-guides"] .guide-compact-image {
-  object-fit: contain !important;
+  block-size: 100% !important;
+  inline-size: 100% !important;
+  max-block-size: 100%;
+  max-inline-size: 100%;
+  object-fit: cover !important;
   object-position: center;
 }
 
-[data-testid="home-guides"] .guide-feature-image {
-  block-size: 88% !important;
-  inline-size: 88% !important;
-  max-block-size: 88%;
-  max-inline-size: 88%;
-}
-
-[data-testid="home-guides"] .guide-compact-image {
-  block-size: 84% !important;
-  inline-size: 84% !important;
-  max-block-size: 84%;
-  max-inline-size: 84%;
+[data-testid="home-guides"] .guide-feature-card,
+[data-testid="home-guides"] .guide-list-panel {
+  min-height: 100%;
 }
 
 @media (min-width: 1024px) {
@@ -850,13 +845,6 @@ main[data-testid^="product-category-"] .product-category-grid article {
     max-height: 100%;
     width: auto;
     aspect-ratio: 1 / 1;
-  }
-
-  [data-testid="home-guides"] .guide-compact-image {
-    block-size: 88% !important;
-    inline-size: 88% !important;
-    max-block-size: 88%;
-    max-inline-size: 88%;
   }
 }
 
@@ -919,12 +907,11 @@ main[data-testid^="product-category-"] .product-category-grid article {
 
 /* Right column list panel — restore borders hidden by global borderless rule. */
 [data-testid="home-guides"] .guide-list-panel {
-  border-top: 1px solid rgba(3, 3, 3, 0.12) !important;
-  border-bottom: 1px solid rgba(3, 3, 3, 0.12) !important;
+  border-color: rgba(3, 3, 3, 0.1) !important;
 }
 
 [data-testid="home-guides"] .guide-list-panel > :not([hidden]) ~ :not([hidden]) {
-  border-top: 1px solid rgba(3, 3, 3, 0.12) !important;
+  border-top: 1px solid rgba(3, 3, 3, 0.1) !important;
 }
 
 /* Article category pages — uniform 1rem card titles. */
