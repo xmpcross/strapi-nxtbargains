@@ -227,7 +227,13 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   const sameFile = (a: string, b: string) =>
     decodeURIComponent(a.split('?')[0].split('/').pop() ?? a) ===
     decodeURIComponent(b.split('?')[0].split('/').pop() ?? b);
-  const showFeatured = Boolean(cover) && !(leadImage && sameFile(cover as string, leadImage));
+  // best-sellers-articles are excluded: those posts promote their first body
+  // heading to the visible <h1>, so a cover above it would sit apart from the
+  // title rather than beneath it.
+  const showFeatured =
+    !isBestSellersArticle
+    && Boolean(cover)
+    && !(leadImage && sameFile(cover as string, leadImage));
 
   return (
     <article
