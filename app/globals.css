@@ -4218,9 +4218,17 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 .bestseller-card-full .nxt-product-card__image {
   padding: 0;
   border: 0;
+  /* Centred against the details column rather than stretched to its full
+     height, which left short product shots pinned to the top. */
+  align-self: center;
 }
 
-.bestseller-card-full .nxt-product-card img { max-height: 320px; }
+/* height:100% only makes sense while the well is stretched; with it centred the
+   image has to size to its own content or it collapses. */
+.bestseller-card-full .nxt-product-card img {
+  height: auto;
+  max-height: 320px;
+}
 
 @media (max-width: 768px) {
   .bestseller-card-full .nxt-product-card {
