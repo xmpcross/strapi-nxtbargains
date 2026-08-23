@@ -234,12 +234,22 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
       ? `Compare current prices for this ${category.toLowerCase()} across trusted merchants.`
       : `Compare current prices for ${product.name} across trusted merchants.`);
   const highlights = productHighlightEntries(product);
+  const shortCopy = shortDescriptionCopy(product.shortDescription);
   const discount = best ? discountPercent(best.offer) : null;
   const updatedLabel = product.updatedAt ? fmtDate(product.updatedAt) : 'Today';
   const canonicalPath = productCanonicalPath(product);
   const reviewCount = reviews.length;
   const averageRating =
     reviewCount > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount : null;
+  // The catalogue aggregate is what the reviews section headlines, so the title
+  // shows the same number; on-site reviews stand in only where it is missing
+  // (the catalogue carries a rating for 350 of the 515 products on this site).
+  // `Number(null)` is 0 and passes a finite check, which rendered "0.0" on the
+  // 165 products that carry no rating at all. An actual zero is not a rating
+  // worth showing either, so both are treated as absent.
+  const catalogueRating = positiveRating(product.rating);
+  const titleRating = catalogueRating ?? positiveRating(averageRating);
+  const titleRatingCount = catalogueRating != null ? product.ratingCount || null : reviewCount || null;
 
   const productLd = productJsonLd({
     name: product.name,
@@ -333,16 +343,48 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
 
               <div className="min-w-0">
                 <div className="border-b border-ink/10 p-6 sm:p-8">
+                  {brand ? <p className="product-title-brand">{brand}</p> : null}
+
                   <h1 className="product-title font-display font-bold leading-tight text-ink">
                     {product.name}
                   </h1>
+
+                  {titleRating != null || (category && categorySlug) ? (
+                    <div className="product-title-meta">
+                      {titleRating != null ? (
+                        <span className="product-title-rating">
+                          <span aria-hidden="true" className="product-title-star">★</span>
+                          <span className="product-title-rating-value">{titleRating.toFixed(1)}</span>
+                          {titleRatingCount ? (
+                            <span className="product-title-rating-count">
+                              ({titleRatingCount.toLocaleString()} {titleRatingCount === 1 ? 'review' : 'reviews'})
+                            </span>
+                          ) : null}
+                        </span>
+                      ) : null}
+
+                      {category && categorySlug ? (
+                        <span className="product-title-type">
+                          Type: <Link href={`/category/${categorySlug}`}>{category}</Link>
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="grid lg:grid-cols-2">
                   <div className="border-b border-ink/10 p-6 sm:p-8 lg:border-b-0 lg:border-r">
-                    <p className="line-clamp-5 text-[14px] leading-7 text-ink/80">
-                      {summary}
-                    </p>
+                    {shortCopy.bullets.length ? (
+                      <ul className="product-description-bullets product-short-description">
+                        {shortCopy.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="line-clamp-5 text-[14px] leading-7 text-ink/80">
+                        {shortCopy.lead ?? summary}
+                      </p>
+                    )}
 
                     <div className="mt-8">
                       {best?.offer.originalPrice && numericValue(best.offer.originalPrice) !== numericValue(best.offer.price) && (
@@ -572,7 +614,7 @@ function ProductInfoTabs({
   // specs of its own, so the generic list stands in whenever GSMArena is absent.
   const useGsmarenaSpecsInSpecifications =
     productHasCategory(product, 'Smart Phones') && gsmarenaSpecGroups.length > 0;
-  const descriptionBullets = productDescriptionBullets(description);
+  const detailBullets = descriptionBullets(description);
   const additionalInfoEntries = productAdditionalInfoEntries(product);
   const specEntries = useGsmarenaSpecsInSpecifications ? [] : productSpecificationEntries(specs);
 
@@ -586,10 +628,10 @@ function ProductInfoTabs({
             <details className="product-accordion-item" name={accordionId} open>
               <summary>Product details</summary>
               <div className="product-accordion-panel tab-panel-description">
-                {descriptionBullets.length > 1 ? (
+                {detailBullets.length ? (
                   <ul className="product-description-bullets">
-                    {descriptionBullets.map((sentence) => (
-                      <li key={sentence}>{sentence}</li>
+                    {detailBullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
                     ))}
                   </ul>
                 ) : description ? (
@@ -597,7 +639,11 @@ function ProductInfoTabs({
                     <ProductDescription markdown={description} />
                   </div>
                 ) : (
-                  <p className="leading-7 text-ink/70">{summary}</p>
+                  // Not `summary`: that falls back to the short description,
+                  // which this panel must not repeat.
+                  <p className="leading-7 text-ink/70">
+                    {`Compare current prices for ${productName} across trusted merchants.`}
+                  </p>
                 )}
               </div>
             </details>
@@ -1241,6 +1287,13 @@ const HIGHLIGHT_LIMIT = 8;
 const HIGHLIGHT_MIN_COUNT = 3;
 const HIGHLIGHT_NEGATIVE_VALUES = new Set(['no', 'none', 'n/a', 'na', 'not applicable', 'unknown', '-']);
 
+/** A rating only counts when it is a real number above zero. */
+function positiveRating(value: number | string | null | undefined): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
 function productHighlightEntries(product: CommerceProduct): SpecificationEntry[] {
   const specs = product.specs;
   if (!isPlainRecord(specs)) return [];
@@ -1284,24 +1337,54 @@ function productHighlightEntries(product: CommerceProduct): SpecificationEntry[]
 }
 
 /**
- * Split a product description into one bullet per sentence.
+ * Bullets for the short description under the product title.
  *
- * 513 of the 515 catalogue descriptions are a single block of marketing prose
- * with no markdown in them, and they read far better as a list of claims than
- * as a wall of text. The other two are already structured (headings, "- "
- * bullets) and are handed to `ProductDescription` untouched — returning an
- * empty array here is how this says "not mine".
- *
- * Nothing is reworded or dropped: the text is only cut at sentence boundaries.
+ * 168 of the 169 products carrying a `shortDescription` store it as a markdown
+ * "- " list of short, hedged, spec-derived lines, which is rendered verbatim.
+ * The rare prose one is cut at sentence boundaries instead, and a single
+ * sentence stays a paragraph rather than becoming a lone bullet.
  */
-function productDescriptionBullets(description?: string | null): string[] {
-  const text = (description ?? '').trim();
-  if (!text) return [];
-  // Structured markdown, or anything spanning multiple lines, keeps its own
-  // shape rather than being flattened into a list.
-  if (text.includes('\n') || /^\s*[-*]\s+/m.test(text) || /^#{2,3}\s/m.test(text)) return [];
+function shortDescriptionCopy(shortDescription?: string | null): { bullets: string[]; lead: string | null } {
+  const short = (shortDescription ?? '').trim();
+  if (!short) return { bullets: [], lead: null };
 
-  const normalized = text.replace(/\s+/g, ' ');
+  const authored = markdownBulletLines(short);
+  if (authored.length) return { bullets: authored, lead: null };
+
+  const split = sentenceBullets(short);
+  if (split.length > 1) return { bullets: split, lead: null };
+
+  return { bullets: [], lead: short };
+}
+
+/**
+ * Bullets for the Product details panel — the long `description` only.
+ *
+ * The short description belongs under the title and is deliberately not
+ * repeated here. Structured markdown keeps its own shape and is handed to
+ * `ProductDescription`; plain prose, which is 513 of the 515 descriptions on
+ * this site, is cut into one bullet per sentence. Nothing is reworded.
+ */
+function descriptionBullets(description?: string | null): string[] {
+  const long = (description ?? '').trim();
+  if (!long) return [];
+  if (long.includes('\n') || /^\s*[-*]\s+/m.test(long) || /^#{2,3}\s/m.test(long)) return [];
+  const split = sentenceBullets(long);
+  // A one-item list is just a paragraph wearing a bullet.
+  return split.length > 1 ? split : [];
+}
+
+/** Lines of a markdown "- " list, or [] if the text is not one. */
+function markdownBulletLines(text: string): string[] {
+  const lines = text.replace(/\r\n/g, '\n').split('\n').map((line) => line.trim()).filter(Boolean);
+  if (!lines.length || !lines.every((line) => /^[-*]\s+/.test(line))) return [];
+  return lines.map((line) => line.replace(/^[-*]\s+/, '').trim()).filter(Boolean);
+}
+
+/** One entry per sentence, with decimals and abbreviations held together. */
+function sentenceBullets(text: string): string[] {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  if (!normalized) return [];
   const sentences: string[] = [];
   let current = '';
   // The lookahead requires the next sentence to start with a capital, a digit
@@ -1315,10 +1398,7 @@ function productDescriptionBullets(description?: string | null): string[] {
     current = '';
   }
   if (current) sentences.push(current);
-
-  const bullets = sentences.map((sentence) => sentence.trim()).filter(Boolean);
-  // A one-item list is just a paragraph wearing a bullet.
-  return bullets.length > 1 ? bullets : [];
+  return sentences.map((sentence) => sentence.trim()).filter(Boolean);
 }
 
 const ABBREVIATION_TAIL =
