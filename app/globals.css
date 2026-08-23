@@ -1146,9 +1146,15 @@ main[data-testid^="product-price-"] .product-main-image {
    so it had no edge at all. Declared here with a soft lift. */
 main[data-testid^="product-price-"] .product-offer-list {
   border: 1px solid #e5e7eb !important;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 1px 2px rgb(13 27 42 / 0.05), 0 10px 28px -20px rgb(13 27 42 / 0.28);
+}
+
+/* Paragraph copy in the widget reads left, including the commission line,
+   which was centred. */
+main[data-testid^="product-price-"] .product-offer-list p {
+  text-align: left !important;
 }
 
 main[data-testid^="product-price-"] .product-offer-list .product-offer-row-extra {

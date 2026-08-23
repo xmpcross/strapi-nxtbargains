@@ -334,7 +334,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
 
                   <aside className="self-center p-5 sm:p-7">
                     {rows.length > 0 ? (
-                      <div className="product-offer-list rounded-[10px] border border-[#e5e7eb] bg-white pl-5">
+                      <div className="product-offer-list rounded-[10px] border border-[#e5e7eb] bg-white p-5">
                         {/* The "Lowest price / $x / at N retailers" header is
                             gone: the same price already leads the left column,
                             and the retailer rows below state the count by being
@@ -671,7 +671,8 @@ function ProductGallery({ images, name }: { images: string[]; name: string }) {
   if (!images.length) return null;
 
   return (
-    <div className="mb-6">
+    // 30px clear of the Additional Info row above it.
+    <div className="mb-6 pt-[30px]">
       <ProductCarousel
         perView={3}
         interval={4000}
