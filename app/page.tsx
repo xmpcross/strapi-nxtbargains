@@ -432,7 +432,7 @@ function GuidesEditorialSection({
 }) {
   return (
     <div
-      className="guide-editorial-grid mt-9 grid gap-4 rounded-[8px] border border-ink/10 bg-[#fbfcf7] p-3 shadow-[0_28px_70px_-52px_rgba(13,27,42,0.58)] lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] lg:items-stretch lg:p-4"
+      className="guide-editorial-grid mt-9 grid gap-4 rounded-[8px] border border-ink/10 bg-[#fbfcf7] p-3 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] lg:items-stretch lg:p-4"
       data-testid="home-guides-editorial"
     >
       <GuideFeatureArticle post={feature} />
