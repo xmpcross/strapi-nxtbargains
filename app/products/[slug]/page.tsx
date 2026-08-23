@@ -563,7 +563,11 @@ function ProductInfoTabs({
                   </ul>
                 ) : description ? (
                   <div className="leading-7 text-ink/70">
-                    <ProductDescription markdown={description} />
+                    <ProductDescriptionWithGallery
+                      markdown={description}
+                      galleryImages={galleryImages}
+                      productName={productName}
+                    />
                   </div>
                 ) : (
                   // Not `summary`: that falls back to the short description,
@@ -580,8 +584,6 @@ function ProductInfoTabs({
               panels={[
                 { id: 'specifications', label: 'Specifications', content: (
                   <>
-                {/* Photography leads the panel, above the spec rows. */}
-                <ProductGallery images={galleryImages} name={productName} />
                 {useGsmarenaSpecsInSpecifications ? (
                   <GsmarenaSpecGroups groups={gsmarenaSpecGroups} />
                 ) : specEntries.length ? (
@@ -1639,6 +1641,39 @@ function schemaCondition(value?: CommerceOffer['condition']): string {
    (### headings + "- " bullets + paragraphs separated by blank lines).
    No external dependency; the format is constrained so a hand-rolled parser
    is shorter than wiring up `marked` and safer than dangerouslySetInnerHTML. */
+function ProductDescriptionWithGallery({
+  markdown,
+  galleryImages,
+  productName,
+}: {
+  markdown: string;
+  galleryImages: string[];
+  productName: string;
+}) {
+  const keySpecsHeading = '\n\n## Key specifications';
+  const splitIndex = markdown.indexOf(keySpecsHeading);
+
+  if (splitIndex === -1) {
+    return (
+      <>
+        <ProductDescription markdown={markdown} />
+        <ProductGallery images={galleryImages} name={productName} />
+      </>
+    );
+  }
+
+  const beforeGallery = markdown.slice(0, splitIndex).trim();
+  const afterGallery = markdown.slice(splitIndex + 2).trim();
+
+  return (
+    <>
+      {beforeGallery ? <ProductDescription markdown={beforeGallery} /> : null}
+      <ProductGallery images={galleryImages} name={productName} />
+      {afterGallery ? <ProductDescription markdown={afterGallery} /> : null}
+    </>
+  );
+}
+
 function ProductDescription({ markdown }: { markdown: string }) {
   function inline(text: string): ReactNode {
     const parts: ReactNode[] = [];
