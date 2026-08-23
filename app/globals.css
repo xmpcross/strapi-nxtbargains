@@ -3925,13 +3925,28 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 
 .read-next-title {
   margin: 0;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
   font-size: 1.25rem !important;
   font-weight: 700 !important;
   line-height: 1.22;
   letter-spacing: -0.01em;
 }
 
-.read-next-title a { color: #161616; text-decoration: none; }
+/* The font has to be restated on the anchor, not just the h3: this title is an
+   <a> inside an <li>, and the global `ul li a` rule sets the body font with
+   !important, which otherwise wins and renders the card titles in Inter. */
+.read-next-title a {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-weight: 700 !important;
+  color: #161616;
+  text-decoration: none;
+}
+
 .read-next-title a:hover { color: #206bea; }
 
 .read-next-excerpt {
