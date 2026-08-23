@@ -1383,7 +1383,10 @@ main[data-testid^="product-price-"] .product-offer-toggle:checked ~ * .show-less
 .post-content .nxt-product-carousel__track {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: calc((100% - 3rem) / 4);
+  /* Three across by default. The track still scrolls for the rest; this only
+     changes how many are in view, and with the contents rail taking a column
+     the article is narrower than it was when this was set to four. */
+  grid-auto-columns: calc((100% - 2rem) / 3);
   gap: 1rem;
   margin-top: 1rem;
   overflow-x: auto;
@@ -3550,10 +3553,23 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   background: #f1f2f6;
 }
 
-.related-posts-thumb img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+.related-posts-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  /* Contained rather than cropped: these are product shots on white, and a crop
+     cuts the product rather than trimming background. */
+  object-fit: contain;
+  padding: 20px;
+  background: #ffffff;
+}
 
 .related-posts-title {
-  display: block;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
   font-size: 1.25rem;
   font-weight: 700 !important;
@@ -3805,7 +3821,11 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 .post-prevnext-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 .post-prevnext-title {
-  display: block;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   margin-top: 0.85rem;
   font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
   font-size: 16px;
@@ -3893,7 +3913,14 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   background: #f1f2f6;
 }
 
-.read-next-media img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+.read-next-media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  padding: 20px;
+  background: #ffffff;
+}
 
 .read-next-body {
   display: flex;
@@ -4179,7 +4206,8 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   padding: 0;
   border: 0;
   gap: 2.5rem;
-  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  /* Even split — image left, details right. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
 /* The image well carries its own border and padding further down the article;
@@ -4212,3 +4240,24 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   object-fit: contain;
   padding: 1.25rem;
 }
+
+/* Best Sellers top section: product card, then the shared byline/share row and
+   a rule closing it off, matching where the editorial header ends. */
+.bestseller-header {
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.bestseller-header .bestseller-card-full { margin-top: 0; }
+
+/* Space between the empty-state line and the "Add a comment" button below it —
+   the two were sitting almost flush. */
+.comments-empty {
+  margin: 0.75rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgba(13, 27, 42, 0.55);
+}
+
+.comments-empty + .comment-collapse { margin-top: 1.5rem; }

@@ -145,3 +145,39 @@ export function applyHtmlHeadingIds(html: string): { html: string; headings: Pos
     })),
   };
 }
+
+/**
+ * Split an HTML body in two at a section break, for inserting a block midway.
+ *
+ * Splits before the second top-level heading, so the insert lands between
+ * sections rather than inside a paragraph run. "Top-level" is checked by
+ * counting div/section/aside tags before the candidate: if any are still open
+ * there, the heading is nested inside a card or wrapper and cutting at that
+ * point would produce two fragments of broken markup, so the split is refused.
+ *
+ * Returns null when there is no safe point — callers should fall back to
+ * appending rather than forcing an insert.
+ */
+export function splitHtmlAtSection(html: string): [string, string] | null {
+  const text = String(html || '');
+  if (!text.trim()) return null;
+
+  const headings = [...text.matchAll(/<h[23]\b[^>]*>/gi)].map((m) => m.index ?? -1).filter((i) => i >= 0);
+  if (headings.length < 3) return null;
+
+  const balanced = (upTo: number) => {
+    const chunk = text.slice(0, upTo);
+    for (const tag of ['div', 'section', 'aside', 'ul', 'ol', 'table']) {
+      const open = (chunk.match(new RegExp(`<${tag}\\b`, 'gi')) ?? []).length;
+      const close = (chunk.match(new RegExp(`</${tag}>`, 'gi')) ?? []).length;
+      if (open !== close) return false;
+    }
+    return true;
+  };
+
+  // Prefer the second heading; walk forward if it is nested.
+  for (const at of headings.slice(1, -1)) {
+    if (balanced(at)) return [text.slice(0, at), text.slice(at)];
+  }
+  return null;
+}

@@ -15,13 +15,13 @@ import PostPriceComparison from '@/components/PostPriceComparison';
 import CommentForm from '@/components/CommentForm';
 import ProductCarousel from '@/components/ProductCarousel';
 import PostMetabar from '@/components/PostMetabar';
-import { applyHtmlHeadingIds, extractHeadings, isMarkdownContent } from '@/lib/post-headings';
+import { applyHtmlHeadingIds, extractHeadings, isMarkdownContent, splitHtmlAtSection } from '@/lib/post-headings';
 import ReadAlso from '@/components/ReadAlso';
 import RelatedPosts from '@/components/RelatedPosts';
 import QuestionsAnswered from '@/components/QuestionsAnswered';
 import PostFooterNav from '@/components/PostFooterNav';
 import ReadNext from '@/components/ReadNext';
-import CopyLinkButton from '@/components/CopyLinkButton';
+import PostInfobar from '@/components/PostInfobar';
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -80,8 +80,9 @@ function spotlightDate(iso?: string): string {
 const RECAP_LAYOUT_EXCLUDED = new Set(['best-sellers-articles']);
 
 /**
- * Recap-layout categories that drop the left contents rail and run two columns
- * instead. Everything else about the layout is unchanged for them.
+ * Categories that drop the left contents rail and run two columns instead.
+ * Independent of the editorial layout — Best Sellers is not on that layout but
+ * still gets a rail.
  */
 const METABAR_EXCLUDED = new Set(['nxt-bargains-informative-articles']);
 
@@ -176,7 +177,6 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     .then((r) => r.data)
     .catch(() => [] as NxtPost[]);
   const recentPool = allPosts.filter((p) => p.id !== post.id);
-  const recentPosts = recentPool.slice(0, 5);
 
   // Neighbours in publish order. The list is sorted newest first, so the entry
   // after this one is the older post.
@@ -299,7 +299,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   const isRecapLayout =
     !RECAP_LAYOUT_EXCLUDED.has(category) && !RECAP_LAYOUT_EXCLUDED.has(cat?.slug ?? '');
   const showMetabar =
-    isRecapLayout && !METABAR_EXCLUDED.has(category) && !METABAR_EXCLUDED.has(cat?.slug ?? '');
+    !METABAR_EXCLUDED.has(category) && !METABAR_EXCLUDED.has(cat?.slug ?? '');
   let postContent = await enrichPostCarouselHtml(post.content);
   // best-sellers-articles: promote the first body heading (the product title) to
   // a semantic <h1> while keeping the h4 size (.post-title-h1), and drop the
@@ -343,7 +343,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   const headerImage = cover || (isRecapLayout ? firstImageUrl(postContent) : null);
 
   let toc: { id: string; text: string; level: 2 | 3 }[] = [];
-  if (isRecapLayout) {
+  if (showMetabar) {
     if (isMarkdownContent(postContent)) {
       // PostContent emits the ids for Markdown, through the same slug helper.
       toc = extractHeadings(postContent);
@@ -368,6 +368,12 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     !isBestSellersArticle
     && Boolean(cover)
     && !(leadImage && sameFile(cover as string, leadImage));
+
+  const readAlso =
+    readAlsoPosts.length > 0 ? (
+      <ReadAlso items={readAlsoPosts.map((rp, i) => ({ post: rp, commentCount: readAlsoCounts[i] ?? 0 }))} />
+    ) : null;
+  const htmlSplit = readAlso && !isMarkdownContent(postContent) ? splitHtmlAtSection(postContent) : null;
 
   return (
     <article
@@ -448,64 +454,27 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               </figure>
             ) : null}
 
-            <div className="recap-infobar">
-              <div className="recap-header-meta">
-                <span className="recap-author">
-                  <span className="recap-avatar" aria-hidden>
-                    {(post.author?.name ?? SITE.name).charAt(0)}
-                  </span>
-                  <span className="recap-author-name">{post.author?.name ?? SITE.name}</span>
-                </span>
-                <span className="recap-meta-line">
-                  <a className="recap-comments" href="#post-comments">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M21 12a8 8 0 0 1-8 8H7l-4 3v-5.5A8 8 0 1 1 21 12z"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    {comments.length}
-                  </a>
-                  <time dateTime={post.publishedAt}>{spotlightDate(post.publishedAt)}</time>
-                </span>
-              </div>
-
-              <div className="recap-share">
-                <span className="recap-share-label">Share</span>
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Share on Facebook"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z" />
-                  </svg>
-                </a>
-                <a
-                  href={`https://x.com/intent/tweet?url=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Share on X"
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M17.53 3H20.5l-6.49 7.42L21.64 21h-5.97l-4.68-6.11L5.6 21H2.63l6.94-7.93L2.36 3h6.12l4.23 5.59L17.53 3zm-1.04 16.2h1.65L7.6 4.71H5.83L16.49 19.2z" />
-                  </svg>
-                </a>
-                <CopyLinkButton url={`${SITE.url}/${category}/${post.slug}`} />
-              </div>
-            </div>
+            <PostInfobar
+              authorName={post.author?.name ?? SITE.name}
+              publishedAt={post.publishedAt}
+              commentCount={comments.length}
+              shareUrl={`${SITE.url}/${category}/${post.slug}`}
+              shareTitle={post.title}
+            />
           </header>
         ) : null}
 
         {bestSellerCard ? (
-          <div
-            className="post-content bestseller-card-full"
-            data-testid="bestseller-card-full"
-            dangerouslySetInnerHTML={{ __html: bestSellerCard }}
-          />
+          <div className="bestseller-header" data-testid="bestseller-card-full">
+            <div className="post-content bestseller-card-full" dangerouslySetInnerHTML={{ __html: bestSellerCard }} />
+            <PostInfobar
+              authorName={post.author?.name ?? SITE.name}
+              publishedAt={post.publishedAt}
+              commentCount={comments.length}
+              shareUrl={`${SITE.url}/${category}/${post.slug}`}
+              shareTitle={post.title}
+            />
+          </div>
         ) : null}
 
         <div
@@ -527,16 +496,22 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
           <div className="w-full" id="post-article-body" data-testid="post-body">
             <KeyTakeaways content={post.keyTakeaways} />
-            <PostContent
-              html={postContent}
-              midBlock={
-                isRecapLayout && readAlsoPosts.length > 0 ? (
-                  <ReadAlso
-                    items={readAlsoPosts.map((rp, i) => ({ post: rp, commentCount: readAlsoCounts[i] ?? 0 }))}
-                  />
-                ) : undefined
-              }
-            />
+            {readAlso && htmlSplit ? (
+              // HTML body: rendered as two blocks with the card between them.
+              // PostContent can only splice a node into its Markdown path, and
+              // most of this catalogue is HTML — this is why Read Also had
+              // never appeared outside the Markdown posts.
+              <>
+                <PostContent html={htmlSplit[0]} />
+                {readAlso}
+                <PostContent html={htmlSplit[1]} />
+              </>
+            ) : (
+              <PostContent html={postContent} midBlock={readAlso ?? undefined} />
+            )}
+            {/* No safe split point in this body — the card goes after it
+                rather than being wedged into broken markup. */}
+            {readAlso && !htmlSplit && !isMarkdownContent(postContent) ? readAlso : null}
 
             {stepsAreAuthored && useHowTo ? (
               <section className="mt-10" data-testid="howto-steps" aria-labelledby="howto-heading">
@@ -583,30 +558,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               commission when you buy through links on this page, at no extra cost to you.
               Prices and availability are accurate as of {fmtDate(post.updatedAt)} and subject to change.
             </div>
-
-            {isRecapLayout ? null : (
-            <div className="mt-10 bg-muted p-8" data-testid="post-author-box">
-              <div className="grid gap-6 sm:grid-cols-[72px_minmax(0,1fr)]">
-                <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-white text-2xl font-bold text-ink/30">
-                  {(post.author?.name ?? SITE.name).charAt(0)}
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink/45">Written by</p>
-                  <h2 className="mt-2 font-display text-xl font-bold text-ink">{post.author?.name ?? SITE.name}</h2>
-                  {post.author?.role ? (
-                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-ink/45">{post.author.role}</p>
-                  ) : null}
-                  <p className="mt-3 text-sm leading-7 text-ink/60">
-                    {post.author?.bio
-                      ?? 'Product comparisons, reviews and practical buying guides for smart tech shoppers.'}
-                  </p>
-                </div>
-              </div>
-            </div>
-            )}
-
-            {isRecapLayout ? (
-              <>
+            <>
                 <RelatedPosts posts={relatedPostsList} />
                 <QuestionsAnswered items={faqs} />
                 <PostFooterNav
@@ -620,31 +572,11 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                   prev={prevPost}
                   next={nextPost}
                 />
-              </>
-            ) : null}
+            </>
 
-            {!isRecapLayout && faqs.length > 0 ? (
-              <section className="mt-10" data-testid="faq-section" aria-labelledby="faq-heading">
-                <h2 id="faq-heading" className="font-display text-2xl font-bold tracking-tight text-ink">
-                  Frequently asked questions
-                </h2>
-                <div className="mt-5 divide-y divide-ink/10 border-y border-ink/10">
-                  {faqs.map((faq, i) => (
-                    <div key={i} className="py-5" data-testid="faq-item">
-                      <h3 className="font-display text-lg font-semibold text-ink">{faq.question}</h3>
-                      <p className="mt-2 text-[0.95rem] leading-7 text-ink/70">{faq.answer}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ) : null}
 
             <section className="mt-10" id="post-comments" data-testid="post-comments">
-              {isRecapLayout ? (
-                <h3 className="comments-eyebrow">Comments</h3>
-              ) : (
-                <h3 className="font-display text-2xl font-bold tracking-tight text-ink">Comments</h3>
-              )}
+              <h3 className="comments-eyebrow">Comments</h3>
               {comments.length > 0 ? (
                 <div className="mt-5 space-y-4">
                   {comments.map((comment) => (
@@ -660,54 +592,15 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                   ))}
                 </div>
               ) : (
-                <p className="mt-3 text-sm leading-6 text-ink/55">No comments yet. Start the conversation.</p>
+                <p className="comments-empty">No comments yet. Start the conversation.</p>
               )}
-              <CommentForm postDocumentId={post.documentId ?? ''} collapsible={isRecapLayout} />
+              <CommentForm postDocumentId={post.documentId ?? ''} collapsible />
             </section>
           </div>
 
-          <aside
-            className={
-              isRecapLayout
-                ? 'post-side-rail-recap space-y-10'
-                : 'space-y-10 lg:sticky lg:top-28'
-            }
-            data-testid="post-side-rail"
-          >
-            {!isRecapLayout && (
-            <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]" data-testid="sidebar-share">
-              <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">Share This Article</h5>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Share on Facebook"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink/10 text-sm font-bold text-ink transition hover:border-primary hover:text-primary"
-                >
-                  f
-                </a>
-                <a
-                  href={`https://x.com/intent/tweet?url=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Share on X"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink/10 text-sm font-bold text-ink transition hover:border-primary hover:text-primary"
-                >
-                  X
-                </a>
-                <a
-                  href={`mailto:?subject=${encodeURIComponent(post.title)}&body=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}`}
-                  aria-label="Share by email"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink/10 text-sm font-bold text-ink transition hover:border-primary hover:text-primary"
-                >
-                  @
-                </a>
-              </div>
-            </div>
-            )}
+          <aside className="post-side-rail-recap space-y-10" data-testid="post-side-rail">
 
-            {isRecapLayout && spotlightPosts.length > 0 ? (
+            {spotlightPosts.length > 0 ? (
               <div data-testid="sidebar-spotlight">
                 <h5 className="spotlight-heading">Spotlight</h5>
                 <ul className="spotlight-list">
@@ -736,8 +629,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               </div>
             ) : null}
 
-            {isRecapLayout ? (
-              <aside className="trailcard" data-testid="sidebar-trailcard">
+            <aside className="trailcard" data-testid="sidebar-trailcard">
                 <p className="trailcard-badge">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M21 3L3 10.5l7 2.5 2.5 7L21 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
@@ -752,46 +644,8 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                   </p>
                   <Link href="/category" className="trailcard-cta">Explore Categories</Link>
                 </div>
-              </aside>
-            ) : null}
+            </aside>
 
-            {!isRecapLayout && recentPosts.length > 0 && (
-              <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]">
-                <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">Latest Posts</h5>
-                <div className="mt-4 space-y-4">
-                  {recentPosts.map((recent) => {
-                    const recentImage = mediaUrl(recent.coverImage ?? null) ?? firstImageUrl(recent.content);
-
-                    return (
-                      <Link
-                        key={recent.id}
-                        href={postPath(recent)}
-                        className="grid grid-cols-[64px_minmax(0,1fr)] gap-3 transition hover:opacity-80"
-                      >
-                        <span className="block h-16 w-16 overflow-hidden rounded bg-white">
-                          {recentImage && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={recentImage}
-                              alt={recent.coverImage?.alternativeText || recent.title}
-                              className="h-full w-full object-cover"
-                            />
-                          )}
-                        </span>
-                        <span className="min-w-0">
-                          <span className="line-clamp-2 text-sm font-normal leading-snug text-[#123d83]">
-                            {recent.title}
-                          </span>
-                          <span className="mt-1 block text-sm font-normal leading-none text-[#6a83aa]">
-                            {recentPostDate(recent.publishedAt)}
-                          </span>
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
             {merchantProducts && (
               <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]" data-testid="sidebar-merchant-products">
                 <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">
@@ -834,7 +688,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
       </div>
 
-      {isRecapLayout && readNextPosts.length > 0 ? <ReadNext posts={readNextPosts} /> : null}
+      {readNextPosts.length > 0 ? <ReadNext posts={readNextPosts} /> : null}
     </article>
   );
 }
