@@ -1146,7 +1146,7 @@ main[data-testid^="product-price-"] .product-main-image {
    so it had no edge at all. Declared here with a soft lift. */
 main[data-testid^="product-price-"] .product-offer-list {
   border: 1px solid #e5e7eb !important;
-  border-radius: 8px;
+  border-radius: 4px;
   background: #ffffff;
   box-shadow: 0 1px 2px rgb(13 27 42 / 0.05), 0 10px 28px -20px rgb(13 27 42 / 0.28);
 }
@@ -2598,6 +2598,15 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   color: #ffffff;
   text-align: center;
   line-height: 1.2;
+}
+
+/* Headings inside an accordion panel take the brand blue, so the sub-headings
+   in the description read as a level below the near-black accordion titles
+   (Product details / Specifications / Additional Info) rather than competing
+   with them at the same weight and colour. */
+.tab-panel-description h3,
+.tab-panel-description h4 {
+  color: var(--color-primary, #0046be);
 }
 
 /* Review card. The border is declared here because the global borderless

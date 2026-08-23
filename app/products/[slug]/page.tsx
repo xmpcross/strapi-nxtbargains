@@ -375,20 +375,10 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                           Last price update was: {updatedAtLabel || updatedLabel}
                         </p>
 
-                        {best ? (
-                          <a
-                            href={buyUrl(best.offer, best.product)}
-                            target="_blank"
-                            rel="nofollow sponsored noopener noreferrer"
-                            className="mt-4 block rounded-[8px] bg-[#ffe000] px-4 py-3.5 text-center font-display text-[15px] font-bold text-ink transition hover:brightness-95"
-                          >
-                            Buy at {merchantName(best.offer)}
-                          </a>
-                        ) : null}
-
-                        <p className="mt-4 text-center text-[12px] leading-5 text-ink/45">
-                          We may earn a commission from links on this page, at no extra cost to you.
-                        </p>
+                        {/* The buy button and the commission line moved to the
+                            left column, beside Set Price Alert. Keeping copies
+                            here would put the same action and the same
+                            disclosure on screen twice. */}
                       </div>
                     ) : (
                       <div className="rounded-[10px] border border-[#e5e7eb] bg-white p-6">
@@ -1052,11 +1042,15 @@ function SavedPriceRow({ row, best }: { row: CommerceOfferRow; best: boolean }) 
   return (
     <article className="grid gap-y-3 border-b border-ink/10 px-5 py-4 last:border-b-0 lg:grid-cols-[minmax(0,1fr)_112px_118px_118px_120px] lg:items-center lg:gap-x-4">
       <div className="flex min-w-0 items-start gap-3">
+        {/* Every mark gets the same 120px box. With w-auto each logo took its
+            own width — eBay wide, Newegg narrow — so the merchant names started
+            at a different x on every row. `contain` keeps each logo's own
+            aspect ratio inside the shared box. */}
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt={`${merchantName(offer)} logo`} className="mt-0.5 h-9 w-auto max-w-[120px] shrink-0 object-contain object-left" />
+          <img src={logo} alt={`${merchantName(offer)} logo`} className="mt-0.5 h-9 w-[120px] shrink-0 object-contain object-left" />
         ) : (
-          <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center bg-muted text-sm font-bold text-ink/45">
+          <span className="mt-0.5 grid h-9 w-[120px] shrink-0 place-items-center bg-muted text-sm font-bold text-ink/45">
             {merchantName(offer).slice(0, 1)}
           </span>
         )}
