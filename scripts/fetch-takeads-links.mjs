@@ -71,7 +71,7 @@ const ALREADY_AFFILIATED = [
                                      // through the converter and wrapped twice
   'goto.walmart.com', 'linksynergy.com', 'go.skimresources.com',
   'prf.hn', 'imp.i',                  // Impact deep links
-  'ebay.com/ulk',                     // eBay EPN
+  'ebay.com', 'ebay.com.au',          // eBay EPN wraps these at render
   'awin1.com', 'tradedoubler.com', 'admitad.com',
 ];
 

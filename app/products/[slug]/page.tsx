@@ -34,6 +34,7 @@ import {
 } from '@/lib/strapi';
 import { wrapImpactAffiliate } from '@/lib/impact-links';
 import { wrapTakeadsAffiliate } from '@/lib/takeads-links';
+import { wrapEbayAffiliate } from '@/lib/ebay-links';
 import { trackedUrl } from '@/lib/click-tracking';
 import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/coupon-data';
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
@@ -105,6 +106,11 @@ function buyDestination(
   const amazon = amazonProductUrl(normalizedOffer, product);
   if (amazon) return { url: amazon, network: 'amazon' };
 
+  // eBay is a direct relationship too, and Takeads does not convert eBay item
+  // URLs, so EPN goes ahead of it.
+  const ebay = wrapEbayAffiliate(resolved);
+  if (ebay) return { url: ebay, network: 'ebay-epn' };
+
   const takeads = wrapTakeadsAffiliate(normalizedOffer, product);
   if (takeads) return { url: takeads, network: 'takeads' };
 
@@ -113,6 +119,37 @@ function buyDestination(
 
 function safeAffiliateUrl(offer: CommerceOffer): string | null {
   return sanitizeOfferUrl(offer.affiliateUrl);
+}
+
+/**
+ * Associates tag per storefront. A US tag on amazon.com.au tracks nothing, so
+ * the offer's own domain decides which one is used; anything unrecognised
+ * falls back to the US tag, which is also the default storefront below.
+ */
+const AMAZON_TAGS: Array<[RegExp, string | undefined]> = [
+  [/(^|\.)amazon\.com\.au$/i, process.env.AMAZON_AFFILIATE_TAG_AU],
+  [/(^|\.)amazon\.co\.uk$/i, process.env.AMAZON_AFFILIATE_TAG_UK],
+  [/(^|\.)amazon\.com$/i, process.env.AMAZON_AFFILIATE_TAG],
+];
+
+function amazonHost(offer: CommerceOffer): string {
+  for (const candidate of [offer.productUrl, offer.affiliateUrl]) {
+    try {
+      const host = new URL(candidate ?? '').hostname;
+      if (/(^|\.)amazon\./i.test(host)) return host;
+    } catch {
+      // not a URL — try the next candidate
+    }
+  }
+  return 'www.amazon.com';
+}
+
+function amazonTagForHost(host: string): string | undefined {
+  return (
+    AMAZON_TAGS.find(([pattern]) => pattern.test(host))?.[1]
+    || process.env.AMAZON_AFFILIATE_TAG
+    || undefined
+  );
 }
 
 function amazonProductUrl(offer: CommerceOffer, product?: CommerceProduct): string | null {
@@ -128,7 +165,15 @@ function amazonProductUrl(offer: CommerceOffer, product?: CommerceProduct): stri
     validAsin(product?.sku?.replace(/^amazon-/i, '') || undefined),
   ].find(Boolean);
 
-  return asin ? `https://www.amazon.com/dp/${asin}` : null;
+  if (!asin) return null;
+
+  // The tag was never appended here at all, so every Amazon product link on
+  // this page was untagged and earned nothing.
+  const host = amazonHost(offer);
+  const tag = amazonTagForHost(host);
+  return tag
+    ? `https://${host}/dp/${asin}?tag=${encodeURIComponent(tag)}`
+    : `https://${host}/dp/${asin}`;
 }
 
 function asinFromUrl(value?: string): string | null {
