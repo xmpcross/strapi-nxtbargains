@@ -14,14 +14,20 @@ export const metadata: Metadata = {
 const pillars = [
   {
     t: 'Compare in one place',
+    img: '/about/about-compare-prices-real.webp',
+    alt: 'Product prices compared across marketplace offers',
     d: 'Pull up a product and see what it costs across 8+ marketplaces at once, side by side. No tab-juggling, no guesswork about who has the better deal today.',
   },
   {
     t: 'Track the price over time',
+    img: '/about/about-price-alerts-real.webp',
+    alt: 'Price history chart with a price drop alert',
     d: `Every product has a price history, so you can tell a real drop from a "sale" that isn't. Set an alert and we'll watch it for you, checking daily and flagging the moment the price falls.`,
   },
   {
     t: 'Cut through the clutter',
+    img: '/about/about-buying-guides-real.webp',
+    alt: 'Buying guides and reviews used for product research',
     d: 'Alongside the prices, we publish buying guides, honest reviews, roundups and how-to articles — the editorial layer that helps you pick the right gadget without the marketplace noise.',
   },
 ];
@@ -31,11 +37,6 @@ const coverage = [
   'Headphones', 'Smart lights', 'Smart locks', 'Video doorbells', 'Smart plugs', 'Raspberry Pi', 'Maker gear',
 ];
 
-const checklist = [
-  'Compare one product across 8+ marketplaces, side by side.',
-  'Track its price history and get an alert when it drops.',
-  'Honest reviews and buying guides — free, and no signup.',
-];
 
 const SHELL = 'mx-auto max-w-[1366px] px-4 sm:px-6';
 const EYEBROW = 'text-[0.74rem] font-bold uppercase tracking-[0.16em] text-primary';
@@ -45,56 +46,24 @@ const BODY = 'text-[1.02rem] leading-[1.7] text-ink/60';
 export default function AboutPage() {
   return (
     <main data-testid="about-page">
-      {/* Hero — dark "At a glance" layout (matches /sitemap) */}
-      <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white" data-testid="about-page-header">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-80"
-          style={{
-            background:
-              'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
-          }}
-        />
-        <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45" aria-label="Breadcrumb">
-            <Link href="/" className="transition hover:text-white">Home</Link>
+      {/* Hero — shared light-gradient page title block (.page-hero) */}
+      <section className="page-hero" data-testid="about-page-header">
+        <div className="page-hero-inner">
+          <nav className="page-hero-crumbs" aria-label="Breadcrumb">
+            <Link href="/">Home</Link>
             <span aria-hidden>/</span>
-            <span className="text-[#ffe000]">About</span>
+            <span className="page-hero-crumbs-current">About</span>
           </nav>
 
-          <div className="mt-8 w-full">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">About {SITE.name}</p>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
-                Never pay full price again.
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-                {SITE.name} is an independent price-comparison platform built on a single, simple idea: you
-                shouldn&apos;t have to open a dozen tabs to find out where a gadget is actually cheapest. We do the
-                comparing so you can skip straight to the buying.
-              </p>
-
-              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
-                {checklist.map((item) => (
-                  <li key={item} className="flex gap-3">
-                    <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-10 flex flex-wrap gap-3">
-                <a href="#about-content" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                  Our story
-                </a>
-                <Link href="/best-deals" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
-                  Today&apos;s best deals
-                </Link>
-                <Link href="/all-products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
-                  Browse products
-                </Link>
-              </div>
-            </div>
+          <div className="mt-7 w-full">
+            <p className="page-hero-eyebrow">About {SITE.name}</p>
+            <h1 className="page-hero-title">Never pay full price again.</h1>
+            <p className="page-hero-desc">
+              {SITE.name} is an independent price-comparison site for tech, home and everyday gadgets.
+              We pull live offers from Amazon, eBay, Walmart, Best Buy and dozens of other retailers, then
+              show you which one is genuinely cheapest right now. No sponsored rankings and no inflated
+              &ldquo;was&rdquo; prices &mdash; just the real number from every store we can reach.
+            </p>
           </div>
         </div>
       </section>
@@ -112,7 +81,7 @@ export default function AboutPage() {
             <div className="mt-9 grid gap-6 md:grid-cols-3">
               {pillars.map((p) => (
                 <div key={p.t} className="flex flex-col rounded-2xl border border-ink/10 bg-white p-6">
-                  <ImagePlaceholder label="Image" ratio="aspect-[16/9]" className="mb-5" />
+                  <AboutImage src={p.img} alt={p.alt} ratio="aspect-[16/9]" className="mb-5" />
                   <h3 className="font-display text-lg font-semibold text-ink">{p.t}</h3>
                   <p className="mt-2 text-[0.95rem] leading-[1.6] text-ink/55">{p.d}</p>
                 </div>
@@ -156,7 +125,7 @@ export default function AboutPage() {
                   browsing our guides is <strong className="font-semibold text-ink">free and requires no signup</strong>.
                 </p>
               </div>
-              <ImagePlaceholder label="Image" ratio="aspect-[4/3]" />
+              <AboutImage src="/about/about-independent-real.webp" alt="Balanced scale showing independent product comparison" ratio="aspect-[4/3]" />
             </div>
           </div>
         </section>
@@ -165,7 +134,7 @@ export default function AboutPage() {
         <section className="border-t border-ink/10 bg-white py-14 sm:py-16">
           <div className={SHELL}>
             <div className="grid items-center gap-12 lg:grid-cols-2">
-              <ImagePlaceholder label="Image" ratio="aspect-[4/3]" className="lg:order-1" />
+              <AboutImage src="/about/about-transparent-deals-real.webp" alt="Shield and deal receipt representing transparent price comparison" ratio="aspect-[4/3]" className="lg:order-1" />
               <div className="lg:order-2">
                 <span className={EYEBROW}>Why it matters</span>
                 <h2 className={`mt-2 ${H2}`}>Transparency beats luck and timing.</h2>
@@ -206,30 +175,20 @@ export default function AboutPage() {
   );
 }
 
-/** Placeholder box standing in for a real image until artwork is added. */
-function ImagePlaceholder({
-  label = 'Image',
+function AboutImage({
+  src,
+  alt,
   ratio = 'aspect-[4/3]',
   className = '',
 }: {
-  label?: string;
+  src: string;
+  alt: string;
   ratio?: string;
   className?: string;
 }) {
   return (
-    <div
-      className={`flex ${ratio} w-full items-center justify-center rounded-2xl border border-dashed border-ink/25 bg-[repeating-linear-gradient(45deg,transparent,transparent_11px,rgba(13,27,42,0.035)_11px,rgba(13,27,42,0.035)_22px)] ${className}`}
-      role="img"
-      aria-label={`${label} placeholder`}
-    >
-      <div className="flex flex-col items-center gap-2 text-ink/35">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-8 w-8">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <circle cx="8.5" cy="8.5" r="1.5" />
-          <path d="m21 15-5-5L5 21" />
-        </svg>
-        <span className="text-[0.7rem] font-bold uppercase tracking-[0.14em]">{label}</span>
-      </div>
+    <div className={`overflow-hidden rounded-2xl border border-ink/10 bg-white ${ratio} ${className}`}>
+      <img src={src} alt={alt} loading="lazy" className="h-full w-full object-cover" />
     </div>
   );
 }

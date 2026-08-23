@@ -275,36 +275,29 @@ function Hero({
   couponCount: number;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            'radial-gradient(at 80% 20%, rgba(0,70,190,0.2) 0%, transparent 50%), radial-gradient(at 20% 80%, rgba(6,182,212,0.1) 0%, transparent 50%)',
-        }}
-      />
+    <section className="page-hero">
       <div className="relative mx-auto max-w-[1366px] px-6 py-10 sm:py-14">
         <div className="flex flex-col gap-[3.5rem]">
-          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
-            <Link href="/" className="transition hover:text-white">Home</Link>
+          <nav className="page-hero-crumbs">
+            <Link href="/">Home</Link>
             <span aria-hidden>/</span>
-            <Link href="/coupons" className="transition hover:text-white">Coupons</Link>
+            <Link href="/coupons" className="transition hover:text-ink">Coupons</Link>
             <span aria-hidden>/</span>
-            <span className="text-[#ffe000]">{storeName}</span>
+            <span className="page-hero-crumbs-current">{storeName}</span>
           </nav>
 
           <div className="flex flex-wrap items-start gap-5">
             <StoreLogo name={storeName} logo={logo} className="h-20 w-24" dark />
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">{category} coupons</p>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
+              <p className="page-hero-eyebrow">{category} coupons</p>
+              <h1 className="page-hero-title">
                 {storeName} coupon codes &amp; deals
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70">
-                Browse current {storeName} promo codes, discounts, and online offers.
-                Codes are pulled from the live coupon feed and refreshed daily.
-              </p>
+              <p className="page-hero-desc">
+              Browse current {storeName} promo codes, discounts, and online offers in one place. Codes come
+              from our live coupon feed and are refreshed daily. Copy the one you want, then apply it at
+              checkout on the {storeName} site.
+            </p>
             </div>
           </div>
 
@@ -315,25 +308,6 @@ function Hero({
             <Stat label="Top offer" value={topOffer} compact />
             <Stat label="Country" value={country} />
           </div>
-        </div>
-
-        <div className="mt-[3.5rem] flex flex-wrap gap-3">
-          <a href="#all-offers" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-            View all offers
-          </a>
-          {storeUrl ? (
-            <a
-              href={storeUrl}
-              target="_blank"
-              rel="nofollow sponsored noopener noreferrer"
-              className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:border-white/40"
-            >
-              Visit {storeName}
-            </a>
-          ) : null}
-          <Link href="/stores" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
-            More stores
-          </Link>
         </div>
       </div>
     </section>

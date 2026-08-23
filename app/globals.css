@@ -126,7 +126,7 @@ html {
 }
 
 body {
-  background: theme('colors.paper');
+  background: #ffffff;
   color: theme('colors.ink');
   font-size: 16px;
   font-weight: 400;
@@ -178,8 +178,8 @@ article[data-testid^="post-"] header h1 {
   font-size: 2rem !important;
   line-height: 1.05;
 }
-h2 { font-size: 2rem !important; line-height: 1.1; letter-spacing: 0; }
-h3 { font-size: 1.625rem !important; line-height: 1.12; letter-spacing: 0; }
+h2 { font-size: 1.5rem !important; line-height: 1.2; letter-spacing: 0; }
+h3 { font-size: 1.2rem !important; line-height: 1.25; letter-spacing: 0; }
 h4 { font-size: 1.3125rem !important; line-height: 1.15; letter-spacing: 0; }
 h5 { font-size: 1.125rem !important; line-height: 1.2; letter-spacing: 0; }
 h6 { font-size: 1rem !important; line-height: 1.25; letter-spacing: 0; }
@@ -666,25 +666,6 @@ a.product-info-sidebar-code:hover {
 }
 
 /* Stores directory — section headings and card titles. */
-[data-testid="stores-page"] h2,
-[data-testid="coupons-page"] h2,
-[data-testid="brands-page"] h2,
-[data-testid="store-coupons-page"] h2,
-[data-testid="best-deals-page"] h2,
-[data-testid="price-drops-page"] h2 {
-  font-size: 1.375rem !important;
-  line-height: 1.2;
-}
-@media (min-width: 640px) {
-  [data-testid="stores-page"] h2,
-  [data-testid="coupons-page"] h2,
-  [data-testid="brands-page"] h2,
-  [data-testid="store-coupons-page"] h2,
-  [data-testid="best-deals-page"] h2,
-  [data-testid="price-drops-page"] h2 {
-    font-size: 1.5rem !important;
-  }
-}
 h4.store-card-title,
 h4.brand-card-title {
   font-size: 0.8125rem !important;
@@ -2662,4 +2643,191 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 }
 .carousel-track::-webkit-scrollbar {
   display: none;
+}
+
+/* ── Page hero ────────────────────────────────────────────────────────────
+   Shared title block for the standalone pages: about, contact, coupons,
+   stores, brands, best sellers, price drops, sitemap.
+
+   These twelve pages each carried their own copy of a dark #1d252c hero with
+   an inline radial-gradient overlay, which meant twelve places to edit and a
+   slow drift between them. The markup is still per-page (the blocks differ
+   below the description — some carry search boxes, stat strips or aside
+   cards), but every colour and the gradient now live here.
+
+   The background is deliberately light: two faint accent washes over an
+   almost-white base, so the title reads as page furniture rather than a
+   banner competing with the content beneath it.
+
+   Note the class name avoids the substring "border" — the global rule at the
+   top of this file strips borders from any section whose class contains it,
+   with !important, and would take the bottom rule with it. */
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(13, 27, 42, 0.09);
+  background:
+    radial-gradient(at 85% 0%, rgba(0, 70, 190, 0.10) 0%, transparent 58%),
+    radial-gradient(at 8% 10%, rgba(255, 224, 0, 0.16) 0%, transparent 55%),
+    linear-gradient(180deg, #f4f7fb 0%, #ffffff 100%);
+  color: #111111;
+}
+
+.page-hero-inner {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto;
+  max-width: 1366px;
+  padding: 3rem 1.5rem 3.25rem;
+}
+
+@media (max-width: 640px) {
+  .page-hero-inner { padding: 2.25rem 1rem 2.5rem; }
+}
+
+/* Breadcrumbs sit above the eyebrow on the pages that have them. */
+.page-hero-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(13, 27, 42, 0.5);
+}
+
+.page-hero-crumbs a { color: rgba(13, 27, 42, 0.5); transition: color 0.15s ease; }
+.page-hero-crumbs a:hover { color: #111111; }
+.page-hero-crumbs .page-hero-crumbs-current { color: var(--colorBgPrimaryHighlight, #0046be); }
+
+/* Was #ffe000 on the dark hero. Yellow on near-white fails contrast outright,
+   so the eyebrow moves to the primary blue and keeps its dot. */
+.page-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--colorBgPrimaryHighlight, #0046be);
+}
+
+.page-hero-eyebrow-dot {
+  height: 6px;
+  width: 6px;
+  border-radius: 9999px;
+  background: var(--colorBgPrimaryHighlight, #0046be);
+}
+
+.page-hero-title {
+  margin-top: 0.85rem;
+  font-family: var(--font-heading), 'Inter', system-ui, sans-serif;
+  font-size: clamp(1.9rem, 1.2rem + 2.2vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #111111;
+}
+
+/* Full width — the old rule capped this at max-w-2xl (~42rem), which left the
+   description in a narrow column against a much wider title. */
+.page-hero-desc {
+  margin-top: 1rem;
+  max-width: none;
+  width: 100%;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: rgba(13, 27, 42, 0.66);
+}
+
+@media (min-width: 640px) {
+  .page-hero-desc { font-size: 1.125rem; }
+}
+
+/* Secondary hero buttons. These were `border border-white/20` utilities, which
+   the global borderless rule above stripped to nothing — the outline never
+   actually rendered. Real CSS here, so they have a visible edge again. */
+.page-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.625rem 1.25rem;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.page-hero-btn-primary {
+  background: var(--colorBgPrimaryHighlight, #0046be);
+  color: #ffffff;
+}
+.page-hero-btn-primary:hover { background: var(--colorBgPrimaryEmphasis, #003494); }
+
+.page-hero-btn-secondary {
+  background: rgba(13, 27, 42, 0.05);
+  color: rgba(13, 27, 42, 0.78);
+}
+.page-hero-btn-secondary:hover { background: rgba(13, 27, 42, 0.09); color: #111111; }
+
+/* Glass stat panels / search boxes that sat inside the old dark hero. They used
+   bg-white/5 over #1d252c with a border-white/15 hairline; on the light hero
+   that reads as nothing at all. Real border, real surface. */
+.page-hero-panel {
+  border: 1px solid rgba(13, 27, 42, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.page-hero-search {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid rgba(13, 27, 42, 0.16);
+  background: #ffffff;
+}
+
+/* Small pill links (marketplace jump links, letter filters) in the hero. */
+.page-hero-pill {
+  display: inline-flex;
+  background: rgba(13, 27, 42, 0.05);
+  color: rgba(13, 27, 42, 0.7);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.page-hero-pill:hover {
+  background: rgba(13, 27, 42, 0.09);
+  color: var(--colorBgPrimaryHighlight, #0046be);
+}
+
+/* ── Site footer ──────────────────────────────────────────────────────────
+   Was a solid dark #1d252c slab with white text. Now a light gradient that
+   starts just off the white page body and deepens slightly toward the bottom,
+   so the footer separates from the content without a hard colour break. */
+.site-footer {
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+  color: rgba(13, 27, 42, 0.66);
+  border-top: 1px solid rgba(13, 27, 42, 0.09);
+}
+
+/* ── Post featured image ──────────────────────────────────────────────────
+   Top-of-article cover shot. Fixed 16:9 so a mixed bag of imported
+   WordPress uploads (portrait screenshots, wide renders) all crop to the same
+   band instead of pushing the article body down by wildly different amounts. */
+.post-featured-image {
+  margin: 2rem 0 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.post-featured-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+  .post-featured-image { margin-top: 1.25rem; border-radius: 6px; }
 }

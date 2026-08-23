@@ -176,83 +176,24 @@ export default async function HtmlSitemapPage() {
     <main data-testid="sitemap-page">
       {/* Hero — matches the /products two-column layout with an "At a glance" panel */}
       <section
-        className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white"
+        className="page-hero"
         data-testid="sitemap-page-header"
       >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-80"
-          style={{
-            background:
-              'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
-          }}
-        />
-        <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
-            <Link href="/" className="transition hover:text-white">Home</Link>
+        <div className="page-hero-inner">
+          <nav className="page-hero-crumbs">
+            <Link href="/">Home</Link>
             <span aria-hidden>/</span>
-            <span className="text-[#ffe000]">Site map</span>
+            <span className="page-hero-crumbs-current">Site map</span>
           </nav>
 
-          <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">Site map</p>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
-                Everything on {SITE.name}
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-                A human-readable index of every page — products, categories, articles, and coupon stores.
-                Use the sidebar to jump straight to the section you need.
-              </p>
-
-              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
-                <li className="flex gap-3">
-                  <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                  <span>Every product, category, article, and coupon store in one index.</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                  <span>Filter by section in the sidebar to drill into a single category.</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                  <span>Prefer machines? Grab the XML feed for crawlers.</span>
-                </li>
-              </ul>
-
-              <div className="mt-10 flex flex-wrap gap-3">
-                <a href="#sitemap-explorer" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                  Browse sections
-                </a>
-                <Link href="/sitemap.xml" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
-                  XML sitemap
-                </Link>
-                <Link href="/all-products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
-                  All products
-                </Link>
-              </div>
-            </div>
-
-            <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="Site map statistics">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
-              <p className="mt-3 text-sm leading-6 text-white/70">
-                A live snapshot of everything indexed on {SITE.name} — {totalLinks} links across products,
-                articles, categories, and coupon stores.
-              </p>
-              <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
-                <Stat label="Total links" value={String(totalLinks)} />
-                <Stat label="Products" value={String(products.length)} />
-                <Stat label="Articles" value={String(posts.length)} />
-                <Stat label="Coupon stores" value={String(couponStores.length)} />
-              </div>
-              <div className="mt-5 border-t border-white/10 pt-4 text-xs text-white/55">
-                Also available as{' '}
-                <Link href="/sitemap.xml" className="font-semibold text-[#ffe000] underline-offset-2 hover:underline">
-                  /sitemap.xml
-                </Link>
-                .
-              </div>
-            </aside>
+          <div className="mt-7">
+            <p className="page-hero-eyebrow">Site map</p>
+            <h1 className="page-hero-title">Everything on {SITE.name}</h1>
+            <p className="page-hero-desc">
+              A human-readable index of everything on {SITE.name} &mdash; products, categories, articles and
+              coupon stores. Use the sidebar to jump straight to the section you need. Every link points to a
+              live page, so this doubles as a quick way to see what we cover.
+            </p>
           </div>
         </div>
       </section>
@@ -268,14 +209,6 @@ export default async function HtmlSitemapPage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="font-display text-2xl font-bold text-white">{value}</p>
-      <p className="mt-1 text-sm text-white/55">{label}</p>
-    </div>
-  );
-}
 
 function humanizeSlug(slug: string): string {
   return slug

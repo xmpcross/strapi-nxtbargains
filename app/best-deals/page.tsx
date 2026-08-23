@@ -226,77 +226,44 @@ function Hero({
   sourceLabel: string;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
-        }}
-      />
-      <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-        <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
-          <Link href="/" className="transition hover:text-white">Home</Link>
+    <section className="page-hero">
+      <div className="page-hero-inner">
+        <nav className="page-hero-crumbs">
+          <Link href="/">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-[#ffe000]">Best deals</span>
+          <span className="page-hero-crumbs-current">Best deals</span>
         </nav>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">NXT.Bargains deals</p>
-            <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
+            <p className="page-hero-eyebrow">NXT.Bargains deals</p>
+            <h1 className="page-hero-title">
               Best deals across live merchant offers
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-              Products ranked by current sale pricing from Real-Time Product Search,
-              with catalog offers used as a fallback when live data is unavailable.
+            <p className="page-hero-desc">
+              The largest current discounts across every retailer we track, ranked by how far each price
+              has actually fallen. Live pricing comes from Real-Time Product Search, with our own catalogue
+              offers used as a fallback whenever live data is unavailable. Deals move quickly, so confirm the
+              final price on the retailer page before you commit.
             </p>
-
-            <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                <span>Ranked by real discount — the biggest savings surface first.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                <span>Live offers from Amazon, eBay, Walmart, Newegg, and Best Buy.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                <span>Final price, shipping, and condition confirmed on the merchant site.</span>
-              </li>
-            </ul>
-
-            <div className="mt-10 flex flex-wrap gap-3">
-              <a href="#all-deals" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                View all deals
-              </a>
-              <Link href="/price-drops" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
-                Price drops
-              </Link>
-              <Link href="/all-products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
-                All products
-              </Link>
-            </div>
           </div>
 
-          <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="Best deals statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
-            <p className="mt-3 text-sm leading-6 text-white/70">
+          <aside className="page-hero-panel p-5 sm:p-6" aria-label="Best deals statistics">
+            <p className="page-hero-eyebrow">At a glance</p>
+            <p className="mt-3 text-sm leading-6 text-ink/65">
               {dealCount > 0
                 ? `A live snapshot of the ${dealCount} strongest deals we're tracking right now, ranked by discount across major marketplaces.`
                 : 'Deals appear here as live merchant offers with sale pricing are tracked across major marketplaces.'}
             </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
+            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-ink/12 pt-5">
               <Stat label="Live deals" value={String(dealCount)} />
               <Stat label="Top discount" value={dealCount > 0 ? `${topDiscount}%` : '—'} />
               <Stat label="Avg. savings" value={dealCount > 0 ? `${avgDiscount}%` : '—'} />
               <Stat label="Stores" value={String(storeCount)} />
             </div>
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-4 text-xs text-white/55">
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-ink/12 pt-4 text-xs text-ink/55">
               <span>Updated {updatedLabel}</span>
-              <span className="font-semibold text-[#ffe000]">{sourceLabel}</span>
+              <span className="font-semibold text-primary">{sourceLabel}</span>
             </div>
           </aside>
         </div>

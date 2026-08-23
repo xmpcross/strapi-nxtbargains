@@ -230,64 +230,30 @@ function PostsHero({
 }) {
   return (
     <section
-      className="relative overflow-hidden border-b border-ink/10 bg-gradient-to-br from-[#f7f9fc] via-[#eef3fa] to-[#e9eef7] text-ink"
+      className="page-hero"
       data-testid="posts-page-header"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            'radial-gradient(at 80% 20%, rgba(0,70,190,0.10) 0%, transparent 55%), radial-gradient(at 15% 85%, rgba(255,224,0,0.16) 0%, transparent 55%)',
-        }}
-      />
-      <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-        <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink/50">
-          <Link href="/" className="transition hover:text-ink">Home</Link>
+      <div className="page-hero-inner">
+        <nav className="page-hero-crumbs">
+          <Link href="/">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-primary">All articles</span>
+          <span className="page-hero-crumbs-current">All articles</span>
         </nav>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">{SITE.name} editorial</p>
-            <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
+            <p className="page-hero-eyebrow">{SITE.name} editorial</p>
+            <h1 className="page-hero-title">
               Every article. Every category. One place to read.
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-ink/70 sm:text-lg">
-              Product comparisons, honest reviews, roundups, how-to guides and buying advice — browse the full
-              archive below, or jump straight into a category.
+            <p className="page-hero-desc">
+              Product comparisons, honest reviews, roundups, how-to guides and buying advice, all in one
+              archive. Browse everything below, or jump straight into the category you care about. Nothing
+              here is behind a signup.
             </p>
-
-            <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-ink/70 sm:text-base">
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
-                <span>Side-by-side comparisons and hands-on reviews across every category.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
-                <span>Buying guides and roundups to shortlist before you shop.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
-                <span>Free to read — no signup required.</span>
-              </li>
-            </ul>
-
-            <div className="mt-10 flex flex-wrap gap-3">
-              <a href="#articles" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                Browse articles
-              </a>
-              <Link href="/category" className="inline-flex border border-ink/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-ink/40 hover:text-ink">
-                Categories
-              </Link>
-              <Link href="/best-deals" className="inline-flex border border-ink/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-ink/40 hover:text-ink">
-                Best deals
-              </Link>
-            </div>
           </div>
 
-          <aside className="border border-ink/12 bg-white/70 p-5 backdrop-blur sm:p-6" aria-label="Article archive statistics">
+          <aside className="page-hero-panel p-5 sm:p-6" aria-label="Article archive statistics">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">At a glance</p>
             <p className="mt-3 text-sm leading-6 text-ink/70">
               A live snapshot of the {SITE.name} article archive — updated as new comparisons, reviews, roundups

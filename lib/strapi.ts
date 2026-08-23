@@ -31,6 +31,18 @@ export type NxtPostType =
   | 'top-rated'
   | 'other';
 
+export type NxtAuthor = {
+  id: number;
+  documentId?: string;
+  name: string;
+  slug: string;
+  role?: string;
+  bio?: string;
+  avatar?: StrapiImage;
+  /** Strapi stores this as JSON; profile URLs for schema.org sameAs. */
+  sameAs?: string[] | null;
+};
+
 export type NxtCategory = {
   id: number;
   documentId?: string;
@@ -103,6 +115,7 @@ export type NxtPost = {
   ogImage?: StrapiImage;
   gallery?: NonNullable<StrapiImage>[];
   categories?: NxtCategory[];
+  author?: NxtAuthor | null;
   faqs?: { question: string; answer: string }[];
   steps?: { name: string; text: string; image?: StrapiImage }[];
 };
@@ -235,6 +248,7 @@ const POST_POPULATE = {
   coverImage: true,
   ogImage: true,
   categories: true,
+  author: { populate: ['avatar'] },
   gallery: true,
   faqs: true,
   steps: { populate: ['image'] },

@@ -346,36 +346,29 @@ function Hero({
   couponCount: number;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            'radial-gradient(at 80% 20%, rgba(0,70,190,0.2) 0%, transparent 50%), radial-gradient(at 20% 80%, rgba(255,153,0,0.08) 0%, transparent 50%)',
-        }}
-      />
+    <section className="page-hero">
       <div className="relative mx-auto max-w-[1366px] px-6 py-10 sm:py-14">
         <div className="flex flex-col gap-[3.5rem]">
-          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
-            <Link href="/" className="transition hover:text-white">Home</Link>
+          <nav className="page-hero-crumbs">
+            <Link href="/">Home</Link>
             <span aria-hidden>/</span>
-            <Link href="/coupons" className="transition hover:text-white">Coupons</Link>
+            <Link href="/coupons" className="transition hover:text-ink">Coupons</Link>
             <span aria-hidden>/</span>
-            <span className="text-[#ffe000]">Amazon</span>
+            <span className="page-hero-crumbs-current">Amazon</span>
           </nav>
 
           <div className="flex flex-wrap items-start gap-5">
             <StoreLogo name="Amazon" logo={logo} className="h-20 w-24" dark />
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">Marketplace coupons</p>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
+              <p className="page-hero-eyebrow">Marketplace coupons</p>
+              <h1 className="page-hero-title">
                 Amazon coupon codes &amp; deals
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70">
-                Amazon-only promo codes and coupon deals for home, kitchen, sports, apparel,
-                electronics, baby products, and more. Refreshed daily from the Amazon deals API.
-              </p>
+              <p className="page-hero-desc">
+              Amazon-only promo codes and coupon deals spanning home, kitchen, sports, apparel, electronics,
+              baby products and more. The list is refreshed daily from the Amazon deals API. Open any deal to
+              check the current price and clip the coupon on Amazon.
+            </p>
             </div>
           </div>
 
@@ -386,23 +379,6 @@ function Hero({
             <Stat label="Top offer" value={topOffer} compact />
             <Stat label="Last updated" value={updatedLabel} />
           </div>
-        </div>
-
-        <div className="mt-[3.5rem] flex flex-wrap gap-3">
-          <a href="#all-offers" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-            View all offers
-          </a>
-          <a
-            href={AMAZON_URL}
-            target="_blank"
-            rel="nofollow sponsored noopener noreferrer"
-            className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:border-white/40"
-          >
-            Visit Amazon
-          </a>
-          <Link href="/stores" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
-            More stores
-          </Link>
         </div>
       </div>
     </section>

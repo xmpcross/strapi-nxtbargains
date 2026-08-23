@@ -178,6 +178,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
         datePublished: post.publishedAt,
         dateModified: post.updatedAt,
         url: pageUrl,
+        author: post.author
+          ? { name: post.author.name, sameAs: post.author.sameAs ?? null }
+          : { name: SITE.name },
       });
 
   const howToLd = useHowTo
@@ -216,6 +219,16 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     postContent = postContent.replace(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/i, '<h1 class="post-title-h1">$2</h1>');
   }
 
+  // Featured image at the top of the post. Much of this catalogue was imported
+  // from WordPress and a good number of those bodies open with the same image
+  // as the cover, so render it only when the body does not already lead with
+  // it — otherwise the reader gets the identical picture twice.
+  const leadImage = firstImageUrl(postContent);
+  const sameFile = (a: string, b: string) =>
+    decodeURIComponent(a.split('?')[0].split('/').pop() ?? a) ===
+    decodeURIComponent(b.split('?')[0].split('/').pop() ?? b);
+  const showFeatured = Boolean(cover) && !(leadImage && sameFile(cover as string, leadImage));
+
   return (
     <article
       className="bg-white"
@@ -249,6 +262,19 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
       <div className="mx-auto max-w-7xl px-6">
         {!isBestSellersArticle && <h1 className="sr-only">{post.title}</h1>}
+
+        {showFeatured ? (
+          <figure className="post-featured-image" data-testid="post-featured-image">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={cover as string}
+              alt={post.coverImage?.alternativeText || post.title}
+              width={1200}
+              height={675}
+              fetchPriority="high"
+            />
+          </figure>
+        ) : null}
 
         <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
           <div className="w-full" data-testid="post-body">
@@ -284,9 +310,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
             <div className="mt-14 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-ink/10 pt-8 text-xs font-semibold uppercase tracking-[0.12em] text-ink/45">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink/10 text-ink/40">
-                N
+                {(post.author?.name ?? SITE.name).charAt(0)}
               </span>
-              <span>By {SITE.name}</span>
+              <span>By {post.author?.name ?? SITE.name}</span>
               <span>{fmtDate(post.publishedAt)}</span>
               {post.readingTimeMinutes && <span>{post.readingTimeMinutes} min read</span>}
             </div>
@@ -300,13 +326,17 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             <div className="mt-10 bg-muted p-8" data-testid="post-author-box">
               <div className="grid gap-6 sm:grid-cols-[72px_minmax(0,1fr)]">
                 <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-white text-2xl font-bold text-ink/30">
-                  N
+                  {(post.author?.name ?? SITE.name).charAt(0)}
                 </div>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink/45">Written by</p>
-                  <h2 className="mt-2 font-display text-xl font-bold text-ink">{SITE.name}</h2>
+                  <h2 className="mt-2 font-display text-xl font-bold text-ink">{post.author?.name ?? SITE.name}</h2>
+                  {post.author?.role ? (
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-ink/45">{post.author.role}</p>
+                  ) : null}
                   <p className="mt-3 text-sm leading-7 text-ink/60">
-                    Product comparisons, reviews and practical buying guides for smart tech shoppers.
+                    {post.author?.bio
+                      ?? 'Product comparisons, reviews and practical buying guides for smart tech shoppers.'}
                   </p>
                 </div>
               </div>

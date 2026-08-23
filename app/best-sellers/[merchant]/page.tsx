@@ -45,69 +45,51 @@ export default async function MarketplaceBestSellersPage({ params }: { params: P
   return (
     <main data-page="best-sellers" data-testid={`best-sellers-${marketplace.key}-page`}>
       {/* Hero — matches /products */}
-      <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white" data-testid="best-sellers-page-header">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-80"
-          style={{
-            background:
-              'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
-          }}
-        />
-        <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
-            <Link href="/" className="transition hover:text-white">Home</Link>
+      <section className="page-hero" data-testid="best-sellers-page-header">
+        <div className="page-hero-inner">
+          <nav className="page-hero-crumbs">
+            <Link href="/">Home</Link>
             <span aria-hidden>/</span>
-            <Link href="/best-sellers" className="transition hover:text-white">Best sellers</Link>
+            <Link href="/best-sellers" className="transition hover:text-ink">Best sellers</Link>
             <span aria-hidden>/</span>
-            <span className="text-[#ffe000]">{marketplace.label}</span>
+            <span className="page-hero-crumbs-current">{marketplace.label}</span>
           </nav>
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-start">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">Best sellers</p>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
+              <p className="page-hero-eyebrow">Best sellers</p>
+              <h1 className="page-hero-title">
                 {marketplace.label} best sellers, ranked.
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-                {marketplace.description} Prices and availability change fast — confirm the final details on {marketplace.label} before you buy.
-              </p>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a href="#ranking" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                  View ranking
-                </a>
-                <Link href="/best-sellers" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
-                  All marketplaces
-                </Link>
-                <Link href="/all-products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
-                  All products
-                </Link>
-              </div>
+              <p className="page-hero-desc">
+              {marketplace.description} Rankings refresh daily, so the order reflects what is moving now
+              rather than an all-time list. Prices and availability change fast &mdash; confirm the final
+              details on {marketplace.label} before you buy.
+            </p>
             </div>
 
             {/* stats card */}
-            <div className="border border-white/12 bg-white/[0.04] p-6 backdrop-blur">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">At a glance</p>
+            <div className="page-hero-panel p-6">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-ink/50">At a glance</p>
               <dl className="mt-4 grid grid-cols-2 gap-4">
                 <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-white/45">Products ranked</dt>
-                  <dd className="mt-1 font-display text-3xl font-bold text-white">{items.length.toLocaleString()}</dd>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink/50">Products ranked</dt>
+                  <dd className="mt-1 font-display text-3xl font-bold text-ink">{items.length.toLocaleString()}</dd>
                 </div>
                 {showCategoryGroups ? (
                   <div>
-                    <dt className="text-xs font-semibold uppercase tracking-wide text-white/45">Categories</dt>
-                    <dd className="mt-1 font-display text-3xl font-bold text-white">{categoryGroups.length}</dd>
+                    <dt className="text-xs font-semibold uppercase tracking-wide text-ink/50">Categories</dt>
+                    <dd className="mt-1 font-display text-3xl font-bold text-ink">{categoryGroups.length}</dd>
                   </div>
                 ) : (
                   <div>
-                    <dt className="text-xs font-semibold uppercase tracking-wide text-white/45">Marketplace</dt>
-                    <dd className="mt-1 font-display text-xl font-bold text-white">{marketplace.label}</dd>
+                    <dt className="text-xs font-semibold uppercase tracking-wide text-ink/50">Marketplace</dt>
+                    <dd className="mt-1 font-display text-xl font-bold text-ink">{marketplace.label}</dd>
                   </div>
                 )}
-                <div className="col-span-2 border-t border-white/12 pt-4">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-white/45">Refresh</dt>
-                  <dd className="mt-1 text-sm font-semibold text-white/80">Rankings update daily</dd>
+                <div className="col-span-2 border-t border-ink/12 pt-4">
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink/50">Refresh</dt>
+                  <dd className="mt-1 text-sm font-semibold text-ink/75">Rankings update daily</dd>
                 </div>
               </dl>
             </div>

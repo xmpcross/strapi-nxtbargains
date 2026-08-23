@@ -17,11 +17,6 @@ const channels = [
   { ic: 'f', t: 'On Facebook', s: '/nxtbargains', href: SITE.social.facebook },
 ];
 
-const checklist = [
-  'Suggest a product you’d like us to track.',
-  'Report a broken link, wrong price, or correction.',
-  'Story tips and partnership questions welcome.',
-];
 
 const quickLinks: [string, string][] = [
   ['/', 'Home'],
@@ -33,55 +28,23 @@ const quickLinks: [string, string][] = [
 export default function ContactPage() {
   return (
     <main data-testid="contact-page">
-      {/* Hero — dark "At a glance" layout (matches /sitemap) */}
-      <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white" data-testid="contact-page-header">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-80"
-          style={{
-            background:
-              'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
-          }}
-        />
-        <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45" aria-label="Breadcrumb">
-            <Link href="/" className="transition hover:text-white">Home</Link>
+      {/* Hero — shared light-gradient page title block (.page-hero) */}
+      <section className="page-hero" data-testid="contact-page-header">
+        <div className="page-hero-inner">
+          <nav className="page-hero-crumbs" aria-label="Breadcrumb">
+            <Link href="/">Home</Link>
             <span aria-hidden>/</span>
-            <span className="text-[#ffe000]">Contact</span>
+            <span className="page-hero-crumbs-current">Contact</span>
           </nav>
 
-          <div className="mt-8 w-full">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">Contact</p>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
-                Get in touch.
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-                Story tips, partnership questions, corrections, or a product you&apos;d like us to track — we read
-                everything that comes through. Pick the channel that fits.
-              </p>
-
-              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
-                {checklist.map((item) => (
-                  <li key={item} className="flex gap-3">
-                    <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-10 flex flex-wrap gap-3">
-                <a href="#contact-form" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                  Send a message
-                </a>
-                <a href="mailto:hello@nxt.bargains" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
-                  Email us
-                </a>
-                <Link href="/sitemap" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
-                  Site map
-                </Link>
-              </div>
-            </div>
+          <div className="mt-7 w-full">
+            <p className="page-hero-eyebrow">Contact</p>
+            <h1 className="page-hero-title">Get in touch.</h1>
+            <p className="page-hero-desc">
+              Story tips, partnership enquiries, corrections, or a product you would like us to start tracking
+              &mdash; every message reaches a person, and we read all of them. Use the form below and we will
+              reply to the address you give us. Pick whichever channel suits you.
+            </p>
           </div>
         </div>
       </section>
@@ -91,12 +54,12 @@ export default function ContactPage() {
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="grid items-start gap-10 lg:grid-cols-[1fr_0.9fr]">
             {/* form card */}
-            <div className="rounded-[20px] border border-ink/10 bg-white p-6 shadow-[0_30px_70px_-42px_rgba(13,27,42,0.4)] sm:p-[34px]" data-testid="contact-form-card">
+            <div className="rounded-[20px] border border-ink/10 bg-white p-6 sm:p-[34px]" data-testid="contact-form-card">
               <span className="text-[0.74rem] font-bold uppercase tracking-[0.16em] text-primary">Send a message</span>
               <h2 className="mb-1.5 mt-1.5 font-display font-bold text-ink">Tell us what&apos;s on your mind.</h2>
               <p className="mb-[22px] text-[0.9rem] leading-[1.55] text-ink/55">
-                Fill in the form and we&apos;ll get back to you. Submitting opens your default email client with the
-                message pre-filled — no data is sent to a server. Prefer email?{' '}
+                Fill in the form and we&apos;ll get back to you by email, usually within a couple of working
+                days. Prefer to write to us directly?{' '}
                 <a href="mailto:hello@nxt.bargains" className="font-semibold text-primary hover:underline">hello@nxt.bargains</a>
               </p>
               <ContactForm />
