@@ -335,10 +335,11 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                       currency={best?.offer.currency ?? 'USD'}
                       currentPrice={bestPrice ?? undefined}
                       buyHref={best ? buyUrl(best.offer, best.product) : undefined}
+                      buyLabel={best ? `Buy at ${merchantName(best.offer)}` : undefined}
                     />
 
                     <p className="mt-5 text-sm text-ink/55">
-                      Updated {updatedLabel}
+                      We may earn a commission from links on this page, at no extra cost to you.
                     </p>
                   </div>
 
