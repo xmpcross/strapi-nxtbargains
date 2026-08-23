@@ -3906,14 +3906,14 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   flex-direction: column;
   overflow: hidden;
   border-radius: 12px;
-  /* Matches .read-next-media so the transparent product image sits flush with
-     the rest of the card instead of on a panel of its own. */
-  background: #f1f2f6;
+  background: #ffffff;
 }
 
 .read-next-media {
   display: block;
-  background: #f1f2f6;
+  /* Matched to the card so the transparent product image sits flush rather
+     than on a panel of its own. */
+  background: #ffffff;
 }
 
 .read-next-media img {
