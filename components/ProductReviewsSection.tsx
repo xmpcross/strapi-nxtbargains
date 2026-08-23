@@ -65,7 +65,7 @@ function ReviewCard({ review }: { review: CommerceReview }) {
   const photos = (review.images ?? []).map(mediaUrl).filter(Boolean) as string[];
 
   return (
-    <article className="flex flex-col rounded-[4px] border border-solid border-[#dddddd] p-4">
+    <article className="product-review-card flex flex-col p-4">
       <Stars rating={Number(review.rating) || 0} />
 
       {review.title ? (

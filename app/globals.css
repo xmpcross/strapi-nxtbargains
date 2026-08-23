@@ -2503,6 +2503,16 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 @media (min-width: 1024px) { .review-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 1280px) { .review-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
+/* Review card. The border is declared here because the global borderless
+   treatment strips `border` from an <article> whose class list contains it —
+   the Tailwind utilities this used to carry were being removed, so the cards
+   ran together with nothing between them. */
+.product-review-card {
+  border: 1px solid #dddddd !important;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
 .review-card {
   display: flex; flex-direction: column; gap: 0.5rem;
   padding: 1.15rem; border: 1px solid rgb(13 27 42 / 0.12); background: #fff;

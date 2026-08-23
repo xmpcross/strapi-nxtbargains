@@ -338,7 +338,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                         <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink/45">
                           Lowest price
                         </p>
-                        <p className="mt-1.5 font-display text-[2.6rem] font-bold leading-none tracking-tight text-ink">
+                        <p className="mt-1.5 font-display text-[24px] font-bold leading-none tracking-tight text-ink">
                           {best
                             ? formatMoney(best.offer.price ?? best.offer.originalPrice, best.offer.currency ?? 'USD')
                             : 'Check price'}
