@@ -123,7 +123,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
         </section>
       ) : null}
 
-      <section className="bg-[#f0f2f4] py-10 sm:py-12" id="articles">
+      <section className="bg-white py-10 sm:py-12" id="articles">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="flex flex-wrap items-end justify-between gap-4 border border-ink/10 bg-white p-5 sm:p-6">
             <div>
@@ -240,8 +240,7 @@ function PostsHero({
           <span className="page-hero-crumbs-current">All articles</span>
         </nav>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
-          <div>
+        <div className="mt-8">
             <p className="page-hero-eyebrow">{SITE.name} editorial</p>
             <h1 className="page-hero-title">
               Every article. Every category. One place to read.
@@ -251,38 +250,12 @@ function PostsHero({
               archive. Browse everything below, or jump straight into the category you care about. Nothing
               here is behind a signup.
             </p>
-          </div>
-
-          <aside className="page-hero-panel p-5 sm:p-6" aria-label="Article archive statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">At a glance</p>
-            <p className="mt-3 text-sm leading-6 text-ink/70">
-              A live snapshot of the {SITE.name} article archive — updated as new comparisons, reviews, roundups
-              and guides are published across {categoryCount} categories.
-            </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-ink/10 pt-5">
-              <Stat label="Articles" value={String(totalPosts)} />
-              <Stat label="Categories" value={String(categoryCount)} />
-              <Stat label="On this page" value={String(showing)} />
-              <Stat label="Pages" value={String(pageCount)} />
-            </div>
-            <div className="mt-5 border-t border-ink/10 pt-4 text-xs text-ink/55">
-              Viewing page {page} of {pageCount}.
-            </div>
-          </aside>
         </div>
       </div>
     </section>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="font-display text-2xl font-bold text-ink">{value}</p>
-      <p className="mt-1 text-sm text-ink/55">{label}</p>
-    </div>
-  );
-}
 
 function BrowseCard({ href, title, subtitle }: { href: string; title: string; subtitle: string }) {
   return (
