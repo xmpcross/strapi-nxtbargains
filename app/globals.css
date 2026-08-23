@@ -3906,7 +3906,9 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   flex-direction: column;
   overflow: hidden;
   border-radius: 12px;
-  background: #f8f8f8;
+  /* Matches .read-next-media so the transparent product image sits flush with
+     the rest of the card instead of on a panel of its own. */
+  background: #f1f2f6;
 }
 
 .read-next-media {
