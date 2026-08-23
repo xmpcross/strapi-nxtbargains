@@ -130,7 +130,7 @@ export default async function Header() {
               <li key={`${item.label}-${item.href}`} className="group relative">
                 <Link
                   href={item.href}
-                  className="top-nav-link inline-flex items-center px-3 py-2 font-['Outfit'] text-[#111111] transition hover:text-[#111111]"
+                  className="top-nav-link inline-flex items-center px-3 py-2 text-[#111111] transition hover:text-[#111111]"
                   data-testid={navTestId(item.label)}
                 >
                   {item.label}
@@ -156,7 +156,7 @@ export default async function Header() {
                       {item.children.map((child) =>
                         child.children?.length ? (
                           <div key={child.label} className="group/nested relative">
-                            <span className="top-nav-dropdown-link flex items-center justify-between px-3 py-2 font-['Outfit'] text-sm font-semibold text-ink/85">
+                            <span className="top-nav-dropdown-link flex items-center justify-between px-3 py-2 text-sm font-semibold text-ink/85">
                               {child.label}
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -178,7 +178,7 @@ export default async function Header() {
                                   <Link
                                     key={nested.href}
                                     href={nested.href}
-                                    className="top-nav-dropdown-link block px-3 py-2 font-['Outfit'] text-sm text-ink/75 transition hover:text-primary"
+                                    className="top-nav-dropdown-link block px-3 py-2 text-sm text-ink/75 transition hover:text-primary"
                                   >
                                     {nested.label}
                                   </Link>
@@ -190,7 +190,7 @@ export default async function Header() {
                           <Link
                             key={child.href}
                             href={child.href!}
-                            className="top-nav-dropdown-link block px-3 py-2 font-['Outfit'] text-sm text-ink/75 transition hover:text-primary"
+                            className="top-nav-dropdown-link block px-3 py-2 text-sm text-ink/75 transition hover:text-primary"
                           >
                             {child.label}
                           </Link>

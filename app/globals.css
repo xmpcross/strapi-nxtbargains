@@ -1,70 +1,18 @@
+/* Inter, self-hosted from public/fonts — one variable file per style covers
+   every weight the site uses, and nothing is fetched from Google at runtime.
+   The Outfit .ttf faces and the Urbanist face that used to sit here are gone:
+   nine TrueType files were being served for weights Inter carries in one. */
 @font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-100.ttf') format('truetype');
+  font-family: 'Inter';
+  src: url('/fonts/InterVariable.woff2') format('woff2');
   font-style: normal;
-  font-weight: 100;
+  font-weight: 100 900;
   font-display: swap;
 }
 @font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-200.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-300.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-400.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-500.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-600.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-700.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-800.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-900.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Urbanist';
-  src: url('/fonts/UrbanistVariable.woff2') format('woff2');
-  font-style: normal;
+  font-family: 'Inter';
+  src: url('/fonts/InterVariable-Italic.woff2') format('woff2');
+  font-style: italic;
   font-weight: 100 900;
   font-display: swap;
 }
@@ -75,8 +23,9 @@
 
 :root {
   color-scheme: light;
-  --font-body: 'Outfit';
-  --font-heading: 'Urbanist';
+  /* One family for the whole site: body and display both resolve to Inter. */
+  --font-body: 'Inter';
+  --font-heading: 'Inter';
 
   /* ------------------------------------------------------------------ */
   /* Brand palette (Best Buy scheme). Semantic tokens below map onto     */
@@ -1620,11 +1569,11 @@ article[data-testid^="post-"] .post-content .cegg-list-card {
   max-width: 100%;
 }
 
-/* Single post body copy — Outfit for paragraphs and list items. */
+/* Single post body copy — the body family for paragraphs and list items. */
 article[data-testid^="post-"] .post-content p,
 article[data-testid^="post-"] .post-content ul li,
 article[data-testid^="post-"] .post-content ul li a {
-  font-family: 'Outfit', Arial, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: var(--font-body), Arial, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 /* Single post page base surface. */
@@ -1913,6 +1862,109 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 }
 
 .product-short-description > li { line-height: 1.7; }
+
+/* ------------------------------------------------------ category card --
+   Comparison card for the category listings. Borders and radii are written
+   out here because the global borderless rule strips `border` from an
+   <article>/<a>, which is where most of this card's structure lives. */
+.category-card {
+  padding: 1rem;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px;
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.category-card:hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 14px 30px -22px rgb(13 27 42 / 0.4);
+}
+
+.category-card-rank {
+  flex-shrink: 0;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  background: #118757;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.category-card-chip {
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  background: #f1f5f9;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.category-card-image-box { background: #f8fafc; border-radius: 8px; }
+
+.category-card-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.35;
+  color: #0f172a;
+}
+
+.category-card-title a:hover { color: var(--color-primary, #0046be); }
+
+.category-card-stars { color: #f5a623; letter-spacing: 0.02em; }
+.category-card-stars-off { color: rgb(13 27 42 / 0.18); }
+
+.category-card-offers {
+  padding: 0.7rem;
+  border-radius: 8px;
+  background: #f1f5f9;
+}
+
+.category-card-offers-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(13 27 42 / 0.45);
+}
+
+.category-card-offer {
+  display: block;
+  padding: 0.45rem 0.3rem;
+  border-radius: 6px;
+  background: #ffffff;
+  text-align: center;
+  transition: box-shadow 0.15s ease;
+}
+
+.category-card-offer:hover { box-shadow: 0 0 0 1px #cbd5e1; }
+
+.category-card-cta {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 8px !important;
+  background: #118757;
+  text-align: center;
+  font-family: var(--font-display, inherit);
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  transition: background-color 0.15s ease;
+}
+
+.category-card-cta:hover { background: #0d6f47; }
+
+.category-card-more {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgb(13 27 42 / 0.55);
+}
+
+.category-card-more:hover { color: var(--color-primary, #0046be); }
+
+/* The generic catalogue-card border would double up on this one. */
+.product-category-grid > article.category-card { border-radius: 10px; }
 
 /* ------------------------------------------------------- product imagery --
    Every product image renders in the same 800x800 square, whatever the source

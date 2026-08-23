@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import CommerceProductCard from '@/components/CommerceProductCard';
+import CategoryProductCard from '@/components/CategoryProductCard';
 import ProductCatalogPagination from '@/components/ProductCatalogPagination';
 import ProductFiltersSidebar from '@/components/ProductFiltersSidebar';
 import {
@@ -19,7 +19,7 @@ import {
   listCommerceProducts,
 } from '@/lib/strapi';
 import { SITE } from '@/lib/site';
-import { categoryDescriptionParagraphs, categoryDescriptionSummary } from '@/lib/category-descriptions';
+import { categoryDescriptionParagraph, categoryDescriptionSummary } from '@/lib/category-descriptions';
 import { pageOpenGraph } from '@/lib/seo';
 
 export const revalidate = 300;
@@ -128,10 +128,8 @@ export default async function ProductCategoryPage({
           <h1 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
             {category.name}
           </h1>
-          <div className="category-intro mt-4 w-full sm:w-4/5">
-            {categoryDescriptionParagraphs(category).map((paragraph) => (
-              <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-            ))}
+          <div className="category-intro mt-4 w-full">
+            <p>{categoryDescriptionParagraph(category)}</p>
           </div>
         </div>
       </section>
@@ -178,12 +176,11 @@ export default async function ProductCategoryPage({
 
               {products.length > 0 ? (
                 <div className="product-category-grid grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                  {products.map((product) => (
-                    <CommerceProductCard
+                  {products.map((product, index) => (
+                    <CategoryProductCard
                       key={product.id}
                       product={product}
-                      showCompareButton={false}
-                      uniformImage
+                      rank={(page - 1) * PAGE_SIZE + index + 1}
                     />
                   ))}
                 </div>

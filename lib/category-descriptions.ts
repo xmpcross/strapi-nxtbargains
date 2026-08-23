@@ -103,10 +103,7 @@ const CATEGORY_DESCRIPTIONS: Record<string, CategoryCopy> = {
   ],
 };
 
-/**
- * Fallback for a category with no written copy yet. Still three paragraphs, so
- * the page never renders a one-line introduction under a full heading.
- */
+/** Fallback for a category with no written copy yet. Rendered as one paragraph. */
 function genericDescription(name: string): CategoryCopy {
   const lower = name.toLowerCase();
   return [
@@ -116,15 +113,24 @@ function genericDescription(name: string): CategoryCopy {
   ];
 }
 
-/** Paragraphs for a category page introduction. Always at least three. */
-export function categoryDescriptionParagraphs(category: {
-  name: string;
-  slug: string;
-}): CategoryCopy {
+function categoryDescriptionCopy(category: { name: string; slug: string }): CategoryCopy {
   return CATEGORY_DESCRIPTIONS[category.slug] ?? genericDescription(category.name);
+}
+
+function firstSentences(text: string, limit = 3): string {
+  const sentences = text
+    .replace(/\s+/g, ' ')
+    .trim()
+    .match(/[^.!?]+[.!?]+|[^.!?]+$/g) ?? [];
+  return sentences.slice(0, limit).join(' ').replace(/\s+/g, ' ').trim();
+}
+
+/** Single-paragraph category page introduction, capped at three sentences. */
+export function categoryDescriptionParagraph(category: { name: string; slug: string }): string {
+  return firstSentences(categoryDescriptionCopy(category).join(' '));
 }
 
 /** Single-paragraph form, for meta descriptions and structured data. */
 export function categoryDescriptionSummary(category: { name: string; slug: string }): string {
-  return categoryDescriptionParagraphs(category)[0];
+  return categoryDescriptionParagraph(category);
 }
