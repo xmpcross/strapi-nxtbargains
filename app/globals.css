@@ -1073,6 +1073,13 @@ main[data-testid^="product-price-"] p {
   font-size: 14px !important;
 }
 
+/* The rule above pins every <p> on this page to 14px with !important, which
+   beats any utility class — a Tailwind text-[24px] here rendered at 14. This
+   is scoped the same way so it carries more specificity, not just !important. */
+main[data-testid^="product-price-"] p.product-lowest-price {
+  font-size: 24px !important;
+}
+
 main[data-testid^="product-price-"] .tab-panel-specifications,
 main[data-testid^="product-price-"] .tab-panel-additional-info {
   font-size: 14px;

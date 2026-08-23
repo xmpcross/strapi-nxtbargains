@@ -334,11 +334,11 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
 
                   <aside className="self-center p-5 sm:p-7">
                     {rows.length > 0 ? (
-                      <div className="product-offer-list rounded-[10px] border border-[#e5e7eb] bg-white p-5">
+                      <div className="product-offer-list rounded-[10px] border border-[#e5e7eb] bg-white pl-5">
                         <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink/45">
                           Lowest price
                         </p>
-                        <p className="mt-1.5 font-display text-[24px] font-bold leading-none tracking-tight text-ink">
+                        <p className="product-lowest-price mt-1.5 font-display font-bold leading-none tracking-tight text-ink">
                           {best
                             ? formatMoney(best.offer.price ?? best.offer.originalPrice, best.offer.currency ?? 'USD')
                             : 'Check price'}
@@ -680,11 +680,10 @@ function ProductGallery({ images, name }: { images: string[]; name: string }) {
   if (!images.length) return null;
 
   return (
-    <div className="my-8">
+    <div className="mb-6">
       <ProductCarousel
         perView={3}
         interval={4000}
-        gapPx={15}
         items={images.map((src, index) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -694,7 +693,7 @@ function ProductGallery({ images, name }: { images: string[]; name: string }) {
             loading="lazy"
             width={800}
             height={800}
-            className="product-gallery-image rounded-[8px]"
+            className="product-gallery-image"
           />
         ))}
       />
