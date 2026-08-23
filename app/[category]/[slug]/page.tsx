@@ -613,7 +613,14 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             </section>
           </div>
 
-          <aside className="space-y-10 lg:sticky lg:top-28" data-testid="post-side-rail">
+          <aside
+            className={
+              isRecapLayout
+                ? 'post-side-rail-recap space-y-10'
+                : 'space-y-10 lg:sticky lg:top-28'
+            }
+            data-testid="post-side-rail"
+          >
             {!isRecapLayout && (
             <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]" data-testid="sidebar-share">
               <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">Share This Article</h5>

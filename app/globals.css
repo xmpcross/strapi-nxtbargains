@@ -4123,3 +4123,31 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 .comment-submit:disabled { opacity: 0.6; cursor: default; }
 
 .comment-form-footnote { margin: 0.9rem 0 0; font-size: 0.8125rem; color: #9aa0ab; }
+
+/* ── Right rail (recap layout) ────────────────────────────────────────────
+   Spotlight scrolls away with the article; the promo card below it is what
+   stays pinned.
+
+   The rail has to stretch to the full grid row for that to work. The post grid
+   uses align-items:start, which sizes each column to its own content — so a
+   sticky child would sit at the bottom of a short box with nowhere to travel
+   and would never move. align-self:stretch gives the card the length of the
+   article to stick against. */
+.post-side-rail-recap { min-width: 0; }
+
+@media (min-width: 1024px) {
+  .post-side-rail-recap {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Spotlight keeps its natural position and scrolls out of view. */
+  .post-side-rail-recap > [data-testid='sidebar-spotlight'] { flex: none; }
+
+  .post-side-rail-recap > .trailcard {
+    position: sticky;
+    top: 7rem;
+    flex: none;
+  }
+}
