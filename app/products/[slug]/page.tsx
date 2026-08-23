@@ -265,7 +265,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
               </div>
 
               <div className="min-w-0">
-                <div className="border-b border-ink/10 p-6 sm:p-8">
+                <div className="border-b border-ink/10 px-6 pb-4 pt-6 sm:px-8 sm:pb-4 sm:pt-8">
                   {brand ? <p className="product-title-brand">{brand}</p> : null}
 
                   <h1 className="product-title font-display font-bold leading-tight text-ink">
@@ -296,7 +296,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                 </div>
 
                 <div className="grid lg:grid-cols-2">
-                  <div className="border-b border-ink/10 p-6 sm:p-8 lg:border-b-0 lg:border-r">
+                  <div className="border-b border-ink/10 px-6 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-4 lg:border-b-0 lg:border-r">
                     {shortCopy.bullets.length ? (
                       <ul className="product-description-bullets product-short-description">
                         {shortCopy.bullets.map((bullet) => (
