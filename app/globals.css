@@ -2805,11 +2805,11 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 }
 
 /* ── Site footer ──────────────────────────────────────────────────────────
-   Was a solid dark #1d252c slab with white text. Now a light gradient that
-   starts just off the white page body and deepens slightly toward the bottom,
-   so the footer separates from the content without a hard colour break. */
+   Was a solid dark #1d252c slab with white text. Now a flat light grey that
+   sits just off the white page body, enough to mark the footer as a separate
+   band without a hard colour break. */
 .site-footer {
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+  background: #f5f6fa;
   color: rgba(13, 27, 42, 0.66);
   border-top: 1px solid rgba(13, 27, 42, 0.09);
 }
@@ -2833,4 +2833,11 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 
 @media (max-width: 640px) {
   .post-featured-image { margin-top: 1.25rem; border-radius: 6px; }
+}
+
+/* Copyright bar. Was bg-black, which survived the footer's move to a light
+   palette and left dark text sitting on a black strip. */
+.site-footer-bottom {
+  background: #ebedf5;
+  color: rgba(13, 27, 42, 0.7);
 }

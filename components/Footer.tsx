@@ -112,8 +112,8 @@ export default function Footer() {
       </div>
 
       {/* bottom */}
-      <div className="mt-6 bg-black">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-xs text-ink/55 sm:text-sm">
+      <div className="site-footer-bottom mt-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-xs text-ink/70 sm:text-sm">
           <span>© {year} {SITE.name}. Independent price comparison — we may earn a commission on some links.</span>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             {legalLinks.map((l) => (
