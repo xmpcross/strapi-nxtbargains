@@ -242,7 +242,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <article className="border border-ink/10 bg-white">
             <div className="grid lg:grid-cols-[34%_minmax(0,1fr)] lg:gap-[10px]">
-              <div className="relative flex min-h-[340px] items-center justify-center border-b border-ink/10 p-7 lg:min-h-[410px] lg:border-b-0 lg:border-r">
+              <div className="relative flex h-[560px] items-center justify-center border-b border-ink/10 p-7 lg:border-b-0 lg:border-r">
                 {discount !== null && (
                   <span className="absolute right-6 top-6 bg-[#ff2447] px-3 py-2 text-sm font-bold text-white">
                     -{discount}%
@@ -573,8 +573,6 @@ function ProductInfoTabs({
                   </p>
                 )}
 
-                {/* Photography closes the section, after the written detail. */}
-                <ProductGallery images={galleryImages} name={productName} />
               </div>
             </details>
 
@@ -582,6 +580,8 @@ function ProductInfoTabs({
               panels={[
                 { id: 'specifications', label: 'Specifications', content: (
                   <>
+                {/* Photography leads the panel, above the spec rows. */}
+                <ProductGallery images={galleryImages} name={productName} />
                 {useGsmarenaSpecsInSpecifications ? (
                   <GsmarenaSpecGroups groups={gsmarenaSpecGroups} />
                 ) : specEntries.length ? (
@@ -678,7 +678,7 @@ function ProductGallery({ images, name }: { images: string[]; name: string }) {
   if (!images.length) return null;
 
   return (
-    <div className="mt-6">
+    <div className="mb-6">
       <ProductCarousel
         perView={3}
         interval={4000}
