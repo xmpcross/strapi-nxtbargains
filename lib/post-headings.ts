@@ -31,6 +31,10 @@ export function headingSlug(text: string, used?: Set<string>): string {
 }
 
 /** True when the value looks like Markdown rather than HTML. Mirrors PostContent. */
+export function isMarkdownContent(value: string): boolean {
+  return isMarkdown(value);
+}
+
 function isMarkdown(value: string): boolean {
   const text = String(value || '').trim();
   if (!text) return false;
@@ -87,4 +91,57 @@ export function extractHeadings(source: string): PostHeading[] {
     text: h.text,
     level: (h.depth === shallowest ? 2 : 3) as 2 | 3,
   }));
+}
+
+/**
+ * Assign anchor ids to the headings in an HTML body and return the list.
+ *
+ * This has to happen on the server, and the returned list has to be what the
+ * rail is built from. Deriving the two independently does not work: an imported
+ * heading may already carry a WordPress id, in which case the body keeps it
+ * while a text-derived slug would point somewhere that does not exist, and the
+ * de-duplication counters drift apart the moment one side skips a heading the
+ * other counted. Both problems showed up as rails full of dead anchors.
+ *
+ * Existing ids are preserved — hand-written in-page links depend on them.
+ */
+export function applyHtmlHeadingIds(html: string): { html: string; headings: PostHeading[] } {
+  const found: { id: string; text: string; depth: number }[] = [];
+  const used = new Set<string>();
+
+  // First pass: reserve every id already present, so a generated slug cannot
+  // collide with one further down the document.
+  for (const m of String(html || '').matchAll(/<h[1-6]\b[^>]*\bid=["']([^"']+)["'][^>]*>/gi)) {
+    used.add(m[1]);
+  }
+
+  const out = String(html || '').replace(
+    /<h([1-6])\b([^>]*)>([\s\S]*?)<\/h\1>/gi,
+    (full, lvl, attrs, inner) => {
+      const text = plainText(inner);
+      if (!text) return full;
+
+      const existing = /\bid=["']([^"']+)["']/i.exec(attrs);
+      if (existing) {
+        found.push({ id: existing[1], text, depth: Number(lvl) });
+        return full;
+      }
+
+      const id = headingSlug(text, used);
+      found.push({ id, text, depth: Number(lvl) });
+      return `<h${lvl}${attrs} id="${id}">${inner}</h${lvl}>`;
+    },
+  );
+
+  if (!found.length) return { html: out, headings: [] };
+
+  const shallowest = Math.min(...found.map((h) => h.depth));
+  return {
+    html: out,
+    headings: found.map((h) => ({
+      id: h.id,
+      text: h.text,
+      level: (h.depth === shallowest ? 2 : 3) as 2 | 3,
+    })),
+  };
 }

@@ -15,7 +15,7 @@ import PostPriceComparison from '@/components/PostPriceComparison';
 import CommentForm from '@/components/CommentForm';
 import ProductCarousel from '@/components/ProductCarousel';
 import PostMetabar from '@/components/PostMetabar';
-import { extractHeadings } from '@/lib/post-headings';
+import { applyHtmlHeadingIds, extractHeadings, isMarkdownContent } from '@/lib/post-headings';
 import ReadAlso from '@/components/ReadAlso';
 import RelatedPosts from '@/components/RelatedPosts';
 import QuestionsAnswered from '@/components/QuestionsAnswered';
@@ -66,13 +66,18 @@ function spotlightDate(iso?: string): string {
 }
 
 /**
- * Categories rendered with the editorial post layout.
+ * Categories that do NOT use the editorial post layout.
  *
- * A set rather than a per-category flag so adding one is a single edit here;
- * the CSS keys off data-layout="recap" on the article, not off the individual
- * category, for the same reason.
+ * An exclusion list rather than an allow-list: the editorial layout is now the
+ * default for the site, and best-sellers-articles is the one exception. Those
+ * posts promote their first body heading to the visible <h1> and are built
+ * around a product carousel, so the two-column header and contents rail fight
+ * with what is already there.
+ *
+ * The CSS keys off data-layout="recap" on the article rather than off any
+ * individual category, so this stays the only place the decision lives.
  */
-const RECAP_LAYOUT_CATEGORIES = new Set(['smart-home', 'buying-guides', 'how-to-guides']);
+const RECAP_LAYOUT_EXCLUDED = new Set(['best-sellers-articles']);
 
 function recentPostDate(iso?: string): string {
   if (!iso) return '';
@@ -282,11 +287,11 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   const faqLd = faqs.length >= 2 ? faqJsonLd(faqs) : null;
 
   const isBestSellersArticle = category === 'best-sellers-articles' || cat?.slug === 'best-sellers-articles';
-  // Categories that use the editorial ("recap") post layout: two-column header,
-  // left contents rail, Spotlight sidebar, Read Also / Related / Read Next.
-  // Everything else keeps the original single-column template.
+  // The editorial ("recap") post layout: two-column header, left contents rail,
+  // Spotlight sidebar, Read Also / Related / Read Next. Applied to every
+  // category except those listed in RECAP_LAYOUT_EXCLUDED.
   const isRecapLayout =
-    RECAP_LAYOUT_CATEGORIES.has(category) || RECAP_LAYOUT_CATEGORIES.has(cat?.slug ?? '');
+    !RECAP_LAYOUT_EXCLUDED.has(category) && !RECAP_LAYOUT_EXCLUDED.has(cat?.slug ?? '');
   let postContent = await enrichPostCarouselHtml(post.content);
   // best-sellers-articles: promote the first body heading (the product title) to
   // a semantic <h1> while keeping the h4 size (.post-title-h1), and drop the
@@ -309,7 +314,20 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   //
   // Top-level sections only: the H3s stay in the body with their anchors
   // intact, they are just not listed here.
-  const toc = isRecapLayout ? extractHeadings(postContent).filter((h) => h.level === 2) : [];
+  let toc: { id: string; text: string; level: 2 | 3 }[] = [];
+  if (isRecapLayout) {
+    if (isMarkdownContent(postContent)) {
+      // PostContent emits the ids for Markdown, through the same slug helper.
+      toc = extractHeadings(postContent);
+    } else {
+      // HTML bodies get their ids assigned here, and the rail is built from
+      // exactly what was written into the markup.
+      const anchored = applyHtmlHeadingIds(postContent);
+      postContent = anchored.html;
+      toc = anchored.headings;
+    }
+    toc = toc.filter((h) => h.level === 2);
+  }
 
   const leadImage = firstImageUrl(postContent);
   const sameFile = (a: string, b: string) =>
