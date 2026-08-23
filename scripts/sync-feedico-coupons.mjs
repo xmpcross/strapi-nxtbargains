@@ -4,12 +4,13 @@
  * collection. Feedico aggregates affiliate networks (CJ, Awin, Impact,
  * Partnerize, Admitad, TradeTracker, Takeads) and returns AFFILIATE-READY links
  * scoped to your tracking IDs — so those links are stored in `affiliateUrl` and
- * used verbatim by the frontend (no GeniusLink wrap needed).
+ * used verbatim by the frontend (no affiliate wrap needed).
  *
- * Amazon is intentionally SKIPPED here — keep Amazon Associates + GeniusLink for
+ * Amazon is intentionally SKIPPED here — keep Amazon Associates for
  * Amazon (Amazon isn't served by these networks). Any coupon that arrives without
  * a tracked link is stored in `destinationUrl`, which the frontend affiliate-wraps
- * via GeniusLink as a fallback.
+ * via Amazon Associates as a fallback. (GeniusLink was retired: the account
+ * is gone and every geni.us link now answers 410.)
  *
  *   node scripts/sync-feedico-coupons.mjs [--limit=500] [--dry]
  *
@@ -62,7 +63,7 @@ const FEEDICO_NETWORK = process.env.FEEDICO_NETWORK || ''; // e.g. "impact_com"
 const STRAPI = (process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'https://cms.fxnstudio.com').replace(/\/$/, '');
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
 
-// Store names to skip (kept on Amazon Associates + GeniusLink).
+// Store names to skip (kept on Amazon Associates).
 const SKIP_STORES = /(^|\s)amazon(\s|$)/i;
 
 if (!FEEDICO_TOKEN) { console.error('FEEDICO_API_TOKEN not set in .env.local — aborting.'); process.exit(1); }
@@ -238,7 +239,7 @@ async function main() {
   }
 
   const byStore = docs.reduce((m, d) => ((m[d.store] = (m[d.store] || 0) + 1), m), {});
-  console.log(`${docs.length} to sync (Amazon skipped → kept on Associates + GeniusLink):`, byStore);
+  console.log(`${docs.length} to sync (Amazon skipped → kept on Associates):`, byStore);
 
   if (DRY) {
     console.log(JSON.stringify(docs.slice(0, 5), null, 2));

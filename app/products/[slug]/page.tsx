@@ -10,6 +10,7 @@ import {
   collectOfferRows,
   comparableProducts,
   formatMoney,
+  isGeniusLinkUrl,
   merchantName,
   numericValue,
   offerPrice,
@@ -38,7 +39,7 @@ import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
 import StoreLinkTile from '@/components/StoreLinkTile';
 import { productCanonicalPath, primaryCategorySlug } from '@/lib/product-url';
-import { clampDescription, fmtDate } from '@/lib/format';
+import { clampDescription, fmtDate, fmtDateTime } from '@/lib/format';
 import { SITE } from '@/lib/site';
 import { pageOpenGraph } from '@/lib/seo';
 import { breadcrumbJsonLd, productJsonLd } from '@/lib/jsonld';
@@ -48,7 +49,7 @@ import ReviewForm from '@/components/ReviewForm';
 import ProductSidePeek from '@/components/ProductSidePeek';
 import ProductHighlights from '@/components/ProductHighlights';
 import ProductReviewsSection from '@/components/ProductReviewsSection';
-import { localMerchantLogo } from '@/lib/merchant-logos';
+import { couponMerchantLogo, localMerchantLogo } from '@/lib/merchant-logos';
 import CommerceProductCard from '@/components/CommerceProductCard';
 import ProductCarousel from '@/components/ProductCarousel';
 
@@ -215,8 +216,13 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
     const p = join(process.cwd(), 'data', 'live-offers.json');
     if (existsSync(p)) {
       const entry = (JSON.parse(readFileSync(p, 'utf8')).items ?? {})[slug];
-      if (entry && Array.isArray(entry.offers) && entry.offers.length >= 2) {
-        liveOffers = entry.offers as LiveOffer[];
+      // Dead Geniuslinks are dropped before the 2-offer test, so a product left
+      // with a single live offer hides the section rather than showing one 410.
+      const usable = (Array.isArray(entry?.offers) ? entry.offers : []).filter(
+        (offer: LiveOffer) => offer.url && !isGeniusLinkUrl(offer.url),
+      );
+      if (usable.length >= 2) {
+        liveOffers = usable as LiveOffer[];
         liveCapturedAt = entry.capturedAt ?? null;
       }
     }
@@ -237,6 +243,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
   const shortCopy = shortDescriptionCopy(product.shortDescription);
   const discount = best ? discountPercent(best.offer) : null;
   const updatedLabel = product.updatedAt ? fmtDate(product.updatedAt) : 'Today';
+  const updatedAtLabel = product.updatedAt ? fmtDateTime(product.updatedAt) : '';
   const canonicalPath = productCanonicalPath(product);
   const reviewCount = reviews.length;
   const averageRating =
@@ -412,15 +419,15 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                   <aside className="self-center p-5 sm:p-7">
                     {rows.length > 0 ? (
                       <div className="product-offer-list rounded-[10px] border border-[#e5e7eb] bg-white p-5">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink/45">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink/45">
                           Lowest price
                         </p>
-                        <p className="mt-1 font-display text-[2.35rem] font-bold leading-none tracking-tight text-ink">
+                        <p className="mt-1.5 font-display text-[2.6rem] font-bold leading-none tracking-tight text-ink">
                           {best
                             ? formatMoney(best.offer.price ?? best.offer.originalPrice, best.offer.currency ?? 'USD')
                             : 'Check price'}
                         </p>
-                        <p className="mt-2 text-[13px] text-ink/50">
+                        <p className="mt-2 text-[13px] text-ink/55">
                           {best ? `at ${merchantName(best.offer)} · ` : ''}
                           {rows.length} retailer{rows.length === 1 ? '' : 's'} compared
                         </p>
@@ -447,7 +454,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                         ) : null}
 
                         <p className="mt-4 text-[12px] text-ink/45">
-                          Last price update was: {updatedLabel}
+                          Last price update was: {updatedAtLabel || updatedLabel}
                         </p>
 
                         {best ? (
@@ -461,7 +468,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                           </a>
                         ) : null}
 
-                        <p className="mt-4 text-center text-[12px] leading-5 text-[#5b7bb5]">
+                        <p className="mt-4 text-center text-[12px] leading-5 text-ink/45">
                           We may earn a commission from links on this page, at no extra cost to you.
                         </p>
                       </div>
@@ -996,27 +1003,31 @@ function PriceHistoryChart({ points }: { points: PriceHistoryPoint[] }) {
 
 function CompactOfferRow({ row, className = '' }: { row: CommerceOfferRow; className?: string }) {
   const { offer, product } = row;
-  // Strapi media first; a committed local file otherwise. Merchants discovered
-  // via Google Shopping sellers have no uploaded logo, so without the fallback
+  // Curated SVG, then an uploaded Strapi logo, then the merchant's favicon —
+  // the same marks the Coupons store tiles show. Merchants discovered via
+  // Google Shopping sellers have no uploaded logo, so without the favicon leg
   // the price table shows a column of grey initials.
-  const logo = mediaUrl(offer.merchant?.logo ?? null) ?? localMerchantLogo(merchantName(offer));
+  const logo =
+    couponMerchantLogo(merchantName(offer), offerUrl(offer))
+    ?? mediaUrl(offer.merchant?.logo ?? null)
+    ?? localMerchantLogo(merchantName(offer));
   const price = offer.price ?? offer.originalPrice;
   const unavailable = offer.availability === 'out_of_stock';
 
   return (
-    <div className={`product-offer-row flex items-center gap-3 rounded-[8px] bg-[#f5f6f7] p-2.5 text-sm ${className}`}>
-      {/* The logo sits on its own white tile, as in the reference: merchant
-          marks are drawn for a white ground and lose contrast on the grey. */}
+    <div className={`product-offer-row flex items-center gap-3 rounded-[8px] bg-[#f2f3f5] px-3 py-3 text-sm ${className}`}>
+      {/* The reference sets the merchant mark straight on the grey rather than
+          on a white chip, so the row reads as one block. */}
       <a
         href={buyUrl(offer, product)}
         target="_blank"
         rel="nofollow sponsored noopener noreferrer"
         aria-label={merchantName(offer)}
-        className="flex h-9 w-[92px] shrink-0 items-center justify-center rounded-[6px] bg-white px-2"
+        className="flex h-8 w-[86px] shrink-0 items-center justify-start"
       >
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt={`${merchantName(offer)} logo`} className="max-h-6 max-w-full object-contain" />
+          <img src={logo} alt={`${merchantName(offer)} logo`} className="max-h-7 max-w-full object-contain object-left" />
         ) : (
           <span className="truncate text-[11px] font-bold text-ink/60">{merchantName(offer)}</span>
         )}
@@ -1032,7 +1043,7 @@ function CompactOfferRow({ row, className = '' }: { row: CommerceOfferRow; class
         target="_blank"
         rel="nofollow sponsored noopener noreferrer"
         aria-label={`See offer for ${offer.title || product.name} at ${merchantName(offer)}`}
-        className="shrink-0 rounded-[6px] bg-[#fdeced] px-3.5 py-2 text-[13px] font-semibold text-[#c9636b] transition hover:bg-[#fbdcde]"
+        className="shrink-0 rounded-[6px] bg-[#118757] px-4 py-2 text-[13px] font-semibold text-white transition hover:bg-[#0d6f47]"
       >
         View
       </a>
@@ -1065,7 +1076,10 @@ function SavedPriceComparison({ rows }: { rows: CommerceOfferRow[] }) {
 
 function SavedPriceRow({ row, best }: { row: CommerceOfferRow; best: boolean }) {
   const { offer, product } = row;
-  const logo = mediaUrl(offer.merchant?.logo ?? null);
+  const logo =
+    couponMerchantLogo(merchantName(offer), offerUrl(offer))
+    ?? mediaUrl(offer.merchant?.logo ?? null)
+    ?? localMerchantLogo(merchantName(offer));
   const price = offerPrice(offer);
   const updated = offer.lastCheckedAt || product.updatedAt;
   const unavailable = offer.availability === 'out_of_stock';

@@ -25,7 +25,7 @@
 // same shape as data/impact-links.json.
 //
 // Existing affiliate links are never sent. A URL that already points at Impact,
-// Amazon with our tag, geni.us or any other network is skipped, because
+// Amazon with our tag or any other network is skipped, because
 // re-affiliating someone else's link is how attribution disputes start.
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -69,7 +69,6 @@ const ALREADY_AFFILIATED = [
   'tatrck.com',                      // Takeads' own tracking domain — a link we
                                      // already converted must never be sent back
                                      // through the converter and wrapped twice
-  'geni.us', 'buy.geni.us',          // Geniuslink (client-side, Amazon)
   'goto.walmart.com', 'linksynergy.com', 'go.skimresources.com',
   'prf.hn', 'imp.i',                  // Impact deep links
   'ebay.com/ulk',                     // eBay EPN

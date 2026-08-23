@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import DealProductCard from '@/components/DealProductCard';
 import { SITE } from '@/lib/site';
-import { bestOffer, collectOfferRows, numericValue, offerPrice, type CommerceOfferRow } from '@/lib/commerce';
+import { bestOffer, collectOfferRows, isGeniusLinkUrl, numericValue, offerPrice, type CommerceOfferRow } from '@/lib/commerce';
 import { monetizeUrl } from '@/lib/coupon-data';
 import { listCommerceProductsForDeals, type CommerceProduct } from '@/lib/strapi';
 import { collectionPageJsonLd } from '@/lib/jsonld';
@@ -364,7 +364,8 @@ function merchantDealUrl(store: string, title: string, fallback: string): string
   // Unknown single-word merchant: guess its .com; else keep the original link.
   const slug = store.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
   if (slug && !/\s/.test(store.trim())) return `https://www.${slug}.com/`;
-  return fallback;
+  // Keeping a dead Geniuslink here would ship a 410 as the deal's only link.
+  return isGeniusLinkUrl(fallback) ? '' : fallback;
 }
 
 async function loadRealTimeBestDeals() {
@@ -382,6 +383,9 @@ async function loadRealTimeBestDeals() {
     const monetized: RealTimeBestDeal[] = [];
     for (const item of items) {
       const merchantUrl = merchantDealUrl(item.store, item.title, item.url);
+      // merchantDealUrl returns '' when all it had was a dead Geniuslink and
+      // the store is not one we can build a search URL for.
+      if (!merchantUrl) continue;
       monetized.push({ ...item, url: await monetizeUrl(merchantUrl) });
     }
     return {

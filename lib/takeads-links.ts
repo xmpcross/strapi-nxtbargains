@@ -38,7 +38,6 @@ const ALREADY_AFFILIATED = [
   // Takeads' own domain: a stale cache entry pointing at an already-converted
   // link must not be substituted a second time.
   'tatrck.com',
-  'geni.us',
   'goto.walmart.com',
   'linksynergy.com',
   'prf.hn',

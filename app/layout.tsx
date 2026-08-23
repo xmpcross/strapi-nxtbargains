@@ -115,6 +115,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
           <ClientErrorReporter />
         </CookieConsentProvider>
+        {/*
+          ConvertLink — auto-affiliates outbound merchant links. Sovrn's install
+          instructions place it immediately before </body>, so it is the last
+          child of <body> rather than a <head> tag.
+
+          Left as a plain <script src> on purpose: React 19 hoists `async`
+          scripts into <head>, which would move it away from the position the
+          installer asks for. Note it still appears a second time inside the RSC
+          hydration payload (self.__next_f.push) — the browser executes it once,
+          but a verifier that text-scans the page will see two copies.
+        */}
+        <script src="https://convertlink.com/script/c53c3d88-ffa9-4d6e-a38b-3e7dc149b38d/bundle.js" />
       </body>
     </html>
   );

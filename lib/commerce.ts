@@ -5,6 +5,25 @@ export type CommerceOfferRow = {
   product: CommerceProduct;
 };
 
+/**
+ * A Geniuslink short link.
+ *
+ * The Geniuslink account behind these is gone — every geni.us link in the
+ * cached feeds now answers HTTP 410, so they are dead outbound links that earn
+ * nothing. The destination cannot be recovered from the short code either (410
+ * carries no redirect), so callers substitute a merchant search URL where they
+ * can derive one and drop the entry where they cannot.
+ */
+export function isGeniusLinkUrl(url?: string | null): boolean {
+  if (!url) return false;
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return host === 'geni.us' || host.endsWith('.geni.us');
+  } catch {
+    return false;
+  }
+}
+
 export function numericValue(value?: number | string | null): number | null {
   if (value === null || value === undefined || value === '') return null;
   const parsed = typeof value === 'number' ? value : Number(value);
