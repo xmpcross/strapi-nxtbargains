@@ -27,6 +27,7 @@ export default function ReadNext({ posts }: { posts: NxtPost[] }) {
             const href = postPath(post);
             const summary = post.excerpt?.trim() || stripHtml(post.content ?? '').slice(0, 160);
             const author = post.author?.name ?? SITE.name;
+            const avatar = mediaUrl(post.author?.avatar ?? null);
 
             return (
               <li key={post.id} className="read-next-card">
@@ -63,9 +64,14 @@ export default function ReadNext({ posts }: { posts: NxtPost[] }) {
 
                   <div className="read-next-foot">
                     <span className="read-next-author">
-                      <span className="read-next-avatar" aria-hidden>
-                        {author.charAt(0)}
-                      </span>
+                      {avatar ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img className="read-next-avatar" src={avatar} alt="" loading="lazy" width={26} height={26} />
+                      ) : (
+                        <span className="read-next-avatar" aria-hidden>
+                          {author.charAt(0)}
+                        </span>
+                      )}
                       {author}
                     </span>
                     <time dateTime={post.publishedAt}>

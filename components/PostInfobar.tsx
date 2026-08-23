@@ -9,12 +9,15 @@ import CopyLinkButton from '@/components/CopyLinkButton';
  */
 export default function PostInfobar({
   authorName,
+  authorAvatar,
   publishedAt,
   commentCount,
   shareUrl,
   shareTitle,
 }: {
   authorName: string;
+  /** Author photo. Falls back to the initial when there is none. */
+  authorAvatar?: string | null;
   publishedAt: string;
   commentCount: number;
   shareUrl: string;
@@ -24,9 +27,14 @@ export default function PostInfobar({
     <div className="recap-infobar">
       <div className="recap-header-meta">
         <span className="recap-author">
-          <span className="recap-avatar" aria-hidden>
-            {authorName.charAt(0)}
-          </span>
+          {authorAvatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="recap-avatar" src={authorAvatar} alt="" loading="lazy" width={26} height={26} />
+          ) : (
+            <span className="recap-avatar" aria-hidden>
+              {authorName.charAt(0)}
+            </span>
+          )}
           <span className="recap-author-name">{authorName}</span>
         </span>
         <span className="recap-meta-line">

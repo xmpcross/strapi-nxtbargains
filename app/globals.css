@@ -3906,7 +3906,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   flex-direction: column;
   overflow: hidden;
   border-radius: 12px;
-  background: #ffffff;
+  background: #f8f8f8;
 }
 
 .read-next-media {
@@ -4262,3 +4262,11 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 }
 
 .comments-empty + .comment-collapse { margin-top: 1.5rem; }
+
+/* Avatar as a photo rather than an initial. Same box either way, so the row
+   does not shift when a post has an author without a picture. */
+img.recap-avatar,
+img.read-next-avatar {
+  object-fit: cover;
+  background: #ebedf5;
+}

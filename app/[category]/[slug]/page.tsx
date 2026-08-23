@@ -15,7 +15,7 @@ import PostPriceComparison from '@/components/PostPriceComparison';
 import CommentForm from '@/components/CommentForm';
 import ProductCarousel from '@/components/ProductCarousel';
 import PostMetabar from '@/components/PostMetabar';
-import { applyHtmlHeadingIds, extractHeadings, isMarkdownContent, splitHtmlAtSection } from '@/lib/post-headings';
+import { applyHtmlHeadingIds, extractHeadings, isMarkdownContent, splitBodyAtSection } from '@/lib/post-headings';
 import ReadAlso from '@/components/ReadAlso';
 import RelatedPosts from '@/components/RelatedPosts';
 import QuestionsAnswered from '@/components/QuestionsAnswered';
@@ -373,7 +373,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     readAlsoPosts.length > 0 ? (
       <ReadAlso items={readAlsoPosts.map((rp, i) => ({ post: rp, commentCount: readAlsoCounts[i] ?? 0 }))} />
     ) : null;
-  const htmlSplit = readAlso && !isMarkdownContent(postContent) ? splitHtmlAtSection(postContent) : null;
+  // Same treatment for both source shapes now, so Markdown posts get the card
+  // in the same place HTML ones do.
+  const bodySplit = readAlso ? splitBodyAtSection(postContent) : null;
 
   return (
     <article
@@ -456,6 +458,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
             <PostInfobar
               authorName={post.author?.name ?? SITE.name}
+              authorAvatar={mediaUrl(post.author?.avatar ?? null)}
               publishedAt={post.publishedAt}
               commentCount={comments.length}
               shareUrl={`${SITE.url}/${category}/${post.slug}`}
@@ -469,6 +472,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             <div className="post-content bestseller-card-full" dangerouslySetInnerHTML={{ __html: bestSellerCard }} />
             <PostInfobar
               authorName={post.author?.name ?? SITE.name}
+              authorAvatar={mediaUrl(post.author?.avatar ?? null)}
               publishedAt={post.publishedAt}
               commentCount={comments.length}
               shareUrl={`${SITE.url}/${category}/${post.slug}`}
@@ -496,22 +500,18 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
           <div className="w-full" id="post-article-body" data-testid="post-body">
             <KeyTakeaways content={post.keyTakeaways} />
-            {readAlso && htmlSplit ? (
-              // HTML body: rendered as two blocks with the card between them.
-              // PostContent can only splice a node into its Markdown path, and
-              // most of this catalogue is HTML — this is why Read Also had
-              // never appeared outside the Markdown posts.
+            {readAlso && bodySplit ? (
               <>
-                <PostContent html={htmlSplit[0]} />
+                <PostContent html={bodySplit[0]} />
                 {readAlso}
-                <PostContent html={htmlSplit[1]} />
+                <PostContent html={bodySplit[1]} />
               </>
             ) : (
-              <PostContent html={postContent} midBlock={readAlso ?? undefined} />
+              <PostContent html={postContent} />
             )}
-            {/* No safe split point in this body — the card goes after it
-                rather than being wedged into broken markup. */}
-            {readAlso && !htmlSplit && !isMarkdownContent(postContent) ? readAlso : null}
+            {/* No safe split point in this body — the card follows it rather
+                than being wedged into broken markup. */}
+            {readAlso && !bodySplit ? readAlso : null}
 
             {stepsAreAuthored && useHowTo ? (
               <section className="mt-10" data-testid="howto-steps" aria-labelledby="howto-heading">
@@ -540,18 +540,6 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
             <PostPriceComparison post={post} />
 
-            <div
-              className={`mt-14 flex-wrap items-center gap-x-4 gap-y-2 border-t border-ink/10 pt-8 text-xs font-semibold uppercase tracking-[0.12em] text-ink/45 ${
-                isRecapLayout ? 'hidden' : 'flex'
-              }`}
-            >
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink/10 text-ink/40">
-                {(post.author?.name ?? SITE.name).charAt(0)}
-              </span>
-              <span>By {post.author?.name ?? SITE.name}</span>
-              <span>{fmtDate(post.publishedAt)}</span>
-              {post.readingTimeMinutes && <span>{post.readingTimeMinutes} min read</span>}
-            </div>
 
             <div className="mt-8 border-y border-ink/10 py-8 text-sm leading-7 text-ink/60">
               <strong className="text-ink">Affiliate disclosure.</strong> {SITE.name} earns a

@@ -147,22 +147,50 @@ export function applyHtmlHeadingIds(html: string): { html: string; headings: Pos
 }
 
 /**
- * Split an HTML body in two at a section break, for inserting a block midway.
+ * Split a post body in two at a section break, for inserting a block midway.
  *
- * Splits before the second top-level heading, so the insert lands between
- * sections rather than inside a paragraph run. "Top-level" is checked by
- * counting div/section/aside tags before the candidate: if any are still open
- * there, the heading is nested inside a card or wrapper and cutting at that
- * point would produce two fragments of broken markup, so the split is refused.
+ * Handles both source shapes. The split point prefers a heading about
+ * alternatives — "Alternatives Worth Comparing" and its variants appear in 32
+ * of the posts here, and it is the natural place for a "read also" card, right
+ * before the reader is sent off to compare other products. Failing that it
+ * falls back to the second heading, so the card lands on a section break rather
+ * than inside a paragraph run.
+ *
+ * For HTML, "top-level" is checked by counting container tags before the
+ * candidate: if any are still open there, the heading is nested inside a card
+ * or wrapper and cutting at that point would produce two fragments of broken
+ * markup, so that candidate is skipped.
  *
  * Returns null when there is no safe point — callers should fall back to
  * appending rather than forcing an insert.
  */
-export function splitHtmlAtSection(html: string): [string, string] | null {
-  const text = String(html || '');
-  if (!text.trim()) return null;
+const PREFERRED_SPLIT = /alternativ/i;
 
-  const headings = [...text.matchAll(/<h[23]\b[^>]*>/gi)].map((m) => m.index ?? -1).filter((i) => i >= 0);
+export function splitBodyAtSection(source: string): [string, string] | null {
+  const text = String(source || '');
+  if (!text.trim()) return null;
+  return isMarkdown(text) ? splitMarkdown(text) : splitHtml(text);
+}
+
+function splitMarkdown(text: string): [string, string] | null {
+  const lines = text.replace(/\r\n/g, '\n').split('\n');
+  const headings: number[] = [];
+  lines.forEach((line, i) => {
+    if (/^\s{0,3}#{1,6}\s+\S/.test(line)) headings.push(i);
+  });
+  if (headings.length < 3) return null;
+
+  const preferred = headings.find((i) => PREFERRED_SPLIT.test(lines[i]));
+  const at = preferred ?? headings[1];
+  if (at === headings[0]) return null;
+
+  return [lines.slice(0, at).join('\n'), lines.slice(at).join('\n')];
+}
+
+function splitHtml(text: string): [string, string] | null {
+  const headings = [...text.matchAll(/<h[23]\b[^>]*>([\s\S]*?)<\/h[23]>/gi)]
+    .map((m) => ({ at: m.index ?? -1, text: m[1] }))
+    .filter((h) => h.at >= 0);
   if (headings.length < 3) return null;
 
   const balanced = (upTo: number) => {
@@ -175,9 +203,10 @@ export function splitHtmlAtSection(html: string): [string, string] | null {
     return true;
   };
 
-  // Prefer the second heading; walk forward if it is nested.
-  for (const at of headings.slice(1, -1)) {
-    if (balanced(at)) return [text.slice(0, at), text.slice(at)];
+  const candidates = headings.slice(1, -1);
+  const preferred = candidates.filter((h) => PREFERRED_SPLIT.test(h.text));
+  for (const h of [...preferred, ...candidates]) {
+    if (balanced(h.at)) return [text.slice(0, h.at), text.slice(h.at)];
   }
   return null;
 }
