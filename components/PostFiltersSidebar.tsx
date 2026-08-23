@@ -17,30 +17,46 @@ import Link from 'next/link';
 export type PostFilterOption = { label: string; value: string; count: number };
 export type PostFilters = { q: string; category: string; type: string };
 
-const SECTION_LABEL = 'mb-2 block text-xs font-bold uppercase tracking-[0.14em] text-ink/55';
 
-function FilterRow({
+/**
+ * Emoji per category. Strapi's nxt-category has an `icon` field but none of the
+ * nine categories set one, so the mapping lives here rather than the rail going
+ * without. Anything unmapped simply renders no icon.
+ */
+const CATEGORY_ICON: Record<string, string> = {
+  'best-sellers-articles': '\u{1F525}',
+  'buying-guides': '\u{1F6D2}',
+  'how-to-guides': '\u{1F6E0}\uFE0F',
+  'nxt-bargains-informative-articles': '\u{1F4D8}',
+  'product-comparisons': '\u2696\uFE0F',
+  'product-reviews': '\u2B50',
+  'product-roundups': '\u{1F4E6}',
+  'smart-home': '\u{1F3E0}',
+  'top-rated-smart-electronics-devices': '\u{1F3C6}',
+};
+
+function CategoryRow({
   href,
   label,
   count,
   active,
+  icon,
 }: {
   href: string;
   label: string;
   count?: number;
   active: boolean;
+  icon?: string;
 }) {
   return (
-    <Link
-      href={href}
-      className={`flex w-full items-center justify-between gap-2 border-b border-ink/8 px-3 py-2 text-sm transition last:border-b-0 ${
-        active ? 'bg-primary font-bold text-white' : 'font-medium text-ink/75 hover:bg-primary/5 hover:text-primary'
-      }`}
-    >
-      <span className="truncate">{label}</span>
-      {count !== undefined ? (
-        <span className={`shrink-0 text-xs ${active ? 'text-white/75' : 'text-ink/45'}`}>{count}</span>
+    <Link href={href} className={`browse-cat${active ? ' is-active' : ''}`}>
+      {icon ? (
+        <span className="browse-cat-icon" aria-hidden>
+          {icon}
+        </span>
       ) : null}
+      <span className="browse-cat-label">{label}</span>
+      {count !== undefined ? <span className="browse-cat-count">{count}</span> : null}
     </Link>
   );
 }
@@ -65,68 +81,36 @@ export default function PostFiltersSidebar({
   className?: string;
 }) {
   const hrefFor = (patch: Partial<PostFilters>) => `/all-posts${postPageQuery({ ...filters, ...patch })}`;
-  const activeCount = [filters.q, filters.category, filters.type].filter(Boolean).length;
 
   return (
-    <aside
-      className={`border border-ink/10 bg-white p-5 shadow-[0_18px_44px_-34px_rgba(13,27,42,0.28)] lg:sticky lg:top-28 ${className}`}
-      aria-label="Article filters"
-    >
-      <div className="flex items-center justify-between gap-3 border-b border-ink/10 pb-3">
-        {/* Size pinned so surrounding typography rules cannot re-scale it,
-            matching Filter Products on the catalogue sidebar. */}
-        <h2 className="!text-[1rem] font-bold uppercase tracking-[0.2em] text-ink">Filter Articles</h2>
-        {activeCount > 0 ? (
-          <Link href="/all-posts" className="text-xs font-bold text-primary hover:underline">
-            Reset All
-          </Link>
-        ) : (
-          <span className="text-xs font-semibold text-ink/45">{totalItems} articles</span>
-        )}
+    <aside className={`browse-cats ${className}`} aria-label="Article categories">
+      <div className="browse-cats-head">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M6 2h11l-2.5 4.5L17 11H8v11H6z" />
+        </svg>
+        Browse by category
       </div>
 
-      <form action="/all-posts" className="mt-5 grid gap-5">
-        {/* Preserve the other filters when the keyword form is submitted. */}
-        {filters.category ? <input type="hidden" name="category" value={filters.category} /> : null}
-        {filters.type ? <input type="hidden" name="type" value={filters.type} /> : null}
-
-        <div>
-          <label htmlFor="post-filter-search" className={SECTION_LABEL}>Search Articles</label>
-          <input
-            id="post-filter-search"
-            name="q"
-            defaultValue={filters.q}
-            placeholder="Search articles"
-            className="min-h-10 w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink outline-none transition placeholder:text-ink/35 focus:border-primary"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="min-h-10 bg-ink px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary"
-        >
-          Apply
-        </button>
-      </form>
-
       {categories.length > 0 ? (
-        <div className="mt-6 border-t border-ink/10 pt-5">
-          <p className={SECTION_LABEL}>Categories</p>
-          <nav aria-label="Article categories" className="max-h-72 overflow-y-auto border border-ink/10">
-            <FilterRow href={hrefFor({ category: '' })} label="All Categories" count={totalItems} active={!filters.category} />
-            {categories.map((c) => (
-              <FilterRow
-                key={c.value}
-                href={hrefFor({ category: c.value })}
-                label={c.label}
-                count={c.count}
-                active={filters.category === c.value}
-              />
-            ))}
-          </nav>
-        </div>
+        <nav className="browse-cats-list" aria-label="Article categories">
+          <CategoryRow
+            href={hrefFor({ category: '' })}
+            label="All articles"
+            count={totalItems}
+            active={!filters.category}
+          />
+          {categories.map((c) => (
+            <CategoryRow
+              key={c.value}
+              href={hrefFor({ category: c.value })}
+              label={c.label}
+              count={c.count}
+              active={filters.category === c.value}
+              icon={CATEGORY_ICON[c.value]}
+            />
+          ))}
+        </nav>
       ) : null}
-
     </aside>
   );
 }

@@ -4299,3 +4299,100 @@ img.read-next-avatar {
 /* Lead block lifted above the columns (the Content Egg offers grid). Runs the
    full container width; the columned layout starts under it. */
 .post-lead-block { margin-top: 2rem; }
+
+/* ── Browse by category rail (/all-posts) ─────────────────────────────────
+   Card with a titled header, then one row per category: icon, label, and a
+   count badge. The active row is a filled pill.
+
+   Class names avoid the substring "border" — the global rule near the top of
+   this file strips borders from any aside or a whose class contains it, with
+   !important. The previous version of this card used Tailwind's `border
+   border-ink/10` and had therefore been rendering with no edge at all. */
+.browse-cats {
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .browse-cats { position: sticky; top: 7rem; }
+}
+
+.browse-cats-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #ececec;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: #161616;
+}
+
+.browse-cats-head svg { flex: none; color: #161616; }
+
+.browse-cats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-top: 0.85rem;
+}
+
+.browse-cat {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #161616;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.browse-cat:hover { background: #f4f5f8; }
+
+.browse-cat-icon {
+  flex: none;
+  width: 1.15rem;
+  font-size: 0.95rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.browse-cat-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.browse-cat-count {
+  flex: none;
+  min-width: 1.6rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  background: #f1f2f4;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(13, 27, 42, 0.55);
+  text-align: center;
+}
+
+/* Active row: filled indigo pill, as the reference shows. */
+.browse-cat.is-active {
+  background: #5b55e0;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.browse-cat.is-active:hover { background: #514bd4; }
+
+.browse-cat.is-active .browse-cat-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
