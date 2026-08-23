@@ -537,6 +537,10 @@ function ProductInfoTabs({
   // specs of its own, so the generic list stands in whenever GSMArena is absent.
   const useGsmarenaSpecsInSpecifications =
     productHasCategory(product, 'Smart Phones') && gsmarenaSpecGroups.length > 0;
+  const heroImage = mediaUrl(product.primaryImage ?? null);
+  const galleryImages = (product.gallery ?? [])
+    .map((img) => mediaUrl(img))
+    .filter((url): url is string => Boolean(url) && url !== heroImage);
   const detailBullets = descriptionBullets(description);
   const additionalInfoEntries = productAdditionalInfoEntries(product);
   const specEntries = useGsmarenaSpecsInSpecifications ? [] : productSpecificationEntries(specs);
@@ -575,6 +579,9 @@ function ProductInfoTabs({
               panels={[
                 { id: 'specifications', label: 'Specifications', content: (
                   <>
+                {/* Product photography leads the panel: the imported gallery is
+                    more use at a glance than the first ten spec rows. */}
+                <ProductGallery images={galleryImages} name={productName} />
                 {useGsmarenaSpecsInSpecifications ? (
                   <GsmarenaSpecGroups groups={gsmarenaSpecGroups} />
                 ) : specEntries.length ? (
@@ -656,6 +663,34 @@ type PriceHistoryEntry = {
   checkedAt: string;
   merchantName?: string;
 };
+
+/**
+ * Imported product photography, shown above the specification table.
+ *
+ * Files are served from our own media library rather than hotlinked, so they
+ * survive Amazon rotating its CDN URLs. The featured image is filtered out by
+ * the caller — it is already the main product shot at the top of the page.
+ */
+function ProductGallery({ images, name }: { images: string[]; name: string }) {
+  if (!images.length) return null;
+
+  return (
+    <div className="product-gallery-grid mb-6">
+      {images.map((src, index) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={src}
+          src={src}
+          alt={`${name} — image ${index + 2}`}
+          loading="lazy"
+          width={800}
+          height={800}
+          className="product-gallery-image"
+        />
+      ))}
+    </div>
+  );
+}
 
 function KeySpecsList({ entries, className = 'mt-5' }: { entries: SpecificationEntry[]; className?: string }) {
   return (
@@ -1073,6 +1108,13 @@ const PRODUCT_IDENTIFIER_FIELDS = [
 ] as const;
 
 const HIDDEN_SPEC_KEYS = new Set([
+  // Leaked out of Amazon's A+ media blocks when product_information was
+  // flattened. `alt` is worse than noise — on the Galaxy A17 it read
+  // "Galaxy S26 Ultra" — and `gallery` is a list of image URLs, not a spec.
+  'alt',
+  'url',
+  'gallery',
+  'amazonAsin',
   'technicalSpecs',
   'features',
   'Features',

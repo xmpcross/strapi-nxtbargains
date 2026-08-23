@@ -1976,6 +1976,24 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 /* The generic catalogue-card border would double up on this one. */
 .product-category-grid > article.category-card { border-radius: 10px; }
 
+/* ------------------------------------------------------- product gallery --
+   Imported photography above the spec table in the Specifications peek. */
+.product-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.product-gallery-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 0.35rem;
+}
+
 /* ------------------------------------------------------- product imagery --
    Every product image renders in the same 800x800 square, whatever the source
    file is. `contain` letterboxes rather than crops, so a wide TV and a tall
