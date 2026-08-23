@@ -1141,6 +1141,16 @@ main[data-testid^="product-price-"] .product-main-image {
   filter: contrast(1.02);
 }
 
+/* The price widget carried Tailwind border utilities, which the global
+   borderless treatment strips from a div whose class list contains "border" —
+   so it had no edge at all. Declared here with a soft lift. */
+main[data-testid^="product-price-"] .product-offer-list {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(13 27 42 / 0.05), 0 10px 28px -20px rgb(13 27 42 / 0.28);
+}
+
 main[data-testid^="product-price-"] .product-offer-list .product-offer-row-extra {
   display: none;
 }
