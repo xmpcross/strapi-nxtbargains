@@ -572,6 +572,9 @@ function ProductInfoTabs({
                     {`Compare current prices for ${productName} across trusted merchants.`}
                   </p>
                 )}
+
+                {/* Photography closes the section, after the written detail. */}
+                <ProductGallery images={galleryImages} name={productName} />
               </div>
             </details>
 
@@ -579,9 +582,6 @@ function ProductInfoTabs({
               panels={[
                 { id: 'specifications', label: 'Specifications', content: (
                   <>
-                {/* Product photography leads the panel: the imported gallery is
-                    more use at a glance than the first ten spec rows. */}
-                <ProductGallery images={galleryImages} name={productName} />
                 {useGsmarenaSpecsInSpecifications ? (
                   <GsmarenaSpecGroups groups={gsmarenaSpecGroups} />
                 ) : specEntries.length ? (
@@ -665,29 +665,36 @@ type PriceHistoryEntry = {
 };
 
 /**
- * Imported product photography, shown above the specification table.
+ * Imported product photography, shown at the end of the Product details panel.
  *
  * Files are served from our own media library rather than hotlinked, so they
  * survive Amazon rotating its CDN URLs. The featured image is filtered out by
  * the caller — it is already the main product shot at the top of the page.
+ *
+ * Reuses the carousel the related-products strip runs on rather than a second
+ * implementation: three across, auto-advancing, pausing on hover.
  */
 function ProductGallery({ images, name }: { images: string[]; name: string }) {
   if (!images.length) return null;
 
   return (
-    <div className="product-gallery-grid mb-6">
-      {images.map((src, index) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={src}
-          src={src}
-          alt={`${name} — image ${index + 2}`}
-          loading="lazy"
-          width={800}
-          height={800}
-          className="product-gallery-image"
-        />
-      ))}
+    <div className="mt-6">
+      <ProductCarousel
+        perView={3}
+        interval={4000}
+        items={images.map((src, index) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={src}
+            src={src}
+            alt={`${name} — image ${index + 2}`}
+            loading="lazy"
+            width={800}
+            height={800}
+            className="product-gallery-image"
+          />
+        ))}
+      />
     </div>
   );
 }

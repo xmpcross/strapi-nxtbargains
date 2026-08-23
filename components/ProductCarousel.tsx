@@ -40,10 +40,13 @@ export default function ProductCarousel({
 
   if (!items.length) return null;
 
+  // gap-5 is 1.25rem, so n across leaves (n-1) gaps to subtract.
   const desktopBasis =
     perView === 6
       ? 'lg:basis-[calc((100%_-_6.25rem)/6)]'
-      : 'lg:basis-[calc((100%_-_5rem)/5)]';
+      : perView === 3
+        ? 'lg:basis-[calc((100%_-_2.5rem)/3)]'
+        : 'lg:basis-[calc((100%_-_5rem)/5)]';
 
   return (
     <div

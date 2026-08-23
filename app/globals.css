@@ -1977,13 +1977,8 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 .product-category-grid > article.category-card { border-radius: 10px; }
 
 /* ------------------------------------------------------- product gallery --
-   Imported photography above the spec table in the Specifications peek. */
-.product-gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.5rem;
-}
-
+   Imported photography closing the Product details panel. Layout comes from
+   ProductCarousel; only the tile treatment lives here. */
 .product-gallery-image {
   width: 100%;
   aspect-ratio: 1 / 1;
