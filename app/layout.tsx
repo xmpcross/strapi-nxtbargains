@@ -127,6 +127,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           but a verifier that text-scans the page will see two copies.
         */}
         <script src="https://convertlink.com/script/c53c3d88-ffa9-4d6e-a38b-3e7dc149b38d/bundle.js" />
+        {/*
+          Skimlinks — the second auto-affiliate layer, alongside ConvertLink
+          above. Same placement rule and the same reason: Skimlinks' installer
+          asks for it immediately before </body>, and leaving off `async` keeps
+          React 19 from hoisting it into <head>.
+        */}
+        <script
+          type="text/javascript"
+          src="https://s.skimresources.com/js/308034X1796330.skimlinks.js"
+        />
       </body>
     </html>
   );
