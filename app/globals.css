@@ -4309,10 +4309,10 @@ img.read-next-avatar {
    !important. The previous version of this card used Tailwind's `border
    border-ink/10` and had therefore been rendering with no edge at all. */
 .browse-cats {
-  border: 1px solid #e6e6e6;
+  border: 0;
   border-radius: 10px;
   background: #ffffff;
-  padding: 1rem;
+  padding: 1rem 1rem 1rem 0;
 }
 
 @media (min-width: 1024px) {
@@ -4395,4 +4395,24 @@ img.read-next-avatar {
 .browse-cat.is-active .browse-cat-count {
   background: rgba(255, 255, 255, 0.22);
   color: #ffffff;
+}
+
+/* Article tile card (/all-posts and the category listings). Class name avoids
+   the substring "border" so the global borderless rule leaves the edge alone —
+   it strips borders from any article whose class contains it. */
+.post-tile {
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0.85rem 0.85rem 1.15rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.post-tile:hover {
+  border-color: #d4d7de;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.0588);
+}
+
+.post-tile-media {
+  border-radius: 8px;
 }

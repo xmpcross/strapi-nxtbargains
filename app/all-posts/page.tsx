@@ -79,7 +79,6 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
     numberOfItems: total,
   });
 
-  const featuredCategories = categories.slice(0, 10);
 
   return (
     <main data-testid="posts-page">
@@ -92,26 +91,6 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
         page={page}
         pageCount={pageCount}
       />
-
-      {featuredCategories.length > 0 ? (
-        <section className="border-b border-ink/10 bg-white py-5" data-testid="posts-category-strip">
-          <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="mr-1 text-xs font-bold uppercase tracking-[0.14em] text-ink/45">Browse:</span>
-              {featuredCategories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/${category.slug}`}
-                  className="inline-flex border border-ink/10 bg-[#f0f2f4] px-3 py-1.5 text-xs font-bold text-ink/65 transition hover:border-primary hover:text-primary"
-                  data-testid={`posts-category-${category.slug}`}
-                >
-                  {category.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       <section className="bg-white py-10 sm:py-12" id="articles">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
