@@ -2659,13 +2659,16 @@ select.filter-field { background: #ffffff; font-weight: 500; }
    almost-white base, so the title reads as page furniture rather than a
    banner competing with the content beneath it.
 
-   Note the class name avoids the substring "border" — the global rule at the
-   top of this file strips borders from any section whose class contains it,
-   with !important, and would take the bottom rule with it. */
+   The hero runs edge to edge with no bottom rule; the gradient resolving to
+   #ffffff is what hands off to the white page body.
+
+   Keep the substring "border" out of this class name if a border is ever added
+   back — the global rule at the top of this file strips borders from any
+   section whose class contains it, with !important. */
 .page-hero {
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid rgba(13, 27, 42, 0.09);
+  border-bottom: 0;
   background:
     radial-gradient(at 85% 0%, rgba(0, 70, 190, 0.10) 0%, transparent 58%),
     radial-gradient(at 8% 10%, rgba(255, 224, 0, 0.16) 0%, transparent 55%),
