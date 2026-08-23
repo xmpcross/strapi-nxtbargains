@@ -56,13 +56,11 @@ export function postPageQuery(filters: Partial<PostFilters>, page?: number) {
 export default function PostFiltersSidebar({
   filters,
   categories,
-  types,
   totalItems,
   className = '',
 }: {
   filters: PostFilters;
   categories: PostFilterOption[];
-  types: PostFilterOption[];
   totalItems: number;
   className?: string;
 }) {
@@ -129,23 +127,6 @@ export default function PostFiltersSidebar({
         </div>
       ) : null}
 
-      {types.length > 0 ? (
-        <div className="mt-6 border-t border-ink/10 pt-5">
-          <p className={SECTION_LABEL}>Article Type</p>
-          <nav aria-label="Article types" className="border border-ink/10">
-            <FilterRow href={hrefFor({ type: '' })} label="All Types" count={totalItems} active={!filters.type} />
-            {types.map((t) => (
-              <FilterRow
-                key={t.value}
-                href={hrefFor({ type: t.value })}
-                label={t.label}
-                count={t.count}
-                active={filters.type === t.value}
-              />
-            ))}
-          </nav>
-        </div>
-      ) : null}
     </aside>
   );
 }

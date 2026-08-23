@@ -67,16 +67,6 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
       .sort((a, b) => b.count - a.count);
   })();
 
-  const typeFacets: PostFilterOption[] = (() => {
-    const counts = new Map<string, number>();
-    for (const post of facetSource) {
-      if (post.postType) counts.set(post.postType, (counts.get(post.postType) ?? 0) + 1);
-    }
-    const label = (v: string) => v.replace(/-/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
-    return [...counts.entries()]
-      .map(([value, count]) => ({ value, label: label(value), count }))
-      .sort((a, b) => b.count - a.count);
-  })();
 
   const posts = res?.data ?? [];
   const total = res?.meta?.pagination?.total ?? posts.length;
@@ -155,7 +145,6 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
             <PostFiltersSidebar
               filters={filters}
               categories={categoryFacets}
-              types={typeFacets}
               totalItems={facetSource.length}
             />
 
