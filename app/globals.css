@@ -1901,14 +1901,14 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 
 .category-card-image-box { background: #f8fafc; border-radius: 8px; }
 
-/* Category listing image, as specified: the image is the square tile rather
-   than a contained photo floating inside one. `cover` fills the frame, so a
-   source photo that is not square is cropped to fit instead of letterboxed —
-   every tile is then the same shape whatever the source file was. */
+/* Category listing image. Every tile is the same 1/1 frame whatever the source
+   file is; `contain` fits the whole product inside it rather than cropping to
+   fill, so a photo that is not square letterboxes against the tile background
+   instead of losing its edges. */
 .category-card-image {
   width: 100%;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
