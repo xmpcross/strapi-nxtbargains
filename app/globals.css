@@ -3863,7 +3863,10 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 .read-next {
   margin-top: 4rem;
   padding: 2.5rem 0 3rem;
-  background: #f7f8fa;
+  background: #ffffff;
+  /* The strip used a grey ground to separate itself from the article; on white
+     it needs a rule instead or it runs straight into the content above. */
+  border-top: 1px solid #e6e6e6;
 }
 
 .read-next-inner {
