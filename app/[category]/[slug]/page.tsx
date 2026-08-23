@@ -478,9 +478,14 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           </header>
         ) : null}
 
-        {bestSellerCard ? (
+        {/* Rendered for every Best Sellers post, not only those whose body
+            carries a product card — four of them do not, and without this they
+            had no top section at all: no byline, no share, nothing. */}
+        {isBestSellersArticle ? (
           <div className="bestseller-header" data-testid="bestseller-card-full">
-            <div className="post-content bestseller-card-full" dangerouslySetInnerHTML={{ __html: bestSellerCard }} />
+            {bestSellerCard ? (
+              <div className="post-content bestseller-card-full" dangerouslySetInnerHTML={{ __html: bestSellerCard }} />
+            ) : null}
             <PostInfobar
               authorName={post.author?.name ?? SITE.name}
               authorAvatar={mediaUrl(post.author?.avatar ?? null)}

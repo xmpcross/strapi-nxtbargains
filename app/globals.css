@@ -4256,6 +4256,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
    a rule closing it off, matching where the editorial header ends. */
 .bestseller-header {
   margin-top: 2rem;
+  padding-top: 50px;
   padding-bottom: 2rem;
   border-bottom: 1px solid #dbdbdb;
 }
