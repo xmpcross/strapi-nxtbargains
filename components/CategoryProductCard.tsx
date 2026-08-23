@@ -73,7 +73,7 @@ export default function CategoryProductCard({
         </span>
       </div>
 
-      <Link href={href} className="category-card-image-box mt-3 grid aspect-square w-full place-items-center overflow-hidden p-4">
+      <Link href={href} className="category-card-image-box mt-3 block w-full overflow-hidden">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -82,10 +82,10 @@ export default function CategoryProductCard({
             loading="lazy"
             width={800}
             height={800}
-            className="commerce-product-image block h-full w-full object-contain mix-blend-multiply"
+            className="category-card-image"
           />
         ) : (
-          <span className="font-display text-lg font-bold text-ink/25">
+          <span className="category-card-image grid place-items-center font-display text-lg font-bold text-ink/25">
             {product.brandRef?.name ?? product.brand ?? 'NXT'}
           </span>
         )}
