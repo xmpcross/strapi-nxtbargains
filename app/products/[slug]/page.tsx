@@ -46,6 +46,7 @@ import { JsonLd } from '@/components/JsonLd';
 import PriceAlertForm from '@/components/PriceAlertForm';
 import ReviewForm from '@/components/ReviewForm';
 import ProductSidePeek from '@/components/ProductSidePeek';
+import ProductHighlights from '@/components/ProductHighlights';
 import ProductReviewsSection from '@/components/ProductReviewsSection';
 import { localMerchantLogo } from '@/lib/merchant-logos';
 import CommerceProductCard from '@/components/CommerceProductCard';
@@ -232,6 +233,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
     (category
       ? `Compare current prices for this ${category.toLowerCase()} across trusted merchants.`
       : `Compare current prices for ${product.name} across trusted merchants.`);
+  const highlights = productHighlightEntries(product);
   const discount = best ? discountPercent(best.offer) : null;
   const updatedLabel = product.updatedAt ? fmtDate(product.updatedAt) : 'Today';
   const canonicalPath = productCanonicalPath(product);
@@ -437,6 +439,14 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
         </div>
       </section>
 
+      {highlights.length > 0 && (
+        <section className="pt-2 pb-10" data-testid="product-highlights">
+          <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
+            <ProductHighlights highlights={highlights} />
+          </div>
+        </section>
+      )}
+
       <section className="pb-6">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <ProductInfoTabs
@@ -562,6 +572,7 @@ function ProductInfoTabs({
   // specs of its own, so the generic list stands in whenever GSMArena is absent.
   const useGsmarenaSpecsInSpecifications =
     productHasCategory(product, 'Smart Phones') && gsmarenaSpecGroups.length > 0;
+  const descriptionBullets = productDescriptionBullets(description);
   const additionalInfoEntries = productAdditionalInfoEntries(product);
   const specEntries = useGsmarenaSpecsInSpecifications ? [] : productSpecificationEntries(specs);
 
@@ -569,14 +580,19 @@ function ProductInfoTabs({
 
   return (
     <div className="product-info-section">
-      <h2 className="product-info-section-title">About this item</h2>
       <div className="product-info-layout">
         <div className="product-info-main">
           <div className="product-info-accordion bg-white" id={accordionId}>
             <details className="product-accordion-item" name={accordionId} open>
               <summary>Product details</summary>
               <div className="product-accordion-panel tab-panel-description">
-                {description ? (
+                {descriptionBullets.length > 1 ? (
+                  <ul className="product-description-bullets">
+                    {descriptionBullets.map((sentence) => (
+                      <li key={sentence}>{sentence}</li>
+                    ))}
+                  </ul>
+                ) : description ? (
                   <div className="leading-7 text-ink/70">
                     <ProductDescription markdown={description} />
                   </div>
@@ -1155,6 +1171,162 @@ function productAdditionalInfoEntries(product: CommerceProduct): SpecificationEn
   ];
 
   return entries.filter((entry): entry is SpecificationEntry => Boolean(entry.value));
+}
+
+/**
+ * Headline attributes for the Highlights tiles above "About this item".
+ *
+ * Reads the same flat spec map the Specifications panel does, then keeps only
+ * what survives being squeezed into a tile. Two things are dropped that a spec
+ * row is happy to carry: long prose (`Cellular Protocols` runs to 180
+ * characters, `descriptionSource` flattens into a paragraph of provenance) and
+ * bare negatives — "Night Vision: No" is not a highlight.
+ *
+ * Well-known attributes lead in the fixed order below; anything left follows in
+ * source order, which the importers already write roughly most-notable-first.
+ */
+const HIGHLIGHT_PRIORITY_LABELS = [
+  'Brand',
+  'Model',
+  'Screen Size',
+  'Display Size',
+  'Display Resolution',
+  'Resolution',
+  'Display Type',
+  'Refresh Rate',
+  'Display Refresh Rate',
+  'Operating System',
+  'Processor',
+  'Processor Brand',
+  'Number of Cores',
+  'RAM',
+  'Installed Memory',
+  'Storage Capacity',
+  'Storage',
+  'Drive Capacity',
+  'Drive Type',
+  'Battery Life',
+  'Max Battery Life',
+  'Battery Capacity',
+  'Camera Resolution',
+  'Rear Camera Resolution',
+  'Front Camera Resolution',
+  'Lens Type',
+  'Field of View',
+  'Night Vision',
+  'Motion Sensing',
+  'With Audio',
+  'Connectivity',
+  'Network Connectivity',
+  'Wireless Connectivity',
+  'With Wi-Fi',
+  'Wi-Fi',
+  'Wireless',
+  'Bluetooth',
+  'With GPS',
+  'NFC',
+  'Assistant Support',
+  'Water Resistant',
+  'Form Factor',
+  'Material',
+  'Color',
+  'Weight',
+];
+
+/** Longest value that still fits a tile without wrapping past two lines. */
+const HIGHLIGHT_MAX_VALUE_LENGTH = 48;
+/** Two full rows of four on desktop. */
+const HIGHLIGHT_LIMIT = 8;
+/** Below this the row reads as a stray chip rather than a section. */
+const HIGHLIGHT_MIN_COUNT = 3;
+const HIGHLIGHT_NEGATIVE_VALUES = new Set(['no', 'none', 'n/a', 'na', 'not applicable', 'unknown', '-']);
+
+function productHighlightEntries(product: CommerceProduct): SpecificationEntry[] {
+  const specs = product.specs;
+  if (!isPlainRecord(specs)) return [];
+
+  const technicalSpecs = isPlainRecord(specs.technicalSpecs) ? specs.technicalSpecs : {};
+  const source = Object.keys(technicalSpecs).length ? technicalSpecs : specs;
+
+  const entries: SpecificationEntry[] = [];
+  const seen = new Set<string>();
+
+  for (const [key, value] of Object.entries(source)) {
+    if (HIDDEN_SPEC_KEYS.has(key) || isProductIdentifierKey(key)) continue;
+    const label = cleanHighlightLabel(key);
+    const formatted = formatSpecValue(value);
+    if (!label || !formatted) continue;
+    if (formatted.length > HIGHLIGHT_MAX_VALUE_LENGTH) continue;
+    if (HIGHLIGHT_NEGATIVE_VALUES.has(formatted.toLowerCase())) continue;
+    const dedupeKey = normalizeSpecKey(label);
+    if (!dedupeKey || seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+    entries.push({ label, value: formatted });
+  }
+
+  // Brand is the one highlight worth synthesising: every product record carries
+  // it, but only about three quarters of them repeat it inside `specs`.
+  if (!seen.has('brand')) {
+    const brand = product.brandRef?.name || product.brand;
+    if (brand) entries.unshift({ label: 'Brand', value: brand });
+  }
+
+  const priority = new Map(HIGHLIGHT_PRIORITY_LABELS.map((label, index) => [normalizeSpecKey(label), index]));
+  const rank = (entry: SpecificationEntry) =>
+    priority.get(normalizeSpecKey(entry.label)) ?? HIGHLIGHT_PRIORITY_LABELS.length;
+
+  const ordered = entries
+    .map((entry, index) => ({ entry, index }))
+    .sort((a, b) => rank(a.entry) - rank(b.entry) || a.index - b.index)
+    .map(({ entry }) => entry);
+
+  return ordered.length >= HIGHLIGHT_MIN_COUNT ? ordered.slice(0, HIGHLIGHT_LIMIT) : [];
+}
+
+/**
+ * Split a product description into one bullet per sentence.
+ *
+ * 513 of the 515 catalogue descriptions are a single block of marketing prose
+ * with no markdown in them, and they read far better as a list of claims than
+ * as a wall of text. The other two are already structured (headings, "- "
+ * bullets) and are handed to `ProductDescription` untouched — returning an
+ * empty array here is how this says "not mine".
+ *
+ * Nothing is reworded or dropped: the text is only cut at sentence boundaries.
+ */
+function productDescriptionBullets(description?: string | null): string[] {
+  const text = (description ?? '').trim();
+  if (!text) return [];
+  // Structured markdown, or anything spanning multiple lines, keeps its own
+  // shape rather than being flattened into a list.
+  if (text.includes('\n') || /^\s*[-*]\s+/m.test(text) || /^#{2,3}\s/m.test(text)) return [];
+
+  const normalized = text.replace(/\s+/g, ' ');
+  const sentences: string[] = [];
+  let current = '';
+  // The lookahead requires the next sentence to start with a capital, a digit
+  // or an opening quote, which is what keeps "16.4 feet" and "$5.99 each" in
+  // one piece; ABBREVIATION_TAIL then re-joins the "e.g." / "Inc." cases the
+  // lookahead cannot see.
+  for (const part of normalized.split(/(?<=[.!?])\s+(?=["'\u201c(]?[A-Z0-9])/)) {
+    current = current ? `${current} ${part}` : part;
+    if (ABBREVIATION_TAIL.test(current)) continue;
+    sentences.push(current);
+    current = '';
+  }
+  if (current) sentences.push(current);
+
+  const bullets = sentences.map((sentence) => sentence.trim()).filter(Boolean);
+  // A one-item list is just a paragraph wearing a bullet.
+  return bullets.length > 1 ? bullets : [];
+}
+
+const ABBREVIATION_TAIL =
+  /(?:\b(?:approx|e\.g|i\.e|vs|etc|Inc|Ltd|Co|Corp|Dept|Est|Fig|Vol|No|Dr|Mr|Mrs|Ms|Prof|St|Jr|Sr)|\b[A-Z])\.$/;
+
+/** `Pan <wbr>/<wbr> Tilt` — some importers leave the source markup in the key. */
+function cleanHighlightLabel(key: string) {
+  return key.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function productHasCategory(product: CommerceProduct, categoryName: string) {

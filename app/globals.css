@@ -649,7 +649,7 @@ a.product-info-sidebar-code:hover {
   border-top: 1px solid rgb(13 27 42 / 0.12);
   background: #ffffff;
   font-family: var(--font-body), Arial, system-ui, sans-serif;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 500;
   line-height: 1.4;
   color: #111111;
@@ -1905,6 +1905,106 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
   color: theme('colors.ink');
 }
 
+/* ------------------------------------------------------ description bullets --
+   Catalogue descriptions arrive as one block of prose; the Product details
+   panel splits them a sentence per line. Custom markers rather than
+   list-style, so the dot aligns to the first line's cap height on a wrapped
+   item instead of floating with the marker box. */
+.product-description-bullets {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: rgb(13 27 42 / 0.7);
+}
+
+.product-description-bullets > li {
+  position: relative;
+  padding-left: 1.15rem;
+  line-height: 1.75;
+}
+
+.product-description-bullets > li::before {
+  content: '';
+  position: absolute;
+  left: 0.15rem;
+  top: 0.72em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgb(13 27 42 / 0.45);
+}
+
+/* --------------------------------------------------------------- highlights --
+   Headline attributes above "About this item". The page's <main> is white, so
+   the tiles carry the contrast themselves rather than sitting in a card.
+   Each one opens the Specifications peek — see ProductHighlights.tsx. */
+.product-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.875rem;
+}
+
+@media (max-width: 1023px) {
+  .product-highlights-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 599px) {
+  .product-highlights-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.product-highlight-tile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  /* Beats the global `button { border-radius: 4px !important }` on specificity,
+     which would otherwise square these off against the 8px card corners. */
+  border-radius: 8px !important;
+  background: #f3f4f6;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.product-highlight-tile:hover { background: #e8eaed; }
+
+.product-highlight-tile:focus-visible {
+  outline: 2px solid var(--color-primary, #0046be);
+  outline-offset: 2px;
+}
+
+.product-highlight-text { min-width: 0; }
+
+.product-highlight-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: rgb(13 27 42 / 0.55);
+}
+
+.product-highlight-value {
+  display: block;
+  font-family: var(--font-body), Arial, system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #111111;
+  /* Values are capped at 48 characters, but an unbroken model number still has
+     to wrap rather than push the chevron out of the tile. */
+  overflow-wrap: anywhere;
+}
+
+.product-highlight-chevron {
+  margin-left: auto;
+  font-size: 1.25rem;
+  line-height: 1;
+  opacity: 0.4;
+}
+
 /* ---------------------------------------------------------------- side peek --
    Features / Specifications / Additional Info open here instead of expanding
    inline, so the reference material never pushes prices and price history down
@@ -1924,6 +2024,9 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
   padding: 1rem 0.25rem;
   border-bottom: 1px solid rgb(13 27 42 / 0.1);
   font-family: var(--font-display, inherit);
+  /* Matches `.product-info-accordion summary`: these read as one stack of tab
+     titles, so a size set on only half of them splits the row. */
+  font-size: 1.125rem;
   font-weight: 700;
   text-align: left;
   background: none;
