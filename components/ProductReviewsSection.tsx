@@ -25,7 +25,9 @@ import ReviewForm from '@/components/ReviewForm';
 
 const REVIEW_CLAMP = 260;
 /* One full row at the widest breakpoint, so the grid never opens half-empty. */
-const INITIAL_CARDS = 4;
+const INITIAL_CARDS = 3;
+/* Thumbnails in the Customer Images strip before the "See more" tile. */
+const IMAGE_STRIP = 7;
 
 function Stars({ rating }: { rating: number }) {
   const filled = Math.max(0, Math.min(5, Math.round(rating)));
@@ -143,12 +145,17 @@ export default function ProductReviewsSection({
   reviews,
   aggregateRating,
   aggregateCount,
+  reviewSummary,
+  reviewTopics,
 }: {
   productName: string;
   productDocumentId: string;
   reviews: CommerceReview[];
   aggregateRating?: number | null;
   aggregateCount?: number | null;
+  /** CMS-written précis of the reviews. Absent on every product today. */
+  reviewSummary?: string | null;
+  reviewTopics?: { label: string; count?: number; sentiment?: 'positive' | 'negative' }[] | null;
 }) {
   const [showAll, setShowAll] = useState(false);
 
@@ -170,10 +177,25 @@ export default function ProductReviewsSection({
     : Number(aggregateRating ?? 0) || null;
   const reviewCount = reviews.length || Number(aggregateCount ?? 0) || null;
 
+  const summary = (reviewSummary ?? '').trim();
+  const topics = reviewTopics ?? [];
+  /* Photos attached to reviews, newest first, deduplicated. */
+  const customerImages = useMemo(() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const r of reviews) {
+      for (const img of r.images ?? []) {
+        const url = mediaUrl(img);
+        if (url && !seen.has(url)) { seen.add(url); out.push(url); }
+      }
+    }
+    return out;
+  }, [reviews]);
+
   const visible = showAll ? reviews : reviews.slice(0, INITIAL_CARDS);
 
   return (
-    <section className="rounded-[4px] bg-white p-5 sm:p-6">
+    <section className="product-reviews-panel p-5 sm:p-6">
       <h2 className="text-2xl font-bold text-[#1d252c]">Reviews</h2>
 
       <div className="mt-5 grid gap-6 sm:grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1.4fr)]">
@@ -225,7 +247,26 @@ export default function ProductReviewsSection({
 
         {reviews.length ? (
           <div className="sm:col-span-2 lg:col-span-1">
-            <h3 className="text-base font-bold text-[#1d252c]">About these reviews</h3>
+            {summary ? (
+              <>
+                <h3 className="text-base font-bold text-[#1d252c]">Customers are saying</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#1d252c]">{summary}</p>
+                {topics.length ? (
+                  <div className="review-topic-strip mt-3">
+                    {topics.map((t) => (
+                      <span key={t.label} className={`review-topic${t.sentiment === 'negative' ? ' is-negative' : ''}`}>
+                        <span aria-hidden="true">{t.sentiment === 'negative' ? '!' : '✓'}</span>
+                        {t.label}{typeof t.count === 'number' ? ` (${t.count})` : ''}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                <p className="mt-3 text-[0.6875rem] leading-relaxed text-[#55555a]">
+                  Summarised from the customer reviews on this page.
+                </p>
+              </>
+            ) : null}
+            <h3 className={`text-base font-bold text-[#1d252c]${summary ? ' mt-5' : ''}`}>About these reviews</h3>
             <p className="mt-2 text-sm leading-relaxed text-[#55555a]">
               These are customer reviews syndicated from retailer product pages, shown with the
               retailer each one came from. We do not edit them, and we do not write our own reviews
@@ -239,11 +280,26 @@ export default function ProductReviewsSection({
         ) : null}
       </div>
 
+      {customerImages.length ? (
+        <div className="review-images-divider mt-6 pt-5">
+          <h3 className="text-base font-bold text-[#1d252c]">Customer images</h3>
+          <div className="review-image-strip mt-3">
+            {customerImages.slice(0, IMAGE_STRIP).map((src) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={src} src={src} alt="" loading="lazy" className="review-image-thumb" />
+            ))}
+            {customerImages.length > IMAGE_STRIP ? (
+              <span className="review-image-more">See more</span>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
       {reviews.length ? (
         <>
-          {/* Four across at the widest breakpoint, as the reference does, stepping
-              down so a card never gets too narrow to read on a laptop or tablet. */}
-          <div className="mt-6 grid gap-4 border-t border-[#dddddd] pt-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {/* Three across, as the reference does, stepping down so a card never
+              gets too narrow to read on a laptop or tablet. */}
+          <div className="review-cards-divider mt-6 grid gap-4 pt-5 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((review) => (
               <ReviewCard key={review.id} review={review} />
             ))}

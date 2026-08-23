@@ -2530,6 +2530,75 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 @media (min-width: 1024px) { .review-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 1280px) { .review-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
+/* ------------------------------------------------------------- reviews --
+   Best Buy PDP layout: one bordered panel holding the score, the histogram,
+   the summary, a customer-image strip and the review cards. Borders live here
+   because the global borderless treatment strips them from section/div. */
+.product-reviews-panel {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(13 27 42 / 0.05);
+}
+
+.review-cards-divider,
+.review-images-divider { border-top: 1px solid #dddddd !important; }
+
+/* Sentiment chips. Horizontally scrollable, as the reference is, rather than
+   wrapping to three rows on a narrow column. */
+.review-topic-strip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+}
+
+.review-topic {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  padding: 0.3rem 0.7rem;
+  border-radius: 9999px;
+  background: #e7f7ee;
+  border: 1px solid #b7e4cb;
+  font-size: 12px;
+  font-weight: 600;
+  color: #14663f;
+  white-space: nowrap;
+}
+
+.review-topic.is-negative {
+  background: #fdecec;
+  border-color: #f3c2c2;
+  color: #8c2020;
+}
+
+.review-image-strip { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.review-image-thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #f1f5f9;
+}
+
+.review-image-more {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
+  background: #1d252c;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.2;
+}
+
 /* Review card. The border is declared here because the global borderless
    treatment strips `border` from an <article> whose class list contains it —
    the Tailwind utilities this used to carry were being removed, so the cards

@@ -436,6 +436,8 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
           {/* The section renders its own "Reviews" heading, as the reference
               layout does — a second one here would duplicate it. */}
           <ProductReviewsSection
+            reviewSummary={product.reviewSummary}
+            reviewTopics={product.reviewTopics}
             productName={product.name}
             productDocumentId={product.documentId ?? ''}
             reviews={reviews}
