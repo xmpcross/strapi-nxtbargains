@@ -4174,9 +4174,19 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 
 .bestseller-card-full .nxt-product-card {
   margin: 0;
-  padding: 1.75rem;
+  /* No frame at the top of the page: the card is the header here, not a boxed
+     insert partway down an article. */
+  padding: 0;
+  border: 0;
   gap: 2.5rem;
   grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+}
+
+/* The image well carries its own border and padding further down the article;
+   both go too, so the shot sits flush in the header. */
+.bestseller-card-full .nxt-product-card__image {
+  padding: 0;
+  border: 0;
 }
 
 .bestseller-card-full .nxt-product-card img { max-height: 320px; }
@@ -4185,7 +4195,20 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   .bestseller-card-full .nxt-product-card {
     grid-template-columns: 1fr;
     gap: 1.25rem;
-    padding: 1.25rem;
   }
   .bestseller-card-full .nxt-product-card__image { grid-row: auto; }
+}
+
+/* Header image standing in from the body — a product shot rather than an
+   editorial cover. Those are square on a white ground, and cropping one to the
+   16:10 cover ratio cuts roughly a third off the product, so it is contained
+   and given the white ground back instead. */
+.recap-media-product {
+  background: #ffffff;
+  border: 1px solid rgba(13, 27, 42, 0.09);
+}
+
+.recap-media-product img {
+  object-fit: contain;
+  padding: 1.25rem;
 }

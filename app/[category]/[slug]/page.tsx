@@ -334,6 +334,14 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     }
   }
 
+  // Header image for the editorial layout. Most posts outside smart-home and
+  // buying-guides carry no coverImage or ogImage at all, which left the header's
+  // right column empty; the first image in the body — a product shot on these
+  // posts — stands in. It sits well down the article rather than at the top, so
+  // promoting it does not put the same picture twice in a row, and it is left in
+  // place because it belongs to a product card that would break without it.
+  const headerImage = cover || (isRecapLayout ? firstImageUrl(postContent) : null);
+
   let toc: { id: string; text: string; level: 2 | 3 }[] = [];
   if (isRecapLayout) {
     if (isMarkdownContent(postContent)) {
@@ -427,11 +435,11 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               {post.excerpt ? <p className="recap-subtitle">{post.excerpt}</p> : null}
             </div>
 
-            {cover ? (
-              <figure className="recap-media">
+            {headerImage ? (
+              <figure className={cover ? 'recap-media' : 'recap-media recap-media-product'}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={cover}
+                  src={headerImage}
                   alt={post.coverImage?.alternativeText || post.title}
                   width={1200}
                   height={750}
