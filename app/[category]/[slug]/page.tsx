@@ -79,6 +79,12 @@ function spotlightDate(iso?: string): string {
  */
 const RECAP_LAYOUT_EXCLUDED = new Set(['best-sellers-articles']);
 
+/**
+ * Recap-layout categories that drop the left contents rail and run two columns
+ * instead. Everything else about the layout is unchanged for them.
+ */
+const METABAR_EXCLUDED = new Set(['nxt-bargains-informative-articles']);
+
 function recentPostDate(iso?: string): string {
   if (!iso) return '';
   return new Intl.DateTimeFormat('en-GB', {
@@ -292,6 +298,8 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   // category except those listed in RECAP_LAYOUT_EXCLUDED.
   const isRecapLayout =
     !RECAP_LAYOUT_EXCLUDED.has(category) && !RECAP_LAYOUT_EXCLUDED.has(cat?.slug ?? '');
+  const showMetabar =
+    isRecapLayout && !METABAR_EXCLUDED.has(category) && !METABAR_EXCLUDED.has(cat?.slug ?? '');
   let postContent = await enrichPostCarouselHtml(post.content);
   // best-sellers-articles: promote the first body heading (the product title) to
   // a semantic <h1> while keeping the h4 size (.post-title-h1), and drop the
@@ -314,6 +322,18 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   //
   // Top-level sections only: the H3s stay in the body with their anchors
   // intact, they are just not listed here.
+  // Best Sellers posts open with a product card the generator injects into the
+  // body. It is lifted out here so it can span the full container instead of
+  // being boxed into the narrower article column beside the sidebar.
+  let bestSellerCard: string | null = null;
+  if (isBestSellersArticle) {
+    const match = postContent.match(/<aside\b[^>]*class="[^"]*nxt-product-card[^"]*"[\s\S]*?<\/aside>/i);
+    if (match) {
+      bestSellerCard = match[0];
+      postContent = postContent.replace(match[0], '');
+    }
+  }
+
   let toc: { id: string; text: string; level: 2 | 3 }[] = [];
   if (isRecapLayout) {
     if (isMarkdownContent(postContent)) {
@@ -472,14 +492,22 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           </header>
         ) : null}
 
+        {bestSellerCard ? (
+          <div
+            className="post-content bestseller-card-full"
+            data-testid="bestseller-card-full"
+            dangerouslySetInnerHTML={{ __html: bestSellerCard }}
+          />
+        ) : null}
+
         <div
           className={
-            isRecapLayout
+            showMetabar
               ? 'mt-12 grid gap-10 lg:grid-cols-[228px_minmax(0,1fr)_340px] lg:items-start'
               : 'mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start'
           }
         >
-          {isRecapLayout ? (
+          {showMetabar ? (
             <div className="metabar-col" data-testid="post-metabar">
               <PostMetabar
                 readingTimeMinutes={post.readingTimeMinutes}
@@ -493,7 +521,6 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             <KeyTakeaways content={post.keyTakeaways} />
             <PostContent
               html={postContent}
-              semanticHeadings={isRecapLayout}
               midBlock={
                 isRecapLayout && readAlsoPosts.length > 0 ? (
                   <ReadAlso

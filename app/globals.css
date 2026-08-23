@@ -4166,3 +4166,26 @@ select.filter-field { background: #ffffff; font-weight: 500; }
     flex: none;
   }
 }
+
+/* Best Sellers product card, lifted out of the article column so it spans the
+   full container. Reuses the .post-content card rules; only the proportions
+   change now that it has the whole width to work with. */
+.bestseller-card-full { margin-top: 2rem; }
+
+.bestseller-card-full .nxt-product-card {
+  margin: 0;
+  padding: 1.75rem;
+  gap: 2.5rem;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+}
+
+.bestseller-card-full .nxt-product-card img { max-height: 320px; }
+
+@media (max-width: 768px) {
+  .bestseller-card-full .nxt-product-card {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+  .bestseller-card-full .nxt-product-card__image { grid-row: auto; }
+}

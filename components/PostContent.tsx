@@ -18,22 +18,18 @@ import { headingSlug } from '@/lib/post-headings';
  * and attach a click handler on its title that toggles the class. CSS in
  * globals.css hides `.gsclose > .gs-accordion-item__content`.
  *
+ * Headings render at the level they were authored at, and each gets an anchor
+ * id. They used to be flattened to <h4> across the board — which is why posts
+ * whose source contained h2 and h3 came out as a wall of identical headings.
+ *
  * Affiliate-tag rewriting happens at import time (server-side, in the importer)
  * — not here.
  */
 export default function PostContent({
   html,
-  semanticHeadings = false,
   midBlock,
 }: {
   html: string;
-  /**
-   * Keep the authored heading levels and give each one an anchor id, instead of
-   * flattening everything to <h4>. Used by the smart-home layout, whose left
-   * rail links to these ids; the flattening below is what the other categories
-   * still expect.
-   */
-  semanticHeadings?: boolean;
   /**
    * Optional node dropped into the middle of the body — used for the inline
    * "Read Also" card. Placed after a heading where possible so it lands on a
@@ -42,7 +38,7 @@ export default function PostContent({
   midBlock?: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const body = semanticHeadings ? withHtmlHeadingIds(html) : normalizePostHeadings(html);
+  const body = withHtmlHeadingIds(html);
   const shouldRenderMarkdown = looksLikeMarkdown(body);
 
   useEffect(() => {
@@ -129,7 +125,7 @@ export default function PostContent({
   if (shouldRenderMarkdown) {
     return (
       <div ref={ref} className="post-content" data-testid="post-content">
-        <MarkdownContent markdown={body} semanticHeadings={semanticHeadings} midBlock={midBlock} />
+        <MarkdownContent markdown={body} midBlock={midBlock} />
       </div>
     );
   }
@@ -161,13 +157,6 @@ function withHtmlHeadingIds(value: string) {
   );
 }
 
-function normalizePostHeadings(value: string) {
-  return String(value || '')
-    .replace(/<h2(\s[^>]*)?>/gi, '<h4$1>')
-    .replace(/<\/h2>/gi, '</h4>')
-    .replace(/<h3(\s[^>]*)?>/gi, '<h4$1>')
-    .replace(/<\/h3>/gi, '</h4>');
-}
 
 function looksLikeMarkdown(value: string) {
   const text = String(value || '').trim();
@@ -180,11 +169,9 @@ function looksLikeMarkdown(value: string) {
 
 function MarkdownContent({
   markdown,
-  semanticHeadings = false,
   midBlock,
 }: {
   markdown: string;
-  semanticHeadings?: boolean;
   midBlock?: ReactNode;
 }) {
   const lines = markdown.replace(/\r\n/g, '\n').split('\n');
@@ -210,25 +197,15 @@ function MarkdownContent({
 
       headingAt.push(blocks.length);
 
-      if (semanticHeadings) {
-        // Authored levels are kept: `#` and `##` become h2, `###` h3, deeper
-        // h4. Each gets the same id the contents rail was built with.
-        const id = headingSlug(
-          heading[2].replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[*_`]+/g, '').trim(),
-          usedIds,
-        );
-        if (level <= 2) blocks.push(<h2 key={key++} id={id}>{children}</h2>);
-        else if (level === 3) blocks.push(<h3 key={key++} id={id}>{children}</h3>);
-        else blocks.push(<h4 key={key++} id={id}>{children}</h4>);
-        i += 1;
-        continue;
-      }
-
-      if (level === 1) blocks.push(<h4 key={key++}>{children}</h4>);
-      else if (level === 2) blocks.push(<h4 key={key++}>{children}</h4>);
-      else if (level === 3) blocks.push(<h4 key={key++}>{children}</h4>);
-      else if (level === 4) blocks.push(<h4 key={key++}>{children}</h4>);
-      else blocks.push(<h5 key={key++}>{children}</h5>);
+      // Authored levels are kept: `#` and `##` become h2, `###` h3, deeper h4.
+      // Each gets the same id the contents rail was built with.
+      const id = headingSlug(
+        heading[2].replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[*_`]+/g, '').trim(),
+        usedIds,
+      );
+      if (level <= 2) blocks.push(<h2 key={key++} id={id}>{children}</h2>);
+      else if (level === 3) blocks.push(<h3 key={key++} id={id}>{children}</h3>);
+      else blocks.push(<h4 key={key++} id={id}>{children}</h4>);
       i += 1;
       continue;
     }
