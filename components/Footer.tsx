@@ -60,9 +60,11 @@ export default function Footer() {
         <div className="footer-top-grid gap-8 border-b border-ink/[0.12] pb-8 sm:grid-cols-2">
           {/* brand */}
           <div className="footer-brand-column sm:col-span-2">
+            {/* The "_light" file is a white wordmark, drawn for the old dark
+                footer; on the light background it was invisible. */}
             <Link href="/" className="mb-4 inline-block" aria-label={`${SITE.name} home`}>
               <Image
-                src="/nxt_bargains_logo_light.svg"
+                src="/nxt_bargains_logo_dark.svg"
                 alt={SITE.name}
                 width={450}
                 height={218}
