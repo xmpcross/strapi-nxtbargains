@@ -214,7 +214,7 @@ export default async function CouponsPage() {
         topStores={topStoreLinks.slice(0, 6)}
       />
 
-      <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="coupon-store-links" id="stores">
+      <section className="border-b border-ink/10 bg-white py-10 sm:py-12" data-testid="coupon-store-links" id="stores">
         <div className="mx-auto max-w-[1366px] px-6">
           <SectionHead
             eyebrow="Shop by store"
@@ -341,8 +341,7 @@ function Hero({
           <span className="page-hero-crumbs-current">Coupons</span>
         </nav>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
-          <div>
+        <div className="mt-8">
             <p className="page-hero-eyebrow">
               <span className="page-hero-eyebrow-dot" aria-hidden />
               Coupons &amp; promo codes
@@ -383,38 +382,12 @@ function Hero({
                 ))}
               </div>
             ) : null}
-          </div>
-
-          <aside className="page-hero-panel p-5 sm:p-6" aria-label="Coupon statistics">
-            <p className="page-hero-eyebrow">At a glance</p>
-            <p className="mt-3 text-sm leading-6 text-ink/65">
-              A live snapshot of the coupon feed — {couponCount} current offers across {storeCount}+ retailer
-              coupon pages, refreshed daily from verified sources.
-            </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-ink/12 pt-5">
-              <Stat label="Live offers" value={String(couponCount)} />
-              <Stat label="Store pages" value={`${storeCount}+`} />
-              <Stat label="Categories" value={String(categoryCount)} />
-              <Stat label="Updated" value="Daily" />
-            </div>
-            <div className="mt-5 border-t border-ink/12 pt-4 text-xs text-ink/55">
-              Free to use — no signup required.
-            </div>
-          </aside>
         </div>
       </div>
     </section>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="font-display text-2xl font-bold text-white">{value}</p>
-      <p className="mt-1 text-sm text-white/55">{label}</p>
-    </div>
-  );
-}
 
 function SectionHead({
   eyebrow,

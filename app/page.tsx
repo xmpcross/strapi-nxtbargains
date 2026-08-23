@@ -235,7 +235,7 @@ const priceDrops = deals.filter((d) => d.pct > 0).sort((a, b) => b.pct - a.pct).
 
       {/* ---------- BUYING GUIDES & REVIEWS ----------- */}
       {guideFeature && (
-        <section className="border-y border-ink/10 bg-[#f4f7ee] py-14 sm:py-[76px]" data-testid="home-guides">
+        <section className="border-y border-ink/10 bg-white py-14 sm:py-[76px]" data-testid="home-guides">
           <div className="guide-shell mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Read first"
