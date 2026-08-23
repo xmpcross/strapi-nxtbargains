@@ -299,10 +299,17 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   // from WordPress and a good number of those bodies open with the same image
   // as the cover, so render it only when the body does not already lead with
   // it — otherwise the reader gets the identical picture twice.
-  // Contents list for the smart-home metabar. Built from the post source with
-  // the same slug helper PostContent uses to emit the ids, so the two cannot
-  // drift apart.
-  const toc = isRecapLayout ? extractHeadings(postContent) : [];
+  // Contents list for the metabar. Built from the post source with the same
+  // slug helper PostContent uses to emit the ids, so the two cannot drift apart.
+  //
+  // Extract first, filter second — never filter inside extractHeadings. The
+  // helper de-duplicates slugs as it walks the headings in order, so dropping
+  // the H3s beforehand would change the numbering of any repeated H2 and leave
+  // the rail pointing at ids the body never rendered.
+  //
+  // Top-level sections only: the H3s stay in the body with their anchors
+  // intact, they are just not listed here.
+  const toc = isRecapLayout ? extractHeadings(postContent).filter((h) => h.level === 2) : [];
 
   const leadImage = firstImageUrl(postContent);
   const sameFile = (a: string, b: string) =>

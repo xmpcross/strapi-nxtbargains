@@ -2932,7 +2932,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
      screens where 3rem would overflow a phone viewport. */
   font-size: 3rem !important;
   font-weight: 700 !important;
-  line-height: 1.14;
+  line-height: 1.1;
   letter-spacing: -0.02em;
   color: #161616;
 }
