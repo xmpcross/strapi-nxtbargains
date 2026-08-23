@@ -2892,13 +2892,15 @@ select.filter-field { background: #ffffff; font-weight: 500; }
     grid-template-columns: 1fr 612px;
     column-gap: 2.5rem;
     row-gap: 1rem;
-    align-items: end;
+    align-items: start;
   }
 }
 
 .recap-header-content {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  align-self: start;
   min-width: 0;
 }
 
@@ -3159,9 +3161,10 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   object-fit: cover;
 }
 
-/* ── Recap-style article body (smart-home posts) ──────────────────────────
-   Scoped through the data-category the article already carries, so nothing
-   here can leak into other categories.
+/* ── Recap-style article body ─────────────────────────────────────────────
+   Scoped through data-layout="recap" on the article, which the template sets
+   for the categories listed in RECAP_LAYOUT_CATEGORIES, so nothing here can
+   leak into the categories still using the original template.
 
    Values lifted from the reference theme's own rules:
      .entry-content            1.125rem / 1.6 / weight 400, colour #161616
@@ -3179,7 +3182,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
    2.625rem and h3 at 2.125rem, but this site was explicitly set to h2 1.5rem /
    h3 1.2rem site-wide, and that global rule carries !important. The spacing and
    rhythm below are the reference's; the scale stays yours. */
-[data-category="smart-home"] .post-content {
+[data-layout="recap"] .post-content {
   max-width: 776px;
   font-size: 1.125rem;
   font-weight: 400;
@@ -3187,26 +3190,26 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   color: #161616;
 }
 
-[data-category="smart-home"] .post-content > * {
+[data-layout="recap"] .post-content > * {
   margin-top: 24px;
   margin-bottom: 24px;
 }
 
-[data-category="smart-home"] .post-content > *:first-child { margin-top: 0; }
-[data-category="smart-home"] .post-content > *:last-child { margin-bottom: 0; }
+[data-layout="recap"] .post-content > *:first-child { margin-top: 0; }
+[data-layout="recap"] .post-content > *:last-child { margin-bottom: 0; }
 
-[data-category="smart-home"] .post-content > :where(h1, h2, h3, h4, h5, h6) {
+[data-layout="recap"] .post-content > :where(h1, h2, h3, h4, h5, h6) {
   margin-top: 48px;
   margin-bottom: 24px;
   clear: both;
   color: #161616;
 }
 
-[data-category="smart-home"] .post-content > :where(h1, h2, h3, h4, h5, h6) + * {
+[data-layout="recap"] .post-content > :where(h1, h2, h3, h4, h5, h6) + * {
   margin-top: 24px;
 }
 
-[data-category="smart-home"] .post-content a:not([class]) {
+[data-layout="recap"] .post-content a:not([class]) {
   color: #206bea;
   text-decoration: none;
   /* Their underline: a 1px gradient painted at the foot of the line box. */
@@ -3218,29 +3221,29 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   transition: background-size 0.2s ease;
 }
 
-[data-category="smart-home"] .post-content a:not([class]):hover {
+[data-layout="recap"] .post-content a:not([class]):hover {
   background-size: 0 1px;
 }
 
-[data-category="smart-home"] .post-content :where(ul, ol) {
+[data-layout="recap"] .post-content :where(ul, ol) {
   padding-left: 1.75rem;
   padding-right: 0;
 }
 
-[data-category="smart-home"] .post-content ul { list-style-type: disc; }
-[data-category="smart-home"] .post-content ol { list-style-type: decimal; }
+[data-layout="recap"] .post-content ul { list-style-type: disc; }
+[data-layout="recap"] .post-content ol { list-style-type: decimal; }
 
-[data-category="smart-home"] .post-content :where(ul, ol) li {
+[data-layout="recap"] .post-content :where(ul, ol) li {
   margin-bottom: 0.5rem;
   padding-left: 0;
   color: #161616;
 }
 
-[data-category="smart-home"] .post-content :where(img, figure img) {
+[data-layout="recap"] .post-content :where(img, figure img) {
   border-radius: 10px;
 }
 
-[data-category="smart-home"] .post-content blockquote {
+[data-layout="recap"] .post-content blockquote {
   margin-left: 0;
   margin-right: 0;
   padding-left: 1.5rem;
@@ -3251,11 +3254,11 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 }
 
 @media (max-width: 1023px) {
-  [data-category="smart-home"] .post-content > :where(h1, h2, h3, h4, h5, h6) {
+  [data-layout="recap"] .post-content > :where(h1, h2, h3, h4, h5, h6) {
     margin-top: 32px;
     margin-bottom: 12px;
   }
-  [data-category="smart-home"] .post-content > :where(h1, h2, h3, h4, h5, h6) + * {
+  [data-layout="recap"] .post-content > :where(h1, h2, h3, h4, h5, h6) + * {
     margin-top: 16px;
   }
 }
@@ -3805,7 +3808,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   display: block;
   margin-top: 0.85rem;
   font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
-  font-size: 1.25rem;
+  font-size: 16px;
   font-weight: 700 !important;
   line-height: 1.25;
   letter-spacing: -0.01em;
@@ -3973,3 +3976,150 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   font-weight: 700;
   color: #161616;
 }
+
+/* ── Comments (recap layout) ──────────────────────────────────────────────
+   Small-caps label, then an "Add a comment" button that reveals the form. The
+   form is collapsed by default — the reference shows it that way, and it keeps
+   a long form from sitting between the article and the page footer. */
+.comments-eyebrow {
+  margin: 0 0 0.9rem;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #737373;
+}
+
+[data-layout="recap"] .comment-collapse { margin-top: 1.25rem; }
+
+.comment-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.1rem;
+  border: 0;
+  border-radius: 8px;
+  background: #2563eb;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.comment-toggle:hover { background: #1d4ed8; }
+.comment-toggle svg { transition: transform 0.2s ease; }
+.comment-toggle svg[data-open='true'] { transform: rotate(180deg); }
+
+.comment-panel { margin-top: 1.5rem; }
+
+.comment-form {
+  padding: 1.75rem;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.comment-form-heading {
+  margin: 0;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  color: #161616;
+}
+
+.comment-form-note {
+  margin: 0.6rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #737373;
+}
+
+.comment-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .comment-form-row { grid-template-columns: 1fr; }
+}
+
+.comment-field { display: flex; flex-direction: column; min-width: 0; }
+.comment-field-full { margin-top: 1.25rem; }
+
+.comment-field label {
+  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #161616;
+}
+
+.comment-req { color: #dc2626; }
+
+.comment-field input,
+.comment-field textarea {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  background: #ffffff;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #161616;
+}
+
+.comment-field textarea { min-height: 120px; resize: vertical; }
+
+.comment-field input::placeholder,
+.comment-field textarea::placeholder { color: #9aa0ab; }
+
+.comment-field input:focus,
+.comment-field textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.comment-remember {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #737373;
+  cursor: pointer;
+}
+
+.comment-remember input {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin-top: 0.1rem;
+  accent-color: #2563eb;
+}
+
+.comment-message { margin: 1rem 0 0; font-size: 0.9375rem; }
+.comment-message.is-ok { color: #047857; }
+.comment-message.is-error { color: #dc2626; }
+
+.comment-submit {
+  margin-top: 1.35rem;
+  padding: 0.7rem 1.15rem;
+  border: 0;
+  border-radius: 8px;
+  background: #2563eb;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.comment-submit:hover { background: #1d4ed8; }
+.comment-submit:disabled { opacity: 0.6; cursor: default; }
+
+.comment-form-footnote { margin: 0.9rem 0 0; font-size: 0.8125rem; color: #9aa0ab; }

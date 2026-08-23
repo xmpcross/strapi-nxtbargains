@@ -65,6 +65,15 @@ function spotlightDate(iso?: string): string {
   }).format(new Date(iso));
 }
 
+/**
+ * Categories rendered with the editorial post layout.
+ *
+ * A set rather than a per-category flag so adding one is a single edit here;
+ * the CSS keys off data-layout="recap" on the article, not off the individual
+ * category, for the same reason.
+ */
+const RECAP_LAYOUT_CATEGORIES = new Set(['smart-home', 'buying-guides', 'how-to-guides']);
+
 function recentPostDate(iso?: string): string {
   if (!iso) return '';
   return new Intl.DateTimeFormat('en-GB', {
@@ -149,11 +158,6 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     const { redirect } = await import('next/navigation');
     redirect(postPath(post));
   }
-
-  // Pull up to 10 related posts from the same category, excluding this one.
-  const related = await listPosts({ category, pageSize: 11 })
-    .then((r) => r.data.filter((p) => p.id !== post.id).slice(0, 10))
-    .catch(() => [] as NxtPost[]);
 
   // One wide fetch feeds every rail on the page — spotlight, read-also,
   // related and prev/next — rather than a query each.
@@ -278,10 +282,11 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   const faqLd = faqs.length >= 2 ? faqJsonLd(faqs) : null;
 
   const isBestSellersArticle = category === 'best-sellers-articles' || cat?.slug === 'best-sellers-articles';
-  // smart-home posts get a visible title. Their bodies open with an <h4> that
-  // is usually a product-name variant rather than the headline, so without this
-  // the page has no visible title at all — only the screen-reader h1.
-  const isSmartHome = category === 'smart-home' || cat?.slug === 'smart-home';
+  // Categories that use the editorial ("recap") post layout: two-column header,
+  // left contents rail, Spotlight sidebar, Read Also / Related / Read Next.
+  // Everything else keeps the original single-column template.
+  const isRecapLayout =
+    RECAP_LAYOUT_CATEGORIES.has(category) || RECAP_LAYOUT_CATEGORIES.has(cat?.slug ?? '');
   let postContent = await enrichPostCarouselHtml(post.content);
   // best-sellers-articles: promote the first body heading (the product title) to
   // a semantic <h1> while keeping the h4 size (.post-title-h1), and drop the
@@ -297,7 +302,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   // Contents list for the smart-home metabar. Built from the post source with
   // the same slug helper PostContent uses to emit the ids, so the two cannot
   // drift apart.
-  const toc = isSmartHome ? extractHeadings(postContent) : [];
+  const toc = isRecapLayout ? extractHeadings(postContent) : [];
 
   const leadImage = firstImageUrl(postContent);
   const sameFile = (a: string, b: string) =>
@@ -316,6 +321,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
       className="bg-white"
       data-testid={`post-${post.slug}`}
       data-category={category}
+      data-layout={isRecapLayout ? 'recap' : undefined}
       data-post-type={post.postType}
     >
       {/* Vendor stylesheets used by the imported product-comparison blocks
@@ -343,9 +349,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
       </section>
 
       <div className="mx-auto max-w-7xl px-6">
-        {!isBestSellersArticle && !isSmartHome && <h1 className="sr-only">{post.title}</h1>}
+        {!isBestSellersArticle && !isRecapLayout && <h1 className="sr-only">{post.title}</h1>}
 
-        {showFeatured && !isSmartHome ? (
+        {showFeatured && !isRecapLayout ? (
           <figure className="post-featured-image" data-testid="post-featured-image">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -358,7 +364,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           </figure>
         ) : null}
 
-        {isSmartHome ? (
+        {isRecapLayout ? (
           <header className="recap-header" data-testid="post-recap-header">
             <div className="recap-header-content">
               <p className="recap-eyebrow">
@@ -443,12 +449,12 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
         <div
           className={
-            isSmartHome
+            isRecapLayout
               ? 'mt-12 grid gap-10 lg:grid-cols-[228px_minmax(0,1fr)_340px] lg:items-start'
               : 'mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start'
           }
         >
-          {isSmartHome ? (
+          {isRecapLayout ? (
             <div className="metabar-col" data-testid="post-metabar">
               <PostMetabar
                 readingTimeMinutes={post.readingTimeMinutes}
@@ -462,9 +468,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             <KeyTakeaways content={post.keyTakeaways} />
             <PostContent
               html={postContent}
-              semanticHeadings={isSmartHome}
+              semanticHeadings={isRecapLayout}
               midBlock={
-                isSmartHome && readAlsoPosts.length > 0 ? (
+                isRecapLayout && readAlsoPosts.length > 0 ? (
                   <ReadAlso
                     items={readAlsoPosts.map((rp, i) => ({ post: rp, commentCount: readAlsoCounts[i] ?? 0 }))}
                   />
@@ -501,7 +507,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
             <div
               className={`mt-14 flex-wrap items-center gap-x-4 gap-y-2 border-t border-ink/10 pt-8 text-xs font-semibold uppercase tracking-[0.12em] text-ink/45 ${
-                isSmartHome ? 'hidden' : 'flex'
+                isRecapLayout ? 'hidden' : 'flex'
               }`}
             >
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink/10 text-ink/40">
@@ -518,7 +524,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               Prices and availability are accurate as of {fmtDate(post.updatedAt)} and subject to change.
             </div>
 
-            {isSmartHome ? null : (
+            {isRecapLayout ? null : (
             <div className="mt-10 bg-muted p-8" data-testid="post-author-box">
               <div className="grid gap-6 sm:grid-cols-[72px_minmax(0,1fr)]">
                 <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-white text-2xl font-bold text-ink/30">
@@ -539,7 +545,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             </div>
             )}
 
-            {isSmartHome ? (
+            {isRecapLayout ? (
               <>
                 <RelatedPosts posts={relatedPostsList} />
                 <QuestionsAnswered items={faqs} />
@@ -557,7 +563,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               </>
             ) : null}
 
-            {!isSmartHome && faqs.length > 0 ? (
+            {!isRecapLayout && faqs.length > 0 ? (
               <section className="mt-10" data-testid="faq-section" aria-labelledby="faq-heading">
                 <h2 id="faq-heading" className="font-display text-2xl font-bold tracking-tight text-ink">
                   Frequently asked questions
@@ -574,7 +580,11 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             ) : null}
 
             <section className="mt-10" id="post-comments" data-testid="post-comments">
-              <h3 className="font-display text-2xl font-bold tracking-tight text-ink">Comments</h3>
+              {isRecapLayout ? (
+                <h3 className="comments-eyebrow">Comments</h3>
+              ) : (
+                <h3 className="font-display text-2xl font-bold tracking-tight text-ink">Comments</h3>
+              )}
               {comments.length > 0 ? (
                 <div className="mt-5 space-y-4">
                   {comments.map((comment) => (
@@ -592,12 +602,12 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               ) : (
                 <p className="mt-3 text-sm leading-6 text-ink/55">No comments yet. Start the conversation.</p>
               )}
-              <CommentForm postDocumentId={post.documentId ?? ''} />
+              <CommentForm postDocumentId={post.documentId ?? ''} collapsible={isRecapLayout} />
             </section>
           </div>
 
           <aside className="space-y-10 lg:sticky lg:top-28" data-testid="post-side-rail">
-            {!isSmartHome && (
+            {!isRecapLayout && (
             <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]" data-testid="sidebar-share">
               <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">Share This Article</h5>
               <div className="mt-4 flex flex-wrap gap-3">
@@ -630,7 +640,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             </div>
             )}
 
-            {isSmartHome && spotlightPosts.length > 0 ? (
+            {isRecapLayout && spotlightPosts.length > 0 ? (
               <div data-testid="sidebar-spotlight">
                 <h5 className="spotlight-heading">Spotlight</h5>
                 <ul className="spotlight-list">
@@ -659,7 +669,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               </div>
             ) : null}
 
-            {isSmartHome ? (
+            {isRecapLayout ? (
               <aside className="trailcard" data-testid="sidebar-trailcard">
                 <p className="trailcard-badge">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -678,7 +688,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               </aside>
             ) : null}
 
-            {!isSmartHome && recentPosts.length > 0 && (
+            {!isRecapLayout && recentPosts.length > 0 && (
               <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]">
                 <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">Latest Posts</h5>
                 <div className="mt-4 space-y-4">
@@ -755,60 +765,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           </aside>
         </div>
 
-        {related.length > 0 && (
-          <aside className="mt-24 border-t border-ink/10 py-16">
-            <div className="w-full text-left">
-              <h3 className="font-display text-3xl font-bold tracking-tight text-ink">Editor's Choice</h3>
-              <p className="mt-2 text-sm uppercase tracking-[0.16em] text-ink/45">
-                More in {cat?.name ?? categoryName(category)}
-              </p>
-            </div>
-            <div className="mt-10" data-testid="editors-choice-slider">
-              <ProductCarousel
-                items={related.map((r) => {
-                  const img = mediaUrl(r.coverImage ?? null) ?? firstImageUrl(r.content);
-                  const href = postPath(r);
-
-                  return (
-                    <article key={r.id} className="group flex h-full flex-col" data-testid={`editors-choice-${r.slug}`}>
-                      <Link href={href} className="block overflow-hidden rounded-3xl bg-muted p-5">
-                        {img ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={img}
-                            alt={r.coverImage?.alternativeText || r.title}
-                            className="aspect-[4/3] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.02]"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="aspect-[4/3] w-full bg-gradient-to-br from-primary-hover to-primary" />
-                        )}
-                      </Link>
-                      <div className="mt-4">
-                        {r.categories?.[0] && (
-                          <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                            {r.categories[0].name}
-                          </p>
-                        )}
-                        <Link href={href}>
-                          <h4 className="mt-2 line-clamp-2 font-display !text-base font-bold leading-snug text-ink transition group-hover:text-primary">
-                            {r.title}
-                          </h4>
-                        </Link>
-                        <p className="mt-3 text-xs text-ink/50">
-                          {fmtDate(r.publishedAt)} · {r.readingTimeMinutes ?? 5} min
-                        </p>
-                      </div>
-                    </article>
-                  );
-                })}
-              />
-            </div>
-          </aside>
-        )}
       </div>
 
-      {isSmartHome && readNextPosts.length > 0 ? <ReadNext posts={readNextPosts} /> : null}
+      {isRecapLayout && readNextPosts.length > 0 ? <ReadNext posts={readNextPosts} /> : null}
     </article>
   );
 }
