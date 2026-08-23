@@ -48,6 +48,15 @@ function categoryName(slug?: string): string {
   return SECTIONS.find((s) => s.slug === slug)?.title ?? slug.replace(/-/g, ' ');
 }
 
+function spotlightDate(iso?: string): string {
+  if (!iso) return '';
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(iso));
+}
+
 function recentPostDate(iso?: string): string {
   if (!iso) return '';
   return new Intl.DateTimeFormat('en-GB', {
@@ -138,9 +147,33 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     .then((r) => r.data.filter((p) => p.id !== post.id).slice(0, 10))
     .catch(() => [] as NxtPost[]);
 
-  const recentPosts = await listPosts({ pageSize: 6 })
-    .then((r) => r.data.filter((p) => p.id !== post.id).slice(0, 5))
+  // Fetched wide so the spotlight below can pick across categories; the
+  // "Latest posts" rail still takes the plain newest five.
+  const recentPool = await listPosts({ pageSize: 24 })
+    .then((r) => r.data.filter((p) => p.id !== post.id))
     .catch(() => [] as NxtPost[]);
+  const recentPosts = recentPool.slice(0, 5);
+
+  // One post per category, newest first. Without this the list is whichever
+  // category published most recently -- five rows all reading "Best Sellers",
+  // which defeats the point of a spotlight. Falls back to filling from the
+  // pool if there are not enough distinct categories.
+  const spotlightPosts = (() => {
+    const seen = new Set<string>();
+    const picked: NxtPost[] = [];
+    for (const p of recentPool) {
+      const key = p.categories?.[0]?.slug ?? '';
+      if (seen.has(key)) continue;
+      seen.add(key);
+      picked.push(p);
+      if (picked.length === 5) break;
+    }
+    for (const p of recentPool) {
+      if (picked.length >= 5) break;
+      if (!picked.includes(p)) picked.push(p);
+    }
+    return picked;
+  })();
 
   const [merchantProducts, comments] = await Promise.all([
     listMerchantTopProducts(post),
@@ -288,7 +321,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
         {isSmartHome ? (
           <header className="recap-header" data-testid="post-recap-header">
-            <div className="recap-header-inner">
+            <div className="recap-header-content">
               <p className="recap-eyebrow">
                 <Link href={`/${category}`}>{cat?.name ?? categoryName(category)}</Link>
               </p>
@@ -312,24 +345,26 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             ) : null}
 
             <div className="recap-infobar">
-              <div className="recap-meta">
+              <div className="recap-header-meta">
                 <span className="recap-author">
                   <span className="recap-avatar" aria-hidden>
                     {(post.author?.name ?? SITE.name).charAt(0)}
                   </span>
                   <span className="recap-author-name">{post.author?.name ?? SITE.name}</span>
                 </span>
-                <span className="recap-sep" aria-hidden />
-                <time dateTime={post.publishedAt}>{fmtDate(post.publishedAt)}</time>
-                {post.readingTimeMinutes ? (
-                  <>
-                    <span className="recap-sep" aria-hidden />
-                    <span>{post.readingTimeMinutes} min read</span>
-                  </>
-                ) : null}
+                <span className="recap-meta-line">
+                  <time dateTime={post.publishedAt}>{fmtDate(post.publishedAt)}</time>
+                  {post.readingTimeMinutes ? (
+                    <>
+                      <span className="recap-sep" aria-hidden />
+                      <span>{post.readingTimeMinutes} min read</span>
+                    </>
+                  ) : null}
+                </span>
               </div>
 
               <div className="recap-share">
+                <span className="recap-share-label">Share</span>
                 <a
                   href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}`}
                   target="_blank"
@@ -467,6 +502,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           </div>
 
           <aside className="space-y-10 lg:sticky lg:top-28" data-testid="post-side-rail">
+            {!isSmartHome && (
             <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]" data-testid="sidebar-share">
               <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">Share This Article</h5>
               <div className="mt-4 flex flex-wrap gap-3">
@@ -497,8 +533,38 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                 </a>
               </div>
             </div>
+            )}
 
-            {recentPosts.length > 0 && (
+            {isSmartHome && spotlightPosts.length > 0 ? (
+              <div data-testid="sidebar-spotlight">
+                <h5 className="spotlight-heading">Spotlight</h5>
+                <ul className="spotlight-list">
+                  {spotlightPosts.map((recent) => {
+                    const img = mediaUrl(recent.coverImage ?? null) ?? firstImageUrl(recent.content);
+                    const rc = recent.categories?.[0];
+                    return (
+                      <li key={recent.id} className="spotlight-item">
+                        <div className="spotlight-text">
+                          {rc ? (
+                            <Link href={`/${rc.slug}`} className="spotlight-cat">{rc.name}</Link>
+                          ) : null}
+                          <Link href={postPath(recent)} className="spotlight-title">{recent.title}</Link>
+                          <span className="spotlight-date">{spotlightDate(recent.publishedAt)}</span>
+                        </div>
+                        <Link href={postPath(recent)} className="spotlight-thumb" tabIndex={-1} aria-hidden>
+                          {img ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={img} alt="" loading="lazy" />
+                          ) : null}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+
+            {!isSmartHome && recentPosts.length > 0 && (
               <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]">
                 <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">Latest Posts</h5>
                 <div className="mt-4 space-y-4">
