@@ -2910,9 +2910,14 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 }
 
 .recap-eyebrow a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   color: #206bea;
   text-decoration: none;
 }
+
+.recap-eyebrow svg { flex: none; }
 
 .recap-eyebrow a:hover { text-decoration: underline; }
 
@@ -2920,8 +2925,10 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   max-width: 598px;
   margin: 0;
   font-family: var(--font-heading), 'Inter', system-ui, sans-serif;
-  /* 2.625rem on desktop, stepping down to 2.125rem on narrow viewports. */
-  font-size: clamp(2.125rem, 1.55rem + 1.8vw, 2.625rem) !important;
+  /* Fixed 3rem, per request. The h1 rule near the top of this file sets 2rem
+     with !important, so this needs !important to win. Steps down on small
+     screens where 3rem would overflow a phone viewport. */
+  font-size: 3rem !important;
   font-weight: 700 !important;
   line-height: 1.14;
   letter-spacing: -0.02em;
@@ -2976,14 +2983,15 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   line-height: 1;
 }
 
+/* Square with a small radius, as the reference shows — not a circle. */
 .recap-avatar {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 9999px;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
   background: #ebedf5;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: #161616;
 }
@@ -2996,8 +3004,18 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 .recap-meta-line {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
+
+.recap-comments {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #206bea;
+  text-decoration: none;
+}
+
+.recap-comments:hover { text-decoration: underline; }
 
 .recap-sep {
   width: 3px;
@@ -3021,27 +3039,33 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   color: #737373;
 }
 
-.recap-share a {
+.recap-share a,
+.recap-share button {
   display: grid;
   place-items: center;
   width: 32px;
   height: 32px;
+  padding: 0;
+  border: 0;
   border-radius: 9999px;
-  background: #f1f2f6;
-  font-size: 13px;
-  font-weight: 700;
+  /* Their value: white pill with a soft drop shadow, not a grey fill. */
+  background: #ffffff;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.0588);
   color: #161616;
   text-decoration: none;
+  cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.recap-share a:hover {
+.recap-share a:hover,
+.recap-share button:hover {
   background: #206bea;
   color: #ffffff;
 }
 
 @media (max-width: 640px) {
   .recap-header { margin-top: 1.25rem; padding-bottom: 2rem; margin-bottom: 2rem; }
+  .recap-title { font-size: 2.125rem !important; }
   .recap-infobar { align-items: flex-start; flex-direction: column; gap: 0.875rem; }
 }
 
@@ -3053,7 +3077,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
    top of this file strips borders, with !important, from any li whose class
    contains it, which would delete the row dividers. */
 .spotlight-heading {
-  font-size: 0.75rem;
+  font-size: 13px !important;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -3092,14 +3116,22 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 .spotlight-title {
   display: block;
   margin-top: 0.35rem;
-  font-family: var(--font-heading), 'Inter', system-ui, sans-serif;
+  /* !important is required, not cosmetic: the global `ul li a` rule sets the
+     body font with !important, and this title is an <a> inside an <li>. */
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
   font-size: 1.0625rem;
-  /* The global `ul li a` rule sets weight 400; the widget title is bold. */
   font-weight: 700 !important;
   line-height: 1.3;
   letter-spacing: -0.01em;
   color: #161616;
   text-decoration: none;
+  /* Two lines max, ellipsised. Keeps every row the same height so the
+     thumbnails and dividers stay on a consistent rhythm. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .spotlight-title:hover { color: #206bea; }
@@ -3125,4 +3157,819 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* ── Recap-style article body (smart-home posts) ──────────────────────────
+   Scoped through the data-category the article already carries, so nothing
+   here can leak into other categories.
+
+   Values lifted from the reference theme's own rules:
+     .entry-content            1.125rem / 1.6 / weight 400, colour #161616
+     .entry-content > *        margin 24px 0, first-child 0, last-child 0
+     headings                  margin 48px top / 24px bottom, clear:both
+                               (32px / 12px under 1024px)
+     heading + next element    margin-top 24px (16px under 1024px)
+     links                     accent #206bea with a 1px underline drawn as a
+                               background gradient, so it sits below the
+                               baseline and breaks around descenders
+     lists                     padding-left 1.75rem, disc, li margin-bottom .5rem
+     media                     10px radius, matching the header cover
+
+   Heading SIZES are deliberately NOT copied: the reference runs content h2 at
+   2.625rem and h3 at 2.125rem, but this site was explicitly set to h2 1.5rem /
+   h3 1.2rem site-wide, and that global rule carries !important. The spacing and
+   rhythm below are the reference's; the scale stays yours. */
+[data-category="smart-home"] .post-content {
+  max-width: 776px;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #161616;
+}
+
+[data-category="smart-home"] .post-content > * {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+[data-category="smart-home"] .post-content > *:first-child { margin-top: 0; }
+[data-category="smart-home"] .post-content > *:last-child { margin-bottom: 0; }
+
+[data-category="smart-home"] .post-content > :where(h1, h2, h3, h4, h5, h6) {
+  margin-top: 48px;
+  margin-bottom: 24px;
+  clear: both;
+  color: #161616;
+}
+
+[data-category="smart-home"] .post-content > :where(h1, h2, h3, h4, h5, h6) + * {
+  margin-top: 24px;
+}
+
+[data-category="smart-home"] .post-content a:not([class]) {
+  color: #206bea;
+  text-decoration: none;
+  /* Their underline: a 1px gradient painted at the foot of the line box. */
+  background-image: linear-gradient(to right, currentColor 0%, currentColor 98%);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  padding-bottom: 0.02em;
+  transition: background-size 0.2s ease;
+}
+
+[data-category="smart-home"] .post-content a:not([class]):hover {
+  background-size: 0 1px;
+}
+
+[data-category="smart-home"] .post-content :where(ul, ol) {
+  padding-left: 1.75rem;
+  padding-right: 0;
+}
+
+[data-category="smart-home"] .post-content ul { list-style-type: disc; }
+[data-category="smart-home"] .post-content ol { list-style-type: decimal; }
+
+[data-category="smart-home"] .post-content :where(ul, ol) li {
+  margin-bottom: 0.5rem;
+  padding-left: 0;
+  color: #161616;
+}
+
+[data-category="smart-home"] .post-content :where(img, figure img) {
+  border-radius: 10px;
+}
+
+[data-category="smart-home"] .post-content blockquote {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 1.5rem;
+  border-left: 3px solid #206bea;
+  color: #161616;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 1023px) {
+  [data-category="smart-home"] .post-content > :where(h1, h2, h3, h4, h5, h6) {
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+  [data-category="smart-home"] .post-content > :where(h1, h2, h3, h4, h5, h6) + * {
+    margin-top: 16px;
+  }
+}
+
+/* Key takeaways callout. The Tailwind `border border-primary/25` it used to
+   carry never rendered — the global borderless rule strips borders from any
+   aside whose class contains "border" — so this is real CSS, on a class name
+   that avoids that substring. Light neutral fill rather than the blue tint. */
+.key-takeaways {
+  background: #f5f7fb;
+  border: 1px solid #e4e9f2;
+}
+
+/* ── Metabar (left rail on smart-home posts) ──────────────────────────────
+   Reading time with a scroll-progress bar, then the contents list. Mirrors the
+   reference theme's cs-entry__metabar column (min 228px), sticky beside the
+   article. h2 entries read as dark and bold, h3 entries as lighter — that is
+   the hierarchy the reference shows, not an active/inactive state. */
+.metabar-col { min-width: 0; }
+
+@media (min-width: 1024px) {
+  /* Sticky has to sit on the grid ITEM, not on the inner .metabar. The grid
+     uses align-items:start, so the column box is only as tall as its content
+     and a sticky child would have no room to travel — it would never move.
+     align-self:start keeps that box short while letting it stick against the
+     grid container's full height. */
+  .metabar-col {
+    position: sticky;
+    top: 7rem;
+    align-self: start;
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    /* Firefox/WebKit scrollbar kept out of the way until it is needed. */
+    scrollbar-width: thin;
+  }
+}
+
+.metabar-card {
+  padding: 0.875rem 1rem 1rem;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.0588);
+}
+
+.metabar-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #161616;
+}
+
+.metabar-time svg { flex: none; color: #737373; }
+
+.metabar-progress {
+  height: 4px;
+  border-radius: 9999px;
+  background: #ebedf5;
+  overflow: hidden;
+}
+
+.metabar-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  background: #206bea;
+  transition: width 0.1s linear;
+}
+
+.metabar-toc { margin-top: 1.75rem; }
+
+.metabar-toc-heading {
+  margin: 0 0 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #737373;
+}
+
+.metabar-toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.metabar-toc li + li { margin-top: 0.9rem; }
+
+.metabar-toc a {
+  display: block;
+  /* !important: the global `ul li a` rule sets the body font and these are
+     anchors inside a list. */
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: #161616;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.metabar-toc li[data-level="2"] > a { font-weight: 700 !important; }
+
+.metabar-toc li[data-level="3"] > a {
+  font-weight: 400 !important;
+  color: #737373;
+}
+
+.metabar-toc a:hover,
+.metabar-toc a[data-active='true'] { color: #206bea; }
+
+@media (max-width: 1023px) {
+  .metabar-card { display: none; }
+  .metabar-toc { margin-top: 0; }
+}
+
+/* ── Sidebar promo card (smart-home posts) ────────────────────────────────
+   Colour-mesh panel under the Spotlight rail. The gradient is layered radial
+   stops rather than an image, so it costs nothing to load and scales to any
+   card height. */
+.trailcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 420px;
+  padding: 1.25rem;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(at 18% 14%, rgba(146, 62, 196, 0.95) 0%, transparent 55%),
+    radial-gradient(at 82% 34%, rgba(196, 68, 118, 0.85) 0%, transparent 55%),
+    radial-gradient(at 72% 8%, rgba(88, 74, 200, 0.85) 0%, transparent 50%),
+    radial-gradient(at 30% 88%, rgba(24, 32, 92, 0.95) 0%, transparent 60%),
+    linear-gradient(150deg, #6a3fa0 0%, #b04b78 42%, #24306b 100%);
+  color: #ffffff;
+}
+
+.trailcard-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.5rem 0.9rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.94);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1c2340;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.45);
+}
+
+.trailcard-badge svg { flex: none; color: #2563eb; }
+
+.trailcard-body { margin-top: auto; }
+
+.trailcard-title {
+  margin: 0;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.trailcard-text {
+  margin: 0.7rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.trailcard-cta {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1.1rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: 8px;
+  background: #2563eb;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.trailcard-cta:hover { background: #1d4ed8; }
+
+/* ── Inline "Read Also" card ──────────────────────────────────────────────
+   Dropped into the middle of a smart-home post body. Class names avoid the
+   substring "border" so the global borderless rule leaves the outline alone. */
+.read-also {
+  margin: 2.5rem 0;
+  padding: 1.75rem;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.read-also-heading {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  color: #161616;
+}
+
+.read-also-list { margin: 0; padding: 0; list-style: none; }
+
+.read-also-item {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.read-also-item + .read-also-item { margin-top: 1.25rem; }
+
+.read-also-thumb {
+  display: block;
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f1f2f6;
+}
+
+.read-also-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.read-also-title {
+  display: block;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-size: 1rem;
+  font-weight: 700 !important;
+  line-height: 1.35;
+  color: #161616;
+  text-decoration: none;
+}
+
+.read-also-title:hover { color: #206bea; }
+
+.read-also-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0;
+  font-size: 0.875rem;
+  color: #737373;
+}
+
+.read-also-dot { width: 3px; height: 3px; border-radius: 9999px; background: rgba(115, 115, 115, 0.6); }
+.read-also-comments { display: inline-flex; align-items: center; gap: 0.3rem; }
+
+/* ── "Related Posts" card ─────────────────────────────────────────────── */
+.related-posts {
+  margin-top: 2.5rem;
+  padding: 1.75rem;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.related-posts-heading {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  color: #161616;
+}
+
+.related-posts-list { margin: 0; padding: 0; list-style: none; }
+
+.related-posts-item {
+  display: grid;
+  grid-template-columns: minmax(0, 230px) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.related-posts-item + .related-posts-item { margin-top: 1.5rem; }
+
+.related-posts-thumb {
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f1f2f6;
+}
+
+.related-posts-thumb img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+
+.related-posts-title {
+  display: block;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-size: 1.25rem;
+  font-weight: 700 !important;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #161616;
+  text-decoration: none;
+}
+
+.related-posts-title:hover { color: #206bea; }
+
+.related-posts-excerpt {
+  margin: 0.55rem 0 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #737373;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.related-posts-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: #737373;
+}
+
+.related-posts-tag { color: #206bea; text-decoration: none; font-weight: 500; }
+.related-posts-tag:hover { text-decoration: underline; }
+.related-posts-dot { width: 3px; height: 3px; border-radius: 9999px; background: rgba(115, 115, 115, 0.6); }
+
+@media (max-width: 640px) {
+  .related-posts-item { grid-template-columns: 1fr; }
+}
+
+/* ── "Questions Answered" card ────────────────────────────────────────── */
+.questions-answered {
+  margin-top: 2.5rem;
+  padding: 1.75rem;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.questions-answered-heading {
+  margin: 0 0 1.5rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  color: #161616;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.qa-list { margin: 0; padding: 0; list-style: none; }
+
+.qa-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) 28px;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.qa-item + .qa-item { margin-top: 1.5rem; }
+
+/* Hidden control for the CSS-only disclosure. */
+.qa-toggle { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
+
+.qa-bullet {
+  width: 8px;
+  height: 8px;
+  margin-top: 0.5rem;
+  border-radius: 9999px;
+  background: #206bea;
+}
+
+.qa-question {
+  margin: 0;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #161616;
+}
+
+.qa-answer {
+  margin: 0.3rem 0 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #737373;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.qa-toggle:checked ~ .qa-body .qa-answer {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+}
+
+.qa-arrow {
+  display: grid;
+  place-items: center;
+  align-self: center;
+  width: 28px;
+  height: 28px;
+  color: #161616;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.2s ease;
+}
+
+.qa-arrow:hover { color: #206bea; }
+.qa-toggle:checked ~ .qa-arrow { transform: rotate(90deg); }
+.qa-toggle:focus-visible ~ .qa-arrow { outline: 2px solid #206bea; outline-offset: 2px; border-radius: 6px; }
+
+/* ── Post footer: next up, meta, share, prev/next ─────────────────────── */
+.post-footer-nav { margin-top: 2.5rem; }
+
+.nextup-heading {
+  margin: 0 0 1rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #161616;
+}
+
+.nextup-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nextup-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 1rem 0.4rem 0.4rem;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.0588);
+  text-decoration: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.nextup-chip:hover { box-shadow: 0 8px 22px 0 rgba(0, 0, 0, 0.1); }
+
+.nextup-thumb {
+  display: block;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f1f2f6;
+}
+
+.nextup-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.nextup-title {
+  max-width: 22ch;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #161616;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e6e6e6;
+}
+
+.post-footer-cat { margin: 0; width: 100%; font-size: 0.9375rem; font-weight: 600; }
+
+.post-footer-cat a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #206bea;
+  text-decoration: none;
+}
+
+.post-footer-cat a:hover { text-decoration: underline; }
+
+.post-footer-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  font-size: 0.9375rem;
+  color: #737373;
+}
+
+.post-footer-comments {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #206bea;
+  text-decoration: none;
+}
+
+.post-footer-comments:hover { text-decoration: underline; }
+
+.post-footer-share { margin-top: 1.25rem; }
+
+.post-prevnext {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e6e6e6;
+}
+
+.post-prevnext-side { min-width: 0; }
+
+.post-prevnext-thumb {
+  display: block;
+  width: 62px;
+  height: 62px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f1f2f6;
+}
+
+.post-prevnext-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.post-prevnext-title {
+  display: block;
+  margin-top: 0.85rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-size: 1.25rem;
+  font-weight: 700 !important;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #161616;
+  text-decoration: none;
+}
+
+.post-prevnext-title:hover { color: #206bea; }
+
+.post-prevnext-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.85rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  background: #eceef4;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #161616;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.post-prevnext-btn:hover { background: #dfe3ee; }
+
+@media (max-width: 640px) {
+  .post-prevnext { grid-template-columns: 1fr; gap: 1.5rem; }
+}
+
+/* ── Full-width "Read Next" strip ─────────────────────────────────────── */
+.read-next {
+  margin-top: 4rem;
+  padding: 2.5rem 0 3rem;
+  background: #f7f8fa;
+}
+
+.read-next-inner {
+  margin: 0 auto;
+  max-width: 1366px;
+  padding: 0 1.5rem;
+}
+
+.read-next-heading {
+  margin: 0 0 1.5rem;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #737373;
+}
+
+.read-next-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 700px) {
+  .read-next-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1100px) {
+  /* Three across, or four when a fourth card exists. */
+  .read-next-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .read-next-grid[data-count="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.read-next-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.read-next-media {
+  display: block;
+  background: #f1f2f6;
+}
+
+.read-next-media img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+
+.read-next-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.25rem;
+}
+
+.read-next-cats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.65rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.read-next-cats a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #206bea;
+  text-decoration: none;
+}
+
+.read-next-cats a:hover { text-decoration: underline; }
+.read-next-cats-sep { margin-right: 0.4rem; color: #c9ccd6; }
+
+.read-next-title {
+  margin: 0;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+}
+
+.read-next-title a { color: #161616; text-decoration: none; }
+.read-next-title a:hover { color: #206bea; }
+
+.read-next-excerpt {
+  margin: 0.85rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #737373;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.read-next-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  font-size: 0.875rem;
+  color: #737373;
+}
+
+.read-next-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #161616;
+}
+
+.read-next-avatar {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  background: #ebedf5;
+  font-size: 12px;
+  font-weight: 700;
+  color: #161616;
 }

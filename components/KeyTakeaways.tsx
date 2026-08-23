@@ -45,7 +45,7 @@ export function KeyTakeaways({
     <aside
       data-testid="key-takeaways"
       aria-label={title}
-      className="not-prose my-6 rounded-xl border border-primary/25 bg-primary/5 p-5 sm:p-6"
+      className="key-takeaways not-prose my-6 rounded-xl p-5 sm:p-6"
     >
       <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">

@@ -14,6 +14,14 @@ import { KeyTakeaways } from '@/components/KeyTakeaways';
 import PostPriceComparison from '@/components/PostPriceComparison';
 import CommentForm from '@/components/CommentForm';
 import ProductCarousel from '@/components/ProductCarousel';
+import PostMetabar from '@/components/PostMetabar';
+import { extractHeadings } from '@/lib/post-headings';
+import ReadAlso from '@/components/ReadAlso';
+import RelatedPosts from '@/components/RelatedPosts';
+import QuestionsAnswered from '@/components/QuestionsAnswered';
+import PostFooterNav from '@/components/PostFooterNav';
+import ReadNext from '@/components/ReadNext';
+import CopyLinkButton from '@/components/CopyLinkButton';
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -147,12 +155,29 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     .then((r) => r.data.filter((p) => p.id !== post.id).slice(0, 10))
     .catch(() => [] as NxtPost[]);
 
-  // Fetched wide so the spotlight below can pick across categories; the
-  // "Latest posts" rail still takes the plain newest five.
-  const recentPool = await listPosts({ pageSize: 24 })
-    .then((r) => r.data.filter((p) => p.id !== post.id))
+  // One wide fetch feeds every rail on the page — spotlight, read-also,
+  // related and prev/next — rather than a query each.
+  const allPosts = await listPosts({ pageSize: 100 })
+    .then((r) => r.data)
     .catch(() => [] as NxtPost[]);
+  const recentPool = allPosts.filter((p) => p.id !== post.id);
   const recentPosts = recentPool.slice(0, 5);
+
+  // Neighbours in publish order. The list is sorted newest first, so the entry
+  // after this one is the older post.
+  const selfIndex = allPosts.findIndex((p) => p.id === post.id);
+  const prevPost = selfIndex >= 0 ? allPosts[selfIndex + 1] ?? null : null;
+  const nextPost = selfIndex > 0 ? allPosts[selfIndex - 1] ?? null : null;
+
+  // Same category first, so the suggestions are actually related.
+  const sameCategory = recentPool.filter((p) =>
+    (p.categories ?? []).some((c) => (post.categories ?? []).some((pc) => pc.slug === c.slug)),
+  );
+  const suggestionPool = [...sameCategory, ...recentPool.filter((p) => !sameCategory.includes(p))];
+  const readAlsoPosts = suggestionPool.slice(0, 2);
+  const relatedPostsList = suggestionPool.slice(2, 4);
+  const nextUpPosts = suggestionPool.slice(0, 4);
+  const readNextPosts = suggestionPool.slice(0, 4);
 
   // One post per category, newest first. Without this the list is whichever
   // category published most recently -- five rows all reading "Best Sellers",
@@ -175,9 +200,18 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     return picked;
   })();
 
-  const [merchantProducts, comments] = await Promise.all([
+  const [merchantProducts, comments, readAlsoCounts] = await Promise.all([
     listMerchantTopProducts(post),
     listPostComments(post.documentId ?? ''),
+    // Counts for the inline Read Also rows. Failures degrade to 0 rather than
+    // taking the page down for a decorative number.
+    Promise.all(
+      readAlsoPosts.map((p) =>
+        listPostComments(p.documentId ?? '')
+          .then((c) => c.length)
+          .catch(() => 0),
+      ),
+    ),
   ]);
 
   const cover = mediaUrl(post.coverImage ?? null) || mediaUrl(post.ogImage ?? null);
@@ -260,6 +294,11 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   // from WordPress and a good number of those bodies open with the same image
   // as the cover, so render it only when the body does not already lead with
   // it — otherwise the reader gets the identical picture twice.
+  // Contents list for the smart-home metabar. Built from the post source with
+  // the same slug helper PostContent uses to emit the ids, so the two cannot
+  // drift apart.
+  const toc = isSmartHome ? extractHeadings(postContent) : [];
+
   const leadImage = firstImageUrl(postContent);
   const sameFile = (a: string, b: string) =>
     decodeURIComponent(a.split('?')[0].split('/').pop() ?? a) ===
@@ -323,7 +362,13 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           <header className="recap-header" data-testid="post-recap-header">
             <div className="recap-header-content">
               <p className="recap-eyebrow">
-                <Link href={`/${category}`}>{cat?.name ?? categoryName(category)}</Link>
+                <Link href={`/${category}`}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="3" y="4" width="7" height="16" rx="1.5" stroke="currentColor" strokeWidth="2" />
+                    <rect x="14" y="4" width="7" height="16" rx="1.5" stroke="currentColor" strokeWidth="2" />
+                  </svg>
+                  {cat?.name ?? categoryName(category)}
+                </Link>
               </p>
 
               <h1 className="recap-title">{post.title}</h1>
@@ -338,7 +383,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                   src={cover}
                   alt={post.coverImage?.alternativeText || post.title}
                   width={1200}
-                  height={675}
+                  height={750}
                   fetchPriority="high"
                 />
               </figure>
@@ -353,13 +398,18 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                   <span className="recap-author-name">{post.author?.name ?? SITE.name}</span>
                 </span>
                 <span className="recap-meta-line">
-                  <time dateTime={post.publishedAt}>{fmtDate(post.publishedAt)}</time>
-                  {post.readingTimeMinutes ? (
-                    <>
-                      <span className="recap-sep" aria-hidden />
-                      <span>{post.readingTimeMinutes} min read</span>
-                    </>
-                  ) : null}
+                  <a className="recap-comments" href="#post-comments">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M21 12a8 8 0 0 1-8 8H7l-4 3v-5.5A8 8 0 1 1 21 12z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    {comments.length}
+                  </a>
+                  <time dateTime={post.publishedAt}>{spotlightDate(post.publishedAt)}</time>
                 </span>
               </div>
 
@@ -371,7 +421,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                   rel="noopener noreferrer"
                   aria-label="Share on Facebook"
                 >
-                  f
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z" />
+                  </svg>
                 </a>
                 <a
                   href={`https://x.com/intent/tweet?url=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
@@ -379,23 +431,46 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                   rel="noopener noreferrer"
                   aria-label="Share on X"
                 >
-                  X
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M17.53 3H20.5l-6.49 7.42L21.64 21h-5.97l-4.68-6.11L5.6 21H2.63l6.94-7.93L2.36 3h6.12l4.23 5.59L17.53 3zm-1.04 16.2h1.65L7.6 4.71H5.83L16.49 19.2z" />
+                  </svg>
                 </a>
-                <a
-                  href={`mailto:?subject=${encodeURIComponent(post.title)}&body=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}`}
-                  aria-label="Share by email"
-                >
-                  @
-                </a>
+                <CopyLinkButton url={`${SITE.url}/${category}/${post.slug}`} />
               </div>
             </div>
           </header>
         ) : null}
 
-        <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
-          <div className="w-full" data-testid="post-body">
+        <div
+          className={
+            isSmartHome
+              ? 'mt-12 grid gap-10 lg:grid-cols-[228px_minmax(0,1fr)_340px] lg:items-start'
+              : 'mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start'
+          }
+        >
+          {isSmartHome ? (
+            <div className="metabar-col" data-testid="post-metabar">
+              <PostMetabar
+                readingTimeMinutes={post.readingTimeMinutes}
+                toc={toc}
+                targetId="post-article-body"
+              />
+            </div>
+          ) : null}
+
+          <div className="w-full" id="post-article-body" data-testid="post-body">
             <KeyTakeaways content={post.keyTakeaways} />
-            <PostContent html={postContent} />
+            <PostContent
+              html={postContent}
+              semanticHeadings={isSmartHome}
+              midBlock={
+                isSmartHome && readAlsoPosts.length > 0 ? (
+                  <ReadAlso
+                    items={readAlsoPosts.map((rp, i) => ({ post: rp, commentCount: readAlsoCounts[i] ?? 0 }))}
+                  />
+                ) : undefined
+              }
+            />
 
             {stepsAreAuthored && useHowTo ? (
               <section className="mt-10" data-testid="howto-steps" aria-labelledby="howto-heading">
@@ -443,6 +518,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               Prices and availability are accurate as of {fmtDate(post.updatedAt)} and subject to change.
             </div>
 
+            {isSmartHome ? null : (
             <div className="mt-10 bg-muted p-8" data-testid="post-author-box">
               <div className="grid gap-6 sm:grid-cols-[72px_minmax(0,1fr)]">
                 <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-white text-2xl font-bold text-ink/30">
@@ -461,8 +537,27 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                 </div>
               </div>
             </div>
+            )}
 
-            {faqs.length > 0 ? (
+            {isSmartHome ? (
+              <>
+                <RelatedPosts posts={relatedPostsList} />
+                <QuestionsAnswered items={faqs} />
+                <PostFooterNav
+                  nextUp={nextUpPosts}
+                  category={category}
+                  categoryName={cat?.name ?? categoryName(category)}
+                  commentCount={comments.length}
+                  updatedAt={post.updatedAt}
+                  shareUrl={`${SITE.url}/${category}/${post.slug}`}
+                  shareTitle={post.title}
+                  prev={prevPost}
+                  next={nextPost}
+                />
+              </>
+            ) : null}
+
+            {!isSmartHome && faqs.length > 0 ? (
               <section className="mt-10" data-testid="faq-section" aria-labelledby="faq-heading">
                 <h2 id="faq-heading" className="font-display text-2xl font-bold tracking-tight text-ink">
                   Frequently asked questions
@@ -478,7 +573,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               </section>
             ) : null}
 
-            <section className="mt-10" data-testid="post-comments">
+            <section className="mt-10" id="post-comments" data-testid="post-comments">
               <h3 className="font-display text-2xl font-bold tracking-tight text-ink">Comments</h3>
               {comments.length > 0 ? (
                 <div className="mt-5 space-y-4">
@@ -562,6 +657,25 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                   })}
                 </ul>
               </div>
+            ) : null}
+
+            {isSmartHome ? (
+              <aside className="trailcard" data-testid="sidebar-trailcard">
+                <p className="trailcard-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M21 3L3 10.5l7 2.5 2.5 7L21 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                  </svg>
+                  Deals Live Here
+                </p>
+
+                <div className="trailcard-body">
+                  <h2 className="trailcard-title">Follow the Price Trail</h2>
+                  <p className="trailcard-text">
+                    Explore every category and find the ones that matter to you.
+                  </p>
+                  <Link href="/category" className="trailcard-cta">Explore Categories</Link>
+                </div>
+              </aside>
             ) : null}
 
             {!isSmartHome && recentPosts.length > 0 && (
@@ -693,6 +807,8 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           </aside>
         )}
       </div>
+
+      {isSmartHome && readNextPosts.length > 0 ? <ReadNext posts={readNextPosts} /> : null}
     </article>
   );
 }

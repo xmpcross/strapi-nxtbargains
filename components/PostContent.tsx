@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { headingSlug } from '@/lib/post-headings';
 
 /**
  * Renders post body HTML.
@@ -20,9 +21,28 @@ import type { ReactNode } from 'react';
  * Affiliate-tag rewriting happens at import time (server-side, in the importer)
  * — not here.
  */
-export default function PostContent({ html }: { html: string }) {
+export default function PostContent({
+  html,
+  semanticHeadings = false,
+  midBlock,
+}: {
+  html: string;
+  /**
+   * Keep the authored heading levels and give each one an anchor id, instead of
+   * flattening everything to <h4>. Used by the smart-home layout, whose left
+   * rail links to these ids; the flattening below is what the other categories
+   * still expect.
+   */
+  semanticHeadings?: boolean;
+  /**
+   * Optional node dropped into the middle of the body — used for the inline
+   * "Read Also" card. Placed after a heading where possible so it lands on a
+   * section break rather than splitting a paragraph run.
+   */
+  midBlock?: ReactNode;
+}) {
   const ref = useRef<HTMLDivElement>(null);
-  const body = normalizePostHeadings(html);
+  const body = semanticHeadings ? withHtmlHeadingIds(html) : normalizePostHeadings(html);
   const shouldRenderMarkdown = looksLikeMarkdown(body);
 
   useEffect(() => {
@@ -109,7 +129,7 @@ export default function PostContent({ html }: { html: string }) {
   if (shouldRenderMarkdown) {
     return (
       <div ref={ref} className="post-content" data-testid="post-content">
-        <MarkdownContent markdown={body} />
+        <MarkdownContent markdown={body} semanticHeadings={semanticHeadings} midBlock={midBlock} />
       </div>
     );
   }
@@ -121,6 +141,23 @@ export default function PostContent({ html }: { html: string }) {
       data-testid="post-content"
       dangerouslySetInnerHTML={{ __html: body }}
     />
+  );
+}
+
+/**
+ * Anchor ids on HTML headings, leaving the levels as authored. Existing ids are
+ * kept so any hand-written in-page links keep resolving.
+ */
+function withHtmlHeadingIds(value: string) {
+  const used = new Set<string>();
+  return String(value || '').replace(
+    /<h([1-6])\b([^>]*)>([\s\S]*?)<\/h\1>/gi,
+    (full, lvl, attrs, inner) => {
+      if (/\bid=/i.test(attrs)) return full;
+      const text = inner.replace(/<[^>]+>/g, '').replace(/&[a-z]+;/gi, ' ').trim();
+      if (!text) return full;
+      return `<h${lvl}${attrs} id="${headingSlug(text, used)}">${inner}</h${lvl}>`;
+    },
   );
 }
 
@@ -141,9 +178,19 @@ function looksLikeMarkdown(value: string) {
     || /(^|\n)\s*\d+\.\s+\S/.test(text);
 }
 
-function MarkdownContent({ markdown }: { markdown: string }) {
+function MarkdownContent({
+  markdown,
+  semanticHeadings = false,
+  midBlock,
+}: {
+  markdown: string;
+  semanticHeadings?: boolean;
+  midBlock?: ReactNode;
+}) {
   const lines = markdown.replace(/\r\n/g, '\n').split('\n');
   const blocks: ReactNode[] = [];
+  const headingAt: number[] = [];
+  const usedIds = new Set<string>();
   let key = 0;
   let i = 0;
 
@@ -160,6 +207,23 @@ function MarkdownContent({ markdown }: { markdown: string }) {
     if (heading) {
       const level = Math.min(6, heading[1].length);
       const children = renderInline(heading[2]);
+
+      headingAt.push(blocks.length);
+
+      if (semanticHeadings) {
+        // Authored levels are kept: `#` and `##` become h2, `###` h3, deeper
+        // h4. Each gets the same id the contents rail was built with.
+        const id = headingSlug(
+          heading[2].replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[*_`]+/g, '').trim(),
+          usedIds,
+        );
+        if (level <= 2) blocks.push(<h2 key={key++} id={id}>{children}</h2>);
+        else if (level === 3) blocks.push(<h3 key={key++} id={id}>{children}</h3>);
+        else blocks.push(<h4 key={key++} id={id}>{children}</h4>);
+        i += 1;
+        continue;
+      }
+
       if (level === 1) blocks.push(<h4 key={key++}>{children}</h4>);
       else if (level === 2) blocks.push(<h4 key={key++}>{children}</h4>);
       else if (level === 3) blocks.push(<h4 key={key++}>{children}</h4>);
@@ -209,6 +273,16 @@ function MarkdownContent({ markdown }: { markdown: string }) {
       i += 1;
     }
     blocks.push(<p key={key++}>{renderInline(paragraph.join(' '))}</p>);
+  }
+
+  if (midBlock) {
+    // Land on a section break where the post has one: just before the second
+    // heading, which puts the card a screen or so in rather than immediately
+    // under the intro. Posts with fewer headings fall back to the midpoint,
+    // and very short posts get it appended rather than wedged after block one.
+    const at =
+      headingAt.length >= 2 ? headingAt[1] : blocks.length >= 4 ? Math.floor(blocks.length / 2) : blocks.length;
+    blocks.splice(at, 0, <div key="mid-block">{midBlock}</div>);
   }
 
   return blocks;
