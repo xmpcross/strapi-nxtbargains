@@ -11,10 +11,12 @@ export default function ProductCarousel({
   items,
   interval = 3500,
   perView = 5,
+  gapPx = 20,
 }: {
   items: React.ReactNode[];
   interval?: number;
   perView?: number;
+  gapPx?: 15 | 20;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const paused = useRef(false);
@@ -23,7 +25,7 @@ export default function ProductCarousel({
     const el = trackRef.current;
     if (!el) return;
     const slide = el.querySelector('[data-slide]') as HTMLElement | null;
-    const amount = slide ? slide.getBoundingClientRect().width + 20 /* gap-5 */ : el.clientWidth;
+    const amount = slide ? slide.getBoundingClientRect().width + gapPx : el.clientWidth;
     const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
     const atStart = el.scrollLeft <= 4;
     if (dir === 1 && atEnd) el.scrollTo({ left: 0, behavior: 'smooth' });
@@ -40,9 +42,21 @@ export default function ProductCarousel({
 
   if (!items.length) return null;
 
-  // gap-5 is 1.25rem, so n across leaves (n-1) gaps to subtract.
-  const desktopBasis =
-    perView === 6
+  const compactGap = gapPx === 15;
+  const trackGapClass = compactGap ? 'gap-[15px]' : 'gap-5';
+  const mobileBasis = compactGap
+    ? 'basis-[calc((100%_-_15px)/2)]'
+    : 'basis-[calc((100%_-_1.25rem)/2)]';
+  const tabletBasis = compactGap
+    ? 'sm:basis-[calc((100%_-_30px)/3)]'
+    : 'sm:basis-[calc((100%_-_2.5rem)/3)]';
+  const desktopBasis = compactGap
+    ? perView === 6
+      ? 'lg:basis-[calc((100%_-_75px)/6)]'
+      : perView === 3
+        ? 'lg:basis-[calc((100%_-_30px)/3)]'
+        : 'lg:basis-[calc((100%_-_60px)/5)]'
+    : perView === 6
       ? 'lg:basis-[calc((100%_-_6.25rem)/6)]'
       : perView === 3
         ? 'lg:basis-[calc((100%_-_2.5rem)/3)]'
@@ -56,13 +70,13 @@ export default function ProductCarousel({
     >
       <div
         ref={trackRef}
-        className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className={`flex snap-x snap-mandatory ${trackGapClass} overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
       >
         {items.map((item, i) => (
           <div
             key={i}
             data-slide
-            className={`shrink-0 snap-start basis-[calc((100%_-_1.25rem)/2)] sm:basis-[calc((100%_-_2.5rem)/3)] ${desktopBasis}`}
+            className={`shrink-0 snap-start ${mobileBasis} ${tabletBasis} ${desktopBasis}`}
           >
             {item}
           </div>

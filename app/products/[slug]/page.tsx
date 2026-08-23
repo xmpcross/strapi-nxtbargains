@@ -680,10 +680,11 @@ function ProductGallery({ images, name }: { images: string[]; name: string }) {
   if (!images.length) return null;
 
   return (
-    <div className="mb-6">
+    <div className="my-8">
       <ProductCarousel
         perView={3}
         interval={4000}
+        gapPx={15}
         items={images.map((src, index) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -693,7 +694,7 @@ function ProductGallery({ images, name }: { images: string[]; name: string }) {
             loading="lazy"
             width={800}
             height={800}
-            className="product-gallery-image"
+            className="product-gallery-image rounded-[8px]"
           />
         ))}
       />
