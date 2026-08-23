@@ -139,13 +139,15 @@ export default async function ProductCategoryPage({
             <p>
               {intro.teaser}
               {intro.rest ? <span className="category-intro-rest"> {intro.rest}</span> : null}
+              {/* Inside the paragraph, so it runs on from the last word rather
+                  than dropping to a line of its own. */}
+              {intro.rest ? (
+                <label htmlFor={introToggleId} className="category-intro-more">
+                  <span className="category-intro-more-open">Read More</span>
+                  <span className="category-intro-more-close">Show less</span>
+                </label>
+              ) : null}
             </p>
-            {intro.rest ? (
-              <label htmlFor={introToggleId} className="category-intro-more">
-                <span className="category-intro-more-open">Read More</span>
-                <span className="category-intro-more-close">Show less</span>
-              </label>
-            ) : null}
           </div>
         </div>
       </section>

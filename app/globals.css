@@ -2020,14 +2020,16 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 .category-intro p + p { margin-top: 0.9rem; }
 
 /* Read More disclosure. CSS-only, so the hidden sentences ship in the HTML and
-   are readable without JavaScript — a crawler sees the whole introduction. */
+   are readable without JavaScript — a crawler sees the whole introduction.
+   The label lives inside the paragraph and is inline, so it continues from the
+   final word instead of starting a new line. */
 .category-intro-rest { display: none; }
 .category-intro-toggle:checked ~ p .category-intro-rest { display: inline; }
 
 .category-intro-more {
-  display: inline-block;
-  margin-top: 0.4rem;
-  font-size: 15px;
+  display: inline;
+  margin-left: 0.4rem;
+  white-space: nowrap;
   font-weight: 600;
   color: var(--color-primary, #0046be);
   cursor: pointer;
@@ -2035,8 +2037,8 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 
 .category-intro-more:hover { text-decoration: underline; }
 .category-intro-more-close { display: none; }
-.category-intro-toggle:checked ~ .category-intro-more .category-intro-more-open { display: none; }
-.category-intro-toggle:checked ~ .category-intro-more .category-intro-more-close { display: inline; }
+.category-intro-toggle:checked ~ p .category-intro-more-open { display: none; }
+.category-intro-toggle:checked ~ p .category-intro-more-close { display: inline; }
 
 /* -------------------------------------------------------- category filters --
    Layout lifted from the nxtsmarthome.com.au category sidebar: one white card,
