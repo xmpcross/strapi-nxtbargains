@@ -35,10 +35,10 @@ export default function CommerceProductCard({
   const useUniformImage = uniformImage || catalogLayout;
   const imageBoxClass = useUniformImage
     ? `price-drop-image-box uniform-product-image-box commerce-product-image-box grid aspect-square w-full place-items-center overflow-hidden bg-white p-4 sm:p-5 ${catalogLayout ? 'mb-3.5 rounded-[11px]' : ''}`
-    : 'commerce-product-image-box grid overflow-hidden bg-white';
+    : 'commerce-product-image-box grid aspect-square w-full place-items-center overflow-hidden bg-white p-5';
   const imageClass = useUniformImage
     ? 'price-drop-image uniform-product-image commerce-product-image block h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.04]'
-    : 'commerce-product-image h-52 w-full object-contain p-5 mix-blend-multiply transition duration-500 group-hover:scale-[1.03]';
+    : 'commerce-product-image block h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.03]';
 
   return (
     <article
@@ -59,11 +59,13 @@ export default function CommerceProductCard({
             src={image}
             alt={product.primaryImage?.alternativeText || product.name}
             loading="lazy"
+            width={800}
+            height={800}
             className={imageClass}
           />
         ) : (
           <span className={`flex items-center justify-center bg-muted px-6 text-center font-display font-bold text-ink/25 ${
-            useUniformImage ? 'h-full w-full text-lg' : 'h-52 w-full text-2xl'
+            useUniformImage ? 'h-full w-full text-lg' : 'h-full w-full text-2xl'
           }`}>
             {product.brandRef?.name ?? product.brand ?? 'NXT'}
           </span>

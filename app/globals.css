@@ -1914,6 +1914,211 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 
 .product-short-description > li { line-height: 1.7; }
 
+/* ------------------------------------------------------- product imagery --
+   Every product image renders in the same 800x800 square, whatever the source
+   file is. `contain` letterboxes rather than crops, so a wide TV and a tall
+   phone both fit their box without being cut.
+
+   This is deliberately broad and uses !important: several page-scoped rules
+   below set their own heights (h-52, 82% insets), and the point of this block
+   is that a product image is the same size everywhere it appears. */
+.commerce-product-image-box,
+.uniform-product-image-box,
+.price-drop-image-box,
+.trending-image-box {
+  aspect-ratio: 1 / 1 !important;
+  inline-size: 100%;
+  block-size: auto !important;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.commerce-product-image,
+.uniform-product-image,
+.price-drop-image,
+.trending-image {
+  inline-size: 100% !important;
+  block-size: 100% !important;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  object-fit: contain !important;
+  object-position: center;
+}
+
+/* Category introduction: multi-paragraph, 18px as specified. The size is set
+   here rather than with a utility because the site-wide `p` rule pins body
+   copy and would otherwise win. */
+.category-intro p {
+  font-size: 18px !important;
+  line-height: 1.7;
+  color: rgb(13 27 42 / 0.62);
+}
+
+.category-intro p + p { margin-top: 0.9rem; }
+
+/* -------------------------------------------------------- category filters --
+   Layout lifted from the nxtsmarthome.com.au category sidebar: one white card,
+   labelled sections, and counted rows that fill in when selected.
+
+   These are real CSS rules rather than Tailwind border utilities because the
+   global borderless treatment above strips `border` from any div/aside/nav
+   whose class list contains the string — so a utility border here would be
+   removed and the card would dissolve into the page. */
+.filter-panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgb(13 27 42 / 0.04);
+}
+
+.filter-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Sections after the first are separated by a rule, as in the reference. */
+.filter-section + .filter-section {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.filter-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.filter-field {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  background: #f8fafc;
+  font-size: 12px;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.filter-field:focus { border-color: #118757 !important; background: #ffffff; }
+.filter-field::placeholder { color: #94a3b8; }
+
+select.filter-field { background: #ffffff; font-weight: 500; }
+
+/* A counted row. Idle rows are quiet text; the selected one fills in. */
+.filter-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #334155;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.filter-row:hover { background: #f1f5f9; }
+.filter-row-count { flex-shrink: 0; font-size: 10px; color: #94a3b8; }
+
+/* Categories fill green, price and store fill dark — the reference draws the
+   same distinction between "where you are" and "how it is narrowed". */
+.filter-row-on-accent,
+.filter-row-on-accent:hover {
+  background: #118757;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.filter-row-on-dark,
+.filter-row-on-dark:hover {
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.filter-row-on-accent .filter-row-count,
+.filter-row-on-dark .filter-row-count { color: rgb(255 255 255 / 0.75); }
+
+.filter-scroll { max-height: 15rem; overflow-y: auto; }
+
+/* --------------------------------------------------------- catalog results --
+   Count on the left, active-filter chips on the right. */
+.catalog-results-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.catalog-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.7rem;
+  border-radius: 9999px;
+  background: #dcfce7;
+  font-size: 12px;
+  font-weight: 600;
+  color: #166534;
+}
+
+.catalog-chip a { font-weight: 700; line-height: 1; }
+.catalog-chip a:hover { color: #052e16; }
+
+/* Catalogue cards sit on a white page now, so a border is what separates one
+   from the next — the reference delineates its cards the same way. Set here
+   rather than as a utility because the global borderless rule strips `border`
+   from an <article>. */
+.product-category-grid > article,
+.products-catalog-grid > article {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-category-grid > article:hover,
+.products-catalog-grid > article:hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 10px 24px -18px rgb(13 27 42 / 0.35);
+}
+
+/* ------------------------------------------------------------ catalog pager --
+   Rounded tiles, the current page a solid fill — the reference's pager. Borders
+   live here because the global borderless rule strips them from an <a>. */
+.catalog-pager-btn { border-radius: 6px !important; }
+.catalog-pager-idle {
+  border: 1px solid #cbd5e1 !important;
+  background: #ffffff;
+  color: #334155;
+}
+.catalog-pager-idle:hover { background: #f8fafc; }
+.catalog-pager-active {
+  border: 1px solid #0c5adb !important;
+  background: #0c5adb;
+  color: #ffffff;
+  font-weight: 600;
+}
+.catalog-pager-disabled {
+  border: 1px solid #e2e8f0 !important;
+  background: #f8fafc;
+  color: rgb(13 27 42 / 0.3);
+}
+
 /* ------------------------------------------------------------- title block --
    Brand above the product title, rating and category type below it. */
 .product-title-brand {
