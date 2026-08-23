@@ -3920,7 +3920,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   aspect-ratio: 16 / 10;
   object-fit: contain;
   padding: 20px;
-  background: #ffffff;
+  background: transparent;
 }
 
 .read-next-body {
