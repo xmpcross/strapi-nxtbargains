@@ -15,7 +15,13 @@ import PostPriceComparison from '@/components/PostPriceComparison';
 import CommentForm from '@/components/CommentForm';
 import ProductCarousel from '@/components/ProductCarousel';
 import PostMetabar from '@/components/PostMetabar';
-import { applyHtmlHeadingIds, extractHeadings, isMarkdownContent, splitBodyAtSection } from '@/lib/post-headings';
+import {
+  applyHtmlHeadingIds,
+  extractHeadings,
+  isMarkdownContent,
+  moveCarouselBeforeSection,
+  splitBodyAtSection,
+} from '@/lib/post-headings';
 import ReadAlso from '@/components/ReadAlso';
 import RelatedPosts from '@/components/RelatedPosts';
 import QuestionsAnswered from '@/components/QuestionsAnswered';
@@ -341,6 +347,11 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   // promoting it does not put the same picture twice in a row, and it is left in
   // place because it belongs to a product card that would break without it.
   const headerImage = cover || (isRecapLayout ? firstImageUrl(postContent) : null);
+
+  // The injected product carousel lands partway through a section; lift it to
+  // the section boundary. Done before the ids and the contents rail are built
+  // so both see the final order.
+  postContent = moveCarouselBeforeSection(postContent);
 
   let toc: { id: string; text: string; level: 2 | 3 }[] = [];
   if (showMetabar) {

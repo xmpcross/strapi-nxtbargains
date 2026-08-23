@@ -210,3 +210,59 @@ function splitHtml(text: string): [string, string] | null {
   }
   return null;
 }
+
+/**
+ * Move the injected product carousel so it sits above the Nth section.
+ *
+ * The generator drops the carousel wherever it happens to land in the body —
+ * on the Best Sellers posts that is partway through the third section, so it
+ * interrupts a heading's own prose. Lifting it to just before that heading puts
+ * it on a section boundary instead.
+ *
+ * No-ops rather than guesses when anything is off: no carousel, too few
+ * sections, or a target heading nested inside a container that is still open
+ * (cutting there would produce broken markup).
+ */
+export function moveCarouselBeforeSection(html: string, sectionIndex = 3): string {
+  const text = String(html || '');
+  const open = text.search(/<section\b[^>]*class="[^"]*nxt-product-carousel[^"]*"/i);
+  if (open < 0) return text;
+
+  // Matching close, allowing for nested <section>.
+  let depth = 0;
+  let cursor = open;
+  let close = -1;
+  while (cursor < text.length) {
+    const nextOpen = text.indexOf('<section', cursor + 1);
+    const nextClose = text.indexOf('</section>', cursor + 1);
+    if (nextClose < 0) break;
+    if (nextOpen >= 0 && nextOpen < nextClose) {
+      depth += 1;
+      cursor = nextOpen;
+    } else {
+      if (depth === 0) {
+        close = nextClose + '</section>'.length;
+        break;
+      }
+      depth -= 1;
+      cursor = nextClose;
+    }
+  }
+  if (close < 0) return text;
+
+  const block = text.slice(open, close);
+  const rest = text.slice(0, open) + text.slice(close);
+
+  const headings = [...rest.matchAll(/<h2\b[^>]*>/gi)].map((m) => m.index ?? -1).filter((i) => i >= 0);
+  if (headings.length < sectionIndex) return text;
+
+  const at = headings[sectionIndex - 1];
+  const chunk = rest.slice(0, at);
+  for (const tag of ['div', 'section', 'aside', 'ul', 'ol', 'table']) {
+    const o = (chunk.match(new RegExp(`<${tag}\\b`, 'gi')) ?? []).length;
+    const c = (chunk.match(new RegExp(`</${tag}>`, 'gi')) ?? []).length;
+    if (o !== c) return text;
+  }
+
+  return `${rest.slice(0, at)}${block}\n${rest.slice(at)}`;
+}
