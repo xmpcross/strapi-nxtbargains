@@ -19,7 +19,7 @@ import {
   listCommerceProducts,
 } from '@/lib/strapi';
 import { SITE } from '@/lib/site';
-import { categoryDescriptionParagraph, categoryDescriptionSummary } from '@/lib/category-descriptions';
+import { categoryDescriptionSummary, categoryDescriptionTeaser } from '@/lib/category-descriptions';
 import { pageOpenGraph } from '@/lib/seo';
 
 export const revalidate = 300;
@@ -99,6 +99,8 @@ export default async function ProductCategoryPage({
   const total = filteredProducts.length;
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const products = filteredProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const intro = categoryDescriptionTeaser(category);
+  const introToggleId = `category-intro-${category.slug}`;
   const activeFilterCount = activeFiltersCount(filters);
 
   if (page > pageCount && total > 0) notFound();
@@ -128,8 +130,22 @@ export default async function ProductCategoryPage({
           <h1 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
             {category.name}
           </h1>
+          {/* Two sentences, then the rest behind a disclosure. A CSS-only
+              checkbox toggle, as the offer list further down uses: the hidden
+              text stays in the served HTML for crawlers and for anyone with
+              JavaScript off, rather than being absent until a click. */}
           <div className="category-intro mt-4 w-full">
-            <p>{categoryDescriptionParagraph(category)}</p>
+            <input id={introToggleId} type="checkbox" className="category-intro-toggle sr-only" />
+            <p>
+              {intro.teaser}
+              {intro.rest ? <span className="category-intro-rest"> {intro.rest}</span> : null}
+            </p>
+            {intro.rest ? (
+              <label htmlFor={introToggleId} className="category-intro-more">
+                <span className="category-intro-more-open">Read More</span>
+                <span className="category-intro-more-close">Show less</span>
+              </label>
+            ) : null}
           </div>
         </div>
       </section>

@@ -129,7 +129,7 @@ body {
   background: theme('colors.paper');
   color: theme('colors.ink');
   font-size: 16px;
-  font-weight:300;
+  font-weight: 400;
   line-height: 1.55;
   font-family: var(--font-body), Arial, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
 }
@@ -141,7 +141,7 @@ ul li a,
 ol li,
 ol li a {
   font-family: var(--font-body), Arial, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
-  font-weight:300;
+  font-weight: 400;
 }
 
 button,
@@ -269,7 +269,6 @@ main[data-testid^="product-price-"] h2 {
 
 [data-testid="related-products"] article[data-testid^="commerce-product-"] > div:last-child > p:first-child {
   font-size: 12px !important;
-  font-weight: 300 !important;
   letter-spacing: 0 !important;
 }
 
@@ -2019,6 +2018,25 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 }
 
 .category-intro p + p { margin-top: 0.9rem; }
+
+/* Read More disclosure. CSS-only, so the hidden sentences ship in the HTML and
+   are readable without JavaScript — a crawler sees the whole introduction. */
+.category-intro-rest { display: none; }
+.category-intro-toggle:checked ~ p .category-intro-rest { display: inline; }
+
+.category-intro-more {
+  display: inline-block;
+  margin-top: 0.4rem;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary, #0046be);
+  cursor: pointer;
+}
+
+.category-intro-more:hover { text-decoration: underline; }
+.category-intro-more-close { display: none; }
+.category-intro-toggle:checked ~ .category-intro-more .category-intro-more-open { display: none; }
+.category-intro-toggle:checked ~ .category-intro-more .category-intro-more-close { display: inline; }
 
 /* -------------------------------------------------------- category filters --
    Layout lifted from the nxtsmarthome.com.au category sidebar: one white card,

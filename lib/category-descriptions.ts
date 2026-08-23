@@ -134,3 +134,21 @@ export function categoryDescriptionParagraph(category: { name: string; slug: str
 export function categoryDescriptionSummary(category: { name: string; slug: string }): string {
   return categoryDescriptionParagraph(category);
 }
+
+/**
+ * The introduction split for a "Read More" disclosure: the first two sentences
+ * are always visible, the remainder is revealed on demand.
+ *
+ * Cut at sentence boundaries with the same care the product descriptions use —
+ * the lookahead keeps decimals and abbreviations intact, so "$1,000+" and
+ * "e.g." do not become a break.
+ */
+export function categoryDescriptionTeaser(category: { name: string; slug: string }): {
+  teaser: string;
+  rest: string;
+} {
+  const full = categoryDescriptionParagraph(category);
+  const parts = full.split(/(?<=[.!?])\s+(?=["'\u201c(]?[A-Z0-9])/);
+  if (parts.length <= 2) return { teaser: full, rest: '' };
+  return { teaser: parts.slice(0, 2).join(' '), rest: parts.slice(2).join(' ') };
+}
