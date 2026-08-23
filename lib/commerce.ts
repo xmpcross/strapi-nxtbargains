@@ -133,6 +133,15 @@ function merchantSearchUrl(offer: CommerceOffer, product?: CommerceProduct, goog
   if (slug.includes('walmart')) return `https://www.walmart.com/search?q=${query}`;
   if (slug.includes('ebay')) return `https://www.ebay.com/sch/i.html?_nkw=${query}`;
   if (slug.includes('newegg')) return `https://www.newegg.com/p/pl?d=${query}`;
+  // Specialist and brand-direct stores that carry the sports-watch catalogue.
+  // Without these the chain falls back to a merchant homepage, which drops the
+  // reader somewhere they still have to search for the product themselves.
+  if (slug.includes('rei')) return `https://www.rei.com/search?q=${query}`;
+  if (slug.includes('dick')) return `https://www.dickssportinggoods.com/search/SearchDisplay?searchTerm=${query}`;
+  if (slug.includes('scheels')) return `https://www.scheels.com/search?q=${query}`;
+  if (slug.includes('garmin')) return `https://www.garmin.com/en-US/search/?q=${query}`;
+  if (slug.includes('suunto')) return `https://www.suunto.com/search/?q=${query}`;
+  if (slug.includes('amazfit')) return `https://www.amazfit.com/search?q=${query}`;
 
   return offer.merchant?.websiteUrl ?? null;
 }
