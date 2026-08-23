@@ -92,27 +92,36 @@ export default async function SearchPage({
   const hasActiveFilters = Boolean(category) || Boolean(postType);
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-12" data-testid="search-page">
+    <section className="mx-auto max-w-[1366px] px-4 py-12 sm:px-6" data-testid="search-page">
       <header>
-        <p className="text-xs font-bold uppercase tracking-wider text-primary">Search</p>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+        {/* Breadcrumb then a heading that names the query, as the reference
+            does — the eyebrow said "Search" twice over. */}
+        <nav aria-label="Breadcrumb" className="text-sm text-ink/50">
+          <Link href="/" className="transition hover:text-ink">Home</Link>
+          <span className="mx-2" aria-hidden="true">›</span>
+          <span className="text-ink">{query ? `Search: ${query}` : 'Search'}</span>
+        </nav>
+
+        <h1 className="mt-4 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">
           {query ? <>Results for “{query}”</> : 'Search'}
         </h1>
 
-        <form
-          action="/search"
-          method="get"
-          className="mt-6 flex h-12 max-w-xl items-center gap-2 rounded-full border border-ink/15 bg-white px-5 transition focus-within:border-primary"
-        >
+        {/* Separate controls rather than one pill: a labelled button beside the
+            field is easier to hit than a word inside its border. */}
+        <form action="/search" method="get" className="mt-7 flex max-w-xl gap-3">
+          <label htmlFor="site-search" className="sr-only">Search</label>
           <input
+            id="site-search"
             type="search"
             name="q"
             defaultValue={query}
             placeholder="Search products, brands, guides…"
-            className="h-full w-full bg-transparent text-base text-ink outline-none placeholder:text-ink/45"
-            aria-label="Search"
+            className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-base text-ink outline-none transition placeholder:text-ink/45 focus:border-primary"
           />
-          <button type="submit" className="text-sm font-bold uppercase tracking-wider text-primary">
+          <button
+            type="submit"
+            className="shrink-0 rounded-lg bg-primary px-7 py-3 font-bold text-white transition hover:bg-primary-emphasis"
+          >
             Search
           </button>
         </form>

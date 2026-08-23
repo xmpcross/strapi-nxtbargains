@@ -248,6 +248,8 @@ const priceDrops = deals.filter((d) => d.pct > 0).sort((a, b) => b.pct - a.pct).
         </section>
       )}
 
+      <HomepageTrustContent />
+
       <HomepageCouponsSection
         coupons={couponPageData.coupons}
         retailers={couponPageData.retailers}
@@ -584,6 +586,70 @@ function HowItWorks() {
                 <p className="mt-2 text-[0.92rem] leading-[1.55] text-white/70">{s.d}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HomepageTrustContent() {
+  const services = [
+    {
+      title: 'Product price comparison',
+      body: 'NXT.Bargains brings product listings, seller offers and marketplace prices into one place so shoppers can compare options without opening a dozen tabs.',
+    },
+    {
+      title: 'Deals, coupons and price drops',
+      body: 'The site highlights current discounts, coupon opportunities and notable price drops across popular electronics categories, including phones, laptops, tablets, smartwatches and smart home products.',
+    },
+    {
+      title: 'Buying guides and product reviews',
+      body: 'Editorial guides explain important specifications, common trade-offs and practical buying tips, helping visitors understand what matters before they choose a product.',
+    },
+  ];
+
+  return (
+    <section className="border-y border-ink/10 bg-white py-14 sm:py-[76px]" data-testid="home-about-service">
+      <div className="mx-auto grid max-w-[1366px] gap-10 px-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start">
+        <div className="max-w-[58ch]">
+          <p className="text-[0.74rem] font-bold uppercase tracking-[0.16em] text-primary">About NXT.Bargains</p>
+          <h2 className="mt-2 font-display text-[clamp(1.5rem,2.6vw,2rem)] font-extrabold leading-tight text-ink">
+            Independent shopping research for comparing tech prices before you buy.
+          </h2>
+          <div className="mt-5 space-y-4 text-[0.98rem] leading-7 text-ink/70">
+            <p>
+              NXT.Bargains is a product discovery and price-comparison website built for shoppers who want clearer buying decisions. We organise marketplace offers, product details, buying guides, reviews, coupons and deal pages so visitors can compare real options from one starting point.
+            </p>
+            <p>
+              Our service focuses on consumer technology and everyday electronics, including smartphones, laptops, tablets, headphones, smartwatches, security cameras, smart home devices and related accessories. Product pages are designed to show useful information first: current offers, key specifications, short summaries, product images, seller details and links to relevant research.
+            </p>
+            <p>
+              NXT.Bargains is free to use and does not require an account. Some outbound store links may be affiliate links, which means we may earn a commission if a visitor buys through those links, at no extra cost to the shopper.
+            </p>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/about" className="rounded-[8px] border border-ink/10 bg-ink px-4 py-2.5 font-display text-sm font-semibold text-white transition hover:-translate-y-px hover:bg-primary">
+              Learn about us
+            </Link>
+            <Link href="/contact" className="rounded-[8px] border border-ink/10 bg-white px-4 py-2.5 font-display text-sm font-semibold text-ink transition hover:-translate-y-px hover:border-primary hover:text-primary">
+              Contact NXT.Bargains
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+          {services.map((service) => (
+            <article key={service.title} className="rounded-[8px] border border-ink/10 bg-[#f7f9f2] p-5">
+              <h3 className="font-display text-[1.05rem] font-bold text-ink">{service.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-ink/68">{service.body}</p>
+            </article>
+          ))}
+          <div className="rounded-[8px] border border-primary/25 bg-primary/5 p-5">
+            <h3 className="font-display text-[1.05rem] font-bold text-ink">Why this helps shoppers</h3>
+            <p className="mt-2 text-sm leading-6 text-ink/68">
+              Prices, availability and seller promotions can change quickly. NXT.Bargains gives visitors a structured place to check product details, compare stores and read practical buying advice before making a purchase decision.
+            </p>
           </div>
         </div>
       </div>
