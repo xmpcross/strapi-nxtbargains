@@ -2608,13 +2608,16 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   line-height: 1.2;
 }
 
-/* Headings inside an accordion panel take the brand blue, so the sub-headings
-   in the description read as a level below the near-black accordion titles
-   (Product details / Specifications / Additional Info) rather than competing
-   with them at the same weight and colour. */
+/* Headings inside the Product details panel sit at #333333 — a level below the
+   near-black accordion titles (Product details / Specifications / Additional
+   Info) without competing with them. Covers h2 to h6: ProductDescription emits
+   h3 for both "##" and "###", but the imported copy is free to use any level. */
+.tab-panel-description h2,
 .tab-panel-description h3,
-.tab-panel-description h4 {
-  color: var(--color-primary, #0046be);
+.tab-panel-description h4,
+.tab-panel-description h5,
+.tab-panel-description h6 {
+  color: #333333 !important;
 }
 
 /* Review card. The border is declared here because the global borderless
