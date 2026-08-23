@@ -2842,19 +2842,156 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   color: rgba(13, 27, 42, 0.7);
 }
 
-/* Visible post title (smart-home posts). Sits under the featured image so the
-   cover still leads the page. Larger than the global h1 rule, which is tuned
-   for the sr-only/product-title cases elsewhere on post pages. */
-.post-visible-title {
-  margin: 1.75rem 0 0;
+
+/* ── Recap-style post header (smart-home category) ────────────────────────
+   Layout and type scale adapted from the Recap theme's single-post header:
+   category label, title, subtitle, full-width cover, then an infobar holding
+   the byline on the left and share links on the right.
+
+   Values taken from that theme's own tokens rather than eyeballed:
+     title      2.625rem, capped at 598px  (--cs-heading-2-font-size /
+                                            --cs-entry-content-large-width)
+     subtitle   1.125rem / 1.6 / weight 400
+     column     776px                      (--cs-entry-content-width)
+     colours    #161616 primary, #737373 secondary, #206bea accent
+     avatar     22px, share buttons 32px
+   Their body font is Inter, which this site already uses, so the type reads
+   the same without importing anything. */
+.recap-header {
+  margin-top: 2rem;
+}
+
+.recap-header-inner {
+  max-width: 776px;
+}
+
+.recap-eyebrow {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.recap-eyebrow a {
+  color: #206bea;
+  text-decoration: none;
+}
+
+.recap-eyebrow a:hover { text-decoration: underline; }
+
+.recap-title {
+  max-width: 598px;
+  margin: 0.75rem 0 0;
   font-family: var(--font-heading), 'Inter', system-ui, sans-serif;
-  font-size: clamp(1.75rem, 1.15rem + 1.9vw, 2.5rem) !important;
+  /* Their desktop size is 2.625rem, stepping down to 2.125rem on narrower
+     viewports; clamp covers both ends in one rule. */
+  font-size: clamp(2.125rem, 1.55rem + 1.8vw, 2.625rem) !important;
   font-weight: 700 !important;
-  line-height: 1.15;
+  line-height: 1.14;
   letter-spacing: -0.02em;
-  color: #111111;
+  color: #161616;
+}
+
+.recap-subtitle {
+  max-width: 776px;
+  margin: 0.9rem 0 0;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #737373;
+}
+
+/* Cover runs the full content width with square corners, as the theme does. */
+.recap-media {
+  margin: 1.75rem 0 0;
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.recap-media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.recap-infobar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(22, 22, 22, 0.1);
+}
+
+.recap-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.875rem;
+  color: #737373;
+}
+
+.recap-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1;
+}
+
+.recap-avatar {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: #ebedf5;
+  font-size: 11px;
+  font-weight: 700;
+  color: #161616;
+}
+
+.recap-author-name {
+  font-weight: 600;
+  color: #161616;
+}
+
+.recap-sep {
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: rgba(115, 115, 115, 0.6);
+}
+
+.recap-share {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.recap-share a {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: #f1f2f6;
+  font-size: 13px;
+  font-weight: 700;
+  color: #161616;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.recap-share a:hover {
+  background: #206bea;
+  color: #ffffff;
 }
 
 @media (max-width: 640px) {
-  .post-visible-title { margin-top: 1.25rem; }
+  .recap-header { margin-top: 1.25rem; }
+  .recap-infobar { align-items: flex-start; flex-direction: column; gap: 0.875rem; }
 }

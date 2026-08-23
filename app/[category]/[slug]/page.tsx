@@ -273,7 +273,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
       <div className="mx-auto max-w-7xl px-6">
         {!isBestSellersArticle && !isSmartHome && <h1 className="sr-only">{post.title}</h1>}
 
-        {showFeatured ? (
+        {showFeatured && !isSmartHome ? (
           <figure className="post-featured-image" data-testid="post-featured-image">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -286,7 +286,76 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           </figure>
         ) : null}
 
-        {isSmartHome ? <h1 className="post-visible-title">{post.title}</h1> : null}
+        {isSmartHome ? (
+          <header className="recap-header" data-testid="post-recap-header">
+            <div className="recap-header-inner">
+              <p className="recap-eyebrow">
+                <Link href={`/${category}`}>{cat?.name ?? categoryName(category)}</Link>
+              </p>
+
+              <h1 className="recap-title">{post.title}</h1>
+
+              {post.excerpt ? <p className="recap-subtitle">{post.excerpt}</p> : null}
+            </div>
+
+            {cover ? (
+              <figure className="recap-media">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={cover}
+                  alt={post.coverImage?.alternativeText || post.title}
+                  width={1200}
+                  height={675}
+                  fetchPriority="high"
+                />
+              </figure>
+            ) : null}
+
+            <div className="recap-infobar">
+              <div className="recap-meta">
+                <span className="recap-author">
+                  <span className="recap-avatar" aria-hidden>
+                    {(post.author?.name ?? SITE.name).charAt(0)}
+                  </span>
+                  <span className="recap-author-name">{post.author?.name ?? SITE.name}</span>
+                </span>
+                <span className="recap-sep" aria-hidden />
+                <time dateTime={post.publishedAt}>{fmtDate(post.publishedAt)}</time>
+                {post.readingTimeMinutes ? (
+                  <>
+                    <span className="recap-sep" aria-hidden />
+                    <span>{post.readingTimeMinutes} min read</span>
+                  </>
+                ) : null}
+              </div>
+
+              <div className="recap-share">
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Share on Facebook"
+                >
+                  f
+                </a>
+                <a
+                  href={`https://x.com/intent/tweet?url=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Share on X"
+                >
+                  X
+                </a>
+                <a
+                  href={`mailto:?subject=${encodeURIComponent(post.title)}&body=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}`}
+                  aria-label="Share by email"
+                >
+                  @
+                </a>
+              </div>
+            </div>
+          </header>
+        ) : null}
 
         <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
           <div className="w-full" data-testid="post-body">
@@ -320,7 +389,11 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
             <PostPriceComparison post={post} />
 
-            <div className="mt-14 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-ink/10 pt-8 text-xs font-semibold uppercase tracking-[0.12em] text-ink/45">
+            <div
+              className={`mt-14 flex-wrap items-center gap-x-4 gap-y-2 border-t border-ink/10 pt-8 text-xs font-semibold uppercase tracking-[0.12em] text-ink/45 ${
+                isSmartHome ? 'hidden' : 'flex'
+              }`}
+            >
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink/10 text-ink/40">
                 {(post.author?.name ?? SITE.name).charAt(0)}
               </span>
