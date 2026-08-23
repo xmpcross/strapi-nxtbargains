@@ -335,24 +335,15 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                   <aside className="self-center p-5 sm:p-7">
                     {rows.length > 0 ? (
                       <div className="product-offer-list rounded-[10px] border border-[#e5e7eb] bg-white pl-5">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink/45">
-                          Lowest price
-                        </p>
-                        <p className="product-lowest-price mt-1.5 font-display font-bold leading-none tracking-tight text-ink">
-                          {best
-                            ? formatMoney(best.offer.price ?? best.offer.originalPrice, best.offer.currency ?? 'USD')
-                            : 'Check price'}
-                        </p>
-                        <p className="mt-2 text-[13px] text-ink/55">
-                          {best ? `at ${merchantName(best.offer)} · ` : ''}
-                          {rows.length} retailer{rows.length === 1 ? '' : 's'} compared
-                        </p>
-
+                        {/* The "Lowest price / $x / at N retailers" header is
+                            gone: the same price already leads the left column,
+                            and the retailer rows below state the count by being
+                            there. The rows, buy button and disclaimer stay. */}
                         {/* Extra rows stay behind the existing CSS-only toggle, so
                             the list opens at four as the reference does without
                             needing client JavaScript. */}
                         <input id={offerToggleId} type="checkbox" className="product-offer-toggle sr-only" />
-                        <div className="mt-4 grid gap-2">
+                        <div className="grid gap-2">
                           {rows.map((row, index) => (
                             <CompactOfferRow
                               key={row.offer.documentId ?? row.offer.id}

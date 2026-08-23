@@ -597,8 +597,9 @@ a.product-info-sidebar-code:hover {
   border-top: 1px solid rgb(13 27 42 / 0.12);
   background: #ffffff;
   font-family: var(--font-body), Arial, system-ui, sans-serif;
-  font-size: 1.125rem;
-  font-weight: 500;
+  /* Matches the Highlights h2 above: 22px, 700, #111111. */
+  font-size: 22px;
+  font-weight: 700;
   line-height: 1.4;
   color: #111111;
   user-select: none;
@@ -2385,10 +2386,13 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   padding: 1rem 0.25rem;
   border-bottom: 1px solid rgb(13 27 42 / 0.1);
   font-family: var(--font-display, inherit);
-  /* Matches `.product-info-accordion summary`: these read as one stack of tab
-     titles, so a size set on only half of them splits the row. */
-  font-size: 1.125rem;
+  /* Matches `.product-info-accordion summary` and the Highlights h2: these read
+     as one stack of tab titles, so a size set on only some of them splits the
+     row. Colour is pinned too — the triggers inherited the body ink, a shade
+     off the #111111 the other headings use. */
+  font-size: 22px;
   font-weight: 700;
+  color: #111111;
   text-align: left;
   background: none;
   cursor: pointer;

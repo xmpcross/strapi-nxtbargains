@@ -266,7 +266,7 @@ export default async function CouponsPage() {
             <aside className="h-fit border border-ink/10 bg-[#fbfcfd] p-5">
               <h3 className="font-display text-lg font-bold text-ink">Shop by category</h3>
               <p className="mt-2 text-sm text-ink/55">Search coupon codes by product category.</p>
-              <div className="mt-4 grid gap-2">
+              <div className="grid gap-2">
                 {popularCategories.map((cat) => (
                   <CategoryShortcut key={cat.label} label={cat.label} query={cat.query} />
                 ))}
