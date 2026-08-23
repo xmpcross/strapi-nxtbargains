@@ -211,6 +211,10 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   const faqLd = faqs.length >= 2 ? faqJsonLd(faqs) : null;
 
   const isBestSellersArticle = category === 'best-sellers-articles' || cat?.slug === 'best-sellers-articles';
+  // smart-home posts get a visible title. Their bodies open with an <h4> that
+  // is usually a product-name variant rather than the headline, so without this
+  // the page has no visible title at all — only the screen-reader h1.
+  const isSmartHome = category === 'smart-home' || cat?.slug === 'smart-home';
   let postContent = await enrichPostCarouselHtml(post.content);
   // best-sellers-articles: promote the first body heading (the product title) to
   // a semantic <h1> while keeping the h4 size (.post-title-h1), and drop the
@@ -267,7 +271,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
       </section>
 
       <div className="mx-auto max-w-7xl px-6">
-        {!isBestSellersArticle && <h1 className="sr-only">{post.title}</h1>}
+        {!isBestSellersArticle && !isSmartHome && <h1 className="sr-only">{post.title}</h1>}
 
         {showFeatured ? (
           <figure className="post-featured-image" data-testid="post-featured-image">
@@ -281,6 +285,8 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
             />
           </figure>
         ) : null}
+
+        {isSmartHome ? <h1 className="post-visible-title">{post.title}</h1> : null}
 
         <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
           <div className="w-full" data-testid="post-body">

@@ -2841,3 +2841,20 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   background: #ebedf5;
   color: rgba(13, 27, 42, 0.7);
 }
+
+/* Visible post title (smart-home posts). Sits under the featured image so the
+   cover still leads the page. Larger than the global h1 rule, which is tuned
+   for the sr-only/product-title cases elsewhere on post pages. */
+.post-visible-title {
+  margin: 1.75rem 0 0;
+  font-family: var(--font-heading), 'Inter', system-ui, sans-serif;
+  font-size: clamp(1.75rem, 1.15rem + 1.9vw, 2.5rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #111111;
+}
+
+@media (max-width: 640px) {
+  .post-visible-title { margin-top: 1.25rem; }
+}
