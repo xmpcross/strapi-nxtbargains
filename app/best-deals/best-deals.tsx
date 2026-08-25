@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { ModernDealCard } from '../components/ModernDealCard';
+import { ModernDealCard } from '../../components/ModernDealCard';
 
 export interface DealItem {
   id: string;

@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { ModernDealCard } from '../components/ModernDealCard';
+import { ModernDealCard } from '../../components/ModernDealCard';
 
 export interface PriceDropItem {
   id: string;
@@ -124,7 +126,7 @@ export const PriceDropsPage: React.FC = () => {
               activeFilter === "huge_drop" ? "bg-emerald-500 text-black shadow-lg" : "bg-white/5 text-gray-400 hover:bg-white/10"
             }`}
           >
-            🔥 Huge Drops (>30% Off)
+            🔥 Huge Drops (&gt;30% Off)
           </button>
         </div>
 
