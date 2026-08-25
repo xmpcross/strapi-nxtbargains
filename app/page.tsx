@@ -625,7 +625,15 @@ function HomepageTrustContent() {
               Our service focuses on consumer technology and everyday electronics, including smartphones, laptops, tablets, headphones, smartwatches, security cameras, smart home devices and related accessories. Product pages are designed to show useful information first: current offers, key specifications, short summaries, product images, seller details and links to relevant research.
             </p>
             <p>
-              NXT.Bargains is free to use and does not require an account. Some outbound store links may be affiliate links, which means we may earn a commission if a visitor buys through those links, at no extra cost to the shopper.
+              NXT.Bargains is free to use and does not require an account. Some outbound store links may be affiliate links, which means we may earn a commission if a visitor buys through those links, at no extra cost to the shopper.{' '}
+              <a
+                href="https://sovrn.co/1abk4m4"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="break-all font-medium text-primary underline transition hover:text-ink"
+              >
+                https://sovrn.co/1abk4m4
+              </a>
             </p>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
