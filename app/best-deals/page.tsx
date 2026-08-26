@@ -52,8 +52,13 @@ type RealTimeBestDealsCache = {
   items?: RealTimeBestDeal[];
 };
 
-export default async function BestDealsPage() {
-  const { items: realTimeDeals, capturedAt, queries } = await loadRealTimeBestDeals();
+export default async function BestDealsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filter?: string }>;
+}) {
+  const { filter: requestedFilter } = await searchParams;
+  const { items: realTimeDeals, queries } = await loadRealTimeBestDeals();
   const products = realTimeDeals.length > 0
     ? [] as CommerceProduct[]
     : await listCommerceProductsForDeals(160).catch(() => [] as CommerceProduct[]);
@@ -72,26 +77,13 @@ export default async function BestDealsPage() {
 
   const usingRealtime = realTimeDeals.length > 0;
   const dealCount = usingRealtime ? realTimeDeals.length : catalogDeals.length;
-  const topDiscount = usingRealtime
-    ? Math.max(0, ...realTimeDeals.map((d) => d.discountPercent))
-    : catalogDeals[0]?.discount ?? 0;
-  const avgDiscount = usingRealtime && realTimeDeals.length > 0
-    ? Math.round(realTimeDeals.reduce((sum, d) => sum + d.discountPercent, 0) / realTimeDeals.length)
-    : catalogDeals.length > 0
-      ? Math.round(catalogDeals.reduce((sum, d) => sum + d.discount, 0) / catalogDeals.length)
-      : 0;
-  const stores = usingRealtime
-    ? new Set(realTimeDeals.map((d) => d.store)).size
-    : new Set(catalogDeals.map((d) => d.row.offer.merchant?.name || 'Merchant')).size;
-
   const featuredRealtime = realTimeDeals.slice(0, 4);
   const featuredCatalog = catalogDeals.slice(0, 4);
-
-  const updatedLabel = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(capturedAt ? new Date(capturedAt) : new Date());
+  const selectedFilter = requestedFilter && queries.includes(requestedFilter) ? requestedFilter : null;
+  const filteredRealtimeDeals = selectedFilter
+    ? realTimeDeals.filter((deal) => deal.query === selectedFilter)
+    : realTimeDeals;
+  const visibleDealCount = usingRealtime ? filteredRealtimeDeals.length : catalogDeals.length;
 
   const pageJsonLd = collectionPageJsonLd({
     name: 'Best Deals',
@@ -104,14 +96,7 @@ export default async function BestDealsPage() {
     <main data-testid="best-deals-page">
       <JsonLd graph={[pageJsonLd]} />
 
-      <Hero
-        dealCount={dealCount}
-        topDiscount={topDiscount}
-        avgDiscount={avgDiscount}
-        storeCount={stores}
-        updatedLabel={updatedLabel}
-        sourceLabel={usingRealtime ? 'Live merchant search' : 'Product catalog'}
-      />
+      <Hero />
 
       {dealCount > 0 ? (
         <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="featured-deals">
@@ -148,7 +133,7 @@ export default async function BestDealsPage() {
             title="Every deal on this page"
             subtitle={
               dealCount > 0
-                ? `${dealCount} offers ranked by discount. Final prices can change at checkout — verify shipping, condition, and seller details on the merchant site.`
+                ? `${visibleDealCount} ${selectedFilter ? `${selectedFilter} ` : ''}offers ranked by discount. Final prices can change at checkout — verify shipping, condition, and seller details on the merchant site.`
                 : 'No discounted offers are available right now.'
             }
           />
@@ -156,22 +141,33 @@ export default async function BestDealsPage() {
           {queries.length > 0 ? (
             <div className="mt-6 flex flex-wrap gap-2">
               {queries.map((query) => (
-                <span
+                <Link
                   key={query}
-                  className="border border-ink/10 bg-[#f0f2f4] px-3 py-1.5 text-xs font-bold text-ink/60"
+                  href={selectedFilter === query ? '/best-deals#all-deals' : `/best-deals?filter=${encodeURIComponent(query)}#all-deals`}
+                  aria-current={selectedFilter === query ? 'true' : undefined}
+                  className={`border px-3 py-1.5 text-xs font-bold transition hover:border-ink/25 hover:text-ink ${
+                    selectedFilter === query
+                      ? 'border-ink/35 bg-ink text-white'
+                      : 'border-ink/10 bg-[#f0f2f4] text-ink/70'
+                  }`}
                 >
                   {query}
-                </span>
+                </Link>
               ))}
             </div>
           ) : null}
 
-          {usingRealtime ? (
+          {usingRealtime && filteredRealtimeDeals.length > 0 ? (
             <div className="mt-8 grid gap-4 lg:grid-cols-2">
-              {realTimeDeals.map((deal) => (
+              {filteredRealtimeDeals.map((deal) => (
                 <RealTimeDealCard key={`${deal.id}-${deal.url}`} deal={deal} />
               ))}
             </div>
+          ) : selectedFilter ? (
+            <EmptyState
+              title={`No ${selectedFilter} deals right now`}
+              body="Try another filter or check back after the next live merchant refresh."
+            />
           ) : catalogDeals.length > 0 ? (
             <div className="mt-8 grid gap-4 lg:grid-cols-2">
               {catalogDeals.map((deal) => (
@@ -210,21 +206,7 @@ export default async function BestDealsPage() {
   );
 }
 
-function Hero({
-  dealCount,
-  topDiscount,
-  avgDiscount,
-  storeCount,
-  updatedLabel,
-  sourceLabel,
-}: {
-  dealCount: number;
-  topDiscount: number;
-  avgDiscount: number;
-  storeCount: number;
-  updatedLabel: string;
-  sourceLabel: string;
-}) {
+function Hero() {
   return (
     <section className="page-hero">
       <div className="page-hero-inner">
@@ -234,7 +216,7 @@ function Hero({
           <span className="page-hero-crumbs-current">Best deals</span>
         </nav>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
+        <div className="mt-8 max-w-4xl">
           <div>
             <p className="page-hero-eyebrow">NXT.Bargains deals</p>
             <h1 className="page-hero-title">
@@ -248,36 +230,9 @@ function Hero({
             </p>
           </div>
 
-          <aside className="page-hero-panel p-5 sm:p-6" aria-label="Best deals statistics">
-            <p className="page-hero-eyebrow">At a glance</p>
-            <p className="mt-3 text-sm leading-6 text-ink/65">
-              {dealCount > 0
-                ? `A live snapshot of the ${dealCount} strongest deals we're tracking right now, ranked by discount across major marketplaces.`
-                : 'Deals appear here as live merchant offers with sale pricing are tracked across major marketplaces.'}
-            </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-ink/12 pt-5">
-              <Stat label="Live deals" value={String(dealCount)} />
-              <Stat label="Top discount" value={dealCount > 0 ? `${topDiscount}%` : '—'} />
-              <Stat label="Avg. savings" value={dealCount > 0 ? `${avgDiscount}%` : '—'} />
-              <Stat label="Stores" value={String(storeCount)} />
-            </div>
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-ink/12 pt-4 text-xs text-ink/55">
-              <span>Updated {updatedLabel}</span>
-              <span className="font-semibold text-primary">{sourceLabel}</span>
-            </div>
-          </aside>
         </div>
       </div>
     </section>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="font-display text-2xl font-bold text-white">{value}</p>
-      <p className="mt-1 text-sm text-white/55">{label}</p>
-    </div>
   );
 }
 
