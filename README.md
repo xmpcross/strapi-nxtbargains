@@ -5,9 +5,12 @@ electronics. It compares one product across major marketplaces, tracks price
 history, surfaces the best deals and coupon codes, and publishes editorial
 buying guides — with every outbound link monetized through affiliate programs.
 
-This repo is the **Next.js frontend**. Content comes from a **Strapi** headless
-CMS; coupons, deals, and product offers come from a layer of **affiliate feeds
-and APIs** cached to disk and (increasingly) to Strapi.
+This repo is the **Next.js frontend**. Editorial content remains in **Strapi**.
+Product comparisons, retailer offers, and price history can be read from the
+Supabase comparison view by setting `COMMERCE_DATA_SOURCE=supabase`; Supabase is
+the sole production database for that commerce data. Keep the setting at
+`strapi` until `schema.sql` is applied, migration counts are verified, and the
+comparison view contains launch-ready products from at least three marketplaces.
 
 ---
 
@@ -358,4 +361,3 @@ Two cron jobs on the origin server write into `data/` every Sunday:
 Netlify serves whatever was committed, so **a fetch alone does not update the
 live site** — the refreshed data has to be committed and deployed. Either make
 that a deliberate step or move the jobs into CI.
-

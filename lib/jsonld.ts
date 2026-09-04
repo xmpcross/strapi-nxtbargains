@@ -126,6 +126,8 @@ export function articleJsonLd(input: {
   datePublished?: string;
   dateModified?: string;
   url: string;
+  /** Byline. Article schema without an author is flagged by Google. */
+  author?: { name: string; url?: string | null; sameAs?: string[] | null } | null;
 }) {
   return {
     '@context': SCHEMA_CONTEXT,
@@ -135,6 +137,16 @@ export function articleJsonLd(input: {
     image: input.image ? [input.image] : undefined,
     datePublished: input.datePublished,
     dateModified: input.dateModified,
+    ...(input.author
+      ? {
+          author: {
+            '@type': 'Person',
+            name: input.author.name,
+            ...(input.author.url ? { url: input.author.url } : {}),
+            ...(input.author.sameAs?.length ? { sameAs: input.author.sameAs } : {}),
+          },
+        }
+      : {}),
     publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
     mainEntityOfPage: input.url,
   };

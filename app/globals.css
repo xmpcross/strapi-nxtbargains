@@ -1,82 +1,65 @@
+/* Inter, self-hosted from public/fonts — one variable file per style covers
+   every weight the site uses, and nothing is fetched from Google at runtime.
+   The Outfit .ttf faces and the Urbanist face that used to sit here are gone:
+   nine TrueType files were being served for weights Inter carries in one. */
 @font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-100.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 100;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-200.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-300.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-400.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-500.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-600.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-700.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-800.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Outfit';
-  src: url('/fonts/Outfit-normal-900.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Urbanist';
-  src: url('/fonts/UrbanistVariable.woff2') format('woff2');
+  font-family: 'Inter';
+  src: url('/fonts/InterVariable.woff2') format('woff2');
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
 }
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/InterVariable-Italic.woff2') format('woff2');
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+}
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/fonts/BricolageGrotesque-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/fonts/BricolageGrotesque-latin-ext.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@import 'tailwindcss';
+@config '../tailwind.config.ts';
+
+/* Tailwind CSS 4 uses currentColor for bare borders. Preserve the v3 default
+   while legacy components are migrated to explicit border colours. */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', var(--font-body), system-ui, sans-serif !important;
+  }
+}
 
 :root {
   color-scheme: light;
-  --font-body: 'Outfit';
-  --font-heading: 'Urbanist';
+  /* One family for the whole site: body and display both resolve to Inter. */
+  --font-body: 'Inter';
+  --font-heading: 'Inter';
 
   /* ------------------------------------------------------------------ */
   /* Brand palette (Best Buy scheme). Semantic tokens below map onto     */
@@ -177,10 +160,10 @@ html {
 }
 
 body {
-  background: theme('colors.paper');
+  background: #ffffff;
   color: theme('colors.ink');
   font-size: 16px;
-  font-weight:300;
+  font-weight: 400;
   line-height: 1.55;
   font-family: var(--font-body), Arial, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
 }
@@ -192,7 +175,7 @@ ul li a,
 ol li,
 ol li a {
   font-family: var(--font-body), Arial, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
-  font-weight:300;
+  font-weight: 400;
 }
 
 button,
@@ -229,8 +212,8 @@ article[data-testid^="post-"] header h1 {
   font-size: 2rem !important;
   line-height: 1.05;
 }
-h2 { font-size: 2rem !important; line-height: 1.1; letter-spacing: 0; }
-h3 { font-size: 1.625rem !important; line-height: 1.12; letter-spacing: 0; }
+h2 { font-size: 1.5rem !important; line-height: 1.2; letter-spacing: 0; }
+h3 { font-size: 1.2rem !important; line-height: 1.25; letter-spacing: 0; }
 h4 { font-size: 1.3125rem !important; line-height: 1.15; letter-spacing: 0; }
 h5 { font-size: 1.125rem !important; line-height: 1.2; letter-spacing: 0; }
 h6 { font-size: 1rem !important; line-height: 1.25; letter-spacing: 0; }
@@ -320,7 +303,6 @@ main[data-testid^="product-price-"] h2 {
 
 [data-testid="related-products"] article[data-testid^="commerce-product-"] > div:last-child > p:first-child {
   font-size: 12px !important;
-  font-weight: 300 !important;
   letter-spacing: 0 !important;
 }
 
@@ -413,6 +395,13 @@ main[data-testid^="product-price-"] h2 {
     grid-column: 5;
     width: 100%;
   }
+}
+
+/* The page-wide `main[data-testid^="product-price-"] h2` rule sets 22px with
+   !important, so matching its scope and adding the class is what wins here —
+   !important alone would tie and lose on specificity. */
+main[data-testid^="product-price-"] h2.product-info-section-title {
+  font-size: 20px !important;
 }
 
 .product-info-section-title {
@@ -649,8 +638,9 @@ a.product-info-sidebar-code:hover {
   border-top: 1px solid rgb(13 27 42 / 0.12);
   background: #ffffff;
   font-family: var(--font-body), Arial, system-ui, sans-serif;
-  font-size: 18px;
-  font-weight: 500;
+  /* Matches the Highlights h2 above: 20px, 700, #111111. */
+  font-size: 20px !important;
+  font-weight: 700;
   line-height: 1.4;
   color: #111111;
   user-select: none;
@@ -710,25 +700,6 @@ a.product-info-sidebar-code:hover {
 }
 
 /* Stores directory — section headings and card titles. */
-[data-testid="stores-page"] h2,
-[data-testid="coupons-page"] h2,
-[data-testid="brands-page"] h2,
-[data-testid="store-coupons-page"] h2,
-[data-testid="best-deals-page"] h2,
-[data-testid="price-drops-page"] h2 {
-  font-size: 1.375rem !important;
-  line-height: 1.2;
-}
-@media (min-width: 640px) {
-  [data-testid="stores-page"] h2,
-  [data-testid="coupons-page"] h2,
-  [data-testid="brands-page"] h2,
-  [data-testid="store-coupons-page"] h2,
-  [data-testid="best-deals-page"] h2,
-  [data-testid="price-drops-page"] h2 {
-    font-size: 1.5rem !important;
-  }
-}
 h4.store-card-title,
 h4.brand-card-title {
   font-size: 0.8125rem !important;
@@ -835,7 +806,7 @@ main[data-testid^="product-category-"] .product-category-grid article {
   height: 100%;
 }
 
-/* Buying guides editorial block (originfacts Car Rentals layout). */
+/* Buying guides editorial block. */
 [data-testid="home-guides"] .guide-feature-image-box,
 [data-testid="home-guides"] .guide-compact-thumb {
   display: grid;
@@ -844,22 +815,17 @@ main[data-testid^="product-category-"] .product-category-grid article {
 
 [data-testid="home-guides"] .guide-feature-image,
 [data-testid="home-guides"] .guide-compact-image {
-  object-fit: contain !important;
+  block-size: 100% !important;
+  inline-size: 100% !important;
+  max-block-size: 100%;
+  max-inline-size: 100%;
+  object-fit: cover !important;
   object-position: center;
 }
 
-[data-testid="home-guides"] .guide-feature-image {
-  block-size: 88% !important;
-  inline-size: 88% !important;
-  max-block-size: 88%;
-  max-inline-size: 88%;
-}
-
-[data-testid="home-guides"] .guide-compact-image {
-  block-size: 84% !important;
-  inline-size: 84% !important;
-  max-block-size: 84%;
-  max-inline-size: 84%;
+[data-testid="home-guides"] .guide-feature-card,
+[data-testid="home-guides"] .guide-list-panel {
+  min-height: 100%;
 }
 
 @media (min-width: 1024px) {
@@ -894,13 +860,6 @@ main[data-testid^="product-category-"] .product-category-grid article {
     max-height: 100%;
     width: auto;
     aspect-ratio: 1 / 1;
-  }
-
-  [data-testid="home-guides"] .guide-compact-image {
-    block-size: 88% !important;
-    inline-size: 88% !important;
-    max-block-size: 88%;
-    max-inline-size: 88%;
   }
 }
 
@@ -963,12 +922,11 @@ main[data-testid^="product-category-"] .product-category-grid article {
 
 /* Right column list panel — restore borders hidden by global borderless rule. */
 [data-testid="home-guides"] .guide-list-panel {
-  border-top: 1px solid rgba(3, 3, 3, 0.12) !important;
-  border-bottom: 1px solid rgba(3, 3, 3, 0.12) !important;
+  border-color: rgba(3, 3, 3, 0.1) !important;
 }
 
 [data-testid="home-guides"] .guide-list-panel > :not([hidden]) ~ :not([hidden]) {
-  border-top: 1px solid rgba(3, 3, 3, 0.12) !important;
+  border-top: 1px solid rgba(3, 3, 3, 0.1) !important;
 }
 
 /* Article category pages — uniform 1rem card titles. */
@@ -1125,6 +1083,13 @@ main[data-testid^="product-price-"] p {
   font-size: 14px !important;
 }
 
+/* The rule above pins every <p> on this page to 14px with !important, which
+   beats any utility class — a Tailwind text-[24px] here rendered at 14. This
+   is scoped the same way so it carries more specificity, not just !important. */
+main[data-testid^="product-price-"] p.product-lowest-price {
+  font-size: 24px !important;
+}
+
 main[data-testid^="product-price-"] .tab-panel-specifications,
 main[data-testid^="product-price-"] .tab-panel-additional-info {
   font-size: 14px;
@@ -1183,6 +1148,22 @@ main[data-testid^="product-price-"] .product-main-image {
   box-shadow: none !important;
   mix-blend-mode: multiply;
   filter: contrast(1.02);
+}
+
+/* The price widget carried Tailwind border utilities, which the global
+   borderless treatment strips from a div whose class list contains "border" —
+   so it had no edge at all. Declared here with a soft lift. */
+main[data-testid^="product-price-"] .product-offer-list {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(13 27 42 / 0.05), 0 10px 28px -20px rgb(13 27 42 / 0.28);
+}
+
+/* Paragraph copy in the widget reads left, including the commission line,
+   which was centred. */
+main[data-testid^="product-price-"] .product-offer-list p {
+  text-align: left !important;
 }
 
 main[data-testid^="product-price-"] .product-offer-list .product-offer-row-extra {
@@ -1417,7 +1398,10 @@ main[data-testid^="product-price-"] .product-offer-toggle:checked ~ * .show-less
 .post-content .nxt-product-carousel__track {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: calc((100% - 3rem) / 4);
+  /* Three across by default. The track still scrolls for the rest; this only
+     changes how many are in view, and with the contents rail taking a column
+     the article is narrower than it was when this was set to four. */
+  grid-auto-columns: calc((100% - 2rem) / 3);
   gap: 1rem;
   margin-top: 1rem;
   overflow-x: auto;
@@ -1620,11 +1604,11 @@ article[data-testid^="post-"] .post-content .cegg-list-card {
   max-width: 100%;
 }
 
-/* Single post body copy — Outfit for paragraphs and list items. */
+/* Single post body copy — the body family for paragraphs and list items. */
 article[data-testid^="post-"] .post-content p,
 article[data-testid^="post-"] .post-content ul li,
 article[data-testid^="post-"] .post-content ul li a {
-  font-family: 'Outfit', Arial, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: var(--font-body), Arial, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 /* Single post page base surface. */
@@ -1905,6 +1889,514 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
   color: theme('colors.ink');
 }
 
+/* Short description under the product title: same bullet treatment as the
+   Product details list, at the smaller size the summary paragraph used. */
+.product-short-description {
+  font-size: 14px;
+  gap: 0.4rem;
+}
+
+.product-short-description > li { line-height: 1.7; }
+
+/* ------------------------------------------------------ category card --
+   Comparison card for the category listings. Borders and radii are written
+   out here because the global borderless rule strips `border` from an
+   <article>/<a>, which is where most of this card's structure lives. */
+.category-card {
+  padding: 1rem;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px;
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.category-card:hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 14px 30px -22px rgb(13 27 42 / 0.4);
+}
+
+.category-card-rank {
+  flex-shrink: 0;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  background: #118757;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.category-card-chip {
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  background: #f1f5f9;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.category-card-image-box { background: #f8fafc; border-radius: 8px; }
+
+/* Category listing image. Every tile is the same 1/1 frame whatever the source
+   file is; `contain` fits the whole product inside it rather than cropping to
+   fill, so a photo that is not square letterboxes against the tile background
+   instead of losing its edges. */
+.category-card-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  display: block;
+}
+
+.category-card-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.35;
+  color: #0f172a;
+}
+
+.category-card-title a:hover { color: var(--color-primary, #0046be); }
+
+.category-card-stars { color: #f5a623; letter-spacing: 0.02em; }
+.category-card-stars-off { color: rgb(13 27 42 / 0.18); }
+
+.category-card-offers {
+  padding: 0.7rem;
+  border-radius: 8px;
+  background: #f1f5f9;
+}
+
+.category-card-offers-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(13 27 42 / 0.45);
+}
+
+.category-card-offer {
+  display: block;
+  padding: 0.45rem 0.3rem;
+  border-radius: 6px;
+  background: #ffffff;
+  text-align: center;
+  transition: box-shadow 0.15s ease;
+}
+
+.category-card-offer:hover { box-shadow: 0 0 0 1px #cbd5e1; }
+
+.category-card-cta {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 8px !important;
+  background: #118757;
+  text-align: center;
+  font-family: var(--font-display, inherit);
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  transition: background-color 0.15s ease;
+}
+
+.category-card-cta:hover { background: #0d6f47; }
+
+.category-card-more {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgb(13 27 42 / 0.55);
+}
+
+.category-card-more:hover { color: var(--color-primary, #0046be); }
+
+/* The generic catalogue-card border would double up on this one. */
+.product-category-grid > article.category-card { border-radius: 10px; }
+
+/* ------------------------------------------------------- product gallery --
+   Imported photography closing the Product details panel. Layout comes from
+   ProductCarousel; only the tile treatment lives here. */
+.product-gallery-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  display: block;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 0.35rem;
+}
+
+/* ------------------------------------------------------- product imagery --
+   Every product image renders in the same 800x800 square, whatever the source
+   file is. `contain` letterboxes rather than crops, so a wide TV and a tall
+   phone both fit their box without being cut.
+
+   This is deliberately broad and uses !important: several page-scoped rules
+   below set their own heights (h-52, 82% insets), and the point of this block
+   is that a product image is the same size everywhere it appears. */
+.commerce-product-image-box,
+.uniform-product-image-box,
+.price-drop-image-box,
+.trending-image-box {
+  aspect-ratio: 1 / 1 !important;
+  inline-size: 100%;
+  block-size: auto !important;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.commerce-product-image,
+.uniform-product-image,
+.price-drop-image,
+.trending-image {
+  inline-size: 100% !important;
+  block-size: 100% !important;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  object-fit: contain !important;
+  object-position: center;
+}
+
+/* Category introduction: multi-paragraph, 18px as specified. The size is set
+   here rather than with a utility because the site-wide `p` rule pins body
+   copy and would otherwise win. */
+.category-intro p {
+  font-size: 18px !important;
+  line-height: 1.7;
+  color: rgb(13 27 42 / 0.62);
+}
+
+.category-intro p + p { margin-top: 0.9rem; }
+
+/* Read More disclosure. CSS-only, so the hidden sentences ship in the HTML and
+   are readable without JavaScript — a crawler sees the whole introduction.
+   The label lives inside the paragraph and is inline, so it continues from the
+   final word instead of starting a new line. */
+.category-intro-rest { display: none; }
+.category-intro-toggle:checked ~ p .category-intro-rest { display: inline; }
+
+.category-intro-more {
+  display: inline;
+  margin-left: 0.4rem;
+  white-space: nowrap;
+  /* Set explicitly: the label would otherwise inherit the 18px the
+     introduction paragraph carries. */
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-primary, #0046be);
+  cursor: pointer;
+}
+
+.category-intro-more:hover { text-decoration: underline; }
+.category-intro-more-close { display: none; }
+.category-intro-toggle:checked ~ p .category-intro-more-open { display: none; }
+.category-intro-toggle:checked ~ p .category-intro-more-close { display: inline; }
+
+/* -------------------------------------------------------- category filters --
+   Layout lifted from the nxtsmarthome.com.au category sidebar: one white card,
+   labelled sections, and counted rows that fill in when selected.
+
+   These are real CSS rules rather than Tailwind border utilities because the
+   global borderless treatment above strips `border` from any div/aside/nav
+   whose class list contains the string — so a utility border here would be
+   removed and the card would dissolve into the page. */
+.filter-panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgb(13 27 42 / 0.04);
+}
+
+.filter-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Sections after the first are separated by a rule, as in the reference. */
+.filter-section + .filter-section {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.filter-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.filter-field {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  background: #f8fafc;
+  font-size: 12px;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.filter-field:focus { border-color: #118757 !important; background: #ffffff; }
+.filter-field::placeholder { color: #94a3b8; }
+
+select.filter-field { background: #ffffff; font-weight: 500; }
+
+/* A counted row. Idle rows are quiet text; the selected one fills in. */
+.filter-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #334155;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.filter-row:hover { background: #f1f5f9; }
+.filter-row-count { flex-shrink: 0; font-size: 10px; color: #94a3b8; }
+
+/* Categories fill green, price and store fill dark — the reference draws the
+   same distinction between "where you are" and "how it is narrowed". */
+.filter-row-on-accent,
+.filter-row-on-accent:hover {
+  background: #118757;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.filter-row-on-dark,
+.filter-row-on-dark:hover {
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.filter-row-on-accent .filter-row-count,
+.filter-row-on-dark .filter-row-count { color: rgb(255 255 255 / 0.75); }
+
+.filter-scroll { max-height: 15rem; overflow-y: auto; }
+
+/* --------------------------------------------------------- catalog results --
+   Count on the left, active-filter chips on the right. */
+.catalog-results-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.catalog-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.7rem;
+  border-radius: 9999px;
+  background: #dcfce7;
+  font-size: 12px;
+  font-weight: 600;
+  color: #166534;
+}
+
+.catalog-chip a { font-weight: 700; line-height: 1; }
+.catalog-chip a:hover { color: #052e16; }
+
+/* Catalogue cards sit on a white page now, so a border is what separates one
+   from the next — the reference delineates its cards the same way. Set here
+   rather than as a utility because the global borderless rule strips `border`
+   from an <article>. */
+.product-category-grid > article,
+.products-catalog-grid > article {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-category-grid > article:hover,
+.products-catalog-grid > article:hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 10px 24px -18px rgb(13 27 42 / 0.35);
+}
+
+/* ------------------------------------------------------------ catalog pager --
+   Rounded tiles, the current page a solid fill — the reference's pager. Borders
+   live here because the global borderless rule strips them from an <a>. */
+.catalog-pager-btn { border-radius: 6px !important; }
+.catalog-pager-idle {
+  border: 1px solid #cbd5e1 !important;
+  background: #ffffff;
+  color: #334155;
+}
+.catalog-pager-idle:hover { background: #f8fafc; }
+.catalog-pager-active {
+  border: 1px solid #0c5adb !important;
+  background: #0c5adb;
+  color: #ffffff;
+  font-weight: 600;
+}
+.catalog-pager-disabled {
+  border: 1px solid #e2e8f0 !important;
+  background: #f8fafc;
+  color: rgb(13 27 42 / 0.3);
+}
+
+/* ------------------------------------------------------------- title block --
+   Brand above the product title, rating and category type below it. */
+.product-title-brand {
+  margin: 0 0 0.35rem;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(13 27 42 / 0.5);
+}
+
+.product-title-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1.5rem;
+  margin-top: 0.7rem;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.product-title-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.product-title-star { color: #f5a623; font-size: 15px; line-height: 1; letter-spacing: 0.02em; }
+.product-title-star-off { color: rgb(13 27 42 / 0.2); }
+.product-title-rating-value { font-weight: 700; color: #111111; }
+.product-title-rating-count { color: rgb(13 27 42 / 0.55); }
+
+.product-title-type { font-weight: 700; color: #111111; }
+
+.product-title-type a {
+  font-weight: 400;
+  color: var(--color-primary, #0046be);
+}
+
+.product-title-type a:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------ description bullets --
+   Catalogue descriptions arrive as one block of prose; the Product details
+   panel splits them a sentence per line. Custom markers rather than
+   list-style, so the dot aligns to the first line's cap height on a wrapped
+   item instead of floating with the marker box. */
+.product-description-bullets {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: rgb(13 27 42 / 0.7);
+}
+
+.product-description-bullets > li {
+  position: relative;
+  padding-left: 1.15rem;
+  line-height: 1.75;
+}
+
+.product-description-bullets > li::before {
+  content: '';
+  position: absolute;
+  left: 0.15rem;
+  top: 0.72em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgb(13 27 42 / 0.45);
+}
+
+/* --------------------------------------------------------------- highlights --
+   Headline attributes above "About this item". The page's <main> is white, so
+   the tiles carry the contrast themselves rather than sitting in a card.
+   Each one opens the Specifications peek — see ProductHighlights.tsx. */
+.product-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.875rem;
+}
+
+@media (max-width: 1023px) {
+  .product-highlights-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 599px) {
+  .product-highlights-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.product-highlight-tile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  /* Beats the global `button { border-radius: 4px !important }` on specificity,
+     which would otherwise square these off against the 8px card corners. */
+  border-radius: 8px !important;
+  background: #f3f4f6;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.product-highlight-tile:hover { background: #e8eaed; }
+
+.product-highlight-tile:focus-visible {
+  outline: 2px solid var(--color-primary, #0046be);
+  outline-offset: 2px;
+}
+
+.product-highlight-text { min-width: 0; }
+
+.product-highlight-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: rgb(13 27 42 / 0.55);
+}
+
+.product-highlight-value {
+  display: block;
+  font-family: var(--font-body), Arial, system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #111111;
+  /* Values are capped at 48 characters, but an unbroken model number still has
+     to wrap rather than push the chevron out of the tile. */
+  overflow-wrap: anywhere;
+}
+
+.product-highlight-chevron {
+  margin-left: auto;
+  font-size: 1.25rem;
+  line-height: 1;
+  opacity: 0.4;
+}
+
 /* ---------------------------------------------------------------- side peek --
    Features / Specifications / Additional Info open here instead of expanding
    inline, so the reference material never pushes prices and price history down
@@ -1924,7 +2416,13 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
   padding: 1rem 0.25rem;
   border-bottom: 1px solid rgb(13 27 42 / 0.1);
   font-family: var(--font-display, inherit);
+  /* Matches `.product-info-accordion summary` and the Highlights h2: these read
+     as one stack of tab titles, so a size set on only some of them splits the
+     row. Colour is pinned too — the triggers inherited the body ink, a shade
+     off the #111111 the other headings use. */
+  font-size: 20px !important;
   font-weight: 700;
+  color: #111111;
   text-align: left;
   background: none;
   cursor: pointer;
@@ -2046,6 +2544,97 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 @media (min-width: 1024px) { .review-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 1280px) { .review-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
+/* ------------------------------------------------------------- reviews --
+   Best Buy PDP layout: one bordered panel holding the score, the histogram,
+   the summary, a customer-image strip and the review cards. Borders live here
+   because the global borderless treatment strips them from section/div. */
+.product-reviews-panel {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(13 27 42 / 0.05);
+}
+
+.review-cards-divider,
+.review-images-divider { border-top: 1px solid #dddddd !important; }
+
+/* Sentiment chips. Horizontally scrollable, as the reference is, rather than
+   wrapping to three rows on a narrow column. */
+.review-topic-strip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+}
+
+.review-topic {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  padding: 0.3rem 0.7rem;
+  border-radius: 9999px;
+  background: #e7f7ee;
+  border: 1px solid #b7e4cb;
+  font-size: 12px;
+  font-weight: 600;
+  color: #14663f;
+  white-space: nowrap;
+}
+
+.review-topic.is-negative {
+  background: #fdecec;
+  border-color: #f3c2c2;
+  color: #8c2020;
+}
+
+.review-image-strip { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.review-image-thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #f1f5f9;
+}
+
+.review-image-more {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
+  background: #1d252c;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Headings inside the Product details panel sit at #333333 — a level below the
+   near-black accordion titles (Product details / Specifications / Additional
+   Info) without competing with them. Covers h2 to h6: ProductDescription emits
+   h3 for both "##" and "###", but the imported copy is free to use any level. */
+.tab-panel-description h2,
+.tab-panel-description h3,
+.tab-panel-description h4,
+.tab-panel-description h5,
+.tab-panel-description h6 {
+  color: #333333 !important;
+}
+
+/* Review card. The border is declared here because the global borderless
+   treatment strips `border` from an <article> whose class list contains it —
+   the Tailwind utilities this used to carry were being removed, so the cards
+   ran together with nothing between them. */
+.product-review-card {
+  border: 1px solid #dddddd !important;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
 .review-card {
   display: flex; flex-direction: column; gap: 0.5rem;
   padding: 1.15rem; border: 1px solid rgb(13 27 42 / 0.12); background: #fff;
@@ -2091,4 +2680,1760 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 }
 .carousel-track::-webkit-scrollbar {
   display: none;
+}
+
+/* ── Page hero ────────────────────────────────────────────────────────────
+   Shared title block for the standalone pages: about, contact, coupons,
+   stores, brands, best sellers, price drops, sitemap.
+
+   These twelve pages each carried their own copy of a dark #1d252c hero with
+   an inline radial-gradient overlay, which meant twelve places to edit and a
+   slow drift between them. The markup is still per-page (the blocks differ
+   below the description — some carry search boxes, stat strips or aside
+   cards), but every colour and the gradient now live here.
+
+   The background is deliberately light: two faint accent washes over an
+   almost-white base, so the title reads as page furniture rather than a
+   banner competing with the content beneath it.
+
+   The hero runs edge to edge with no bottom rule; the gradient resolving to
+   #ffffff is what hands off to the white page body.
+
+   Keep the substring "border" out of this class name if a border is ever added
+   back — the global rule at the top of this file strips borders from any
+   section whose class contains it, with !important. */
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 0;
+  background:
+    radial-gradient(at 85% 0%, rgba(0, 70, 190, 0.10) 0%, transparent 58%),
+    radial-gradient(at 8% 10%, rgba(255, 224, 0, 0.16) 0%, transparent 55%),
+    linear-gradient(180deg, #f4f7fb 0%, #ffffff 100%);
+  color: #111111;
+}
+
+.page-hero-inner {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto;
+  max-width: 1366px;
+  padding: 3rem 1.5rem 3.25rem;
+}
+
+@media (max-width: 640px) {
+  .page-hero-inner { padding: 2.25rem 1rem 2.5rem; }
+}
+
+/* Breadcrumbs sit above the eyebrow on the pages that have them. */
+.page-hero-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(13, 27, 42, 0.5);
+}
+
+.page-hero-crumbs a { color: rgba(13, 27, 42, 0.5); transition: color 0.15s ease; }
+.page-hero-crumbs a:hover { color: #111111; }
+.page-hero-crumbs .page-hero-crumbs-current { color: var(--colorBgPrimaryHighlight, #0046be); }
+
+/* Was #ffe000 on the dark hero. Yellow on near-white fails contrast outright,
+   so the eyebrow moves to the primary blue and keeps its dot. */
+.page-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--colorBgPrimaryHighlight, #0046be);
+}
+
+.page-hero-eyebrow-dot {
+  height: 6px;
+  width: 6px;
+  border-radius: 9999px;
+  background: var(--colorBgPrimaryHighlight, #0046be);
+}
+
+.page-hero-title {
+  margin-top: 0.85rem;
+  font-family: var(--font-heading), 'Inter', system-ui, sans-serif;
+  font-size: clamp(1.9rem, 1.2rem + 2.2vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #111111;
+}
+
+/* Full width — the old rule capped this at max-w-2xl (~42rem), which left the
+   description in a narrow column against a much wider title. */
+.page-hero-desc {
+  margin-top: 1rem;
+  max-width: none;
+  width: 100%;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: rgba(13, 27, 42, 0.66);
+}
+
+.best-deal-card {
+  border: 1px solid #cbd1d8 !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .page-hero-desc { font-size: 1.125rem; }
+}
+
+/* Secondary hero buttons. These were `border border-white/20` utilities, which
+   the global borderless rule above stripped to nothing — the outline never
+   actually rendered. Real CSS here, so they have a visible edge again. */
+.page-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.625rem 1.25rem;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.page-hero-btn-primary {
+  background: var(--colorBgPrimaryHighlight, #0046be);
+  color: #ffffff;
+}
+.page-hero-btn-primary:hover { background: var(--colorBgPrimaryEmphasis, #003494); }
+
+.page-hero-btn-secondary {
+  background: rgba(13, 27, 42, 0.05);
+  color: rgba(13, 27, 42, 0.78);
+}
+.page-hero-btn-secondary:hover { background: rgba(13, 27, 42, 0.09); color: #111111; }
+
+/* Glass stat panels / search boxes that sat inside the old dark hero. They used
+   bg-white/5 over #1d252c with a border-white/15 hairline; on the light hero
+   that reads as nothing at all. Real border, real surface. */
+.page-hero-panel {
+  border: 1px solid rgba(13, 27, 42, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.page-hero-search {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid rgba(13, 27, 42, 0.16);
+  background: #ffffff;
+}
+
+/* Small pill links (marketplace jump links, letter filters) in the hero. */
+.page-hero-pill {
+  display: inline-flex;
+  background: rgba(13, 27, 42, 0.05);
+  color: rgba(13, 27, 42, 0.7);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.page-hero-pill:hover {
+  background: rgba(13, 27, 42, 0.09);
+  color: var(--colorBgPrimaryHighlight, #0046be);
+}
+
+/* ── Site footer ──────────────────────────────────────────────────────────
+   Was a solid dark #1d252c slab with white text. Now a flat light grey that
+   sits just off the white page body, enough to mark the footer as a separate
+   band without a hard colour break. */
+.site-footer {
+  background: #f5f6fa;
+  color: rgba(13, 27, 42, 0.66);
+  border-top: 0;
+}
+
+/* ── Post featured image ──────────────────────────────────────────────────
+   Top-of-article cover shot. Fixed 16:9 so a mixed bag of imported
+   WordPress uploads (portrait screenshots, wide renders) all crop to the same
+   band instead of pushing the article body down by wildly different amounts. */
+.post-featured-image {
+  margin: 2rem 0 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.post-featured-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+  .post-featured-image { margin-top: 1.25rem; border-radius: 6px; }
+}
+
+/* Copyright bar. Was bg-black, which survived the footer's move to a light
+   palette and left dark text sitting on a black strip. */
+.site-footer-bottom {
+  background: #ebedf5;
+  color: rgba(13, 27, 42, 0.7);
+}
+
+
+/* ── Recap-style post header (smart-home category) ────────────────────────
+   Two-column split header adapted from the Recap theme: text left, cover
+   right, with the byline/share infobar spanning both underneath.
+
+   Grid and type taken from that theme's own rules rather than estimated:
+     .cs-entry__header-standard  grid-template-columns: 1fr 612px
+                                 gap 2.5rem, row-gap 1rem
+                                 padding-bottom/margin-bottom 3rem
+                                 border-bottom 1px #dbdbdb
+     infobar                     grid-column 1/-1, space-between, align end
+     header-meta                 column flex, gap .25rem
+     title    2.625rem capped at 598px   subtitle 1.125rem/1.6
+     colours  #161616 / #737373 / #206bea
+     radius   10px (--cs-thumbnail-border-radius)
+   Their body font is Inter, which this site already ships. */
+.recap-header {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-bottom: 3rem;
+  margin-bottom: 3rem;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+@media (min-width: 1024px) {
+  .recap-header {
+    grid-template-columns: 1fr 612px;
+    column-gap: 2.5rem;
+    row-gap: 1rem;
+    align-items: start;
+  }
+}
+
+.recap-header-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-self: start;
+  min-width: 0;
+}
+
+.recap-eyebrow {
+  margin: 0 0 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.recap-eyebrow a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #206bea;
+  text-decoration: none;
+}
+
+.recap-eyebrow svg { flex: none; }
+
+.recap-eyebrow a:hover { text-decoration: underline; }
+
+.recap-title {
+  max-width: 598px;
+  margin: 0;
+  font-family: var(--font-heading), 'Inter', system-ui, sans-serif;
+  /* Fixed 3rem, per request. The h1 rule near the top of this file sets 2rem
+     with !important, so this needs !important to win. Steps down on small
+     screens where 3rem would overflow a phone viewport. */
+  font-size: 3rem !important;
+  font-weight: 700 !important;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #161616;
+}
+
+.recap-subtitle {
+  max-width: 598px;
+  margin: 1.25rem 0 0;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #737373;
+}
+
+.recap-media {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.recap-media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.recap-infobar {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Author on one line, date and reading time on the next. */
+.recap-header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #737373;
+}
+
+.recap-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1;
+}
+
+/* Square with a small radius, as the reference shows — not a circle. */
+.recap-avatar {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  background: #ebedf5;
+  font-size: 12px;
+  font-weight: 700;
+  color: #161616;
+}
+
+.recap-author-name {
+  font-weight: 600;
+  color: #161616;
+}
+
+.recap-meta-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.recap-comments {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #206bea;
+  text-decoration: none;
+}
+
+.recap-comments:hover { text-decoration: underline; }
+
+.recap-sep {
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: rgba(115, 115, 115, 0.6);
+}
+
+.recap-share {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recap-share-label {
+  margin-right: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #737373;
+}
+
+.recap-share a,
+.recap-share button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  /* Their value: white pill with a soft drop shadow, not a grey fill. */
+  background: #ffffff;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.0588);
+  color: #161616;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.recap-share a:hover,
+.recap-share button:hover {
+  background: #206bea;
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .recap-header { margin-top: 1.25rem; padding-bottom: 2rem; margin-bottom: 2rem; }
+  .recap-title { font-size: 2.125rem !important; }
+  .recap-infobar { align-items: flex-start; flex-direction: column; gap: 0.875rem; }
+}
+
+/* ── Spotlight sidebar widget (smart-home posts) ──────────────────────────
+   Recap-style: small caps heading, then rows of category / title / date with
+   an 86px square thumbnail on the right, separated by hairlines.
+
+   Note the class names avoid the substring "border" — the global rule near the
+   top of this file strips borders, with !important, from any li whose class
+   contains it, which would delete the row dividers. */
+.spotlight-heading {
+  font-size: 13px !important;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #737373;
+}
+
+.spotlight-list {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spotlight-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 86px;
+  gap: 1rem;
+  align-items: start;
+  padding-bottom: 1.375rem;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.spotlight-item + .spotlight-item { padding-top: 1.375rem; }
+
+.spotlight-text { min-width: 0; }
+
+.spotlight-cat {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #206bea;
+  text-decoration: none;
+}
+
+.spotlight-cat:hover { text-decoration: underline; }
+
+.spotlight-title {
+  display: block;
+  margin-top: 0.35rem;
+  /* !important is required, not cosmetic: the global `ul li a` rule sets the
+     body font with !important, and this title is an <a> inside an <li>. */
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-size: 1.0625rem;
+  font-weight: 700 !important;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: #161616;
+  text-decoration: none;
+  /* Two lines max, ellipsised. Keeps every row the same height so the
+     thumbnails and dividers stay on a consistent rhythm. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.spotlight-title:hover { color: #206bea; }
+
+.spotlight-date {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #737373;
+}
+
+.spotlight-thumb {
+  display: block;
+  width: 86px;
+  height: 86px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f1f2f6;
+}
+
+.spotlight-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Recap-style article body ─────────────────────────────────────────────
+   Scoped through data-layout="recap" on the article, which the template sets
+   for the categories listed in RECAP_LAYOUT_CATEGORIES, so nothing here can
+   leak into the categories still using the original template.
+
+   Values lifted from the reference theme's own rules:
+     .entry-content            1.125rem / 1.6 / weight 400, colour #161616
+     .entry-content > *        margin 24px 0, first-child 0, last-child 0
+     headings                  margin 48px top / 24px bottom, clear:both
+                               (32px / 12px under 1024px)
+     heading + next element    margin-top 24px (16px under 1024px)
+     links                     accent #206bea with a 1px underline drawn as a
+                               background gradient, so it sits below the
+                               baseline and breaks around descenders
+     lists                     padding-left 1.75rem, disc, li margin-bottom .5rem
+     media                     10px radius, matching the header cover
+
+   Heading SIZES are deliberately NOT copied: the reference runs content h2 at
+   2.625rem and h3 at 2.125rem, but this site was explicitly set to h2 1.5rem /
+   h3 1.2rem site-wide, and that global rule carries !important. The spacing and
+   rhythm below are the reference's; the scale stays yours. */
+[data-layout="recap"] .post-content {
+  max-width: 776px;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #161616;
+}
+
+[data-layout="recap"] .post-content > * {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+[data-layout="recap"] .post-content > *:first-child { margin-top: 0; }
+[data-layout="recap"] .post-content > *:last-child { margin-bottom: 0; }
+
+[data-layout="recap"] .post-content > :where(h1, h2, h3, h4, h5, h6) {
+  margin-top: 48px;
+  margin-bottom: 24px;
+  clear: both;
+  color: #161616;
+}
+
+[data-layout="recap"] .post-content > :where(h1, h2, h3, h4, h5, h6) + * {
+  margin-top: 24px;
+}
+
+[data-layout="recap"] .post-content a:not([class]) {
+  color: #206bea;
+  text-decoration: none;
+  /* Their underline: a 1px gradient painted at the foot of the line box. */
+  background-image: linear-gradient(to right, currentColor 0%, currentColor 98%);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  padding-bottom: 0.02em;
+  transition: background-size 0.2s ease;
+}
+
+[data-layout="recap"] .post-content a:not([class]):hover {
+  background-size: 0 1px;
+}
+
+[data-layout="recap"] .post-content :where(ul, ol) {
+  padding-left: 1.75rem;
+  padding-right: 0;
+}
+
+[data-layout="recap"] .post-content ul { list-style-type: disc; }
+[data-layout="recap"] .post-content ol { list-style-type: decimal; }
+
+[data-layout="recap"] .post-content :where(ul, ol) li {
+  margin-bottom: 0.5rem;
+  padding-left: 0;
+  color: #161616;
+}
+
+[data-layout="recap"] .post-content :where(img, figure img) {
+  border-radius: 10px;
+}
+
+[data-layout="recap"] .post-content blockquote {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 1.5rem;
+  border-left: 3px solid #206bea;
+  color: #161616;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 1023px) {
+  [data-layout="recap"] .post-content > :where(h1, h2, h3, h4, h5, h6) {
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+  [data-layout="recap"] .post-content > :where(h1, h2, h3, h4, h5, h6) + * {
+    margin-top: 16px;
+  }
+}
+
+/* Key takeaways callout. The Tailwind `border border-primary/25` it used to
+   carry never rendered — the global borderless rule strips borders from any
+   aside whose class contains "border" — so this is real CSS, on a class name
+   that avoids that substring. Light neutral fill rather than the blue tint. */
+.key-takeaways {
+  background: #f5f7fb;
+  border: 1px solid #e4e9f2;
+}
+
+/* ── Metabar (left rail on smart-home posts) ──────────────────────────────
+   Reading time with a scroll-progress bar, then the contents list. Mirrors the
+   reference theme's cs-entry__metabar column (min 228px), sticky beside the
+   article. h2 entries read as dark and bold, h3 entries as lighter — that is
+   the hierarchy the reference shows, not an active/inactive state. */
+.metabar-col { min-width: 0; }
+
+@media (min-width: 1024px) {
+  /* Sticky has to sit on the grid ITEM, not on the inner .metabar. The grid
+     uses align-items:start, so the column box is only as tall as its content
+     and a sticky child would have no room to travel — it would never move.
+     align-self:start keeps that box short while letting it stick against the
+     grid container's full height. */
+  .metabar-col {
+    position: sticky;
+    top: 7rem;
+    align-self: start;
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    /* Firefox/WebKit scrollbar kept out of the way until it is needed. */
+    scrollbar-width: thin;
+  }
+}
+
+.metabar-card {
+  padding: 0.875rem 1rem 1rem;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.0588);
+}
+
+.metabar-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #161616;
+}
+
+.metabar-time svg { flex: none; color: #737373; }
+
+.metabar-progress {
+  height: 4px;
+  border-radius: 9999px;
+  background: #ebedf5;
+  overflow: hidden;
+}
+
+.metabar-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  background: #206bea;
+  transition: width 0.1s linear;
+}
+
+.metabar-toc { margin-top: 1.75rem; }
+
+.metabar-toc-heading {
+  margin: 0 0 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #737373;
+}
+
+.metabar-toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.metabar-toc li + li { margin-top: 0.9rem; }
+
+.metabar-toc a {
+  display: block;
+  /* !important: the global `ul li a` rule sets the body font and these are
+     anchors inside a list. */
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: #161616;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.metabar-toc li[data-level="2"] > a { font-weight: 700 !important; }
+
+.metabar-toc li[data-level="3"] > a {
+  font-weight: 400 !important;
+  color: #737373;
+}
+
+.metabar-toc a:hover,
+.metabar-toc a[data-active='true'] { color: #206bea; }
+
+@media (max-width: 1023px) {
+  .metabar-card { display: none; }
+  .metabar-toc { margin-top: 0; }
+}
+
+/* ── Sidebar promo card (smart-home posts) ────────────────────────────────
+   Colour-mesh panel under the Spotlight rail. The gradient is layered radial
+   stops rather than an image, so it costs nothing to load and scales to any
+   card height. */
+.trailcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 420px;
+  padding: 1.25rem;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(at 18% 14%, rgba(146, 62, 196, 0.95) 0%, transparent 55%),
+    radial-gradient(at 82% 34%, rgba(196, 68, 118, 0.85) 0%, transparent 55%),
+    radial-gradient(at 72% 8%, rgba(88, 74, 200, 0.85) 0%, transparent 50%),
+    radial-gradient(at 30% 88%, rgba(24, 32, 92, 0.95) 0%, transparent 60%),
+    linear-gradient(150deg, #6a3fa0 0%, #b04b78 42%, #24306b 100%);
+  color: #ffffff;
+}
+
+.trailcard-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.5rem 0.9rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.94);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1c2340;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.45);
+}
+
+.trailcard-badge svg { flex: none; color: #2563eb; }
+
+.trailcard-body { margin-top: auto; }
+
+.trailcard-title {
+  margin: 0;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.trailcard-text {
+  margin: 0.7rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.trailcard-cta {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1.1rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: 8px;
+  background: #2563eb;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.trailcard-cta:hover { background: #1d4ed8; }
+
+/* ── Inline "Read Also" card ──────────────────────────────────────────────
+   Dropped into the middle of a smart-home post body. Class names avoid the
+   substring "border" so the global borderless rule leaves the outline alone. */
+.read-also {
+  margin: 2.5rem 0;
+  padding: 1.75rem;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.read-also-heading {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  color: #161616;
+}
+
+.read-also-list { margin: 0; padding: 0; list-style: none; }
+
+.read-also-item {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.read-also-item + .read-also-item { margin-top: 1.25rem; }
+
+.read-also-thumb {
+  display: block;
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f1f2f6;
+}
+
+.read-also-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.read-also-title {
+  display: block;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-size: 1rem;
+  font-weight: 700 !important;
+  line-height: 1.35;
+  color: #161616;
+  text-decoration: none;
+}
+
+.read-also-title:hover { color: #206bea; }
+
+.read-also-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0;
+  font-size: 0.875rem;
+  color: #737373;
+}
+
+.read-also-dot { width: 3px; height: 3px; border-radius: 9999px; background: rgba(115, 115, 115, 0.6); }
+.read-also-comments { display: inline-flex; align-items: center; gap: 0.3rem; }
+
+/* ── "Related Posts" card ─────────────────────────────────────────────── */
+.related-posts {
+  margin-top: 2.5rem;
+  padding: 1.75rem;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.related-posts-heading {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  color: #161616;
+}
+
+.related-posts-list { margin: 0; padding: 0; list-style: none; }
+
+.related-posts-item {
+  display: grid;
+  grid-template-columns: minmax(0, 230px) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.related-posts-item + .related-posts-item { margin-top: 1.5rem; }
+
+.related-posts-thumb {
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f1f2f6;
+}
+
+.related-posts-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  /* Contained rather than cropped: these are product shots on white, and a crop
+     cuts the product rather than trimming background. */
+  object-fit: contain;
+  padding: 20px;
+  background: #ffffff;
+}
+
+.related-posts-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-size: 1.25rem;
+  font-weight: 700 !important;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #161616;
+  text-decoration: none;
+}
+
+.related-posts-title:hover { color: #206bea; }
+
+.related-posts-excerpt {
+  margin: 0.55rem 0 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #737373;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.related-posts-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: #737373;
+}
+
+.related-posts-tag { color: #206bea; text-decoration: none; font-weight: 500; }
+.related-posts-tag:hover { text-decoration: underline; }
+.related-posts-dot { width: 3px; height: 3px; border-radius: 9999px; background: rgba(115, 115, 115, 0.6); }
+
+@media (max-width: 640px) {
+  .related-posts-item { grid-template-columns: 1fr; }
+}
+
+/* ── "Questions Answered" card ────────────────────────────────────────── */
+.questions-answered {
+  margin-top: 2.5rem;
+  padding: 1.75rem;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.questions-answered-heading {
+  margin: 0 0 1.5rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  color: #161616;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.qa-list { margin: 0; padding: 0; list-style: none; }
+
+.qa-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) 28px;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.qa-item + .qa-item { margin-top: 1.5rem; }
+
+/* Hidden control for the CSS-only disclosure. */
+.qa-toggle { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
+
+.qa-bullet {
+  width: 8px;
+  height: 8px;
+  margin-top: 0.5rem;
+  border-radius: 9999px;
+  background: #206bea;
+}
+
+.qa-question {
+  margin: 0;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #161616;
+}
+
+.qa-answer {
+  margin: 0.3rem 0 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #737373;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.qa-toggle:checked ~ .qa-body .qa-answer {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+}
+
+.qa-arrow {
+  display: grid;
+  place-items: center;
+  align-self: center;
+  width: 28px;
+  height: 28px;
+  color: #161616;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.2s ease;
+}
+
+.qa-arrow:hover { color: #206bea; }
+.qa-toggle:checked ~ .qa-arrow { transform: rotate(90deg); }
+.qa-toggle:focus-visible ~ .qa-arrow { outline: 2px solid #206bea; outline-offset: 2px; border-radius: 6px; }
+
+/* ── Post footer: next up, meta, share, prev/next ─────────────────────── */
+.post-footer-nav { margin-top: 2.5rem; }
+
+.nextup-heading {
+  margin: 0 0 1rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #161616;
+}
+
+.nextup-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nextup-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 1rem 0.4rem 0.4rem;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.0588);
+  text-decoration: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.nextup-chip:hover { box-shadow: 0 8px 22px 0 rgba(0, 0, 0, 0.1); }
+
+.nextup-thumb {
+  display: block;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f1f2f6;
+}
+
+.nextup-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.nextup-title {
+  max-width: 22ch;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #161616;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e6e6e6;
+}
+
+.post-footer-cat { margin: 0; width: 100%; font-size: 0.9375rem; font-weight: 600; }
+
+.post-footer-cat a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #206bea;
+  text-decoration: none;
+}
+
+.post-footer-cat a:hover { text-decoration: underline; }
+
+.post-footer-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  font-size: 0.9375rem;
+  color: #737373;
+}
+
+.post-footer-comments {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #206bea;
+  text-decoration: none;
+}
+
+.post-footer-comments:hover { text-decoration: underline; }
+
+.post-footer-share { margin-top: 1.25rem; }
+
+.post-prevnext {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e6e6e6;
+}
+
+.post-prevnext-side { min-width: 0; }
+
+.post-prevnext-thumb {
+  display: block;
+  width: 62px;
+  height: 62px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f1f2f6;
+}
+
+.post-prevnext-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Contained rather than cropped — these are product shots, and a square crop
+     cuts the product rather than trimming background. */
+  object-fit: contain;
+}
+
+.post-prevnext-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 0.85rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-size: 16px;
+  font-weight: 700 !important;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #161616;
+  text-decoration: none;
+}
+
+.post-prevnext-title:hover { color: #206bea; }
+
+.post-prevnext-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.85rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  background: #eceef4;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #161616;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.post-prevnext-btn:hover { background: #dfe3ee; }
+
+@media (max-width: 640px) {
+  .post-prevnext { grid-template-columns: 1fr; gap: 1.5rem; }
+}
+
+/* ── Full-width "Read Next" strip ─────────────────────────────────────── */
+.read-next {
+  margin-top: 4rem;
+  padding: 2.5rem 0 3rem;
+  background: #ffffff;
+  border-top: 0;
+}
+
+.read-next-inner {
+  margin: 0 auto;
+  max-width: 1366px;
+  padding: 0 1.5rem;
+}
+
+.read-next-heading {
+  margin: 0 0 1.5rem;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #737373;
+}
+
+.read-next-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 700px) {
+  .read-next-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1100px) {
+  /* Three across, or four when a fourth card exists. */
+  .read-next-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .read-next-grid[data-count="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.read-next-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* The strip behind these is also white, so without an edge and a lift the
+     cards do not read as cards at all. */
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.0588);
+}
+
+.read-next-media {
+  display: block;
+  /* Matched to the card so the transparent product image sits flush rather
+     than on a panel of its own. */
+  background: #ffffff;
+}
+
+.read-next-media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  padding: 20px;
+  background: transparent;
+}
+
+.read-next-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.25rem;
+}
+
+.read-next-cats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.65rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.read-next-cats a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #206bea;
+  text-decoration: none;
+}
+
+.read-next-cats a:hover { text-decoration: underline; }
+.read-next-cats-sep { margin-right: 0.4rem; color: #c9ccd6; }
+
+.read-next-title {
+  margin: 0;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+}
+
+/* The font has to be restated on the anchor, not just the h3: this title is an
+   <a> inside an <li>, and the global `ul li a` rule sets the body font with
+   !important, which otherwise wins and renders the card titles in Inter. */
+.read-next-title a {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif !important;
+  font-weight: 700 !important;
+  color: #161616;
+  text-decoration: none;
+}
+
+.read-next-title a:hover { color: #206bea; }
+
+.read-next-excerpt {
+  margin: 0.85rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #737373;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.read-next-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  font-size: 0.875rem;
+  color: #737373;
+}
+
+.read-next-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #161616;
+}
+
+.read-next-avatar {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  background: #ebedf5;
+  font-size: 12px;
+  font-weight: 700;
+  color: #161616;
+}
+
+/* ── Comments (recap layout) ──────────────────────────────────────────────
+   Small-caps label, then an "Add a comment" button that reveals the form. The
+   form is collapsed by default — the reference shows it that way, and it keeps
+   a long form from sitting between the article and the page footer. */
+.comments-eyebrow {
+  margin: 0 0 0.9rem;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #737373;
+}
+
+[data-layout="recap"] .comment-collapse { margin-top: 1.25rem; }
+
+.comment-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.1rem;
+  border: 0;
+  border-radius: 8px;
+  background: #2563eb;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.comment-toggle:hover { background: #1d4ed8; }
+.comment-toggle svg { transition: transform 0.2s ease; }
+.comment-toggle svg[data-open='true'] { transform: rotate(180deg); }
+
+.comment-panel { margin-top: 1.5rem; }
+
+.comment-form {
+  padding: 1.75rem;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.comment-form-heading {
+  margin: 0;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  color: #161616;
+}
+
+.comment-form-note {
+  margin: 0.6rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #737373;
+}
+
+.comment-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .comment-form-row { grid-template-columns: 1fr; }
+}
+
+.comment-field { display: flex; flex-direction: column; min-width: 0; }
+.comment-field-full { margin-top: 1.25rem; }
+
+.comment-field label {
+  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #161616;
+}
+
+.comment-req { color: #dc2626; }
+
+.comment-field input,
+.comment-field textarea {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  background: #ffffff;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #161616;
+}
+
+.comment-field textarea { min-height: 120px; resize: vertical; }
+
+.comment-field input::placeholder,
+.comment-field textarea::placeholder { color: #9aa0ab; }
+
+.comment-field input:focus,
+.comment-field textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.comment-remember {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #737373;
+  cursor: pointer;
+}
+
+.comment-remember input {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin-top: 0.1rem;
+  accent-color: #2563eb;
+}
+
+.comment-message { margin: 1rem 0 0; font-size: 0.9375rem; }
+.comment-message.is-ok { color: #047857; }
+.comment-message.is-error { color: #dc2626; }
+
+.comment-submit {
+  margin-top: 1.35rem;
+  padding: 0.7rem 1.15rem;
+  border: 0;
+  border-radius: 8px;
+  background: #2563eb;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.comment-submit:hover { background: #1d4ed8; }
+.comment-submit:disabled { opacity: 0.6; cursor: default; }
+
+.comment-form-footnote { margin: 0.9rem 0 0; font-size: 0.8125rem; color: #9aa0ab; }
+
+/* ── Right rail (recap layout) ────────────────────────────────────────────
+   Spotlight scrolls away with the article; the promo card below it is what
+   stays pinned.
+
+   The rail has to stretch to the full grid row for that to work. The post grid
+   uses align-items:start, which sizes each column to its own content — so a
+   sticky child would sit at the bottom of a short box with nowhere to travel
+   and would never move. align-self:stretch gives the card the length of the
+   article to stick against. */
+.post-side-rail-recap { min-width: 0; }
+
+@media (min-width: 1024px) {
+  .post-side-rail-recap {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Spotlight keeps its natural position and scrolls out of view. */
+  .post-side-rail-recap > [data-testid='sidebar-spotlight'] { flex: none; }
+
+  .post-side-rail-recap > .trailcard {
+    position: sticky;
+    top: 7rem;
+    flex: none;
+  }
+}
+
+/* Best Sellers product card, lifted out of the article column so it spans the
+   full container. Reuses the .post-content card rules; only the proportions
+   change now that it has the whole width to work with. */
+.bestseller-card-full { margin-top: 2rem; }
+
+.bestseller-card-full .nxt-product-card {
+  margin: 0;
+  /* No frame at the top of the page: the card is the header here, not a boxed
+     insert partway down an article. */
+  padding: 0;
+  border: 0;
+  gap: 2.5rem;
+  /* Same column sizing as the editorial header (1fr + 612px): flexible first
+     column, fixed second. Here that is the image left, details right. */
+  grid-template-columns: minmax(0, 1fr) 612px;
+}
+
+/* The image well carries its own border and padding further down the article;
+   both go too, so the shot sits flush in the header. */
+.bestseller-card-full .nxt-product-card__image {
+  padding: 0;
+  border: 0;
+  /* Centred against the details column rather than stretched to its full
+     height, which left short product shots pinned to the top. */
+  align-self: center;
+}
+
+/* height:100% only makes sense while the well is stretched; with it centred the
+   image has to size to its own content or it collapses. */
+.bestseller-card-full .nxt-product-card img {
+  height: auto;
+  max-height: 320px;
+}
+
+/* The editorial header drops to one column under 1024px; the fixed 612px track
+   cannot survive below that either. */
+@media (max-width: 1023px) {
+  .bestseller-card-full .nxt-product-card {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .bestseller-card-full .nxt-product-card__image { grid-row: auto; }
+}
+
+/* Header image standing in from the body — a product shot rather than an
+   editorial cover. Those are square on a white ground, and cropping one to the
+   16:10 cover ratio cuts roughly a third off the product, so it is contained
+   and given the white ground back instead. */
+.recap-media-product {
+  background: #ffffff;
+  border: 1px solid rgba(13, 27, 42, 0.09);
+}
+
+.recap-media-product img {
+  object-fit: contain;
+  padding: 1.25rem;
+}
+
+/* Best Sellers top section: product card, then the shared byline/share row and
+   a rule closing it off, matching where the editorial header ends. */
+.bestseller-header {
+  margin-top: 2rem;
+  padding-top: 50px;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.bestseller-header .bestseller-card-full { margin-top: 0; }
+
+/* Space between the empty-state line and the "Add a comment" button below it —
+   the two were sitting almost flush. */
+.comments-empty {
+  margin: 0.75rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgba(13, 27, 42, 0.55);
+}
+
+.comments-empty + .comment-collapse { margin-top: 1.5rem; }
+
+/* Avatar as a photo rather than an initial. Same box either way, so the row
+   does not shift when a post has an author without a picture. */
+img.recap-avatar,
+img.read-next-avatar {
+  object-fit: cover;
+  background: #ebedf5;
+}
+
+/* Lead block lifted above the columns (the Content Egg offers grid). Runs the
+   full container width; the columned layout starts under it. */
+.post-lead-block { margin-top: 2rem; }
+
+/* ── Browse by category rail (/all-posts) ─────────────────────────────────
+   Card with a titled header, then one row per category: icon, label, and a
+   count badge. The active row is a filled pill.
+
+   Class names avoid the substring "border" — the global rule near the top of
+   this file strips borders from any aside or a whose class contains it, with
+   !important. The previous version of this card used Tailwind's `border
+   border-ink/10` and had therefore been rendering with no edge at all. */
+.browse-cats {
+  border: 0;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 1rem 1rem 1rem 0;
+}
+
+@media (min-width: 1024px) {
+  .browse-cats { position: sticky; top: 7rem; }
+}
+
+.browse-cats-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #ececec;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: #161616;
+}
+
+.browse-cats-head svg { flex: none; color: #161616; }
+
+.browse-cats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-top: 0.85rem;
+}
+
+.browse-cat {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #161616;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.browse-cat:hover { background: #f4f5f8; }
+
+.browse-cat-icon {
+  flex: none;
+  width: 1.15rem;
+  font-size: 0.95rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.browse-cat-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.browse-cat-count {
+  flex: none;
+  min-width: 1.6rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  background: #f1f2f4;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(13, 27, 42, 0.55);
+  text-align: center;
+}
+
+/* Active row: filled indigo pill, as the reference shows. */
+.browse-cat.is-active {
+  background: #5b55e0;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.browse-cat.is-active:hover { background: #514bd4; }
+
+.browse-cat.is-active .browse-cat-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+/* Article tile card (/all-posts and the category listings). Class name avoids
+   the substring "border" so the global borderless rule leaves the edge alone —
+   it strips borders from any article whose class contains it. */
+.post-tile {
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0.85rem 0.85rem 1.15rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.post-tile:hover {
+  border-color: #d4d7de;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.0588);
+}
+
+.post-tile-media {
+  border-radius: 8px;
 }

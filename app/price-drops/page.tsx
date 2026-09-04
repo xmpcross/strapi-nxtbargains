@@ -180,77 +180,44 @@ function Hero({
   totalSavings: string | null;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
-        }}
-      />
-      <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-        <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
-          <Link href="/" className="transition hover:text-white">Home</Link>
+    <section className="page-hero">
+      <div className="page-hero-inner">
+        <nav className="page-hero-crumbs">
+          <Link href="/">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-[#ffe000]">Price drops</span>
+          <span className="page-hero-crumbs-current">Price drops</span>
         </nav>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">Tracked price history</p>
-            <h1 className="mt-3 max-w-4xl font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
+            <p className="page-hero-eyebrow">Tracked price history</p>
+            <h1 className="page-hero-title">
               Price drops worth checking before they move again
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-              Ranked from saved price-history snapshots, with current offers pulled into
-              each product card so you can compare the drop and the live marketplace price.
+            <p className="page-hero-desc">
+              Products whose tracked price has fallen, ranked from our saved price-history snapshots. Each
+              card pulls in current merchant offers alongside the drop, so you can compare the old price with
+              what the marketplace is charging today. A product only appears once we hold enough history to
+              confirm the drop is real.
             </p>
-
-            <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                <span>Latest tracked price compared against its highest earlier snapshot.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                <span>Every card links to live merchant offers so you can compare before buying.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                <span>Sorted by drop size — the sharpest recent moves surface first.</span>
-              </li>
-            </ul>
-
-            <div className="mt-10 flex flex-wrap gap-3">
-              <a href="#all-drops" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                View all drops
-              </a>
-              <Link href="/best-deals" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
-                Best deals
-              </Link>
-              <Link href="/coupons" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
-                Coupons
-              </Link>
-            </div>
           </div>
 
-          <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="Price drop statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
-            <p className="mt-3 text-sm leading-6 text-white/70">
+          <aside className="page-hero-panel p-5 sm:p-6" aria-label="Price drop statistics">
+            <p className="page-hero-eyebrow">At a glance</p>
+            <p className="mt-3 text-sm leading-6 text-ink/65">
               {dropCount > 0
                 ? `Tracking ${dropCount} recent price drops across ${productsTracked} products, ranked by how far each price has fallen.`
                 : 'Drops appear here once tracked products have at least two price snapshots with a lower latest price.'}
             </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
+            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-ink/12 pt-5">
               <Stat label="Price drops" value={String(dropCount)} />
               <Stat label="Biggest drop" value={dropCount > 0 ? `${topDrop}%` : '—'} />
               <Stat label="Avg. drop" value={dropCount > 0 ? `${avgDrop}%` : '—'} />
               <Stat label="Products tracked" value={String(productsTracked)} />
             </div>
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-4 text-xs text-white/55">
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-ink/12 pt-4 text-xs text-ink/55">
               <span>{snapshotsCount} snapshots · updated {updatedLabel}</span>
-              {totalSavings ? <span className="font-semibold text-[#ffe000]">{totalSavings} tracked savings</span> : null}
+              {totalSavings ? <span className="font-semibold text-primary">{totalSavings} tracked savings</span> : null}
             </div>
           </aside>
         </div>

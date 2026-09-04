@@ -3,7 +3,7 @@
  * Pull coupons/deals directly from Impact.com (Impact Radius) for every joined
  * campaign (e.g. Walmart) via the Promotions API, and write a JSON cache in the
  * shared coupon shape. Links come back as affiliate-ready Impact TrackingLinks,
- * so no GeniusLink wrap is needed.
+ * so no affiliate wrap is needed.
  *
  *   node scripts/fetch-impact-promotions.mjs [--limit=500]
  *

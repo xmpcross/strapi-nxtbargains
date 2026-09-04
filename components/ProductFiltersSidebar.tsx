@@ -44,7 +44,7 @@ type Props = {
   className?: string;
 };
 
-const SECTION_LABEL = 'mb-2 block text-xs font-bold uppercase tracking-[0.14em] text-ink/55';
+const SECTION_LABEL = 'filter-label';
 
 /** One counted row. Selected rows invert, as the reference's buttons do. */
 function FilterRow({
@@ -60,20 +60,11 @@ function FilterRow({
   active: boolean;
   tone?: 'ink' | 'primary';
 }) {
-  const activeClass = tone === 'primary'
-    ? 'bg-primary font-bold text-white'
-    : 'bg-ink font-bold text-white';
+  const activeClass = tone === 'primary' ? 'filter-row-on-accent' : 'filter-row-on-dark';
   return (
-    <Link
-      href={href}
-      className={`flex w-full items-center justify-between gap-2 px-3 py-2 text-sm transition ${
-        active ? activeClass : 'font-medium text-ink/75 hover:bg-primary/5 hover:text-primary'
-      }`}
-    >
+    <Link href={href} className={`filter-row ${active ? activeClass : ''}`}>
       <span className="truncate">{label}</span>
-      {count !== undefined ? (
-        <span className={`shrink-0 text-[10px] ${active ? 'opacity-80' : 'text-ink/45'}`}>({count})</span>
-      ) : null}
+      {count !== undefined ? <span className="filter-row-count">({count})</span> : null}
     </Link>
   );
 }
@@ -96,7 +87,7 @@ function FilterSelect({
         id={`filter-${name}`}
         name={name}
         defaultValue={value}
-        className="min-h-10 w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink outline-none transition focus:border-primary"
+        className="filter-field"
       >
         <option value="">All</option>
         {options.map((option) => (
@@ -131,15 +122,15 @@ export default function ProductFiltersSidebar({
 
   return (
     <aside
-      className={`border border-ink/10 bg-white p-5 shadow-[0_18px_44px_-34px_rgba(13,27,42,0.28)] lg:sticky lg:top-28 ${className}`}
+      className={`filter-panel lg:sticky lg:top-24 ${className}`}
       aria-label="Product filters"
     >
-      <div className="flex items-center justify-between gap-3 border-b border-ink/10 pb-3">
+      <div className="filter-panel-head">
         {/* Size is pinned with Tailwind's important modifier so the heading is
             not re-sized by the surrounding page's typography rules. */}
-        <h2 className="!text-[1rem] font-bold uppercase tracking-[0.2em] text-ink">Filter Products</h2>
+        <h2 className="!text-[0.875rem] font-bold uppercase tracking-[0.1em] text-ink">Filter Products</h2>
         {activeFilterCount > 0 ? (
-          <Link href={clearHref} className="text-xs font-bold text-primary hover:underline">
+          <Link href={clearHref} className="text-xs font-semibold text-[#118757] hover:underline">
             Reset All
           </Link>
         ) : (
@@ -148,7 +139,7 @@ export default function ProductFiltersSidebar({
       </div>
 
       {/* Search and sort post the whole form; the lists below are plain links. */}
-      <form action={action} className="mt-5 grid gap-5">
+      <form action={action} className="filter-section mt-5 grid gap-4">
         {categoryMode === 'list' && filters.category ? (
           <input type="hidden" name="category" value={filters.category} />
         ) : null}
@@ -160,7 +151,7 @@ export default function ProductFiltersSidebar({
             name="q"
             defaultValue={filters.q}
             placeholder={searchPlaceholder}
-            className="min-h-10 w-full border border-ink/10 bg-white px-3 py-2 text-sm text-ink outline-none transition placeholder:text-ink/35 focus:border-primary"
+            className="filter-field"
           />
         </div>
 
@@ -173,16 +164,16 @@ export default function ProductFiltersSidebar({
 
         <button
           type="submit"
-          className="min-h-10 bg-ink px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary"
+          className="min-h-10 rounded-lg bg-[#118757] px-3 py-2 text-xs font-bold uppercase tracking-[0.1em] text-white transition hover:bg-[#0d6f47]"
         >
           Apply
         </button>
       </form>
 
       {categories.length > 0 ? (
-        <div className="mt-6 border-t border-ink/10 pt-5">
-          <p className={SECTION_LABEL}>Categories</p>
-          <nav aria-label="Product categories" className="max-h-72 overflow-y-auto border border-ink/10">
+        <div className="filter-section">
+          <p className={SECTION_LABEL}>Categories &amp; Subcategories</p>
+          <nav aria-label="Product categories" className="filter-scroll grid gap-1">
             <FilterRow
               href={categoryHref('')}
               label="All Categories"
@@ -204,9 +195,9 @@ export default function ProductFiltersSidebar({
         </div>
       ) : null}
 
-      <div className="mt-6 border-t border-ink/10 pt-5">
+      <div className="filter-section">
         <p className={SECTION_LABEL}>Price</p>
-        <div className="border border-ink/10">
+        <div className="grid gap-1">
           <FilterRow href={hrefFor({ price: '' })} label="Any price" count={totalItems} active={!filters.price} />
           {PRICE_FILTERS.map((band) => (
             <FilterRow
@@ -221,14 +212,14 @@ export default function ProductFiltersSidebar({
       </div>
 
       {filterOptions.merchants.length > 0 ? (
-        <div className="mt-6 border-t border-ink/10 pt-5">
+        <div className="filter-section">
           <p className={SECTION_LABEL}>Store</p>
-          <div className="border border-ink/10">
+          <div className="grid gap-1">
             <FilterRow href={hrefFor({ merchant: '' })} label="All Stores" count={totalItems} active={!filters.merchant} />
           </div>
           {/* Too many stores to list in full: capped and scrolled, with
               "All Stores" left outside so it is always reachable. */}
-          <div className="mt-1.5 max-h-56 overflow-y-auto border border-ink/10">
+          <div className="filter-scroll mt-1 grid gap-1">
             {filterOptions.merchants.map((merchant) => (
               <FilterRow
                 key={merchant.value}

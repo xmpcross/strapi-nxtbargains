@@ -67,16 +67,6 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
       .sort((a, b) => b.count - a.count);
   })();
 
-  const typeFacets: PostFilterOption[] = (() => {
-    const counts = new Map<string, number>();
-    for (const post of facetSource) {
-      if (post.postType) counts.set(post.postType, (counts.get(post.postType) ?? 0) + 1);
-    }
-    const label = (v: string) => v.replace(/-/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
-    return [...counts.entries()]
-      .map(([value, count]) => ({ value, label: label(value), count }))
-      .sort((a, b) => b.count - a.count);
-  })();
 
   const posts = res?.data ?? [];
   const total = res?.meta?.pagination?.total ?? posts.length;
@@ -89,7 +79,6 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
     numberOfItems: total,
   });
 
-  const featuredCategories = categories.slice(0, 10);
 
   return (
     <main data-testid="posts-page">
@@ -103,27 +92,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
         pageCount={pageCount}
       />
 
-      {featuredCategories.length > 0 ? (
-        <section className="border-b border-ink/10 bg-white py-5" data-testid="posts-category-strip">
-          <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="mr-1 text-xs font-bold uppercase tracking-[0.14em] text-ink/45">Browse:</span>
-              {featuredCategories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/${category.slug}`}
-                  className="inline-flex border border-ink/10 bg-[#f0f2f4] px-3 py-1.5 text-xs font-bold text-ink/65 transition hover:border-primary hover:text-primary"
-                  data-testid={`posts-category-${category.slug}`}
-                >
-                  {category.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      <section className="bg-[#f0f2f4] py-10 sm:py-12" id="articles">
+      <section className="bg-white py-10 sm:py-12" id="articles">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="flex flex-wrap items-end justify-between gap-4 border border-ink/10 bg-white p-5 sm:p-6">
             <div>
@@ -155,7 +124,6 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
             <PostFiltersSidebar
               filters={filters}
               categories={categoryFacets}
-              types={typeFacets}
               totalItems={facetSource.length}
             />
 
@@ -230,93 +198,32 @@ function PostsHero({
 }) {
   return (
     <section
-      className="relative overflow-hidden border-b border-ink/10 bg-gradient-to-br from-[#f7f9fc] via-[#eef3fa] to-[#e9eef7] text-ink"
+      className="page-hero"
       data-testid="posts-page-header"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            'radial-gradient(at 80% 20%, rgba(0,70,190,0.10) 0%, transparent 55%), radial-gradient(at 15% 85%, rgba(255,224,0,0.16) 0%, transparent 55%)',
-        }}
-      />
-      <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-        <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink/50">
-          <Link href="/" className="transition hover:text-ink">Home</Link>
+      <div className="page-hero-inner">
+        <nav className="page-hero-crumbs">
+          <Link href="/">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-primary">All articles</span>
+          <span className="page-hero-crumbs-current">All articles</span>
         </nav>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">{SITE.name} editorial</p>
-            <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
+        <div className="mt-8">
+            <p className="page-hero-eyebrow">{SITE.name} editorial</p>
+            <h1 className="page-hero-title">
               Every article. Every category. One place to read.
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-ink/70 sm:text-lg">
-              Product comparisons, honest reviews, roundups, how-to guides and buying advice — browse the full
-              archive below, or jump straight into a category.
+            <p className="page-hero-desc">
+              Product comparisons, honest reviews, roundups, how-to guides and buying advice, all in one
+              archive. Browse everything below, or jump straight into the category you care about. Nothing
+              here is behind a signup.
             </p>
-
-            <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-ink/70 sm:text-base">
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
-                <span>Side-by-side comparisons and hands-on reviews across every category.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
-                <span>Buying guides and roundups to shortlist before you shop.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
-                <span>Free to read — no signup required.</span>
-              </li>
-            </ul>
-
-            <div className="mt-10 flex flex-wrap gap-3">
-              <a href="#articles" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                Browse articles
-              </a>
-              <Link href="/category" className="inline-flex border border-ink/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-ink/40 hover:text-ink">
-                Categories
-              </Link>
-              <Link href="/best-deals" className="inline-flex border border-ink/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-ink/40 hover:text-ink">
-                Best deals
-              </Link>
-            </div>
-          </div>
-
-          <aside className="border border-ink/12 bg-white/70 p-5 backdrop-blur sm:p-6" aria-label="Article archive statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">At a glance</p>
-            <p className="mt-3 text-sm leading-6 text-ink/70">
-              A live snapshot of the {SITE.name} article archive — updated as new comparisons, reviews, roundups
-              and guides are published across {categoryCount} categories.
-            </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-ink/10 pt-5">
-              <Stat label="Articles" value={String(totalPosts)} />
-              <Stat label="Categories" value={String(categoryCount)} />
-              <Stat label="On this page" value={String(showing)} />
-              <Stat label="Pages" value={String(pageCount)} />
-            </div>
-            <div className="mt-5 border-t border-ink/10 pt-4 text-xs text-ink/55">
-              Viewing page {page} of {pageCount}.
-            </div>
-          </aside>
         </div>
       </div>
     </section>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="font-display text-2xl font-bold text-ink">{value}</p>
-      <p className="mt-1 text-sm text-ink/55">{label}</p>
-    </div>
-  );
-}
 
 function BrowseCard({ href, title, subtitle }: { href: string; title: string; subtitle: string }) {
   return (

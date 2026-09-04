@@ -1,16 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const REMEMBER_KEY = 'nxt-comment-author';
 
 type Status = 'idle' | 'submitting' | 'ok' | 'error';
 
-export default function CommentForm({ postDocumentId }: { postDocumentId: string }) {
+export default function CommentForm({
+  postDocumentId,
+  collapsible = false,
+}: {
+  postDocumentId: string;
+  /**
+   * Render the form behind an "Add a comment" toggle, collapsed by default.
+   * Used by the editorial post layout; the original template shows it open.
+   */
+  collapsible?: boolean;
+}) {
+  const [open, setOpen] = useState(!collapsible);
   const [authorName, setAuthorName] = useState('');
   const [email, setEmail] = useState('');
   const [body, setBody] = useState('');
   const [website, setWebsite] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
+  const [remember, setRemember] = useState(false);
+
+  // Restore a previously saved name/e-mail. Wrapped because storage throws
+  // outright in some privacy modes rather than just returning null.
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(REMEMBER_KEY);
+      if (!saved) return;
+      const parsed = JSON.parse(saved) as { name?: string; email?: string };
+      if (parsed.name) setAuthorName(parsed.name);
+      if (parsed.email) setEmail(parsed.email);
+      setRemember(true);
+    } catch {
+      /* no stored details, or storage unavailable */
+    }
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -27,6 +56,12 @@ export default function CommentForm({ postDocumentId }: { postDocumentId: string
       const data = await res.json().catch(() => ({}));
 
       if (res.ok) {
+        try {
+          if (remember) window.localStorage.setItem(REMEMBER_KEY, JSON.stringify({ name: authorName, email }));
+          else window.localStorage.removeItem(REMEMBER_KEY);
+        } catch {
+          /* storage unavailable — the comment still went through */
+        }
         setStatus('ok');
         setMessage(data.message || 'Thanks for your comment. It will appear once approved.');
         setAuthorName('');
@@ -43,29 +78,45 @@ export default function CommentForm({ postDocumentId }: { postDocumentId: string
     }
   }
 
-  return (
-    <form onSubmit={onSubmit} className="mt-6 border border-ink/10 bg-paper p-5 sm:p-6" data-testid="comment-form">
-      <h4 className="font-display text-lg font-bold text-ink">Leave a comment</h4>
+  const form = (
+    <form onSubmit={onSubmit} className="comment-form" data-testid="comment-form">
+      <h4 className="comment-form-heading">Leave a Reply</h4>
+      <p className="comment-form-note">
+        Your email address will not be published. Required fields are marked{' '}
+        <span aria-hidden>*</span>
+      </p>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <input
-          required
-          value={authorName}
-          onChange={(e) => setAuthorName(e.target.value)}
-          placeholder="Your name"
-          maxLength={80}
-          className="border border-ink/15 bg-white px-3 py-2 text-sm text-ink placeholder:text-ink/35"
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email (optional, not published)"
-          maxLength={180}
-          className="border border-ink/15 bg-white px-3 py-2 text-sm text-ink placeholder:text-ink/35"
-        />
+      <div className="comment-form-row">
+        <div className="comment-field">
+          <label htmlFor="comment-name">
+            Name <span className="comment-req" aria-hidden>*</span>
+          </label>
+          <input
+            id="comment-name"
+            required
+            value={authorName}
+            onChange={(e) => setAuthorName(e.target.value)}
+            placeholder="Enter Your Name"
+            maxLength={80}
+          />
+        </div>
+
+        <div className="comment-field">
+          <label htmlFor="comment-email">
+            E-mail <span className="comment-req" aria-hidden>*</span>
+          </label>
+          <input
+            id="comment-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter Your E-mail"
+            maxLength={180}
+          />
+        </div>
       </div>
 
+      {/* Honeypot — a real visitor never sees it, a bot fills it in. */}
       <input
         tabIndex={-1}
         autoComplete="off"
@@ -75,34 +126,72 @@ export default function CommentForm({ postDocumentId }: { postDocumentId: string
         aria-hidden="true"
       />
 
-      <textarea
-        required
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-        placeholder="Join the conversation"
-        rows={5}
-        minLength={5}
-        maxLength={4000}
-        className="mt-3 w-full border border-ink/15 bg-white px-3 py-2 text-sm leading-6 text-ink placeholder:text-ink/35"
-      />
+      <div className="comment-field comment-field-full">
+        <label htmlFor="comment-body">
+          Message <span className="comment-req" aria-hidden>*</span>
+        </label>
+        <textarea
+          id="comment-body"
+          required
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Your Message"
+          rows={5}
+          minLength={5}
+          maxLength={4000}
+        />
+      </div>
+
+      {/* Presentational only. Nothing here persists the name or e-mail, and a
+          checkbox that silently does nothing would be a lie to the reader, so
+          it is wired to a real localStorage write below. */}
+      <label className="comment-remember">
+        <input
+          type="checkbox"
+          checked={remember}
+          onChange={(e) => setRemember(e.target.checked)}
+        />
+        <span>Save my name and e-mail in this browser for the next time I comment.</span>
+      </label>
 
       {message && (
         <p
-          className={`mt-3 text-sm ${status === 'ok' ? 'text-emerald-700' : 'text-[#ff2447]'}`}
+          className={`comment-message ${status === 'ok' ? 'is-ok' : 'is-error'}`}
           data-testid={status === 'ok' ? 'comment-success' : 'comment-error'}
         >
           {message}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={status === 'submitting' || !postDocumentId}
-        className="mt-4 inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-primary-emphasis disabled:opacity-60"
-      >
-        {status === 'submitting' ? 'Submitting...' : 'Submit comment'}
+      <button type="submit" disabled={status === 'submitting' || !postDocumentId} className="comment-submit">
+        {status === 'submitting' ? 'Submitting…' : 'Submit Comment'}
       </button>
-      <p className="mt-3 text-xs text-ink/40">Comments are checked before they appear.</p>
+      <p className="comment-form-footnote">Comments are checked before they appear.</p>
     </form>
+  );
+
+  if (!collapsible) return form;
+
+  return (
+    <div className="comment-collapse" data-testid="comment-collapse">
+      <button
+        type="button"
+        className="comment-toggle"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-controls="comment-form-panel"
+      >
+        Add a comment
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" data-open={open ? 'true' : undefined}>
+          <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      {open ? (
+        <div id="comment-form-panel" className="comment-panel">
+          {form}
+        </div>
+      ) : null}
+    </div>
   );
 }

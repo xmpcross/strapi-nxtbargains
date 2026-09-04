@@ -146,7 +146,7 @@ export default function MobileNav({ items }: { items: NavItem[] }) {
                     <Link
                       href={item.href}
                       onClick={() => setOpen(false)}
-                      className="flex items-center justify-between py-4 font-['Outfit'] text-lg font-semibold tracking-tight text-ink transition hover:text-primary"
+                      className="flex items-center justify-between py-4 text-lg font-semibold tracking-tight text-ink transition hover:text-primary"
                     >
                       {item.label}
                       <svg
@@ -169,7 +169,7 @@ export default function MobileNav({ items }: { items: NavItem[] }) {
                           <li key={child.href || child.label}>
                             {child.children?.length ? (
                               <>
-                                <p className="py-2 font-['Outfit'] text-xs font-bold uppercase tracking-[0.14em] text-ink/45">
+                                <p className="py-2 text-xs font-bold uppercase tracking-[0.14em] text-ink/45">
                                   {child.label}
                                 </p>
                                 <ul className="pb-2 pl-3">
@@ -178,7 +178,7 @@ export default function MobileNav({ items }: { items: NavItem[] }) {
                                       <Link
                                         href={nested.href}
                                         onClick={() => setOpen(false)}
-                                        className="block py-2 font-['Outfit'] text-sm font-semibold text-ink/65 transition hover:text-primary"
+                                        className="block py-2 text-sm font-semibold text-ink/65 transition hover:text-primary"
                                       >
                                         {nested.label}
                                       </Link>
@@ -190,7 +190,7 @@ export default function MobileNav({ items }: { items: NavItem[] }) {
                               <Link
                                 href={child.href!}
                                 onClick={() => setOpen(false)}
-                                className="block py-2 font-['Outfit'] text-sm font-semibold text-ink/65 transition hover:text-primary"
+                                className="block py-2 text-sm font-semibold text-ink/65 transition hover:text-primary"
                               >
                                 {child.label}
                               </Link>

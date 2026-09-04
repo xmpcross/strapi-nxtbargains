@@ -25,7 +25,7 @@
 // same shape as data/impact-links.json.
 //
 // Existing affiliate links are never sent. A URL that already points at Impact,
-// Amazon with our tag, geni.us or any other network is skipped, because
+// Amazon with our tag or any other network is skipped, because
 // re-affiliating someone else's link is how attribution disputes start.
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -69,10 +69,9 @@ const ALREADY_AFFILIATED = [
   'tatrck.com',                      // Takeads' own tracking domain — a link we
                                      // already converted must never be sent back
                                      // through the converter and wrapped twice
-  'geni.us', 'buy.geni.us',          // Geniuslink (client-side, Amazon)
   'goto.walmart.com', 'linksynergy.com', 'go.skimresources.com',
   'prf.hn', 'imp.i',                  // Impact deep links
-  'ebay.com/ulk',                     // eBay EPN
+  'ebay.com', 'ebay.com.au',          // eBay EPN wraps these at render
   'awin1.com', 'tradedoubler.com', 'admitad.com',
 ];
 
@@ -106,7 +105,40 @@ const isNonMerchant = (url) => {
   } catch { return true; }
 };
 
-const isAffiliated = (url) => isAffiliatedHost(url) || isAmazon(url) || isNonMerchant(url);
+/*
+ * Domains Impact already deep-links, read from data/impact-links.json rather
+ * than hard-coded so adding an advertiser there is enough. Walmart is the only
+ * one today: its raw www.walmart.com offer URLs are wrapped by
+ * wrapImpactAffiliate at render, so handing them to Takeads as well would put
+ * two networks on the same click.
+ */
+function impactDomains() {
+  try {
+    const p = join(ROOT, 'data', 'impact-links.json');
+    if (!existsSync(p)) return [];
+    const advertisers = JSON.parse(readFileSync(p, 'utf8')).advertisers ?? {};
+    return Object.values(advertisers)
+      .filter((a) => a?.allowsDeeplinking)
+      .flatMap((a) => a.deeplinkDomains ?? [])
+      .map((d) => String(d).replace(/^\*\./, '').toLowerCase());
+  } catch {
+    return [];
+  }
+}
+
+const IMPACT_DOMAINS = impactDomains();
+
+const isImpactCovered = (url) => {
+  try {
+    const h = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+    return IMPACT_DOMAINS.some((d) => h === d || h.endsWith(`.${d}`));
+  } catch {
+    return false;
+  }
+};
+
+const isAffiliated = (url) =>
+  isAffiliatedHost(url) || isAmazon(url) || isNonMerchant(url) || isImpactCovered(url);
 
 function readCache() {
   try {
@@ -157,6 +189,52 @@ async function monetize(urls) {
   return out;
 }
 
+/**
+ * Destination URLs for every offer attached to a product tagged for this site.
+ *
+ * The two on-disk feeds this script started with hold only Amazon best-sellers
+ * and Google Shopping deals — both correctly refused above — so on their own
+ * they yield nothing to convert. The offers worth monetising (Best Buy, Newegg,
+ * Target, Apple and the rest of the long tail) only exist in Strapi.
+ */
+async function strapiOfferUrls() {
+  const base = (process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || '').replace(/\/$/, '');
+  const token = process.env.STRAPI_API_TOKEN;
+  if (!base || !token) {
+    console.warn('STRAPI_INTERNAL_URL / STRAPI_API_TOKEN missing — skipping Strapi offers.');
+    return [];
+  }
+  const tag = process.env.NEXT_PUBLIC_SITE_PRODUCT_TAG || 'nxt-bargains';
+  const found = new Set();
+
+  for (let page = 1; page <= 50; page += 1) {
+    const q = new URLSearchParams({
+      'pagination[pageSize]': '200',
+      'pagination[page]': String(page),
+      'populate[product][fields][0]': 'tags',
+    });
+    const res = await fetch(`${base}/api/commerce-offers?${q}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      console.warn(`  Strapi offers page ${page}: HTTP ${res.status} — stopping.`);
+      break;
+    }
+    const json = await res.json();
+    for (const offer of json.data ?? []) {
+      // Offers are a pool shared with the other storefronts; only this site's
+      // links should be converted against this site's Takeads key.
+      const tags = JSON.stringify(offer.product?.tags ?? []);
+      if (!tags.includes(tag)) continue;
+      const url = offer.productUrl || offer.url || offer.affiliateUrl;
+      if (typeof url === 'string' && /^https?:\/\//.test(url)) found.add(url);
+    }
+    const meta = json.meta?.pagination;
+    if (!meta || page >= meta.pageCount) break;
+  }
+  return [...found];
+}
+
 async function main() {
   if (probe) {
     const sample = args.find((a) => a.startsWith('http')) ?? 'https://www.walmart.com/ip/123';
@@ -168,6 +246,7 @@ async function main() {
 
   // Collect distinct destination URLs from the offer feeds already on disk.
   const urls = new Set();
+  for (const u of await strapiOfferUrls()) if (!isAffiliated(u)) urls.add(u);
   for (const file of ['best-deals-realtime.json', 'best-sellers.json']) {
     const p = join(ROOT, 'data', file);
     if (!existsSync(p)) continue;

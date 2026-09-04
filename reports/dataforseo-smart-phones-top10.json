@@ -1,0 +1,287 @@
+{
+  "USA": {
+    "keyword": "Smart Phones",
+    "items": [
+      {
+        "rank": 1,
+        "title": "Apple iPhone 17 Pro Max",
+        "price": 1199,
+        "currency": "USD",
+        "seller": "Apple",
+        "product_id": "10559753634283767328",
+        "url": null
+      },
+      {
+        "rank": 2,
+        "title": "Samsung Galaxy A17 5G",
+        "price": 199.99,
+        "currency": "USD",
+        "seller": "Best Buy",
+        "product_id": "4384259750587301034",
+        "url": null
+      },
+      {
+        "rank": 3,
+        "title": "Google Pixel 10a - 128 GB - Black / Obsidian (with Mobile Phone Plan) - Boost Mobile",
+        "price": 499.99,
+        "currency": "USD",
+        "seller": "Boost Mobile",
+        "product_id": null,
+        "url": null
+      },
+      {
+        "rank": 4,
+        "title": "Samsung Galaxy S26",
+        "price": 4.99,
+        "currency": "USD",
+        "seller": "AT&T",
+        "product_id": "6385544852855559337",
+        "url": null
+      },
+      {
+        "rank": 5,
+        "title": "Motorola Moto G Stylus 2025",
+        "price": 29.99,
+        "currency": "USD",
+        "seller": "Cricket Wireless",
+        "product_id": "626605255782489809",
+        "url": null
+      },
+      {
+        "rank": 6,
+        "title": "Apple iPhone 12",
+        "price": 174.5,
+        "currency": "USD",
+        "seller": "Walmart - Seller",
+        "product_id": "8723398810561324111",
+        "url": null
+      },
+      {
+        "rank": 7,
+        "title": "Nothing Phone 4a Pro",
+        "price": 539,
+        "currency": "USD",
+        "seller": "Nothing US",
+        "product_id": "14516742666810203236",
+        "url": null
+      },
+      {
+        "rank": 8,
+        "title": "Apple iPhone 17",
+        "price": 829,
+        "currency": "USD",
+        "seller": "Apple",
+        "product_id": "1162483734985481855",
+        "url": null
+      },
+      {
+        "rank": 9,
+        "title": "Tracfone BLU View Speed Ultra 64GB Prepaid",
+        "price": 24.99,
+        "currency": "USD",
+        "seller": "Best Buy",
+        "product_id": "12817008981276650141",
+        "url": null
+      },
+      {
+        "rank": 10,
+        "title": "Apple iPhone 15 128GB",
+        "price": 629.99,
+        "currency": "USD",
+        "seller": "Boost Mobile",
+        "product_id": "9402654696244930073",
+        "url": null
+      }
+    ]
+  },
+  "UK": {
+    "keyword": "Smart Phones",
+    "items": [
+      {
+        "rank": 1,
+        "title": "Honor X5c Plus",
+        "price": 99.99,
+        "currency": "GBP",
+        "seller": "Argos",
+        "product_id": "7129294055272576163",
+        "url": null
+      },
+      {
+        "rank": 2,
+        "title": "Samsung Galaxy A17",
+        "price": 130.99,
+        "currency": "GBP",
+        "seller": "Amazon.co.uk - Amazon.co.uk-Seller",
+        "product_id": "7406378050444604130",
+        "url": null
+      },
+      {
+        "rank": 3,
+        "title": "Google Pixel 7a 128GB",
+        "price": 169,
+        "currency": "GBP",
+        "seller": "Vodafone UK",
+        "product_id": "9629426250433498043",
+        "url": null
+      },
+      {
+        "rank": 4,
+        "title": "Samsung Galaxy A16",
+        "price": 139,
+        "currency": "GBP",
+        "seller": "Currys",
+        "product_id": "4491409569674095135",
+        "url": null
+      },
+      {
+        "rank": 5,
+        "title": "Motorola Moto G06 64GB Tapestry",
+        "price": 89.99,
+        "currency": "GBP",
+        "seller": "Argos",
+        "product_id": "6099734609828060022",
+        "url": null
+      },
+      {
+        "rank": 6,
+        "title": "Apple iPhone 17 Pro",
+        "price": 54.25,
+        "currency": "GBP",
+        "seller": "Vodafone UK",
+        "product_id": "10829684444717430506",
+        "url": null
+      },
+      {
+        "rank": 7,
+        "title": "Google Pixel 10a",
+        "price": 399,
+        "currency": "GBP",
+        "seller": "Currys",
+        "product_id": "8638146437764676092",
+        "url": null
+      },
+      {
+        "rank": 8,
+        "title": "Galaxy A17 4G Samsung",
+        "price": 132.99,
+        "currency": "GBP",
+        "seller": "Amazon.co.uk - Amazon.co.uk-Seller",
+        "product_id": "3353829019137175115",
+        "url": null
+      },
+      {
+        "rank": 9,
+        "title": "Samsung Galaxy A17 5G",
+        "price": 169,
+        "currency": "GBP",
+        "seller": "AO.com",
+        "product_id": "3808567184719499037",
+        "url": null
+      },
+      {
+        "rank": 10,
+        "title": "Motorola Moto g15 6.72\" Dual SIM Android 15 4G",
+        "price": 99,
+        "currency": "GBP",
+        "seller": "Currys",
+        "product_id": "2737947267443866326",
+        "url": null
+      }
+    ]
+  },
+  "Europe (DE)": {
+    "keyword": "Smartphone",
+    "items": [
+      {
+        "rank": 1,
+        "title": "Samsung Galaxy A16 5G",
+        "price": 1,
+        "currency": "EUR",
+        "seller": "starmobile.de",
+        "product_id": "6684176862652641843",
+        "url": null
+      },
+      {
+        "rank": 2,
+        "title": "Google Pixel 10a",
+        "price": 24.99,
+        "currency": "EUR",
+        "seller": "MediaMarkt DE",
+        "product_id": "2002284955048161555",
+        "url": null
+      },
+      {
+        "rank": 3,
+        "title": "ZTE Blade A35e Smartphone",
+        "price": 69,
+        "currency": "EUR",
+        "seller": "OTTO",
+        "product_id": "6836774107583726296",
+        "url": null
+      },
+      {
+        "rank": 4,
+        "title": "Motorola Moto G75 5G",
+        "price": 4.95,
+        "currency": "EUR",
+        "seller": "starmobile.de",
+        "product_id": "14448512795109877609",
+        "url": null
+      },
+      {
+        "rank": 5,
+        "title": "Nothing Phone",
+        "price": 39.99,
+        "currency": "EUR",
+        "seller": "handytick.de",
+        "product_id": "1548513701864745651",
+        "url": null
+      },
+      {
+        "rank": 6,
+        "title": "Galaxy S25 FE Samsung",
+        "price": 59.99,
+        "currency": "EUR",
+        "seller": "MediaMarkt DE",
+        "product_id": "15074496973709324439",
+        "url": null
+      },
+      {
+        "rank": 7,
+        "title": "MTGud 4G Smartphone, 6,6 Zoll HD Display, 4GB+32GB Speicher (erweiterbar bis 256GB), 13MP Front- & 21MP Rückkamera, Android 12, Gesichtsentsperrung,",
+        "price": 78.99,
+        "currency": "EUR",
+        "seller": "Amazon.de - Amazon.de-Seller",
+        "product_id": "6639845096745745596",
+        "url": null
+      },
+      {
+        "rank": 8,
+        "title": "Google Pixel 10",
+        "price": 799,
+        "currency": "EUR",
+        "seller": "Google Store",
+        "product_id": "7441722523555666324",
+        "url": null
+      },
+      {
+        "rank": 9,
+        "title": "Samsung Galaxy A56 5G awesome",
+        "price": 4.95,
+        "currency": "EUR",
+        "seller": "starmobile.de",
+        "product_id": "3108324527511037251",
+        "url": null
+      },
+      {
+        "rank": 10,
+        "title": "Xiaomi 17 Smartphone",
+        "price": 34.99,
+        "currency": "EUR",
+        "seller": "MediaMarkt DE",
+        "product_id": "9520295754378347844",
+        "url": null
+      }
+    ]
+  }
+}

@@ -74,13 +74,12 @@ export function listBestSellersForMarketplace(marketplaceKey: Marketplace): Best
     if (!existsSync(path)) return [];
 
     const parsed = JSON.parse(readFileSync(path, 'utf8')) as { items?: BestSeller[] };
-    const geniusDestinations = geniusDestinationMap();
-
     return (parsed.items ?? [])
       .map((item) => ({
         ...item,
         marketplace: marketplace.key,
-        url: isGoogleShoppingUrl(geniusDestinations.get(item.url) ?? item.url)
+        // Replace aggregator searches, but preserve existing affiliate links.
+        url: isGoogleShoppingUrl(item.url)
           ? marketplaceSearchUrl(marketplace.key, item.title)
           : item.url,
       }))
@@ -121,16 +120,6 @@ function slugifyCategory(value: string) {
     .replace(/^-+|-+$/g, '') || 'top-products';
 }
 
-function geniusDestinationMap() {
-  try {
-    const path = join(process.cwd(), 'data', 'geniuslink-cache.json');
-    if (!existsSync(path)) return new Map<string, string>();
-    const cache = JSON.parse(readFileSync(path, 'utf8')) as Record<string, string>;
-    return new Map(Object.entries(cache).map(([destination, short]) => [short, destination]));
-  } catch {
-    return new Map<string, string>();
-  }
-}
 
 function isGoogleShoppingUrl(url: string) {
   try {

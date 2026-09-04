@@ -3,17 +3,34 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { getPost, listPostComments, listPosts, mediaUrl, type NxtPost } from '@/lib/strapi';
+import { getCommerceProduct, getPost, listPostComments, listPosts, mediaUrl, type NxtPost } from '@/lib/strapi';
 import { SECTIONS, SITE } from '@/lib/site';
 import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, howToJsonLd } from '@/lib/jsonld';
 import { JsonLd } from '@/components/JsonLd';
 import { enrichPostCarouselHtml } from '@/lib/enrich-post-carousel';
 import { clampDescription, firstImageUrl, fmtDate, parseHowToSteps, primaryCategorySlug, postPath, stripHtml, warnSeoLength } from '@/lib/format';
+import { productCanonicalPath } from '@/lib/product-url';
 import PostContent from '@/components/PostContent';
 import { KeyTakeaways } from '@/components/KeyTakeaways';
 import PostPriceComparison from '@/components/PostPriceComparison';
 import CommentForm from '@/components/CommentForm';
 import ProductCarousel from '@/components/ProductCarousel';
+import PostMetabar from '@/components/PostMetabar';
+import {
+  applyHtmlHeadingIds,
+  extractHeadings,
+  isMarkdownContent,
+  moveCarouselBeforeSection,
+  splitAfterContainer,
+  splitBodyAtSection,
+} from '@/lib/post-headings';
+import ReadAlso from '@/components/ReadAlso';
+import RelatedPosts from '@/components/RelatedPosts';
+import QuestionsAnswered from '@/components/QuestionsAnswered';
+import PostFooterNav from '@/components/PostFooterNav';
+import ReadNext from '@/components/ReadNext';
+import PostInfobar from '@/components/PostInfobar';
+import { isPillarPost, pillarPathForPost } from '@/lib/pillar';
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -48,6 +65,36 @@ function categoryName(slug?: string): string {
   return SECTIONS.find((s) => s.slug === slug)?.title ?? slug.replace(/-/g, ' ');
 }
 
+function spotlightDate(iso?: string): string {
+  if (!iso) return '';
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(iso));
+}
+
+/**
+ * Categories that do NOT use the editorial post layout.
+ *
+ * An exclusion list rather than an allow-list: the editorial layout is now the
+ * default for the site, and best-sellers-articles is the one exception. Those
+ * posts promote their first body heading to the visible <h1> and are built
+ * around a product carousel, so the two-column header and contents rail fight
+ * with what is already there.
+ *
+ * The CSS keys off data-layout="recap" on the article rather than off any
+ * individual category, so this stays the only place the decision lives.
+ */
+const RECAP_LAYOUT_EXCLUDED = new Set(['best-sellers-articles']);
+
+/**
+ * Categories that drop the left contents rail and run two columns instead.
+ * Empty at present — kept because it is the one switch for that decision, and
+ * the alternative is scattering category checks through the template again.
+ */
+const METABAR_EXCLUDED = new Set<string>();
+
 function recentPostDate(iso?: string): string {
   if (!iso) return '';
   return new Intl.DateTimeFormat('en-GB', {
@@ -56,6 +103,8 @@ function recentPostDate(iso?: string): string {
     year: 'numeric',
   }).format(new Date(iso));
 }
+
+
 
 function detectMerchant(post: NxtPost): MerchantConfig | null {
   const merchantMatch = post.content.match(/<strong>Merchant:<\/strong>\s*([^<]+)/i);
@@ -124,7 +173,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 export default async function PostPage({ params }: { params: Promise<Params> }) {
   const { slug, category } = await params;
   const post = await getPost(slug).catch(() => null);
-  if (!post) notFound();
+  if (!post) {
+    const product = await getCommerceProduct(slug).catch(() => null);
+    if (product) {
+      const { redirect } = await import('next/navigation');
+      redirect(productCanonicalPath(product));
+    }
+    notFound();
+  }
 
   // If the URL category doesn't match the post's primary category, send them to the canonical URL.
   const canonicalCat = primaryCategorySlug(post);
@@ -133,18 +189,71 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     redirect(postPath(post));
   }
 
-  // Pull up to 10 related posts from the same category, excluding this one.
-  const related = await listPosts({ category, pageSize: 11 })
-    .then((r) => r.data.filter((p) => p.id !== post.id).slice(0, 10))
-    .catch(() => [] as NxtPost[]);
 
-  const recentPosts = await listPosts({ pageSize: 6 })
-    .then((r) => r.data.filter((p) => p.id !== post.id).slice(0, 5))
-    .catch(() => [] as NxtPost[]);
+  if (isPillarPost(post)) {
+    const pillarPath = pillarPathForPost(post);
+    if (pillarPath) {
+      const { permanentRedirect } = await import('next/navigation');
+      permanentRedirect(pillarPath);
+    }
+  }
 
-  const [merchantProducts, comments] = await Promise.all([
+  // One wide fetch feeds every rail on the page — spotlight, read-also,
+  // related and prev/next — rather than a query each.
+  const allPosts = await listPosts({ pageSize: 100 })
+    .then((r) => r.data)
+    .catch(() => [] as NxtPost[]);
+  const recentPool = allPosts.filter((p) => p.id !== post.id);
+
+  // Neighbours in publish order. The list is sorted newest first, so the entry
+  // after this one is the older post.
+  const selfIndex = allPosts.findIndex((p) => p.id === post.id);
+  const prevPost = selfIndex >= 0 ? allPosts[selfIndex + 1] ?? null : null;
+  const nextPost = selfIndex > 0 ? allPosts[selfIndex - 1] ?? null : null;
+
+  // Same category first, so the suggestions are actually related.
+  const sameCategory = recentPool.filter((p) =>
+    (p.categories ?? []).some((c) => (post.categories ?? []).some((pc) => pc.slug === c.slug)),
+  );
+  const suggestionPool = [...sameCategory, ...recentPool.filter((p) => !sameCategory.includes(p))];
+  const readAlsoPosts = suggestionPool.slice(0, 2);
+  const relatedPostsList = suggestionPool.slice(2, 4);
+  const nextUpPosts = suggestionPool.slice(0, 4);
+  const readNextPosts = suggestionPool.slice(0, 4);
+
+  // One post per category, newest first. Without this the list is whichever
+  // category published most recently -- five rows all reading "Best Sellers",
+  // which defeats the point of a spotlight. Falls back to filling from the
+  // pool if there are not enough distinct categories.
+  const spotlightPosts = (() => {
+    const seen = new Set<string>();
+    const picked: NxtPost[] = [];
+    for (const p of recentPool) {
+      const key = p.categories?.[0]?.slug ?? '';
+      if (seen.has(key)) continue;
+      seen.add(key);
+      picked.push(p);
+      if (picked.length === 5) break;
+    }
+    for (const p of recentPool) {
+      if (picked.length >= 5) break;
+      if (!picked.includes(p)) picked.push(p);
+    }
+    return picked;
+  })();
+
+  const [merchantProducts, comments, readAlsoCounts] = await Promise.all([
     listMerchantTopProducts(post),
     listPostComments(post.documentId ?? ''),
+    // Counts for the inline Read Also rows. Failures degrade to 0 rather than
+    // taking the page down for a decorative number.
+    Promise.all(
+      readAlsoPosts.map((p) =>
+        listPostComments(p.documentId ?? '')
+          .then((c) => c.length)
+          .catch(() => 0),
+      ),
+    ),
   ]);
 
   const cover = mediaUrl(post.coverImage ?? null) || mediaUrl(post.ogImage ?? null);
@@ -178,6 +287,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
         datePublished: post.publishedAt,
         dateModified: post.updatedAt,
         url: pageUrl,
+        author: post.author
+          ? { name: post.author.name, sameAs: post.author.sameAs ?? null }
+          : { name: SITE.name },
       });
 
   const howToLd = useHowTo
@@ -208,6 +320,13 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   const faqLd = faqs.length >= 2 ? faqJsonLd(faqs) : null;
 
   const isBestSellersArticle = category === 'best-sellers-articles' || cat?.slug === 'best-sellers-articles';
+  // The editorial ("recap") post layout: two-column header, left contents rail,
+  // Spotlight sidebar, Read Also / Related / Read Next. Applied to every
+  // category except those listed in RECAP_LAYOUT_EXCLUDED.
+  const isRecapLayout =
+    !RECAP_LAYOUT_EXCLUDED.has(category) && !RECAP_LAYOUT_EXCLUDED.has(cat?.slug ?? '');
+  const showMetabar =
+    !METABAR_EXCLUDED.has(category) && !METABAR_EXCLUDED.has(cat?.slug ?? '');
   let postContent = await enrichPostCarouselHtml(post.content);
   // best-sellers-articles: promote the first body heading (the product title) to
   // a semantic <h1> while keeping the h4 size (.post-title-h1), and drop the
@@ -216,11 +335,99 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
     postContent = postContent.replace(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/i, '<h1 class="post-title-h1">$2</h1>');
   }
 
+  // Featured image at the top of the post. Much of this catalogue was imported
+  // from WordPress and a good number of those bodies open with the same image
+  // as the cover, so render it only when the body does not already lead with
+  // it — otherwise the reader gets the identical picture twice.
+  // Contents list for the metabar. Built from the post source with the same
+  // slug helper PostContent uses to emit the ids, so the two cannot drift apart.
+  //
+  // Extract first, filter second — never filter inside extractHeadings. The
+  // helper de-duplicates slugs as it walks the headings in order, so dropping
+  // the H3s beforehand would change the numbering of any repeated H2 and leave
+  // the rail pointing at ids the body never rendered.
+  //
+  // Top-level sections only: the H3s stay in the body with their anchors
+  // intact, they are just not listed here.
+  // Best Sellers posts open with a product card the generator injects into the
+  // body. It is lifted out here so it can span the full container instead of
+  // being boxed into the narrower article column beside the sidebar.
+  let bestSellerCard: string | null = null;
+  if (isBestSellersArticle) {
+    const match = postContent.match(/<aside\b[^>]*class="[^"]*nxt-product-card[^"]*"[\s\S]*?<\/aside>/i);
+    if (match) {
+      bestSellerCard = match[0];
+      postContent = postContent.replace(match[0], '');
+    }
+  }
+
+  // Header image for the editorial layout. Most posts outside smart-home and
+  // buying-guides carry no coverImage or ogImage at all, which left the header's
+  // right column empty; the first image in the body — a product shot on these
+  // posts — stands in. It sits well down the article rather than at the top, so
+  // promoting it does not put the same picture twice in a row, and it is left in
+  // place because it belongs to a product card that would break without it.
+  const headerImage = cover || (isRecapLayout ? firstImageUrl(postContent) : null);
+
+  // The injected product carousel lands partway through a section; lift it to
+  // the section boundary. Done before the ids and the contents rail are built
+  // so both see the final order.
+  postContent = moveCarouselBeforeSection(postContent);
+
+  let toc: { id: string; text: string; level: 2 | 3 }[] = [];
+  if (showMetabar) {
+    if (isMarkdownContent(postContent)) {
+      // PostContent emits the ids for Markdown, through the same slug helper.
+      toc = extractHeadings(postContent);
+    } else {
+      // HTML bodies get their ids assigned here, and the rail is built from
+      // exactly what was written into the markup.
+      const anchored = applyHtmlHeadingIds(postContent);
+      postContent = anchored.html;
+      toc = anchored.headings;
+    }
+    toc = toc.filter((h) => h.level === 2);
+  }
+
+  const leadImage = firstImageUrl(postContent);
+  const sameFile = (a: string, b: string) =>
+    decodeURIComponent(a.split('?')[0].split('/').pop() ?? a) ===
+    decodeURIComponent(b.split('?')[0].split('/').pop() ?? b);
+  // best-sellers-articles are excluded: those posts promote their first body
+  // heading to the visible <h1>, so a cover above it would sit apart from the
+  // title rather than beneath it.
+  const showFeatured =
+    !isBestSellersArticle
+    && Boolean(cover)
+    && !(leadImage && sameFile(cover as string, leadImage));
+
+  // The Content Egg offers grid sits right under the intro on the informative
+  // posts. Lifted out so it runs full width, with the columned layout — and so
+  // the contents rail — starting beneath it. Done after the heading ids are
+  // assigned above, so anchors in the lead still resolve.
+  let leadBlock: string | null = null;
+  if (showMetabar && !isMarkdownContent(postContent)) {
+    const split = splitAfterContainer(postContent, 'cegg5-container');
+    if (split) {
+      leadBlock = split[0];
+      postContent = split[1];
+    }
+  }
+
+  const readAlso =
+    readAlsoPosts.length > 0 ? (
+      <ReadAlso items={readAlsoPosts.map((rp, i) => ({ post: rp, commentCount: readAlsoCounts[i] ?? 0 }))} />
+    ) : null;
+  // Same treatment for both source shapes now, so Markdown posts get the card
+  // in the same place HTML ones do.
+  const bodySplit = readAlso ? splitBodyAtSection(postContent) : null;
+
   return (
     <article
       className="bg-white"
       data-testid={`post-${post.slug}`}
       data-category={category}
+      data-layout={isRecapLayout ? 'recap' : undefined}
       data-post-type={post.postType}
     >
       {/* Vendor stylesheets used by the imported product-comparison blocks
@@ -248,12 +455,121 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
       </section>
 
       <div className="mx-auto max-w-7xl px-6">
-        {!isBestSellersArticle && <h1 className="sr-only">{post.title}</h1>}
+        {!isBestSellersArticle && !isRecapLayout && <h1 className="sr-only">{post.title}</h1>}
 
-        <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
-          <div className="w-full" data-testid="post-body">
+        {showFeatured && !isRecapLayout ? (
+          <figure className="post-featured-image" data-testid="post-featured-image">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={cover as string}
+              alt={post.coverImage?.alternativeText || post.title}
+              width={1200}
+              height={675}
+              fetchPriority="high"
+            />
+          </figure>
+        ) : null}
+
+        {isRecapLayout ? (
+          <header className="recap-header" data-testid="post-recap-header">
+            <div className="recap-header-content">
+              <p className="recap-eyebrow">
+                <Link href={`/${category}`}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="3" y="4" width="7" height="16" rx="1.5" stroke="currentColor" strokeWidth="2" />
+                    <rect x="14" y="4" width="7" height="16" rx="1.5" stroke="currentColor" strokeWidth="2" />
+                  </svg>
+                  {cat?.name ?? categoryName(category)}
+                </Link>
+              </p>
+
+              <h1 className="recap-title">{post.title}</h1>
+
+              {post.excerpt ? <p className="recap-subtitle">{post.excerpt}</p> : null}
+            </div>
+
+            {headerImage ? (
+              <figure className={cover ? 'recap-media' : 'recap-media recap-media-product'}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={headerImage}
+                  alt={post.coverImage?.alternativeText || post.title}
+                  width={1200}
+                  height={750}
+                  fetchPriority="high"
+                />
+              </figure>
+            ) : null}
+
+            <PostInfobar
+              authorName={post.author?.name ?? SITE.name}
+              authorAvatar={mediaUrl(post.author?.avatar ?? null)}
+              publishedAt={post.publishedAt}
+              commentCount={comments.length}
+              shareUrl={`${SITE.url}/${category}/${post.slug}`}
+              shareTitle={post.title}
+            />
+          </header>
+        ) : null}
+
+        {/* Rendered for every Best Sellers post, not only those whose body
+            carries a product card — four of them do not, and without this they
+            had no top section at all: no byline, no share, nothing. */}
+        {isBestSellersArticle ? (
+          <div className="bestseller-header" data-testid="bestseller-card-full">
+            {bestSellerCard ? (
+              <div className="post-content bestseller-card-full" dangerouslySetInnerHTML={{ __html: bestSellerCard }} />
+            ) : null}
+            <PostInfobar
+              authorName={post.author?.name ?? SITE.name}
+              authorAvatar={mediaUrl(post.author?.avatar ?? null)}
+              publishedAt={post.publishedAt}
+              commentCount={comments.length}
+              shareUrl={`${SITE.url}/${category}/${post.slug}`}
+              shareTitle={post.title}
+            />
+          </div>
+        ) : null}
+
+        {leadBlock ? (
+          <div
+            className="post-content post-lead-block"
+            data-testid="post-lead-block"
+            dangerouslySetInnerHTML={{ __html: leadBlock }}
+          />
+        ) : null}
+
+        <div
+          className={
+            showMetabar
+              ? 'mt-12 grid gap-10 lg:grid-cols-[228px_minmax(0,1fr)_340px] lg:items-start'
+              : 'mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start'
+          }
+        >
+          {showMetabar ? (
+            <div className="metabar-col" data-testid="post-metabar">
+              <PostMetabar
+                readingTimeMinutes={post.readingTimeMinutes}
+                toc={toc}
+                targetId="post-article-body"
+              />
+            </div>
+          ) : null}
+
+          <div className="w-full" id="post-article-body" data-testid="post-body">
             <KeyTakeaways content={post.keyTakeaways} />
-            <PostContent html={postContent} />
+            {readAlso && bodySplit ? (
+              <>
+                <PostContent html={bodySplit[0]} />
+                {readAlso}
+                <PostContent html={bodySplit[1]} />
+              </>
+            ) : (
+              <PostContent html={postContent} />
+            )}
+            {/* No safe split point in this body — the card follows it rather
+                than being wedged into broken markup. */}
+            {readAlso && !bodySplit ? readAlso : null}
 
             {stepsAreAuthored && useHowTo ? (
               <section className="mt-10" data-testid="howto-steps" aria-labelledby="howto-heading">
@@ -282,54 +598,31 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
             <PostPriceComparison post={post} />
 
-            <div className="mt-14 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-ink/10 pt-8 text-xs font-semibold uppercase tracking-[0.12em] text-ink/45">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink/10 text-ink/40">
-                N
-              </span>
-              <span>By {SITE.name}</span>
-              <span>{fmtDate(post.publishedAt)}</span>
-              {post.readingTimeMinutes && <span>{post.readingTimeMinutes} min read</span>}
-            </div>
 
             <div className="mt-8 border-y border-ink/10 py-8 text-sm leading-7 text-ink/60">
               <strong className="text-ink">Affiliate disclosure.</strong> {SITE.name} earns a
               commission when you buy through links on this page, at no extra cost to you.
               Prices and availability are accurate as of {fmtDate(post.updatedAt)} and subject to change.
             </div>
+            <>
+                <RelatedPosts posts={relatedPostsList} />
+                <QuestionsAnswered items={faqs} />
+                <PostFooterNav
+                  nextUp={nextUpPosts}
+                  category={category}
+                  categoryName={cat?.name ?? categoryName(category)}
+                  commentCount={comments.length}
+                  updatedAt={post.updatedAt}
+                  shareUrl={`${SITE.url}/${category}/${post.slug}`}
+                  shareTitle={post.title}
+                  prev={prevPost}
+                  next={nextPost}
+                />
+            </>
 
-            <div className="mt-10 bg-muted p-8" data-testid="post-author-box">
-              <div className="grid gap-6 sm:grid-cols-[72px_minmax(0,1fr)]">
-                <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-white text-2xl font-bold text-ink/30">
-                  N
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink/45">Written by</p>
-                  <h2 className="mt-2 font-display text-xl font-bold text-ink">{SITE.name}</h2>
-                  <p className="mt-3 text-sm leading-7 text-ink/60">
-                    Product comparisons, reviews and practical buying guides for smart tech shoppers.
-                  </p>
-                </div>
-              </div>
-            </div>
 
-            {faqs.length > 0 ? (
-              <section className="mt-10" data-testid="faq-section" aria-labelledby="faq-heading">
-                <h2 id="faq-heading" className="font-display text-2xl font-bold tracking-tight text-ink">
-                  Frequently asked questions
-                </h2>
-                <div className="mt-5 divide-y divide-ink/10 border-y border-ink/10">
-                  {faqs.map((faq, i) => (
-                    <div key={i} className="py-5" data-testid="faq-item">
-                      <h3 className="font-display text-lg font-semibold text-ink">{faq.question}</h3>
-                      <p className="mt-2 text-[0.95rem] leading-7 text-ink/70">{faq.answer}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ) : null}
-
-            <section className="mt-10" data-testid="post-comments">
-              <h3 className="font-display text-2xl font-bold tracking-tight text-ink">Comments</h3>
+            <section className="mt-10" id="post-comments" data-testid="post-comments">
+              <h3 className="comments-eyebrow">Comments</h3>
               {comments.length > 0 ? (
                 <div className="mt-5 space-y-4">
                   {comments.map((comment) => (
@@ -345,81 +638,60 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
                   ))}
                 </div>
               ) : (
-                <p className="mt-3 text-sm leading-6 text-ink/55">No comments yet. Start the conversation.</p>
+                <p className="comments-empty">No comments yet. Start the conversation.</p>
               )}
-              <CommentForm postDocumentId={post.documentId ?? ''} />
+              <CommentForm postDocumentId={post.documentId ?? ''} collapsible />
             </section>
           </div>
 
-          <aside className="space-y-10 lg:sticky lg:top-28" data-testid="post-side-rail">
-            <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]" data-testid="sidebar-share">
-              <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">Share This Article</h5>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Share on Facebook"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink/10 text-sm font-bold text-ink transition hover:border-primary hover:text-primary"
-                >
-                  f
-                </a>
-                <a
-                  href={`https://x.com/intent/tweet?url=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}&text=${encodeURIComponent(post.title)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Share on X"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink/10 text-sm font-bold text-ink transition hover:border-primary hover:text-primary"
-                >
-                  X
-                </a>
-                <a
-                  href={`mailto:?subject=${encodeURIComponent(post.title)}&body=${encodeURIComponent(`${SITE.url}/${category}/${post.slug}`)}`}
-                  aria-label="Share by email"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink/10 text-sm font-bold text-ink transition hover:border-primary hover:text-primary"
-                >
-                  @
-                </a>
-              </div>
-            </div>
+          <aside className="post-side-rail-recap space-y-10" data-testid="post-side-rail">
 
-            {recentPosts.length > 0 && (
-              <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]">
-                <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">Latest Posts</h5>
-                <div className="mt-4 space-y-4">
-                  {recentPosts.map((recent) => {
-                    const recentImage = mediaUrl(recent.coverImage ?? null) ?? firstImageUrl(recent.content);
-
+            {spotlightPosts.length > 0 ? (
+              <div data-testid="sidebar-spotlight">
+                <h5 className="spotlight-heading">Spotlight</h5>
+                <ul className="spotlight-list">
+                  {spotlightPosts.map((recent) => {
+                    const img = mediaUrl(recent.coverImage ?? null) ?? firstImageUrl(recent.content);
+                    const rc = recent.categories?.[0];
                     return (
-                      <Link
-                        key={recent.id}
-                        href={postPath(recent)}
-                        className="grid grid-cols-[64px_minmax(0,1fr)] gap-3 transition hover:opacity-80"
-                      >
-                        <span className="block h-16 w-16 overflow-hidden rounded bg-white">
-                          {recentImage && (
+                      <li key={recent.id} className="spotlight-item">
+                        <div className="spotlight-text">
+                          {rc ? (
+                            <Link href={`/${rc.slug}`} className="spotlight-cat">{rc.name}</Link>
+                          ) : null}
+                          <Link href={postPath(recent)} className="spotlight-title">{recent.title}</Link>
+                          <span className="spotlight-date">{spotlightDate(recent.publishedAt)}</span>
+                        </div>
+                        <Link href={postPath(recent)} className="spotlight-thumb" tabIndex={-1} aria-hidden>
+                          {img ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={recentImage}
-                              alt={recent.coverImage?.alternativeText || recent.title}
-                              className="h-full w-full object-cover"
-                            />
-                          )}
-                        </span>
-                        <span className="min-w-0">
-                          <span className="line-clamp-2 text-sm font-normal leading-snug text-[#123d83]">
-                            {recent.title}
-                          </span>
-                          <span className="mt-1 block text-sm font-normal leading-none text-[#6a83aa]">
-                            {recentPostDate(recent.publishedAt)}
-                          </span>
-                        </span>
-                      </Link>
+                            <img src={img} alt="" loading="lazy" />
+                          ) : null}
+                        </Link>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               </div>
-            )}
+            ) : null}
+
+            <aside className="trailcard" data-testid="sidebar-trailcard">
+                <p className="trailcard-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M21 3L3 10.5l7 2.5 2.5 7L21 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                  </svg>
+                  Deals Live Here
+                </p>
+
+                <div className="trailcard-body">
+                  <h2 className="trailcard-title">Follow the Price Trail</h2>
+                  <p className="trailcard-text">
+                    Explore every category and find the ones that matter to you.
+                  </p>
+                  <Link href="/category" className="trailcard-cta">Explore Categories</Link>
+                </div>
+            </aside>
+
             {merchantProducts && (
               <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]" data-testid="sidebar-merchant-products">
                 <h5 className="text-sm font-bold uppercase tracking-wide text-[#111111]">
@@ -460,58 +732,9 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
           </aside>
         </div>
 
-        {related.length > 0 && (
-          <aside className="mt-24 border-t border-ink/10 py-16">
-            <div className="w-full text-left">
-              <h3 className="font-display text-3xl font-bold tracking-tight text-ink">Editor's Choice</h3>
-              <p className="mt-2 text-sm uppercase tracking-[0.16em] text-ink/45">
-                More in {cat?.name ?? categoryName(category)}
-              </p>
-            </div>
-            <div className="mt-10" data-testid="editors-choice-slider">
-              <ProductCarousel
-                items={related.map((r) => {
-                  const img = mediaUrl(r.coverImage ?? null) ?? firstImageUrl(r.content);
-                  const href = postPath(r);
-
-                  return (
-                    <article key={r.id} className="group flex h-full flex-col" data-testid={`editors-choice-${r.slug}`}>
-                      <Link href={href} className="block overflow-hidden rounded-3xl bg-muted p-5">
-                        {img ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={img}
-                            alt={r.coverImage?.alternativeText || r.title}
-                            className="aspect-[4/3] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.02]"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="aspect-[4/3] w-full bg-gradient-to-br from-primary-hover to-primary" />
-                        )}
-                      </Link>
-                      <div className="mt-4">
-                        {r.categories?.[0] && (
-                          <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                            {r.categories[0].name}
-                          </p>
-                        )}
-                        <Link href={href}>
-                          <h4 className="mt-2 line-clamp-2 font-display !text-base font-bold leading-snug text-ink transition group-hover:text-primary">
-                            {r.title}
-                          </h4>
-                        </Link>
-                        <p className="mt-3 text-xs text-ink/50">
-                          {fmtDate(r.publishedAt)} · {r.readingTimeMinutes ?? 5} min
-                        </p>
-                      </div>
-                    </article>
-                  );
-                })}
-              />
-            </div>
-          </aside>
-        )}
       </div>
+
+      {readNextPosts.length > 0 ? <ReadNext posts={readNextPosts} /> : null}
     </article>
   );
 }

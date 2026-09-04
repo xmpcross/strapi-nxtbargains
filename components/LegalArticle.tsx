@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { format, parseISO } from 'date-fns';
 
-const NAV: { key: 'terms' | 'privacy' | 'cookies'; label: string; href: string }[] = [
+const NAV: { key: 'notice' | 'terms' | 'privacy' | 'cookies'; label: string; href: string }[] = [
+  { key: 'notice',  label: 'Legal Notice',         href: '/legal/notice' },
   { key: 'terms',   label: 'Terms and Conditions', href: '/legal/terms' },
   { key: 'privacy', label: 'Privacy Policy',       href: '/legal/privacy' },
   { key: 'cookies', label: 'Cookie Policy',        href: '/legal/cookies' },

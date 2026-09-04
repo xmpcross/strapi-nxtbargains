@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { wrapImpactAffiliate } from './impact-links';
+import { wrapGeniuslinkUrl } from './geniuslink';
 import { takeadsLinkForUrl } from './takeads-links';
 import { couponStoreSlug } from './coupon-stores';
 import { listNxtCoupons, type NxtCoupon } from './strapi';
@@ -58,25 +58,15 @@ const STARTER_COUPONS: Coupon[] = [
     title: 'Stack seller markdowns with seasonal voucher offers across tech, fashion, and home.',
     code: 'DEALSTACK',
     discount: 'Extra 10% off',
-    category: 'Marketplace codes',
-    href: '/search?q=ebay+promo+code',
+    category: 'eBay vouchers',
+    href: '/coupons/ebay',
     type: 'Promo code',
-    verified: 'Verified feed',
+    verified: 'Verified active',
     featured: true,
   },
   {
-    store: 'Walmart',
-    title: 'Rollbacks and online-only offers on smart home, appliances, toys, and daily essentials.',
-    discount: 'Rollback deals',
-    category: 'Department deals',
-    href: '/search?q=walmart+deals',
-    type: 'Sale',
-    verified: 'Updated daily',
-  },
-  {
     store: 'Best Buy',
-    title: 'Member pricing and open-box savings on laptops, TVs, monitors, and headphones.',
-    code: 'TECHSAVE',
+    title: 'Browse member pricing and doorbusters on tech, laptops, and appliances.',
     discount: 'Save 5-25%',
     category: 'Electronics',
     href: '/search?q=best+buy+promo+code',
@@ -146,16 +136,13 @@ function readStoreCouponCache(storeId: number | string) {
  * many call sites do not all have to change.
  */
 export async function monetizeUrl(url: string) {
-  // Merchant is read off the original destination, before wrapping: afterwards
-  // the host belongs to Impact or Takeads and every click looks like the same
-  // merchant.
   const merchant = merchantHost(url);
-
-  const impactUrl = wrapImpactAffiliate({ id: 0, productUrl: url });
-  if (impactUrl) return trackedUrl(impactUrl, { merchant, network: 'impact' });
 
   const takeadsUrl = takeadsLinkForUrl(url);
   if (takeadsUrl) return trackedUrl(takeadsUrl, { merchant, network: 'takeads' });
+
+  const geniusUrl = wrapGeniuslinkUrl(url);
+  if (geniusUrl) return trackedUrl(geniusUrl, { merchant, network: 'geniuslink' });
 
   return trackedUrl(url, { merchant, network: 'direct' });
 }

@@ -45,6 +45,7 @@ const aboutLinks = [
 const MARKETPLACES = ['Amazon', 'eBay', 'Walmart', 'AliExpress', 'Best Buy', 'Target', 'Newegg'];
 
 const legalLinks = [
+  { href: '/legal/notice', label: 'Legal Notice' },
   { href: '/legal/terms', label: 'Terms & Conditions' },
   { href: '/legal/privacy', label: 'Privacy Policy' },
   { href: '/legal/cookies', label: 'Cookie Policy' },
@@ -54,22 +55,24 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#1d252c] pt-[50px] text-sm text-white/70" data-testid="site-footer">
+    <footer className="site-footer pt-[50px] text-sm" data-testid="site-footer">
       <div className="mx-auto max-w-7xl px-6">
         {/* top: brand + columns */}
-        <div className="footer-top-grid gap-8 border-b border-white/[0.13] pb-8 sm:grid-cols-2">
+        <div className="footer-top-grid gap-8 border-b border-ink/[0.12] pb-8 sm:grid-cols-2">
           {/* brand */}
           <div className="footer-brand-column sm:col-span-2">
+            {/* The "_light" file is a white wordmark, drawn for the old dark
+                footer; on the light background it was invisible. */}
             <Link href="/" className="mb-4 inline-block" aria-label={`${SITE.name} home`}>
               <Image
-                src="/nxt_bargains_logo_light.svg"
+                src="/nxt_bargains_logo_dark.svg"
                 alt={SITE.name}
                 width={450}
                 height={218}
                 className="h-10 w-auto"
               />
             </Link>
-            <p className="mb-5 max-w-sm text-[16px] leading-6 text-white/70">
+            <p className="mb-5 max-w-sm text-[16px] leading-6 text-ink/65">
               Compare one product across the major marketplaces, track its price history,
               and buy at the lowest price. Never pay full price again.
             </p>
@@ -89,7 +92,7 @@ export default function Footer() {
 
             <div className="mt-6">
               <div className="mb-5 text-xs font-bold uppercase tracking-wide text-primary">Tips &amp; partnerships</div>
-              <Link href="/contact" className="border-b border-primary/50 pb-px text-[20px] font-medium text-white transition hover:text-primary">
+              <Link href="/contact" className="border-b border-primary/50 pb-px text-[20px] font-medium text-ink transition hover:text-primary">
                 hello@nxt.bargains
               </Link>
             </div>
@@ -101,10 +104,10 @@ export default function Footer() {
         </div>
 
         {/* comparing prices across */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/[0.13] py-6">
-          <span className="text-sm font-semibold text-white/60">Comparing prices across</span>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-ink/[0.12] py-6">
+          <span className="text-sm font-semibold text-ink/60">Comparing prices across</span>
           {MARKETPLACES.map((m) => (
-            <b key={m} className="font-display text-sm font-bold text-white/85">{m}</b>
+            <b key={m} className="font-display text-sm font-bold text-ink/80">{m}</b>
           ))}
           <span className="text-sm font-semibold text-primary">+ more</span>
         </div>
@@ -112,14 +115,14 @@ export default function Footer() {
       </div>
 
       {/* bottom */}
-      <div className="mt-6 bg-black">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-xs text-white/55 sm:text-sm">
+      <div className="site-footer-bottom mt-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-xs text-ink/70 sm:text-sm">
           <span>© {year} {SITE.name}. Independent price comparison — we may earn a commission on some links.</span>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             {legalLinks.map((l) => (
-              <Link key={l.href} href={l.href} className="transition hover:text-white">{l.label}</Link>
+              <Link key={l.href} href={l.href} className="transition hover:text-ink">{l.label}</Link>
             ))}
-            <CookieSettingsButton className="transition hover:text-white" />
+            <CookieSettingsButton className="transition hover:text-ink" />
           </div>
         </div>
       </div>
@@ -138,11 +141,11 @@ function FooterColumn({
 }) {
   return (
     <div className={className}>
-      <h5 className="mb-4 font-display text-[14px] font-semibold uppercase tracking-wide text-white">{title}</h5>
+      <h5 className="mb-4 font-display text-[14px] font-semibold uppercase tracking-wide text-ink">{title}</h5>
       {links.map((item) =>
         'heading' in item ? (
           <div key={item.heading} className="group/sub mb-2.5">
-            <p className="mb-1.5 flex cursor-default items-center gap-1.5 text-sm text-white/70 transition hover:text-white">
+            <p className="mb-1.5 flex cursor-default items-center gap-1.5 text-sm text-ink/65 transition hover:text-ink">
               {item.heading}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -152,7 +155,7 @@ function FooterColumn({
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-3.5 w-3.5 text-white/40 transition-transform duration-200 group-hover/sub:rotate-180"
+                className="h-3.5 w-3.5 text-ink/45 transition-transform duration-200 group-hover/sub:rotate-180"
                 aria-hidden
               >
                 <path d="m6 9 6 6 6-6" />
@@ -164,7 +167,7 @@ function FooterColumn({
                   <Link
                     key={l.href + l.label}
                     href={l.href}
-                    className="mb-2.5 block pl-3 text-sm text-white/70 transition hover:pl-4 hover:text-white"
+                    className="mb-2.5 block pl-3 text-sm text-ink/65 transition hover:pl-4 hover:text-ink"
                   >
                     {l.label}
                   </Link>
@@ -176,7 +179,7 @@ function FooterColumn({
           <Link
             key={item.href + item.label}
             href={item.href}
-            className="mb-2.5 block text-sm text-white/70 transition hover:pl-1 hover:text-white"
+            className="mb-2.5 block text-sm text-ink/65 transition hover:pl-1 hover:text-ink"
           >
             {item.label}
           </Link>
@@ -194,7 +197,7 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
       aria-label={label}
       target={external ? '_blank' : undefined}
       rel={external ? 'noopener noreferrer' : undefined}
-      className="grid h-9 w-9 place-items-center rounded border border-white/10 bg-white/[0.07] text-white/80 transition hover:-translate-y-0.5 hover:border-primary hover:bg-primary hover:text-white"
+      className="grid h-9 w-9 place-items-center rounded bg-ink/[0.06] text-ink/70 transition hover:-translate-y-0.5 hover:bg-primary hover:text-ink"
     >
       <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
         {children}

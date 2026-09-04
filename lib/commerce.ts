@@ -5,6 +5,19 @@ export type CommerceOfferRow = {
   product: CommerceProduct;
 };
 
+/**
+ * Recognize Geniuslink URLs without assuming their availability.
+ */
+export function isGeniusLinkUrl(url?: string | null): boolean {
+  if (!url) return false;
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return host === 'geni.us' || host.endsWith('.geni.us');
+  } catch {
+    return false;
+  }
+}
+
 export function numericValue(value?: number | string | null): number | null {
   if (value === null || value === undefined || value === '') return null;
   const parsed = typeof value === 'number' ? value : Number(value);
@@ -88,6 +101,27 @@ export function sanitizeOfferUrl(value?: string | null): string | null {
     return nestedMerchantUrl(trimmed);
   }
   if (isAmazonSearchUrl(trimmed)) return null;
+
+  try {
+    const parsed = new URL(trimmed);
+    const host = parsed.hostname.toLowerCase();
+    // Filter out synthetic or broken domain names
+    if (host.includes('_store') || host.includes('amazon_us') || host.includes('official_store') || host.includes('marketplace_store')) {
+      return null;
+    }
+    // Filter out known dummy/fake product URLs from backfilled test data that cause 404s on merchant sites
+    if (parsed.pathname.includes('/998877665') || parsed.pathname.includes('/6505727.p') || parsed.pathname.includes('A-86718520') || parsed.pathname.includes('123456789012')) {
+      return null;
+    }
+    // Non-Amazon hosts with /dp/ synthetic paths (e.g. walmart.com/dp/...) cause 404s
+    const isAmazon = host === 'amazon.com' || host.endsWith('.amazon.com') || host.includes('amazon.');
+    if (!isAmazon && parsed.pathname.startsWith('/dp/')) {
+      return null;
+    }
+  } catch {
+    return null;
+  }
+
   return trimmed;
 }
 
@@ -107,13 +141,26 @@ function merchantSearchUrl(offer: CommerceOffer, product?: CommerceProduct, goog
   if (!queryText) return offer.merchant?.websiteUrl ?? null;
 
   const query = encodeURIComponent(queryText);
-  const slug = (offer.merchant?.slug ?? merchantName(offer)).toLowerCase();
+  const slug = (offer.merchant?.slug ?? offer.merchant?.name ?? merchantName(offer)).toLowerCase();
   if (slug.includes('amazon')) return `https://www.amazon.com/s?k=${query}`;
-  if (slug.includes('bestbuy') || slug.includes('best-buy')) return `https://www.bestbuy.com/site/searchpage.jsp?st=${query}`;
+  if (slug.includes('bestbuy') || slug.includes('best-buy') || slug.includes('best buy')) return `https://www.bestbuy.com/site/searchpage.jsp?st=${query}`;
   if (slug.includes('target')) return `https://www.target.com/s?searchTerm=${query}`;
   if (slug.includes('walmart')) return `https://www.walmart.com/search?q=${query}`;
   if (slug.includes('ebay')) return `https://www.ebay.com/sch/i.html?_nkw=${query}`;
   if (slug.includes('newegg')) return `https://www.newegg.com/p/pl?d=${query}`;
+  if (slug.includes('apple')) return `https://www.apple.com/us/search/${query}`;
+  if (slug.includes('verizon')) return `https://www.verizon.com/search/?q=${query}`;
+  if (slug.includes('att') || slug.includes('at&t')) return `https://www.att.com/search/results?q=${query}`;
+  if (slug.includes('tmobile') || slug.includes('t-mobile')) return `https://www.t-mobile.com/search?q=${query}`;
+  // Specialist and brand-direct stores that carry the sports-watch catalogue.
+  // Without these the chain falls back to a merchant homepage, which drops the
+  // reader somewhere they still have to search for the product themselves.
+  if (slug.includes('rei')) return `https://www.rei.com/search?q=${query}`;
+  if (slug.includes('dick')) return `https://www.dickssportinggoods.com/search/SearchDisplay?searchTerm=${query}`;
+  if (slug.includes('scheels')) return `https://www.scheels.com/search?q=${query}`;
+  if (slug.includes('garmin')) return `https://www.garmin.com/en-US/search/?q=${query}`;
+  if (slug.includes('suunto')) return `https://www.suunto.com/search/?q=${query}`;
+  if (slug.includes('amazfit')) return `https://www.amazfit.com/search?q=${query}`;
 
   return offer.merchant?.websiteUrl ?? null;
 }

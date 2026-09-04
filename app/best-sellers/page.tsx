@@ -25,73 +25,48 @@ export default function BestSellersIndexPage() {
   return (
     <main data-page="best-sellers" data-testid="best-sellers-index-page">
       {/* Hero — matches the /products header */}
-      <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white" data-testid="best-sellers-page-header">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-80"
-          style={{
-            background:
-              'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
-          }}
-        />
-        <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
-            <Link href="/" className="transition hover:text-white">Home</Link>
+      <section className="page-hero" data-testid="best-sellers-page-header">
+        <div className="page-hero-inner">
+          <nav className="page-hero-crumbs">
+            <Link href="/">Home</Link>
             <span aria-hidden>/</span>
-            <span className="text-[#ffe000]">Best sellers</span>
+            <span className="page-hero-crumbs-current">Best sellers</span>
           </nav>
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-start">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">NXT.Bargains best sellers</p>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
+              <p className="page-hero-eyebrow">NXT.Bargains best sellers</p>
+              <h1 className="page-hero-title">
                 The top-selling products across every marketplace.
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-                See what&apos;s actually selling right now on Amazon, eBay, Walmart, Target, Best Buy and Newegg — ranked
-                by popularity and refreshed daily, so you can spot the products worth buying before you shop.
-              </p>
-
-              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
-                <li className="flex gap-3"><span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span><span>Live best-seller rankings pulled straight from each marketplace.</span></li>
-                <li className="flex gap-3"><span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span><span>Ratings, review counts, and Prime / deal badges at a glance.</span></li>
-                <li className="flex gap-3"><span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span><span>Amazon broken out by category — phones, laptops, smart home and more.</span></li>
-                <li className="flex gap-3"><span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span><span>Free to browse — no signup required.</span></li>
-              </ul>
-
-              <div className="mt-10 flex flex-wrap gap-3">
-                <a href="#marketplaces" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                  Browse best sellers
-                </a>
-                <Link href="/all-products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
-                  All products
-                </Link>
-                <Link href="/best-deals" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
-                  Best deals
-                </Link>
-              </div>
+              <p className="page-hero-desc">
+              See what is genuinely selling right now across Amazon, eBay, Walmart, Target, Best Buy and
+              Newegg. Rankings are refreshed daily and broken out by category, so you can spot the products
+              worth buying before you start shopping. Every listing links straight through to the retailer
+              for the current price.
+            </p>
             </div>
 
             {/* stats card */}
-            <div className="rounded-none border border-white/12 bg-white/[0.04] p-6 backdrop-blur">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">At a glance</p>
+            <div className="page-hero-panel p-6">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-ink/50">At a glance</p>
               <dl className="mt-4 grid grid-cols-2 gap-4">
                 <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-white/45">Products ranked</dt>
-                  <dd className="mt-1 font-display text-3xl font-bold text-white">{totalProducts.toLocaleString()}</dd>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink/50">Products ranked</dt>
+                  <dd className="mt-1 font-display text-3xl font-bold text-ink">{totalProducts.toLocaleString()}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-white/45">Marketplaces</dt>
-                  <dd className="mt-1 font-display text-3xl font-bold text-white">{groups.length}</dd>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink/50">Marketplaces</dt>
+                  <dd className="mt-1 font-display text-3xl font-bold text-ink">{groups.length}</dd>
                 </div>
-                <div className="col-span-2 border-t border-white/12 pt-4">
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-white/45">Refresh</dt>
-                  <dd className="mt-1 text-sm font-semibold text-white/80">Rankings update daily</dd>
+                <div className="col-span-2 border-t border-ink/12 pt-4">
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-ink/50">Refresh</dt>
+                  <dd className="mt-1 text-sm font-semibold text-ink/75">Rankings update daily</dd>
                 </div>
               </dl>
               <nav className="mt-5 flex flex-wrap gap-2" aria-label="Jump to marketplace">
                 {groups.map((group) => (
-                  <a key={group.key} href={`#best-sellers-${group.key}`} className="inline-flex border border-white/15 px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-white/70 transition hover:border-[#ffe000] hover:text-[#ffe000]">
+                  <a key={group.key} href={`#best-sellers-${group.key}`} className="page-hero-pill px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-[0.1em]">
                     {group.label}
                   </a>
                 ))}

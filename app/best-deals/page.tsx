@@ -4,11 +4,12 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import DealProductCard from '@/components/DealProductCard';
 import { SITE } from '@/lib/site';
-import { bestOffer, collectOfferRows, numericValue, offerPrice, type CommerceOfferRow } from '@/lib/commerce';
+import { bestOffer, collectOfferRows, isGeniusLinkUrl, numericValue, offerPrice, type CommerceOfferRow } from '@/lib/commerce';
 import { monetizeUrl } from '@/lib/coupon-data';
 import { listCommerceProductsForDeals, type CommerceProduct } from '@/lib/strapi';
 import { collectionPageJsonLd } from '@/lib/jsonld';
 import { JsonLd } from '@/components/JsonLd';
+import DealFilterCarousel from '@/components/DealFilterCarousel';
 
 export const revalidate = 120;
 
@@ -52,8 +53,19 @@ type RealTimeBestDealsCache = {
   items?: RealTimeBestDeal[];
 };
 
-export default async function BestDealsPage() {
-  const { items: realTimeDeals, capturedAt, queries } = await loadRealTimeBestDeals();
+const POPULAR_CATEGORY_FILTERS = ['smartphone', 'headphones', 'smartwatch', 'laptop', 'smart tv', 'tablet'];
+const POPULAR_RETAILER_FILTERS = [
+  'amazon deals', 'best buy deals', 'walmart deals', 'ebay deals', 'target deals',
+  'newegg deals', 'dell deals', 'hp deals', 'lenovo deals', 'samsung deals',
+];
+
+export default async function BestDealsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filter?: string }>;
+}) {
+  const { filter: requestedFilter } = await searchParams;
+  const { items: realTimeDeals, queries } = await loadRealTimeBestDeals();
   const products = realTimeDeals.length > 0
     ? [] as CommerceProduct[]
     : await listCommerceProductsForDeals(160).catch(() => [] as CommerceProduct[]);
@@ -72,26 +84,19 @@ export default async function BestDealsPage() {
 
   const usingRealtime = realTimeDeals.length > 0;
   const dealCount = usingRealtime ? realTimeDeals.length : catalogDeals.length;
-  const topDiscount = usingRealtime
-    ? Math.max(0, ...realTimeDeals.map((d) => d.discountPercent))
-    : catalogDeals[0]?.discount ?? 0;
-  const avgDiscount = usingRealtime && realTimeDeals.length > 0
-    ? Math.round(realTimeDeals.reduce((sum, d) => sum + d.discountPercent, 0) / realTimeDeals.length)
-    : catalogDeals.length > 0
-      ? Math.round(catalogDeals.reduce((sum, d) => sum + d.discount, 0) / catalogDeals.length)
-      : 0;
-  const stores = usingRealtime
-    ? new Set(realTimeDeals.map((d) => d.store)).size
-    : new Set(catalogDeals.map((d) => d.row.offer.merchant?.name || 'Merchant')).size;
-
   const featuredRealtime = realTimeDeals.slice(0, 4);
   const featuredCatalog = catalogDeals.slice(0, 4);
-
-  const updatedLabel = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(capturedAt ? new Date(capturedAt) : new Date());
+  const selectedFilter = requestedFilter && queries.includes(requestedFilter) ? requestedFilter : null;
+  const categoryQueries = queries.filter((query) => POPULAR_CATEGORY_FILTERS.includes(query));
+  const retailerQueries = queries.filter((query) => POPULAR_RETAILER_FILTERS.includes(query));
+  const selectedCategory = selectedFilter && categoryQueries.includes(selectedFilter) ? selectedFilter : null;
+  const selectedRetailer = selectedFilter && retailerQueries.includes(selectedFilter) ? selectedFilter : null;
+  const categoryDeals = realTimeDeals.filter((deal) =>
+    selectedCategory ? deal.query === selectedCategory : categoryQueries.includes(deal.query)
+  ).slice(0, 12);
+  const retailerDeals = realTimeDeals.filter((deal) =>
+    selectedRetailer ? deal.query === selectedRetailer : retailerQueries.includes(deal.query)
+  ).slice(0, 12);
 
   const pageJsonLd = collectionPageJsonLd({
     name: 'Best Deals',
@@ -104,14 +109,7 @@ export default async function BestDealsPage() {
     <main data-testid="best-deals-page">
       <JsonLd graph={[pageJsonLd]} />
 
-      <Hero
-        dealCount={dealCount}
-        topDiscount={topDiscount}
-        avgDiscount={avgDiscount}
-        storeCount={stores}
-        updatedLabel={updatedLabel}
-        sourceLabel={usingRealtime ? 'Live merchant search' : 'Product catalog'}
-      />
+      <Hero />
 
       {dealCount > 0 ? (
         <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="featured-deals">
@@ -124,7 +122,7 @@ export default async function BestDealsPage() {
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
               {usingRealtime
                 ? featuredRealtime.map((deal) => (
-                    <RealTimeDealCard key={`featured-${deal.id}-${deal.url}`} deal={deal} featured />
+                    <RealTimeDealCard key={`featured-${deal.query}-${deal.id}-${deal.url}`} deal={deal} featured />
                   ))
                 : featuredCatalog.map((deal) => (
                     <DealProductCard
@@ -145,35 +143,29 @@ export default async function BestDealsPage() {
         <div className="mx-auto max-w-[1366px] px-6">
           <SectionHead
             eyebrow="All deals"
-            title="Every deal on this page"
+            title="Deal on popular categories"
             subtitle={
               dealCount > 0
-                ? `${dealCount} offers ranked by discount. Final prices can change at checkout — verify shipping, condition, and seller details on the merchant site.`
+                ? `${usingRealtime ? categoryDeals.length : catalogDeals.length} offers across popular product categories. Choose a category to narrow the results.`
                 : 'No discounted offers are available right now.'
             }
           />
 
-          {queries.length > 0 ? (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {queries.map((query) => (
-                <span
-                  key={query}
-                  className="border border-ink/10 bg-[#f0f2f4] px-3 py-1.5 text-xs font-bold text-ink/60"
-                >
-                  {query}
-                </span>
-              ))}
-            </div>
-          ) : null}
+          <DealFilterCarousel queries={categoryQueries} selected={selectedCategory} anchor="all-deals" autoSlide />
 
-          {usingRealtime ? (
-            <div className="mt-8 grid gap-4 lg:grid-cols-2">
-              {realTimeDeals.map((deal) => (
-                <RealTimeDealCard key={`${deal.id}-${deal.url}`} deal={deal} />
+          {usingRealtime && categoryDeals.length > 0 ? (
+            <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {categoryDeals.map((deal) => (
+                <RealTimeDealCard key={`${deal.query}-${deal.id}-${deal.url}`} deal={deal} />
               ))}
             </div>
+          ) : selectedCategory ? (
+            <EmptyState
+              title={`No ${selectedCategory} deals right now`}
+              body="Try another filter or check back after the next live merchant refresh."
+            />
           ) : catalogDeals.length > 0 ? (
-            <div className="mt-8 grid gap-4 lg:grid-cols-2">
+            <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {catalogDeals.map((deal) => (
                 <DealProductCard
                   key={`${deal.product.id}-${deal.row.offer.id}`}
@@ -194,7 +186,30 @@ export default async function BestDealsPage() {
         </div>
       </section>
 
-      <section className="border-t border-ink/10 bg-[#f0f2f4] py-10">
+      <section className="border-t border-ink/10 bg-[#f0f2f4] py-10 sm:py-14" id="retailer-deals">
+        <div className="mx-auto max-w-[1366px] px-6">
+          <SectionHead
+            eyebrow="Shop by store"
+            title="Deals on popular retailers, marketplaces and brands"
+            subtitle={`${retailerDeals.length} offers from well-known stores and technology brands. Choose a name to view its related deals.`}
+          />
+          <DealFilterCarousel queries={retailerQueries} selected={selectedRetailer} anchor="retailer-deals" />
+          {retailerDeals.length > 0 ? (
+            <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {retailerDeals.map((deal) => (
+                <RealTimeDealCard key={`retailer-${deal.query}-${deal.id}-${deal.url}`} deal={deal} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No retailer deals right now"
+              body="Try another retailer or check back after the next live merchant refresh."
+            />
+          )}
+        </div>
+      </section>
+
+      <section className="border-t border-ink/10 bg-white py-10">
         <div className="mx-auto max-w-[1366px] px-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <BrowseCard href="/price-drops" title="Price drops" subtitle="Recently tracked price movements" />
@@ -210,107 +225,30 @@ export default async function BestDealsPage() {
   );
 }
 
-function Hero({
-  dealCount,
-  topDiscount,
-  avgDiscount,
-  storeCount,
-  updatedLabel,
-  sourceLabel,
-}: {
-  dealCount: number;
-  topDiscount: number;
-  avgDiscount: number;
-  storeCount: number;
-  updatedLabel: string;
-  sourceLabel: string;
-}) {
+function Hero() {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            'radial-gradient(at 80% 20%, rgba(0,70,190,0.22) 0%, transparent 50%), radial-gradient(at 15% 85%, rgba(255,224,0,0.12) 0%, transparent 50%)',
-        }}
-      />
-      <div className="relative mx-auto max-w-[1366px] px-4 py-10 sm:px-6 sm:py-14">
-        <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
-          <Link href="/" className="transition hover:text-white">Home</Link>
+    <section className="page-hero">
+      <div className="page-hero-inner">
+        <nav className="page-hero-crumbs">
+          <Link href="/">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-[#ffe000]">Best deals</span>
+          <span className="page-hero-crumbs-current">Best deals</span>
         </nav>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">NXT.Bargains deals</p>
-            <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
-              Best deals across live merchant offers
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-              Products ranked by current sale pricing from Real-Time Product Search,
-              with catalog offers used as a fallback when live data is unavailable.
-            </p>
-
-            <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/75 sm:text-base">
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                <span>Ranked by real discount — the biggest savings surface first.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                <span>Live offers from Amazon, eBay, Walmart, Newegg, and Best Buy.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-[#ffe000]" aria-hidden>✓</span>
-                <span>Final price, shipping, and condition confirmed on the merchant site.</span>
-              </li>
-            </ul>
-
-            <div className="mt-10 flex flex-wrap gap-3">
-              <a href="#all-deals" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                View all deals
-              </a>
-              <Link href="/price-drops" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
-                Price drops
-              </Link>
-              <Link href="/all-products" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/75 transition hover:border-white/40 hover:text-white">
-                All products
-              </Link>
-            </div>
-          </div>
-
-          <aside className="border border-white/15 bg-white/5 p-5 backdrop-blur sm:p-6" aria-label="Best deals statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">At a glance</p>
-            <p className="mt-3 text-sm leading-6 text-white/70">
-              {dealCount > 0
-                ? `A live snapshot of the ${dealCount} strongest deals we're tracking right now, ranked by discount across major marketplaces.`
-                : 'Deals appear here as live merchant offers with sale pricing are tracked across major marketplaces.'}
-            </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
-              <Stat label="Live deals" value={String(dealCount)} />
-              <Stat label="Top discount" value={dealCount > 0 ? `${topDiscount}%` : '—'} />
-              <Stat label="Avg. savings" value={dealCount > 0 ? `${avgDiscount}%` : '—'} />
-              <Stat label="Stores" value={String(storeCount)} />
-            </div>
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-4 text-xs text-white/55">
-              <span>Updated {updatedLabel}</span>
-              <span className="font-semibold text-[#ffe000]">{sourceLabel}</span>
-            </div>
-          </aside>
+        <div className="mt-8 w-full">
+          <p className="page-hero-eyebrow">NXT.Bargains deals</p>
+          <h1 className="page-hero-title">
+            Best deals across live merchant offers
+          </h1>
+          <p className="page-hero-desc">
+            The largest current discounts across every retailer we track, ranked by how far each price
+            has actually fallen. Live pricing comes from Real-Time Product Search, with our own catalogue
+            offers used as a fallback whenever live data is unavailable. Deals move quickly, so confirm the
+            final price on the retailer page before you commit.
+          </p>
         </div>
       </div>
     </section>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="font-display text-2xl font-bold text-white">{value}</p>
-      <p className="mt-1 text-sm text-white/55">{label}</p>
-    </div>
   );
 }
 
@@ -358,6 +296,7 @@ const MERCHANT_SEARCH: Array<[RegExp, (q: string) => string]> = [
 ];
 
 function merchantDealUrl(store: string, title: string, fallback: string): string {
+  if (isGeniusLinkUrl(fallback)) return fallback;
   const q = encodeURIComponent(title.trim().slice(0, 150));
   const match = MERCHANT_SEARCH.find(([re]) => re.test(store));
   if (match) return match[1](q);
@@ -374,7 +313,7 @@ async function loadRealTimeBestDeals() {
     const items = (cache.items ?? [])
       .filter((item) => item.title && item.image && item.url && item.priceValue !== null)
       .sort((a, b) => b.discountPercent - a.discountPercent || b.savingsValue - a.savingsValue)
-      .slice(0, 36);
+      .slice(0, 192);
     // Replace the Google Shopping link with the merchant's own search URL, then
     // affiliate-wrap it (Impact deep-link when the domain qualifies — e.g.
     // walmart.com — else a Takeads link where the map has one) so clicks land on
@@ -382,6 +321,7 @@ async function loadRealTimeBestDeals() {
     const monetized: RealTimeBestDeal[] = [];
     for (const item of items) {
       const merchantUrl = merchantDealUrl(item.store, item.title, item.url);
+      if (!merchantUrl) continue;
       monetized.push({ ...item, url: await monetizeUrl(merchantUrl) });
     }
     return {
@@ -418,6 +358,8 @@ function formatPlainMoney(value: number, currency: string) {
 // deal's favicon, then a favicon derived from the product URL's domain.
 const REALTIME_STORE_LOGOS: Array<[RegExp, string]> = [
   [/amazon/, '/logos/amazon-logo.svg'],
+  [/best.?buy/, '/logos/best-buy-logo.svg'],
+  [/\bbj'?s\b/, '/logos/bjs-wholesale-club-logo.svg'],
   [/\bebay\b/, '/logos/ebay-logo.svg'],
   [/wal-?mart/, '/logos/walmart-logo.svg'],
   [/newegg/, '/logos/newegg-logo.svg'],
@@ -458,26 +400,30 @@ function RealTimeDealCard({ deal, featured = false }: { deal: RealTimeBestDeal; 
 
   return (
     <article
-      className={`group grid gap-0 border bg-white transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-20px_rgba(13,27,42,0.35)] sm:grid-cols-[160px_minmax(0,1fr)] ${
-        featured ? 'border-primary/25 shadow-[0_12px_24px_-18px_rgba(0,70,190,0.2)]' : 'border-ink/10 hover:border-primary/30'
+      className={`best-deal-card group grid gap-0 border bg-white transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-20px_rgba(13,27,42,0.35)] ${
+        featured ? 'sm:grid-cols-[160px_minmax(0,1fr)]' : 'sm:grid-cols-[125px_minmax(0,1fr)]'
+      } ${
+        featured ? 'border-primary/25 shadow-[0_12px_24px_-18px_rgba(0,70,190,0.2)]' : 'border-ink/25 hover:border-primary/50'
       }`}
     >
       <a
         href={deal.url}
         target="_blank"
         rel="nofollow sponsored noopener noreferrer"
-        className="flex min-h-[170px] items-center justify-center border-b border-ink/10 bg-white p-4 sm:border-b-0 sm:border-r"
+        className={`flex items-center justify-center border-b border-ink/10 bg-white sm:border-b-0 sm:border-r ${
+          featured ? 'min-h-[170px] p-4' : 'min-h-[132px] p-3'
+        }`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={deal.image}
           alt={deal.title}
           referrerPolicy="no-referrer"
-          className="max-h-36 w-full object-contain mix-blend-multiply transition duration-300 group-hover:scale-[1.03]"
+          className={`${featured ? 'max-h-36' : 'max-h-28'} w-full object-contain mix-blend-multiply transition duration-300 group-hover:scale-[1.03]`}
         />
       </a>
 
-      <div className="flex min-w-0 flex-col p-4 sm:p-5">
+      <div className={`flex min-w-0 flex-col ${featured ? 'p-4 sm:p-5' : 'p-3.5'}`}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="rounded bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
             Save {discount}%
@@ -501,22 +447,22 @@ function RealTimeDealCard({ deal, featured = false }: { deal: RealTimeBestDeal; 
           ) : null}
         </div>
 
-        <a href={deal.url} target="_blank" rel="nofollow sponsored noopener noreferrer" className="mt-3 block">
-          <h5 className="line-clamp-2 font-display text-lg font-bold leading-snug text-ink transition group-hover:text-primary">
+        <a href={deal.url} target="_blank" rel="nofollow sponsored noopener noreferrer" className={featured ? 'mt-3 block' : 'mt-2.5 block'}>
+          <h5 className={`line-clamp-2 font-display font-bold leading-snug text-ink transition group-hover:text-primary ${featured ? 'text-lg' : 'text-base'}`}>
             {deal.title}
           </h5>
         </a>
 
-        <p className="mt-2 line-clamp-2 text-sm leading-6 text-ink/60">
+        <p className={`${featured ? 'mt-2 line-clamp-2 leading-6' : 'mt-1.5 line-clamp-1 leading-5'} text-sm text-ink/60`}>
           {meta || `Current offer from ${deal.store}.`}
         </p>
 
-        <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-4">
+        <div className={`mt-auto flex flex-wrap items-end justify-between gap-3 ${featured ? 'pt-4' : 'pt-3'}`}>
           <div>
             {deal.originalPrice && deal.originalPriceValue !== null && deal.priceValue !== null && deal.originalPriceValue > deal.priceValue ? (
               <p className="text-sm text-ink/35 line-through">{deal.originalPrice}</p>
             ) : null}
-            <p className="font-display text-2xl font-bold text-ink">{deal.price ?? 'Check price'}</p>
+            <p className={`font-display font-bold text-ink ${featured ? 'text-2xl' : 'text-xl'}`}>{deal.price ?? 'Check price'}</p>
             <p className="mt-1 text-xs text-ink/45">
               {savings ? `Est. savings ${savings}` : deal.store}
             </p>
@@ -525,7 +471,9 @@ function RealTimeDealCard({ deal, featured = false }: { deal: RealTimeBestDeal; 
             href={deal.url}
             target="_blank"
             rel="nofollow sponsored noopener noreferrer"
-            className="inline-flex bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-white transition hover:bg-primary-emphasis"
+            className={`inline-flex bg-primary text-xs font-bold uppercase tracking-[0.1em] text-white transition hover:bg-primary-emphasis ${
+              featured ? 'px-4 py-2.5' : 'px-3 py-2'
+            }`}
           >
             View deal
           </a>

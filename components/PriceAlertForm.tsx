@@ -14,11 +14,14 @@ export default function PriceAlertForm({
   currency = 'USD',
   currentPrice,
   buyHref,
+  buyLabel,
 }: {
   productDocumentId?: string;
   currency?: string;
   currentPrice?: number;
   buyHref?: string;
+  /** e.g. "Buy at Garmin". Falls back to the generic wording. */
+  buyLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
@@ -62,8 +65,10 @@ export default function PriceAlertForm({
   }
 
   // Shared sizing so the two buttons are identical in width + height.
+  /* h-10 rather than vertical padding: both buttons are then exactly 40px
+     whatever their label wraps to, so the pair stays level. */
   const btnBase =
-    'inline-flex flex-1 basis-0 min-w-[130px] items-center justify-center gap-1.5 rounded-md px-3 py-2 font-display text-[11px] font-bold uppercase tracking-wider transition';
+    'inline-flex h-10 flex-1 basis-0 min-w-[130px] items-center justify-center gap-1.5 rounded-md px-3 font-display text-[11px] font-bold uppercase tracking-wider transition';
 
   return (
     <div className="mt-4">
@@ -92,9 +97,11 @@ export default function PriceAlertForm({
             href={buyHref}
             target="_blank"
             rel="noopener noreferrer sponsored"
-            className={`${btnBase} bg-primary text-white hover:bg-primary-emphasis`}
+            /* Same yellow as the price sidebar's buy button, so the two
+               primary buy actions on the page look like one thing. */
+            className={`${btnBase} bg-[#ffe000] text-ink hover:brightness-95`}
           >
-            Buy For Best Price
+            {buyLabel ?? 'Buy For Best Price'}
           </a>
         )}
       </div>

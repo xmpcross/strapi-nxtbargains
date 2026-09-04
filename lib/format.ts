@@ -1,5 +1,20 @@
 import { format, parseISO } from 'date-fns';
 
+/**
+ * Date and time, as the price box shows it: "5 Aug 2026, 5:06 pm".
+ *
+ * Rendered on the server only, so there is no client/server locale split to
+ * reconcile — the string in the HTML is the string the reader sees.
+ */
+export function fmtDateTime(iso?: string): string {
+  if (!iso) return '';
+  try {
+    return format(parseISO(iso), 'd MMM yyyy, h:mm aaa');
+  } catch {
+    return '';
+  }
+}
+
 export function fmtDate(iso?: string): string {
   if (!iso) return '';
   try {

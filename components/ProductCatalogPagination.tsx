@@ -9,11 +9,10 @@ type ProductCatalogPaginationProps = {
 };
 
 const PAGE_BTN =
-  'inline-flex h-10 w-10 shrink-0 items-center justify-center border text-sm font-medium tabular-nums transition';
-const PAGE_BTN_IDLE =
-  'border-[#d8dee6] bg-white text-ink/80 hover:border-[#b8c0cc] hover:bg-[#f0f2f4]';
-const PAGE_BTN_ACTIVE = 'border-primary bg-primary text-white';
-const PAGE_BTN_DISABLED = 'cursor-not-allowed border-[#e4e8ee] bg-[#f0f2f4] text-ink/30';
+  'catalog-pager-btn inline-flex h-10 w-10 shrink-0 items-center justify-center text-sm font-medium tabular-nums transition';
+const PAGE_BTN_IDLE = 'catalog-pager-idle';
+const PAGE_BTN_ACTIVE = 'catalog-pager-active';
+const PAGE_BTN_DISABLED = 'catalog-pager-disabled cursor-not-allowed';
 
 function visiblePages(page: number, pageCount: number, maxVisible: number) {
   if (pageCount <= maxVisible) {
@@ -61,7 +60,7 @@ export default function ProductCatalogPagination({
 
   return (
     <nav
-      className="product-catalog-pagination mt-10 flex justify-end"
+      className="product-catalog-pagination mt-8 flex justify-end"
       aria-label="Product pagination"
       data-testid="product-catalog-pagination"
     >

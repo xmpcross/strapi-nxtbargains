@@ -140,8 +140,8 @@ export default function PostCard({
 
   // tile (default)
   return (
-    <article className="group flex flex-col" data-testid={`tile-${post.slug}`}>
-      <Link href={href} className={`block overflow-hidden rounded-3xl ${thumbBg}`}>
+    <article className="post-tile group flex flex-col" data-testid={`tile-${post.slug}`}>
+      <Link href={href} className={`post-tile-media block overflow-hidden ${thumbBg}`}>
         {img ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -154,7 +154,7 @@ export default function PostCard({
           <div className="aspect-[4/3] w-full bg-gradient-to-br from-primary-hover to-primary" />
         )}
       </Link>
-      <div className="mt-4">
+      <div className="mt-3.5">
         {cat && <p className="text-[11px] font-bold uppercase tracking-wider text-primary">{cat.name}</p>}
         <Link href={href}>
           {/* Pinned with the important modifier so surrounding typography rules

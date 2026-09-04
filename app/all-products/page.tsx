@@ -156,9 +156,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         </section>
       ) : null}
 
-      <section className="bg-[#f0f2f4] py-10 sm:py-12" id="catalog">
+      <section className="bg-white py-8" id="catalog">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <div className="grid gap-8 lg:grid-cols-[minmax(240px,24%)_minmax(0,76%)] lg:items-start">
+          <div className="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start">
             <ProductFiltersSidebar
               action="/all-products"
               clearHref="/all-products"
@@ -173,60 +173,35 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             />
 
             <div>
-              <div className="flex flex-wrap items-end justify-between gap-4 border border-ink/10 bg-white p-5 sm:p-6">
-                <div>
-                  <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
-                    {filters.q ? 'Search results' : activeCategory ? activeCategory.name : 'Product catalog'}
-                  </p>
-                  <h2 className="mt-2 font-display text-2xl font-bold text-ink sm:text-3xl">
-                    {filters.q
-                      ? `${total} result${total === 1 ? '' : 's'} for "${filters.q}"`
-                      : `${total} product${total === 1 ? '' : 's'} to compare`}
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-ink/55">
-                    Page {page} of {pageCount}
-                    {activeFilterCount > 0 ? ` · ${activeFilterCount} filter${activeFilterCount === 1 ? '' : 's'} applied` : ''}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Link
-                    href="/best-deals"
-                    className="inline-flex border border-ink/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-ink/60 transition hover:border-primary hover:text-primary"
-                  >
-                    Best deals
-                  </Link>
-                  <Link
-                    href="/price-drops"
-                    className="inline-flex border border-ink/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-ink/60 transition hover:border-primary hover:text-primary"
-                  >
-                    Price drops
-                  </Link>
-                </div>
+              {/* Results bar in the reference's shape: the count on the left,
+                  dismissible chips for the active filters on the right. The
+                  boxed heading and the Best deals / Price drops buttons that
+                  used to sit here are in the hero and the nav already. */}
+              <div className="catalog-results-bar">
+                <p className="text-sm text-ink/55">
+                  Showing <strong className="font-bold text-ink">{products.length}</strong> of{' '}
+                  <strong className="font-bold text-ink">{total}</strong> products
+                  {filters.q ? <> for &ldquo;<strong className="font-bold text-ink">{filters.q}</strong>&rdquo;</> : null}
+                  {pageCount > 1 ? <span className="text-ink/40"> · page {page} of {pageCount}</span> : null}
+                </p>
+
+                {filterChips.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-2" data-testid="products-active-filters">
+                    {filterChips.map((chip) => (
+                      <span key={chip.key} className="catalog-chip">
+                        {chip.label}
+                        <Link href={chip.href} aria-label={`Remove ${chip.label}`}>×</Link>
+                      </span>
+                    ))}
+                    <Link href="/all-products" className="text-xs font-semibold text-[#118757] hover:underline">
+                      Clear all
+                    </Link>
+                  </div>
+                ) : null}
               </div>
 
-              {filterChips.length > 0 ? (
-                <div className="mt-4 flex flex-wrap items-center gap-2" data-testid="products-active-filters">
-                  {filterChips.map((chip) => (
-                    <Link
-                      key={chip.key}
-                      href={chip.href}
-                      className="inline-flex items-center gap-2 border border-ink/10 bg-white px-3 py-1.5 text-xs font-semibold text-ink/70 transition hover:border-primary hover:text-primary"
-                    >
-                      {chip.label}
-                      <span aria-hidden className="text-ink/35">×</span>
-                    </Link>
-                  ))}
-                  <Link
-                    href="/all-products"
-                    className="text-xs font-bold uppercase tracking-[0.12em] text-primary underline underline-offset-4"
-                  >
-                    Clear all
-                  </Link>
-                </div>
-              ) : null}
-
               {products.length > 0 ? (
-                <div className="products-catalog-grid mt-6 grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
+                <div className="products-catalog-grid grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
                   {products.map((product) => (
                     <CommerceProductCard
                       key={product.id}
@@ -275,7 +250,6 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
 function ProductsHero({
   totalProducts,
-  showing,
   categoryCount,
   storeCount,
   activeCategory,
@@ -287,85 +261,28 @@ function ProductsHero({
   activeCategory?: string;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-gradient-to-br from-[#f7f9fc] via-[#eef3fa] to-[#e9eef7] text-ink" data-testid="products-page-header">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            'radial-gradient(at 80% 20%, rgba(0,70,190,0.10) 0%, transparent 55%), radial-gradient(at 15% 85%, rgba(255,224,0,0.16) 0%, transparent 55%)',
-        }}
-      />
-      <div className="products-page-header-inner relative mx-auto px-4 py-10 sm:px-6 sm:py-14">
-        <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink/50">
+    <section className="bg-white pb-2 pt-8" data-testid="products-hero">
+      <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
+        <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold text-ink/45" aria-label="Breadcrumb">
           <Link href="/" className="transition hover:text-ink">Home</Link>
           <span aria-hidden>/</span>
-          <span className="text-primary">All products</span>
+          <span className="text-ink/70">All products</span>
         </nav>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">NXT.Bargains catalog</p>
-            <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
-              Every product. Every marketplace. One place to compare.
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-ink/70 sm:text-lg">
-              Search the full catalog, filter by category, brand, store, or price range, and see current offers from major retailers side by side.
-              {activeCategory ? ` Currently browsing ${activeCategory}.` : ''}
-            </p>
-
-            <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-ink/70 sm:text-base">
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
-                <span>Side-by-side prices from Amazon, eBay, Walmart, Newegg, and Best Buy.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
-                <span>Filter by category, brand, store, availability, condition, and price range.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
-                <span>See the lowest current offer before you leave NXT.Bargains.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-0.5 shrink-0 text-primary" aria-hidden>✓</span>
-                <span>Free to browse — no signup required.</span>
-              </li>
-            </ul>
-
-            <div className="mt-10 flex flex-wrap gap-3">
-              <a href="#catalog" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-                Browse catalog
-              </a>
-              <Link href="/category" className="inline-flex border border-ink/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-ink/40 hover:text-ink">
-                Categories
-              </Link>
-              <Link href="/best-deals" className="inline-flex border border-ink/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-ink/40 hover:text-ink">
-                Best deals
-              </Link>
-            </div>
-          </div>
-
-          <aside className="products-hero-panel border border-ink/12 bg-white/70 p-5 backdrop-blur sm:p-6" aria-label="Product catalog statistics">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">At a glance</p>
-            <p className="mt-3 text-sm leading-6 text-ink/70">
-              A live snapshot of the NXT.Bargains product catalog — updated as new products and merchant offers are added across major marketplaces.
-            </p>
-            <p className="mt-3 text-sm leading-6 text-ink/60">
-              {activeCategory
-                ? `Browsing ${activeCategory} with ${showing} product${showing === 1 ? '' : 's'} currently visible from ${totalProducts} in the full catalog.`
-                : showing !== totalProducts
-                  ? `Showing ${showing} of ${totalProducts} products after your current filters. Clear filters to view the full catalog.`
-                  : `Browse ${totalProducts} products across ${categoryCount} categories and ${storeCount} stores, then compare offers before you buy.`}
-            </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-ink/10 pt-5">
-              <Stat label="In catalog" value={String(totalProducts)} compact />
-              <Stat label="Showing" value={String(showing)} compact />
-              <Stat label="Categories" value={String(categoryCount)} compact />
-              <Stat label="Stores" value={String(storeCount)} compact />
-            </div>
-          </aside>
-        </div>
+        <p className="mt-6 text-xs font-bold uppercase tracking-[0.14em] text-[#118757]">
+          {SITE.name} catalog
+        </p>
+        <h1 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
+          {activeCategory ?? 'Every product. Every marketplace. One place to compare.'}
+        </h1>
+        {/* The counts the old "At a glance" card carried, folded into the intro
+            rather than given a panel of their own — the catalogue is what this
+            page is for, and the panel pushed it below the fold. */}
+        <p className="mt-4 w-full text-sm leading-relaxed text-ink/60 sm:w-4/5 sm:text-base">
+          Search {totalProducts.toLocaleString()} products across {categoryCount} categories and{' '}
+          {storeCount} stores. Filter by category, brand, store or price, and compare current offers
+          from major retailers side by side.
+        </p>
       </div>
     </section>
   );

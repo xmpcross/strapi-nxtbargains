@@ -31,14 +31,12 @@ import {
   type CommerceProduct,
   type CommerceReview,
 } from '@/lib/strapi';
-import { wrapImpactAffiliate } from '@/lib/impact-links';
-import { wrapTakeadsAffiliate } from '@/lib/takeads-links';
-import { trackedUrl } from '@/lib/click-tracking';
+import { buyUrl } from '@/lib/offer-links';
 import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/coupon-data';
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
 import StoreLinkTile from '@/components/StoreLinkTile';
 import { productCanonicalPath, primaryCategorySlug } from '@/lib/product-url';
-import { clampDescription, fmtDate } from '@/lib/format';
+import { clampDescription, fmtDate, fmtDateTime } from '@/lib/format';
 import { SITE } from '@/lib/site';
 import { pageOpenGraph } from '@/lib/seo';
 import { breadcrumbJsonLd, productJsonLd } from '@/lib/jsonld';
@@ -46,8 +44,9 @@ import { JsonLd } from '@/components/JsonLd';
 import PriceAlertForm from '@/components/PriceAlertForm';
 import ReviewForm from '@/components/ReviewForm';
 import ProductSidePeek from '@/components/ProductSidePeek';
+import ProductHighlights from '@/components/ProductHighlights';
 import ProductReviewsSection from '@/components/ProductReviewsSection';
-import { localMerchantLogo } from '@/lib/merchant-logos';
+import { couponMerchantLogo, localMerchantLogo } from '@/lib/merchant-logos';
 import CommerceProductCard from '@/components/CommerceProductCard';
 import ProductCarousel from '@/components/ProductCarousel';
 
@@ -55,88 +54,6 @@ export const revalidate = 60;
 export const dynamicParams = true;
 
 type Params = { slug: string };
-
-// Outbound buy link: Impact deep-link if the merchant matches an approved Impact
-// campaign (e.g. Whatnot), otherwise the offer's own affiliate/product URL.
-function buyUrl(offer: CommerceOffer, product?: CommerceProduct): string {
-  const { url, network } = buyDestination(offer, product);
-  if (!url || url === '#') return '#';
-
-  return trackedUrl(url, {
-    merchant: offer.merchant?.slug ?? offer.merchant?.name ?? null,
-    network,
-    offerDocumentId: offer.documentId ?? null,
-    productDocumentId: product?.documentId ?? null,
-  });
-}
-
-/* The destination itself, and which relationship produced it. Split out from
-   buyUrl so the tracking wrapper has one place to sit and the choice of network
-   is recorded rather than guessed from the final host — after wrapping, every
-   Impact link looks like Impact. */
-function buyDestination(
-  offer: CommerceOffer,
-  product?: CommerceProduct,
-): { url: string | null; network: string } {
-  const affiliate = sanitizeOfferUrl(offer.affiliateUrl);
-  const resolved = resolveOfferDestination(offer, product);
-
-  if (affiliate) {
-    const normalizedOffer: CommerceOffer = {
-      ...offer,
-      affiliateUrl: affiliate,
-      productUrl: resolved ?? offer.productUrl,
-    };
-    const impact = wrapImpactAffiliate(normalizedOffer);
-    return impact ? { url: impact, network: 'impact' } : { url: affiliate, network: 'offer-affiliate' };
-  }
-
-  if (!resolved) return { url: offer.merchant?.websiteUrl ?? '#', network: 'merchant-home' };
-
-  const normalizedOffer: CommerceOffer = { ...offer, productUrl: resolved, affiliateUrl: null };
-  // Order matters: Impact and Amazon are direct relationships, so they win.
-  // Takeads covers the long tail of merchants neither of them has, and only
-  // ever substitutes a URL it has actually converted.
-  const impact = wrapImpactAffiliate(normalizedOffer);
-  if (impact) return { url: impact, network: 'impact' };
-
-  const amazon = amazonProductUrl(normalizedOffer, product);
-  if (amazon) return { url: amazon, network: 'amazon' };
-
-  const takeads = wrapTakeadsAffiliate(normalizedOffer, product);
-  if (takeads) return { url: takeads, network: 'takeads' };
-
-  return { url: resolved, network: 'direct' };
-}
-
-function safeAffiliateUrl(offer: CommerceOffer): string | null {
-  return sanitizeOfferUrl(offer.affiliateUrl);
-}
-
-function amazonProductUrl(offer: CommerceOffer, product?: CommerceProduct): string | null {
-  const merchantSlug = offer.merchant?.slug?.toLowerCase();
-  const merchant = merchantSlug || merchantName(offer).toLowerCase();
-  if (!merchant.includes('amazon')) return null;
-
-  const asin = [
-    asinFromUrl(offer.productUrl),
-    asinFromUrl(offer.affiliateUrl || undefined),
-    validAsin(offer.merchantSku || undefined),
-    validAsin(product?.asin || undefined),
-    validAsin(product?.sku?.replace(/^amazon-/i, '') || undefined),
-  ].find(Boolean);
-
-  return asin ? `https://www.amazon.com/dp/${asin}` : null;
-}
-
-function asinFromUrl(value?: string): string | null {
-  return value?.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})(?:[/?]|$)/i)?.[1]?.toUpperCase() ?? null;
-}
-
-function validAsin(value?: string): string | null {
-  const candidate = value?.trim().toUpperCase();
-  return candidate && /^[A-Z0-9]{10}$/.test(candidate) ? candidate : null;
-}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
@@ -146,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const image = productImageUrl(product);
   const description = clampDescription(
     product.shortDescription ||
-      `Compare current merchant prices for ${product.name} on ${SITE.name}.`,
+    `Compare current merchant prices for ${product.name} on ${SITE.name}.`,
   );
   const canonicalPath = productCanonicalPath(product);
 
@@ -214,12 +131,15 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
     const p = join(process.cwd(), 'data', 'live-offers.json');
     if (existsSync(p)) {
       const entry = (JSON.parse(readFileSync(p, 'utf8')).items ?? {})[slug];
-      if (entry && Array.isArray(entry.offers) && entry.offers.length >= 2) {
-        liveOffers = entry.offers as LiveOffer[];
+      const usable = (Array.isArray(entry?.offers) ? entry.offers : []).filter(
+        (offer: LiveOffer) => Boolean(offer.url),
+      );
+      if (usable.length >= 2) {
+        liveOffers = usable as LiveOffer[];
         liveCapturedAt = entry.capturedAt ?? null;
       }
     }
-  } catch {}
+  } catch { }
   const category = product.categories?.[0]?.name ?? product.category;
   const bestPrice = best ? offerPrice(best.offer) : null;
   const pricedRows = rows.filter((row) => offerPrice(row.offer) !== null);
@@ -232,12 +152,24 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
     (category
       ? `Compare current prices for this ${category.toLowerCase()} across trusted merchants.`
       : `Compare current prices for ${product.name} across trusted merchants.`);
+  const highlights = productHighlightEntries(product);
+  const shortCopy = shortDescriptionCopy(product.shortDescription);
   const discount = best ? discountPercent(best.offer) : null;
   const updatedLabel = product.updatedAt ? fmtDate(product.updatedAt) : 'Today';
+  const updatedAtLabel = product.updatedAt ? fmtDateTime(product.updatedAt) : '';
   const canonicalPath = productCanonicalPath(product);
   const reviewCount = reviews.length;
   const averageRating =
     reviewCount > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount : null;
+  // The catalogue aggregate is what the reviews section headlines, so the title
+  // shows the same number; on-site reviews stand in only where it is missing
+  // (the catalogue carries a rating for 350 of the 515 products on this site).
+  // `Number(null)` is 0 and passes a finite check, which rendered "0.0" on the
+  // 165 products that carry no rating at all. An actual zero is not a rating
+  // worth showing either, so both are treated as absent.
+  const catalogueRating = positiveRating(product.rating);
+  const titleRating = catalogueRating ?? positiveRating(averageRating);
+  const titleRatingCount = catalogueRating != null ? product.ratingCount || null : reviewCount || null;
 
   const productLd = productJsonLd({
     name: product.name,
@@ -253,14 +185,14 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
     reviews,
     offers: rows.length
       ? {
-          offerCount: rows.length,
-          lowPrice: bestPrice ?? undefined,
-          highPrice: pricedRows.length
-            ? Math.max(...pricedRows.map((row) => offerPrice(row.offer) ?? 0))
-            : undefined,
-          priceCurrency: best?.offer.currency ?? 'USD',
-          offers: rows.map((row) => offerJsonLd(row.offer)),
-        }
+        offerCount: rows.length,
+        lowPrice: bestPrice ?? undefined,
+        highPrice: pricedRows.length
+          ? Math.max(...pricedRows.map((row) => offerPrice(row.offer) ?? 0))
+          : undefined,
+        priceCurrency: best?.offer.currency ?? 'USD',
+        offers: rows.map((row) => offerJsonLd(row.offer)),
+      }
       : null,
   });
 
@@ -307,7 +239,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <article className="border border-ink/10 bg-white">
             <div className="grid lg:grid-cols-[34%_minmax(0,1fr)] lg:gap-[10px]">
-              <div className="relative flex min-h-[340px] items-center justify-center border-b border-ink/10 p-7 lg:min-h-[410px] lg:border-b-0 lg:border-r">
+              <div className="relative flex h-[560px] items-center justify-center border-b border-ink/10 p-7 lg:border-b-0 lg:border-r">
                 {discount !== null && (
                   <span className="absolute right-6 top-6 bg-[#ff2447] px-3 py-2 text-sm font-bold text-white">
                     -{discount}%
@@ -330,17 +262,59 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
               </div>
 
               <div className="min-w-0">
-                <div className="border-b border-ink/10 p-6 sm:p-8">
+                <div className="border-b border-ink/10 px-6 pb-4 pt-6 sm:px-8 sm:pb-4 sm:pt-8">
+                  {brand ? <p className="product-title-brand">{brand}</p> : null}
+
                   <h1 className="product-title font-display font-bold leading-tight text-ink">
                     {product.name}
                   </h1>
+
+                  {titleRating != null || (category && categorySlug) ? (
+                    <div className="product-title-meta">
+                      {titleRating != null ? (
+                        <span
+                          className="product-title-rating"
+                          aria-label={`${titleRating.toFixed(1)} out of 5 stars${titleRatingCount ? ` from ${titleRatingCount.toLocaleString()} reviews` : ''}`}
+                        >
+                          {/* Five stars filled to the rounded rating, rather
+                              than one star beside the number. */}
+                          <span aria-hidden="true" className="product-title-star">
+                            {'★'.repeat(Math.round(Math.min(5, Math.max(0, titleRating))))}
+                            <span className="product-title-star-off">
+                              {'★'.repeat(5 - Math.round(Math.min(5, Math.max(0, titleRating))))}
+                            </span>
+                          </span>
+                          <span className="product-title-rating-value">{titleRating.toFixed(1)}</span>
+                          {titleRatingCount ? (
+                            <span className="product-title-rating-count">
+                              ({titleRatingCount.toLocaleString()})
+                            </span>
+                          ) : null}
+                        </span>
+                      ) : null}
+
+                      {category && categorySlug ? (
+                        <span className="product-title-type">
+                          Type: <Link href={`/category/${categorySlug}`}>{category}</Link>
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="grid lg:grid-cols-2">
-                  <div className="border-b border-ink/10 p-6 sm:p-8 lg:border-b-0 lg:border-r">
-                    <p className="line-clamp-5 text-[14px] leading-7 text-ink/80">
-                      {summary}
-                    </p>
+                  <div className="border-b border-ink/10 px-6 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-4 lg:border-b-0 lg:border-r">
+                    {shortCopy.bullets.length ? (
+                      <ul className="product-description-bullets product-short-description">
+                        {shortCopy.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="line-clamp-5 text-[14px] leading-7 text-ink/80">
+                        {shortCopy.lead ?? summary}
+                      </p>
+                    )}
 
                     <div className="mt-8">
                       {best?.offer.originalPrice && numericValue(best.offer.originalPrice) !== numericValue(best.offer.price) && (
@@ -358,34 +332,26 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                       currency={best?.offer.currency ?? 'USD'}
                       currentPrice={bestPrice ?? undefined}
                       buyHref={best ? buyUrl(best.offer, best.product) : undefined}
+                      buyLabel={best ? `Buy at ${merchantName(best.offer)}` : undefined}
                     />
 
                     <p className="mt-5 text-sm text-ink/55">
-                      Updated {updatedLabel}
+                      We may earn a commission from links on this page, at no extra cost to you.
                     </p>
                   </div>
 
-                  <aside className="self-center p-5 sm:p-7">
+                  <aside className="self-center">
                     {rows.length > 0 ? (
                       <div className="product-offer-list rounded-[10px] border border-[#e5e7eb] bg-white p-5">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink/45">
-                          Lowest price
-                        </p>
-                        <p className="mt-1 font-display text-[2.35rem] font-bold leading-none tracking-tight text-ink">
-                          {best
-                            ? formatMoney(best.offer.price ?? best.offer.originalPrice, best.offer.currency ?? 'USD')
-                            : 'Check price'}
-                        </p>
-                        <p className="mt-2 text-[13px] text-ink/50">
-                          {best ? `at ${merchantName(best.offer)} · ` : ''}
-                          {rows.length} retailer{rows.length === 1 ? '' : 's'} compared
-                        </p>
-
+                        {/* The "Lowest price / $x / at N retailers" header is
+                            gone: the same price already leads the left column,
+                            and the retailer rows below state the count by being
+                            there. The rows, buy button and disclaimer stay. */}
                         {/* Extra rows stay behind the existing CSS-only toggle, so
                             the list opens at four as the reference does without
                             needing client JavaScript. */}
                         <input id={offerToggleId} type="checkbox" className="product-offer-toggle sr-only" />
-                        <div className="mt-4 grid gap-2">
+                        <div className="grid gap-2">
                           {rows.map((row, index) => (
                             <CompactOfferRow
                               key={row.offer.documentId ?? row.offer.id}
@@ -403,23 +369,13 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                         ) : null}
 
                         <p className="mt-4 text-[12px] text-ink/45">
-                          Last price update was: {updatedLabel}
+                          Last price update was: {updatedAtLabel || updatedLabel}
                         </p>
 
-                        {best ? (
-                          <a
-                            href={buyUrl(best.offer, best.product)}
-                            target="_blank"
-                            rel="nofollow sponsored noopener noreferrer"
-                            className="mt-4 block rounded-[8px] bg-[#ffe000] px-4 py-3.5 text-center font-display text-[15px] font-bold text-ink transition hover:brightness-95"
-                          >
-                            Buy at {merchantName(best.offer)}
-                          </a>
-                        ) : null}
-
-                        <p className="mt-4 text-center text-[12px] leading-5 text-[#5b7bb5]">
-                          We may earn a commission from links on this page, at no extra cost to you.
-                        </p>
+                        {/* The buy button and the commission line moved to the
+                            left column, beside Set Price Alert. Keeping copies
+                            here would put the same action and the same
+                            disclosure on screen twice. */}
                       </div>
                     ) : (
                       <div className="rounded-[10px] border border-[#e5e7eb] bg-white p-6">
@@ -436,6 +392,14 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
           </article>
         </div>
       </section>
+
+      {highlights.length > 0 && (
+        <section className="pt-2 pb-10" data-testid="product-highlights">
+          <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
+            <ProductHighlights highlights={highlights} />
+          </div>
+        </section>
+      )}
 
       <section className="pb-6">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
@@ -470,6 +434,8 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
           {/* The section renders its own "Reviews" heading, as the reference
               layout does — a second one here would duplicate it. */}
           <ProductReviewsSection
+            reviewSummary={product.reviewSummary}
+            reviewTopics={product.reviewTopics}
             productName={product.name}
             productDocumentId={product.documentId ?? ''}
             reviews={reviews}
@@ -545,7 +511,7 @@ function ProductInfoTabs({
   brandGroups,
 }: {
   product: CommerceProduct;
-  productId: number;
+  productId: number | string;
   productName: string;
   summary: string;
   description?: string | null;
@@ -562,6 +528,11 @@ function ProductInfoTabs({
   // specs of its own, so the generic list stands in whenever GSMArena is absent.
   const useGsmarenaSpecsInSpecifications =
     productHasCategory(product, 'Smart Phones') && gsmarenaSpecGroups.length > 0;
+  const heroImage = mediaUrl(product.primaryImage ?? null);
+  const galleryImages = (product.gallery ?? [])
+    .map((img) => mediaUrl(img))
+    .filter((url): url is string => Boolean(url) && url !== heroImage);
+  const detailBullets = descriptionBullets(description);
   const additionalInfoEntries = productAdditionalInfoEntries(product);
   const specEntries = useGsmarenaSpecsInSpecifications ? [] : productSpecificationEntries(specs);
 
@@ -569,61 +540,79 @@ function ProductInfoTabs({
 
   return (
     <div className="product-info-section">
-      <h2 className="product-info-section-title">About this item</h2>
       <div className="product-info-layout">
         <div className="product-info-main">
           <div className="product-info-accordion bg-white" id={accordionId}>
             <details className="product-accordion-item" name={accordionId} open>
               <summary>Product details</summary>
               <div className="product-accordion-panel tab-panel-description">
-                {description ? (
+                {detailBullets.length ? (
+                  <ul className="product-description-bullets">
+                    {detailBullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                ) : description ? (
                   <div className="leading-7 text-ink/70">
                     <ProductDescription markdown={description} />
                   </div>
                 ) : (
-                  <p className="leading-7 text-ink/70">{summary}</p>
+                  // Not `summary`: that falls back to the short description,
+                  // which this panel must not repeat.
+                  <p className="leading-7 text-ink/70">
+                    {`Compare current prices for ${productName} across trusted merchants.`}
+                  </p>
                 )}
+
               </div>
             </details>
 
             <ProductSidePeek
               panels={[
-                { id: 'specifications', label: 'Specifications', content: (
-                  <>
-                {useGsmarenaSpecsInSpecifications ? (
-                  <GsmarenaSpecGroups groups={gsmarenaSpecGroups} />
-                ) : specEntries.length ? (
-                  <KeySpecsList entries={specEntries} className="mt-0" />
-                ) : (
-                  <div className="border border-ink/10 bg-paper p-6 leading-6 text-ink/60">
-                    Product specifications have not been imported for this item yet.
-                  </div>
-                )}
-                  </>
-                ) },
-                { id: 'additional-info', label: 'Additional Info', content: (
-                  <>
-                {additionalInfoEntries.length ? (
-                  <dl className="grid overflow-hidden border-0">
-                    {additionalInfoEntries.map((entry) => (
-                      <div key={entry.label} className="grid gap-2 border-b border-ink/10 px-4 py-3 last:border-b-0 sm:grid-cols-[190px_minmax(0,1fr)]">
-                        <dt className="font-bold text-ink/55">{entry.label}</dt>
-                        {/* break-words: the restored Image URL row is a single
+                {
+                  id: 'specifications', label: 'Specifications', content: (
+                    <>
+                      {useGsmarenaSpecsInSpecifications ? (
+                        <GsmarenaSpecGroups groups={gsmarenaSpecGroups} />
+                      ) : specEntries.length ? (
+                        <KeySpecsList entries={specEntries} className="mt-0" />
+                      ) : (
+                        <div className="border border-ink/10 bg-paper p-6 leading-6 text-ink/60">
+                          Product specifications have not been imported for this item yet.
+                        </div>
+                      )}
+                    </>
+                  )
+                },
+                {
+                  id: 'additional-info', label: 'Additional Info', content: (
+                    <>
+                      {additionalInfoEntries.length ? (
+                        <dl className="grid overflow-hidden border-0">
+                          {additionalInfoEntries.map((entry) => (
+                            <div key={entry.label} className="grid gap-2 border-b border-ink/10 px-4 py-3 last:border-b-0 sm:grid-cols-[190px_minmax(0,1fr)]">
+                              <dt className="font-bold text-ink/55">{entry.label}</dt>
+                              {/* break-words: the restored Image URL row is a single
                             unbroken 200-character string with no spaces to wrap
                             at, and would otherwise run past the table. */}
-                        <dd className="break-words text-ink">{entry.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                ) : (
-                  <div className="border border-ink/10 bg-paper p-6 leading-6 text-ink/60">
-                    Additional product information is not available for this item yet.
-                  </div>
-                )}
-                  </>
-                ) },
+                              <dd className="break-words text-ink">{entry.value}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      ) : (
+                        <div className="border border-ink/10 bg-paper p-6 leading-6 text-ink/60">
+                          Additional product information is not available for this item yet.
+                        </div>
+                      )}
+                    </>
+                  )
+                },
               ]}
             />
+
+            {/* Photography closes the accordion stack: below the Additional
+                Info row, above the spec table the peeks render. */}
+            <ProductGallery images={galleryImages} name={productName} />
           </div>
         </div>
 
@@ -671,6 +660,43 @@ type PriceHistoryEntry = {
   checkedAt: string;
   merchantName?: string;
 };
+
+/**
+ * Imported product photography, shown at the end of the Product details panel.
+ *
+ * Files are served from our own media library rather than hotlinked, so they
+ * survive Amazon rotating its CDN URLs. The featured image is filtered out by
+ * the caller — it is already the main product shot at the top of the page.
+ *
+ * Reuses the carousel the related-products strip runs on rather than a second
+ * implementation: three across, auto-advancing, pausing on hover.
+ */
+function ProductGallery({ images, name }: { images: string[]; name: string }) {
+  if (!images.length) return null;
+
+  return (
+    // 30px clear of the Additional Info row above it.
+    <div className="mb-6 pt-[30px]">
+      <ProductCarousel
+        perView={4}
+        interval={4000}
+        gapPx={15}
+        items={images.map((src, index) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={src}
+            src={src}
+            alt={`${name} — image ${index + 2}`}
+            loading="lazy"
+            width={800}
+            height={800}
+            className="product-gallery-image"
+          />
+        ))}
+      />
+    </div>
+  );
+}
 
 function KeySpecsList({ entries, className = 'mt-5' }: { entries: SpecificationEntry[]; className?: string }) {
   return (
@@ -731,7 +757,7 @@ function PriceHistorySection({
   const since = points[0]?.checkedAt;
 
   const content = (
-    <div className={embedded ? 'p-6 sm:p-8' : 'p-5'}>
+    <div className={embedded ? 'p-6 sm:p-8' : ''}>
       <div className="border border-ink/10 bg-white">
         <div className="bg-muted px-5 py-4 text-center font-display text-base font-bold text-ink">
           Price history for {productName}
@@ -783,7 +809,7 @@ function PriceHistorySection({
 
   return (
     <div className="border border-ink/10 bg-white">
-      <div className="flex min-h-11 items-center justify-between border-b border-ink/10 bg-white px-4">
+      <div className="flex min-h-11 items-center justify-between border-b border-ink/10 bg-white">
         <div className="flex items-center gap-3">
           <h2 className="font-display text-lg font-bold text-ink">Price History</h2>
         </div>
@@ -821,8 +847,8 @@ function PriceHistoryChart({ points }: { points: PriceHistoryPoint[] }) {
     coords.length === 1
       ? `M ${plotLeft} ${plotBottom} L ${plotLeft} ${first.y} L ${plotRight} ${first.y} L ${plotRight} ${plotBottom} Z`
       : `M ${plotLeft} ${plotBottom} ${coords
-          .map((point, index) => `${index === 0 ? 'L' : 'L'} ${point.x} ${point.y}`)
-          .join(' ')} L ${last.x} ${plotBottom} Z`;
+        .map((point, index) => `${index === 0 ? 'L' : 'L'} ${point.x} ${point.y}`)
+        .join(' ')} L ${last.x} ${plotBottom} Z`;
   const xTicks = chartTickPoints(points);
   const tooltipWidth = 112;
   const tooltipHeight = 62;
@@ -934,27 +960,31 @@ function PriceHistoryChart({ points }: { points: PriceHistoryPoint[] }) {
 
 function CompactOfferRow({ row, className = '' }: { row: CommerceOfferRow; className?: string }) {
   const { offer, product } = row;
-  // Strapi media first; a committed local file otherwise. Merchants discovered
-  // via Google Shopping sellers have no uploaded logo, so without the fallback
+  // Curated SVG, then an uploaded Strapi logo, then the merchant's favicon —
+  // the same marks the Coupons store tiles show. Merchants discovered via
+  // Google Shopping sellers have no uploaded logo, so without the favicon leg
   // the price table shows a column of grey initials.
-  const logo = mediaUrl(offer.merchant?.logo ?? null) ?? localMerchantLogo(merchantName(offer));
+  const logo =
+    couponMerchantLogo(merchantName(offer), offerUrl(offer))
+    ?? mediaUrl(offer.merchant?.logo ?? null)
+    ?? localMerchantLogo(merchantName(offer));
   const price = offer.price ?? offer.originalPrice;
   const unavailable = offer.availability === 'out_of_stock';
 
   return (
-    <div className={`product-offer-row flex items-center gap-3 rounded-[8px] bg-[#f5f6f7] p-2.5 text-sm ${className}`}>
-      {/* The logo sits on its own white tile, as in the reference: merchant
-          marks are drawn for a white ground and lose contrast on the grey. */}
+    <div className={`product-offer-row flex items-center gap-3 rounded-[8px] bg-[#f2f3f5] px-3 py-3 text-sm ${className}`}>
+      {/* The reference sets the merchant mark straight on the grey rather than
+          on a white chip, so the row reads as one block. */}
       <a
         href={buyUrl(offer, product)}
         target="_blank"
         rel="nofollow sponsored noopener noreferrer"
         aria-label={merchantName(offer)}
-        className="flex h-9 w-[92px] shrink-0 items-center justify-center rounded-[6px] bg-white px-2"
+        className="flex h-8 w-[86px] shrink-0 items-center justify-start"
       >
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt={`${merchantName(offer)} logo`} className="max-h-6 max-w-full object-contain" />
+          <img src={logo} alt={`${merchantName(offer)} logo`} className="max-h-7 max-w-full object-contain object-left" />
         ) : (
           <span className="truncate text-[11px] font-bold text-ink/60">{merchantName(offer)}</span>
         )}
@@ -970,7 +1000,7 @@ function CompactOfferRow({ row, className = '' }: { row: CommerceOfferRow; class
         target="_blank"
         rel="nofollow sponsored noopener noreferrer"
         aria-label={`See offer for ${offer.title || product.name} at ${merchantName(offer)}`}
-        className="shrink-0 rounded-[6px] bg-[#fdeced] px-3.5 py-2 text-[13px] font-semibold text-[#c9636b] transition hover:bg-[#fbdcde]"
+        className="shrink-0 rounded-[6px] bg-[#118757] px-4 py-2 text-[13px] font-semibold text-white transition hover:bg-[#0d6f47]"
       >
         View
       </a>
@@ -1003,7 +1033,10 @@ function SavedPriceComparison({ rows }: { rows: CommerceOfferRow[] }) {
 
 function SavedPriceRow({ row, best }: { row: CommerceOfferRow; best: boolean }) {
   const { offer, product } = row;
-  const logo = mediaUrl(offer.merchant?.logo ?? null);
+  const logo =
+    couponMerchantLogo(merchantName(offer), offerUrl(offer))
+    ?? mediaUrl(offer.merchant?.logo ?? null)
+    ?? localMerchantLogo(merchantName(offer));
   const price = offerPrice(offer);
   const updated = offer.lastCheckedAt || product.updatedAt;
   const unavailable = offer.availability === 'out_of_stock';
@@ -1011,11 +1044,15 @@ function SavedPriceRow({ row, best }: { row: CommerceOfferRow; best: boolean }) 
   return (
     <article className="grid gap-y-3 border-b border-ink/10 px-5 py-4 last:border-b-0 lg:grid-cols-[minmax(0,1fr)_112px_118px_118px_120px] lg:items-center lg:gap-x-4">
       <div className="flex min-w-0 items-start gap-3">
+        {/* Every mark gets the same 120px box. With w-auto each logo took its
+            own width — eBay wide, Newegg narrow — so the merchant names started
+            at a different x on every row. `contain` keeps each logo's own
+            aspect ratio inside the shared box. */}
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} alt={`${merchantName(offer)} logo`} className="mt-0.5 h-9 w-auto max-w-[120px] shrink-0 object-contain object-left" />
+          <img src={logo} alt={`${merchantName(offer)} logo`} className="mt-0.5 h-9 w-[120px] shrink-0 object-contain object-left" />
         ) : (
-          <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center bg-muted text-sm font-bold text-ink/45">
+          <span className="mt-0.5 grid h-9 w-[120px] shrink-0 place-items-center bg-muted text-sm font-bold text-ink/45">
             {merchantName(offer).slice(0, 1)}
           </span>
         )}
@@ -1081,6 +1118,13 @@ const PRODUCT_IDENTIFIER_FIELDS = [
 ] as const;
 
 const HIDDEN_SPEC_KEYS = new Set([
+  // Leaked out of Amazon's A+ media blocks when product_information was
+  // flattened. `alt` is worse than noise — on the Galaxy A17 it read
+  // "Galaxy S26 Ultra" — and `gallery` is a list of image URLs, not a spec.
+  'alt',
+  'url',
+  'gallery',
+  'amazonAsin',
   'technicalSpecs',
   'features',
   'Features',
@@ -1155,6 +1199,196 @@ function productAdditionalInfoEntries(product: CommerceProduct): SpecificationEn
   ];
 
   return entries.filter((entry): entry is SpecificationEntry => Boolean(entry.value));
+}
+
+/**
+ * Headline attributes for the Highlights tiles above "About this item".
+ *
+ * Reads the same flat spec map the Specifications panel does, then keeps only
+ * what survives being squeezed into a tile. Two things are dropped that a spec
+ * row is happy to carry: long prose (`Cellular Protocols` runs to 180
+ * characters, `descriptionSource` flattens into a paragraph of provenance) and
+ * bare negatives — "Night Vision: No" is not a highlight.
+ *
+ * Well-known attributes lead in the fixed order below; anything left follows in
+ * source order, which the importers already write roughly most-notable-first.
+ */
+const HIGHLIGHT_PRIORITY_LABELS = [
+  'Brand',
+  'Model',
+  'Screen Size',
+  'Display Size',
+  'Display Resolution',
+  'Resolution',
+  'Display Type',
+  'Refresh Rate',
+  'Display Refresh Rate',
+  'Operating System',
+  'Processor',
+  'Processor Brand',
+  'Number of Cores',
+  'RAM',
+  'Installed Memory',
+  'Storage Capacity',
+  'Storage',
+  'Drive Capacity',
+  'Drive Type',
+  'Battery Life',
+  'Max Battery Life',
+  'Battery Capacity',
+  'Camera Resolution',
+  'Rear Camera Resolution',
+  'Front Camera Resolution',
+  'Lens Type',
+  'Field of View',
+  'Night Vision',
+  'Motion Sensing',
+  'With Audio',
+  'Connectivity',
+  'Network Connectivity',
+  'Wireless Connectivity',
+  'With Wi-Fi',
+  'Wi-Fi',
+  'Wireless',
+  'Bluetooth',
+  'With GPS',
+  'NFC',
+  'Assistant Support',
+  'Water Resistant',
+  'Form Factor',
+  'Material',
+  'Color',
+  'Weight',
+];
+
+/** Longest value that still fits a tile without wrapping past two lines. */
+const HIGHLIGHT_MAX_VALUE_LENGTH = 48;
+/** Two full rows of four on desktop. */
+const HIGHLIGHT_LIMIT = 8;
+/** Below this the row reads as a stray chip rather than a section. */
+const HIGHLIGHT_MIN_COUNT = 3;
+const HIGHLIGHT_NEGATIVE_VALUES = new Set(['no', 'none', 'n/a', 'na', 'not applicable', 'unknown', '-']);
+
+/** A rating only counts when it is a real number above zero. */
+function positiveRating(value: number | string | null | undefined): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function productHighlightEntries(product: CommerceProduct): SpecificationEntry[] {
+  const specs = product.specs;
+  if (!isPlainRecord(specs)) return [];
+
+  const technicalSpecs = isPlainRecord(specs.technicalSpecs) ? specs.technicalSpecs : {};
+  const source = Object.keys(technicalSpecs).length ? technicalSpecs : specs;
+
+  const entries: SpecificationEntry[] = [];
+  const seen = new Set<string>();
+
+  for (const [key, value] of Object.entries(source)) {
+    if (HIDDEN_SPEC_KEYS.has(key) || isProductIdentifierKey(key)) continue;
+    const label = cleanHighlightLabel(key);
+    const formatted = formatSpecValue(value);
+    if (!label || !formatted) continue;
+    if (formatted.length > HIGHLIGHT_MAX_VALUE_LENGTH) continue;
+    if (HIGHLIGHT_NEGATIVE_VALUES.has(formatted.toLowerCase())) continue;
+    const dedupeKey = normalizeSpecKey(label);
+    if (!dedupeKey || seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+    entries.push({ label, value: formatted });
+  }
+
+  // Brand is the one highlight worth synthesising: every product record carries
+  // it, but only about three quarters of them repeat it inside `specs`.
+  if (!seen.has('brand')) {
+    const brand = product.brandRef?.name || product.brand;
+    if (brand) entries.unshift({ label: 'Brand', value: brand });
+  }
+
+  const priority = new Map(HIGHLIGHT_PRIORITY_LABELS.map((label, index) => [normalizeSpecKey(label), index]));
+  const rank = (entry: SpecificationEntry) =>
+    priority.get(normalizeSpecKey(entry.label)) ?? HIGHLIGHT_PRIORITY_LABELS.length;
+
+  const ordered = entries
+    .map((entry, index) => ({ entry, index }))
+    .sort((a, b) => rank(a.entry) - rank(b.entry) || a.index - b.index)
+    .map(({ entry }) => entry);
+
+  return ordered.length >= HIGHLIGHT_MIN_COUNT ? ordered.slice(0, HIGHLIGHT_LIMIT) : [];
+}
+
+/**
+ * Bullets for the short description under the product title.
+ *
+ * 168 of the 169 products carrying a `shortDescription` store it as a markdown
+ * "- " list of short, hedged, spec-derived lines, which is rendered verbatim.
+ * The rare prose one is cut at sentence boundaries instead, and a single
+ * sentence stays a paragraph rather than becoming a lone bullet.
+ */
+function shortDescriptionCopy(shortDescription?: string | null): { bullets: string[]; lead: string | null } {
+  const short = (shortDescription ?? '').trim();
+  if (!short) return { bullets: [], lead: null };
+
+  const authored = markdownBulletLines(short);
+  if (authored.length) return { bullets: authored, lead: null };
+
+  const split = sentenceBullets(short);
+  if (split.length > 1) return { bullets: split, lead: null };
+
+  return { bullets: [], lead: short };
+}
+
+/**
+ * Bullets for the Product details panel — the long `description` only.
+ *
+ * The short description belongs under the title and is deliberately not
+ * repeated here. Structured markdown keeps its own shape and is handed to
+ * `ProductDescription`; plain prose, which is 513 of the 515 descriptions on
+ * this site, is cut into one bullet per sentence. Nothing is reworded.
+ */
+function descriptionBullets(description?: string | null): string[] {
+  const long = (description ?? '').trim();
+  if (!long) return [];
+  if (long.includes('\n') || /^\s*[-*]\s+/m.test(long) || /^#{2,3}\s/m.test(long)) return [];
+  const split = sentenceBullets(long);
+  // A one-item list is just a paragraph wearing a bullet.
+  return split.length > 1 ? split : [];
+}
+
+/** Lines of a markdown "- " list, or [] if the text is not one. */
+function markdownBulletLines(text: string): string[] {
+  const lines = text.replace(/\r\n/g, '\n').split('\n').map((line) => line.trim()).filter(Boolean);
+  if (!lines.length || !lines.every((line) => /^[-*]\s+/.test(line))) return [];
+  return lines.map((line) => line.replace(/^[-*]\s+/, '').trim()).filter(Boolean);
+}
+
+/** One entry per sentence, with decimals and abbreviations held together. */
+function sentenceBullets(text: string): string[] {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  if (!normalized) return [];
+  const sentences: string[] = [];
+  let current = '';
+  // The lookahead requires the next sentence to start with a capital, a digit
+  // or an opening quote, which is what keeps "16.4 feet" and "$5.99 each" in
+  // one piece; ABBREVIATION_TAIL then re-joins the "e.g." / "Inc." cases the
+  // lookahead cannot see.
+  for (const part of normalized.split(/(?<=[.!?])\s+(?=["'\u201c(]?[A-Z0-9])/)) {
+    current = current ? `${current} ${part}` : part;
+    if (ABBREVIATION_TAIL.test(current)) continue;
+    sentences.push(current);
+    current = '';
+  }
+  if (current) sentences.push(current);
+  return sentences.map((sentence) => sentence.trim()).filter(Boolean);
+}
+
+const ABBREVIATION_TAIL =
+  /(?:\b(?:approx|e\.g|i\.e|vs|etc|Inc|Ltd|Co|Corp|Dept|Est|Fig|Vol|No|Dr|Mr|Mrs|Ms|Prof|St|Jr|Sr)|\b[A-Z])\.$/;
+
+/** `Pan <wbr>/<wbr> Tilt` — some importers leave the source markup in the key. */
+function cleanHighlightLabel(key: string) {
+  return key.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function productHasCategory(product: CommerceProduct, categoryName: string) {
@@ -1408,6 +1642,7 @@ function schemaCondition(value?: CommerceOffer['condition']): string {
    (### headings + "- " bullets + paragraphs separated by blank lines).
    No external dependency; the format is constrained so a hand-rolled parser
    is shorter than wiring up `marked` and safer than dangerouslySetInnerHTML. */
+
 function ProductDescription({ markdown }: { markdown: string }) {
   function inline(text: string): ReactNode {
     const parts: ReactNode[] = [];

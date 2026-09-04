@@ -2,6 +2,18 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+/**
+ * Open a peek panel from a trigger that lives outside this component.
+ *
+ * The Highlights tiles sit above "About this item" while the peek is rendered
+ * inside it, so the two cannot share state through props without lifting it
+ * across that section boundary. The tile asks for a panel by id instead, and
+ * hands over its own element so focus can be returned when the peek closes.
+ */
+export const PRODUCT_PEEK_OPEN_EVENT = 'product-peek:open';
+
+export type ProductPeekOpenDetail = { id: string; trigger?: HTMLButtonElement | null };
+
 export type PeekPanel = {
   id: string;
   label: string;
@@ -29,12 +41,29 @@ export default function ProductSidePeek({ panels }: { panels: PeekPanel[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const lastTrigger = useRef<HTMLButtonElement | null>(null);
+  // Read inside the listener below rather than closed over, so subscribing
+  // once does not go stale when the panel array is rebuilt on a render.
+  const panelsRef = useRef(panels);
+  panelsRef.current = panels;
 
   const close = useCallback(() => {
     setOpenId(null);
     // Return focus to whatever opened the peek, or the keyboard user is
     // stranded at the top of the document.
     lastTrigger.current?.focus();
+  }, []);
+
+  // Only ids this peek actually owns are honoured, so a second peek elsewhere
+  // on the page ignores an event that was not meant for it.
+  useEffect(() => {
+    const onOpen = (event: Event) => {
+      const detail = (event as CustomEvent<ProductPeekOpenDetail>).detail;
+      if (!detail?.id || !panelsRef.current.some((p) => p.id === detail.id)) return;
+      lastTrigger.current = detail.trigger ?? null;
+      setOpenId(detail.id);
+    };
+    window.addEventListener(PRODUCT_PEEK_OPEN_EVENT, onOpen);
+    return () => window.removeEventListener(PRODUCT_PEEK_OPEN_EVENT, onOpen);
   }, []);
 
   useEffect(() => {

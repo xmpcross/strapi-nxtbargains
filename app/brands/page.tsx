@@ -339,43 +339,24 @@ export default async function BrandsPage({
 
 function Hero({ brandCount, featuredCount }: { brandCount: number; featuredCount: number }) {
   return (
-    <section className="relative overflow-hidden border-b border-ink/10 bg-[#1d252c] text-white">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            'radial-gradient(at 75% 15%, rgba(0,70,190,0.2) 0%, transparent 50%), radial-gradient(at 25% 85%, rgba(168,85,247,0.12) 0%, transparent 50%)',
-        }}
-      />
-      <div className="relative mx-auto max-w-[1366px] px-6 py-14 sm:py-18">
-        <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#ffe000]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#ffe000]" aria-hidden />
+    <section className="page-hero">
+      <div className="page-hero-inner">
+        <p className="page-hero-eyebrow">
+          <span className="page-hero-eyebrow-dot" aria-hidden />
           Brand directory
         </p>
-        <h1 className="mt-5 font-display text-4xl font-bold leading-[1.04] tracking-tight sm:text-5xl">
+        <h1 className="page-hero-title">
           Shop by brand — coupon codes &amp; deals
         </h1>
-        <p className="mt-5 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-          Browse {brandCount} top retail brands and jump straight to live promo-code pages.
-          Filter by category, country, or letter to find the brand you need.
-        </p>
+        <p className="page-hero-desc">
+              Browse {brandCount} top retail brands and jump straight to their live promo-code pages.
+              Filter by category, country, or opening letter to narrow the list to the brand you want.
+              Each brand page lists the codes and offers we currently hold for that retailer.
+            </p>
         <div className="mt-8 flex flex-wrap gap-6">
           <Stat label="Total brands" value={String(brandCount)} />
           <Stat label="Featured" value={String(featuredCount)} />
-        </div>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <a href="#featured-brands" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:border-white/40">
-            Featured brands
-          </a>
-          <a href="#all-brands" className="inline-flex bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary-emphasis">
-            Browse all brands
-          </a>
-          <Link href="/coupons" className="inline-flex border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/80 transition hover:border-white/40 hover:text-white">
-            All coupons
-          </Link>
-        </div>
-      </div>
+        </div>      </div>
     </section>
   );
 }
