@@ -29,6 +29,7 @@ import QuestionsAnswered from '@/components/QuestionsAnswered';
 import PostFooterNav from '@/components/PostFooterNav';
 import ReadNext from '@/components/ReadNext';
 import PostInfobar from '@/components/PostInfobar';
+import { isPillarPost, pillarPathForPost } from '@/lib/pillar';
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -101,6 +102,8 @@ function recentPostDate(iso?: string): string {
     year: 'numeric',
   }).format(new Date(iso));
 }
+
+
 
 function detectMerchant(post: NxtPost): MerchantConfig | null {
   const merchantMatch = post.content.match(/<strong>Merchant:<\/strong>\s*([^<]+)/i);
@@ -176,6 +179,15 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   if (canonicalCat !== category) {
     const { redirect } = await import('next/navigation');
     redirect(postPath(post));
+  }
+
+
+  if (isPillarPost(post)) {
+    const pillarPath = pillarPathForPost(post);
+    if (pillarPath) {
+      const { permanentRedirect } = await import('next/navigation');
+      permanentRedirect(pillarPath);
+    }
   }
 
   // One wide fetch feeds every rail on the page — spotlight, read-also,

@@ -514,7 +514,7 @@ function ProductInfoTabs({
   brandGroups,
 }: {
   product: CommerceProduct;
-  productId: number;
+  productId: number | string;
   productName: string;
   summary: string;
   description?: string | null;

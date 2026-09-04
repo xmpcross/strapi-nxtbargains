@@ -58,6 +58,7 @@ const LINK_GROUPS: Array<{ title: string; links: Array<{ href: string; label: st
   {
     title: 'Legal',
     links: [
+      { href: '/legal/notice', label: 'Legal Notice' },
       { href: '/legal/terms', label: 'Terms & Conditions' },
       { href: '/legal/privacy', label: 'Privacy Policy' },
       { href: '/legal/cookies', label: 'Cookie Policy' },

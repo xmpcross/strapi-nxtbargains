@@ -45,6 +45,7 @@ const aboutLinks = [
 const MARKETPLACES = ['Amazon', 'eBay', 'Walmart', 'AliExpress', 'Best Buy', 'Target', 'Newegg'];
 
 const legalLinks = [
+  { href: '/legal/notice', label: 'Legal Notice' },
   { href: '/legal/terms', label: 'Terms & Conditions' },
   { href: '/legal/privacy', label: 'Privacy Policy' },
   { href: '/legal/cookies', label: 'Cookie Policy' },

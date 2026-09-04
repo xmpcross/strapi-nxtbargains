@@ -2,6 +2,7 @@ import type { CommerceProduct } from '@/lib/strapi';
 
 export const COMMERCE_PRODUCT_CATEGORY_SLUGS = [
   'smart-phones',
+  'smart-home',
   'smartwatches',
   'tablets',
   'laptops',

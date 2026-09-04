@@ -52,6 +52,7 @@ export const config = {
   matcher: [
     '/category/:category/:productSlug',
     '/smart-phones/:productSlug',
+    '/smart-home/:productSlug',
     '/smartwatches/:productSlug',
     '/tablets/:productSlug',
     '/laptops/:productSlug',
