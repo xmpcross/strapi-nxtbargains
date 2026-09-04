@@ -2,6 +2,7 @@ import type { CommerceProduct } from '@/lib/strapi';
 
 export const COMMERCE_PRODUCT_CATEGORY_SLUGS = [
   'smart-phones',
+  'smartphones',
   'smart-home',
   'smartwatches',
   'tablets',
@@ -15,10 +16,43 @@ export const COMMERCE_PRODUCT_CATEGORY_SLUGS = [
   'video-doorbells',
   'headphones',
   'raspberry-pi',
+  'climate-comfort',
+  'energy-solar',
+  'entertainment-audio',
+  'hubs-platforms',
+  'lighting',
+  'robot-vacuums',
+  'security-cameras',
 ] as const;
 
+const EDITORIAL_AND_STATIC_SLUGS = new Set([
+  'product-comparisons',
+  'product-reviews',
+  'product-roundups',
+  'how-to-guides',
+  'top-rated-smart-electronics-devices',
+  'nxt-bargains-informative-articles',
+  'best-sellers-articles',
+  'buying-guides',
+  'category',
+  'products',
+  'all-products',
+  'stores',
+  'coupons',
+  'blog',
+  'search',
+  'privacy',
+  'terms',
+  'contact',
+  'about',
+  'api',
+]);
+
 export function isCommerceProductCategorySlug(slug: string): boolean {
-  return (COMMERCE_PRODUCT_CATEGORY_SLUGS as readonly string[]).includes(slug);
+  if (!slug) return false;
+  const normalized = slug.toLowerCase().trim();
+  if ((COMMERCE_PRODUCT_CATEGORY_SLUGS as readonly string[]).includes(normalized)) return true;
+  return !EDITORIAL_AND_STATIC_SLUGS.has(normalized);
 }
 
 export function primaryCategorySlug(

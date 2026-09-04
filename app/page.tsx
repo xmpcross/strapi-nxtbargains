@@ -132,7 +132,10 @@ export default async function HomePage() {
   });
   const deals = dealProducts.map(toDeal).filter((d): d is Deal => d !== null);
   /* Ten, shown five at a time by the auto-advancing carousel below. */
-const priceDrops = deals.filter((d) => d.pct > 0).sort((a, b) => b.pct - a.pct).slice(0, 10);
+  let priceDrops = deals.filter((d) => d.pct > 0).sort((a, b) => b.pct - a.pct).slice(0, 10);
+  if (priceDrops.length < 3) {
+    priceDrops = deals.slice(0, 10);
+  }
   const trending = products.slice(0, 6);
 
   // Best Sellers — one daily JSON cache per marketplace (scripts/fetch-*.mjs).
@@ -625,15 +628,7 @@ function HomepageTrustContent() {
               Our service focuses on consumer technology and everyday electronics, including smartphones, laptops, tablets, headphones, smartwatches, security cameras, smart home devices and related accessories. Product pages are designed to show useful information first: current offers, key specifications, short summaries, product images, seller details and links to relevant research.
             </p>
             <p>
-              NXT.Bargains is free to use and does not require an account. Some outbound store links may be affiliate links, which means we may earn a commission if a visitor buys through those links, at no extra cost to the shopper.{' '}
-              <a
-                href="https://sovrn.co/1abk4m4"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="break-all font-medium text-primary underline transition hover:text-ink"
-              >
-                https://sovrn.co/1abk4m4
-              </a>
+              NXT.Bargains is free to use and does not require an account. Some outbound store links may be affiliate links, which means we may earn a commission if a visitor buys through those links, at no extra cost to the shopper.
             </p>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">

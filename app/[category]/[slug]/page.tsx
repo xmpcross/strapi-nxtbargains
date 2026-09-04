@@ -3,12 +3,13 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { getPost, listPostComments, listPosts, mediaUrl, type NxtPost } from '@/lib/strapi';
+import { getCommerceProduct, getPost, listPostComments, listPosts, mediaUrl, type NxtPost } from '@/lib/strapi';
 import { SECTIONS, SITE } from '@/lib/site';
 import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, howToJsonLd } from '@/lib/jsonld';
 import { JsonLd } from '@/components/JsonLd';
 import { enrichPostCarouselHtml } from '@/lib/enrich-post-carousel';
 import { clampDescription, firstImageUrl, fmtDate, parseHowToSteps, primaryCategorySlug, postPath, stripHtml, warnSeoLength } from '@/lib/format';
+import { productCanonicalPath } from '@/lib/product-url';
 import PostContent from '@/components/PostContent';
 import { KeyTakeaways } from '@/components/KeyTakeaways';
 import PostPriceComparison from '@/components/PostPriceComparison';
@@ -172,7 +173,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 export default async function PostPage({ params }: { params: Promise<Params> }) {
   const { slug, category } = await params;
   const post = await getPost(slug).catch(() => null);
-  if (!post) notFound();
+  if (!post) {
+    const product = await getCommerceProduct(slug).catch(() => null);
+    if (product) {
+      const { redirect } = await import('next/navigation');
+      redirect(productCanonicalPath(product));
+    }
+    notFound();
+  }
 
   // If the URL category doesn't match the post's primary category, send them to the canonical URL.
   const canonicalCat = primaryCategorySlug(post);

@@ -296,14 +296,14 @@ const MERCHANT_SEARCH: Array<[RegExp, (q: string) => string]> = [
 ];
 
 function merchantDealUrl(store: string, title: string, fallback: string): string {
+  if (isGeniusLinkUrl(fallback)) return fallback;
   const q = encodeURIComponent(title.trim().slice(0, 150));
   const match = MERCHANT_SEARCH.find(([re]) => re.test(store));
   if (match) return match[1](q);
   // Unknown single-word merchant: guess its .com; else keep the original link.
   const slug = store.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
   if (slug && !/\s/.test(store.trim())) return `https://www.${slug}.com/`;
-  // Keeping a dead Geniuslink here would ship a 410 as the deal's only link.
-  return isGeniusLinkUrl(fallback) ? '' : fallback;
+  return fallback;
 }
 
 async function loadRealTimeBestDeals() {
@@ -321,8 +321,6 @@ async function loadRealTimeBestDeals() {
     const monetized: RealTimeBestDeal[] = [];
     for (const item of items) {
       const merchantUrl = merchantDealUrl(item.store, item.title, item.url);
-      // merchantDealUrl returns '' when all it had was a dead Geniuslink and
-      // the store is not one we can build a search URL for.
       if (!merchantUrl) continue;
       monetized.push({ ...item, url: await monetizeUrl(merchantUrl) });
     }

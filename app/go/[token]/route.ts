@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifyClickToken } from '@/lib/click-tracking';
+import { createGeniusLink, isGeniusLinkUrl } from '@/lib/geniuslink';
 
 /**
  * Outbound affiliate redirect.
@@ -70,11 +71,6 @@ export async function GET(request: Request, context: { params: Promise<{ token: 
   const { token } = await context.params;
   const headers = request.headers;
 
-  /* The public host, taken from the proxy's headers. request.url is the
-     internal address behind nginx — 127.0.0.1:3008 — so using it would bounce
-     visitors to localhost and make every genuine referrer look foreign. nginx
-     here sets Host but no X-Forwarded-Host, and blanks X-Forwarded-Proto, so
-     Host is the ground truth and https is the only sensible scheme. */
   const selfHost =
     headers.get('x-forwarded-host') || headers.get('host') || new URL(request.url).host;
   const selfOrigin = `https://${selfHost}`;
@@ -82,8 +78,6 @@ export async function GET(request: Request, context: { params: Promise<{ token: 
   const click = verifyClickToken(token);
 
   if (!click) {
-    // An unsigned or tampered token gets no redirect at all — this endpoint
-    // must never forward to a URL it did not itself produce.
     return NextResponse.redirect(`${selfOrigin}/`, 302);
   }
   const country =
@@ -92,12 +86,13 @@ export async function GET(request: Request, context: { params: Promise<{ token: 
     headers.get('x-geo-country') ||
     null;
 
+  const destination = await createGeniusLink(click.u);
   void record({
     clickedAt: new Date().toISOString(),
     targetUrl: click.u,
     targetHost: hostOf(click.u),
     merchant: click.merchant ?? null,
-    network: click.network ?? null,
+    network: isGeniusLinkUrl(destination) ? 'geniuslink' : click.network === 'geniuslink' ? 'direct-fallback' : click.network ?? null,
     offerDocumentId: click.offerDocumentId ?? null,
     productDocumentId: click.productDocumentId ?? null,
     country: country && /^[A-Za-z]{2}$/.test(country) ? country.toUpperCase() : null,
@@ -105,7 +100,7 @@ export async function GET(request: Request, context: { params: Promise<{ token: 
     siteSlug: SITE_SLUG,
   });
 
-  const response = NextResponse.redirect(click.u, 302);
+  const response = NextResponse.redirect(destination, 302);
   // Affiliate destinations change; never let an intermediary keep this hop.
   response.headers.set('cache-control', 'no-store, max-age=0');
   return response;

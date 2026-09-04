@@ -56,6 +56,7 @@ const ALREADY_AFFILIATED = [
  * resolution on top rather than duplicating the guard.
  */
 export function takeadsLinkForUrl(destination: string): string | null {
+  if (process.env.TAKEADS_ENABLED !== 'true') return null;
   if (!destination || !destination.startsWith('http')) return null;
   if (ALREADY_AFFILIATED.some((h) => destination.includes(h))) return null;
 

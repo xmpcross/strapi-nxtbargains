@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import ClientErrorReporter from '@/components/ClientErrorReporter';
 import { CookieConsentProvider } from '@/components/CookieConsentProvider';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import Geniuslink from '@/components/Geniuslink';
 import { SITE } from '@/lib/site';
 import { cmsOrigin } from '@/lib/seo';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonld';
@@ -105,38 +106,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <link rel="preconnect" href={cms} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={cms} />
-        <JsonLd graph={[organizationJsonLd(), websiteJsonLd()]} />
       </head>
       <body className="min-h-screen flex flex-col font-sans font-normal" data-testid="app-shell">
         <CookieConsentProvider>
           <GoogleAnalytics />
+          <Geniuslink />
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
           <ClientErrorReporter />
         </CookieConsentProvider>
-        {/*
-          ConvertLink — auto-affiliates outbound merchant links. Sovrn's install
-          instructions place it immediately before </body>, so it is the last
-          child of <body> rather than a <head> tag.
-
-          Left as a plain <script src> on purpose: React 19 hoists `async`
-          scripts into <head>, which would move it away from the position the
-          installer asks for. Note it still appears a second time inside the RSC
-          hydration payload (self.__next_f.push) — the browser executes it once,
-          but a verifier that text-scans the page will see two copies.
-        */}
-        <script src="https://convertlink.com/script/c53c3d88-ffa9-4d6e-a38b-3e7dc149b38d/bundle.js" />
-        {/*
-          Skimlinks — the second auto-affiliate layer, alongside ConvertLink
-          above. Same placement rule and the same reason: Skimlinks' installer
-          asks for it immediately before </body>, and leaving off `async` keeps
-          React 19 from hoisting it into <head>.
-        */}
-        <script
-          type="text/javascript"
-          src="https://s.skimresources.com/js/308034X1796330.skimlinks.js"
-        />
       </body>
     </html>
   );

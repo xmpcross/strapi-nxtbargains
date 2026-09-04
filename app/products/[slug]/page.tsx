@@ -10,7 +10,6 @@ import {
   collectOfferRows,
   comparableProducts,
   formatMoney,
-  isGeniusLinkUrl,
   merchantName,
   numericValue,
   offerPrice,
@@ -64,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const image = productImageUrl(product);
   const description = clampDescription(
     product.shortDescription ||
-      `Compare current merchant prices for ${product.name} on ${SITE.name}.`,
+    `Compare current merchant prices for ${product.name} on ${SITE.name}.`,
   );
   const canonicalPath = productCanonicalPath(product);
 
@@ -132,17 +131,15 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
     const p = join(process.cwd(), 'data', 'live-offers.json');
     if (existsSync(p)) {
       const entry = (JSON.parse(readFileSync(p, 'utf8')).items ?? {})[slug];
-      // Dead Geniuslinks are dropped before the 2-offer test, so a product left
-      // with a single live offer hides the section rather than showing one 410.
       const usable = (Array.isArray(entry?.offers) ? entry.offers : []).filter(
-        (offer: LiveOffer) => offer.url && !isGeniusLinkUrl(offer.url),
+        (offer: LiveOffer) => Boolean(offer.url),
       );
       if (usable.length >= 2) {
         liveOffers = usable as LiveOffer[];
         liveCapturedAt = entry.capturedAt ?? null;
       }
     }
-  } catch {}
+  } catch { }
   const category = product.categories?.[0]?.name ?? product.category;
   const bestPrice = best ? offerPrice(best.offer) : null;
   const pricedRows = rows.filter((row) => offerPrice(row.offer) !== null);
@@ -188,14 +185,14 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
     reviews,
     offers: rows.length
       ? {
-          offerCount: rows.length,
-          lowPrice: bestPrice ?? undefined,
-          highPrice: pricedRows.length
-            ? Math.max(...pricedRows.map((row) => offerPrice(row.offer) ?? 0))
-            : undefined,
-          priceCurrency: best?.offer.currency ?? 'USD',
-          offers: rows.map((row) => offerJsonLd(row.offer)),
-        }
+        offerCount: rows.length,
+        lowPrice: bestPrice ?? undefined,
+        highPrice: pricedRows.length
+          ? Math.max(...pricedRows.map((row) => offerPrice(row.offer) ?? 0))
+          : undefined,
+        priceCurrency: best?.offer.currency ?? 'USD',
+        offers: rows.map((row) => offerJsonLd(row.offer)),
+      }
       : null,
   });
 
@@ -572,40 +569,44 @@ function ProductInfoTabs({
 
             <ProductSidePeek
               panels={[
-                { id: 'specifications', label: 'Specifications', content: (
-                  <>
-                {useGsmarenaSpecsInSpecifications ? (
-                  <GsmarenaSpecGroups groups={gsmarenaSpecGroups} />
-                ) : specEntries.length ? (
-                  <KeySpecsList entries={specEntries} className="mt-0" />
-                ) : (
-                  <div className="border border-ink/10 bg-paper p-6 leading-6 text-ink/60">
-                    Product specifications have not been imported for this item yet.
-                  </div>
-                )}
-                  </>
-                ) },
-                { id: 'additional-info', label: 'Additional Info', content: (
-                  <>
-                {additionalInfoEntries.length ? (
-                  <dl className="grid overflow-hidden border-0">
-                    {additionalInfoEntries.map((entry) => (
-                      <div key={entry.label} className="grid gap-2 border-b border-ink/10 px-4 py-3 last:border-b-0 sm:grid-cols-[190px_minmax(0,1fr)]">
-                        <dt className="font-bold text-ink/55">{entry.label}</dt>
-                        {/* break-words: the restored Image URL row is a single
+                {
+                  id: 'specifications', label: 'Specifications', content: (
+                    <>
+                      {useGsmarenaSpecsInSpecifications ? (
+                        <GsmarenaSpecGroups groups={gsmarenaSpecGroups} />
+                      ) : specEntries.length ? (
+                        <KeySpecsList entries={specEntries} className="mt-0" />
+                      ) : (
+                        <div className="border border-ink/10 bg-paper p-6 leading-6 text-ink/60">
+                          Product specifications have not been imported for this item yet.
+                        </div>
+                      )}
+                    </>
+                  )
+                },
+                {
+                  id: 'additional-info', label: 'Additional Info', content: (
+                    <>
+                      {additionalInfoEntries.length ? (
+                        <dl className="grid overflow-hidden border-0">
+                          {additionalInfoEntries.map((entry) => (
+                            <div key={entry.label} className="grid gap-2 border-b border-ink/10 px-4 py-3 last:border-b-0 sm:grid-cols-[190px_minmax(0,1fr)]">
+                              <dt className="font-bold text-ink/55">{entry.label}</dt>
+                              {/* break-words: the restored Image URL row is a single
                             unbroken 200-character string with no spaces to wrap
                             at, and would otherwise run past the table. */}
-                        <dd className="break-words text-ink">{entry.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                ) : (
-                  <div className="border border-ink/10 bg-paper p-6 leading-6 text-ink/60">
-                    Additional product information is not available for this item yet.
-                  </div>
-                )}
-                  </>
-                ) },
+                              <dd className="break-words text-ink">{entry.value}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      ) : (
+                        <div className="border border-ink/10 bg-paper p-6 leading-6 text-ink/60">
+                          Additional product information is not available for this item yet.
+                        </div>
+                      )}
+                    </>
+                  )
+                },
               ]}
             />
 
@@ -756,7 +757,7 @@ function PriceHistorySection({
   const since = points[0]?.checkedAt;
 
   const content = (
-    <div className={embedded ? 'p-6 sm:p-8' : 'p-5'}>
+    <div className={embedded ? 'p-6 sm:p-8' : ''}>
       <div className="border border-ink/10 bg-white">
         <div className="bg-muted px-5 py-4 text-center font-display text-base font-bold text-ink">
           Price history for {productName}
@@ -808,7 +809,7 @@ function PriceHistorySection({
 
   return (
     <div className="border border-ink/10 bg-white">
-      <div className="flex min-h-11 items-center justify-between border-b border-ink/10 bg-white px-4">
+      <div className="flex min-h-11 items-center justify-between border-b border-ink/10 bg-white">
         <div className="flex items-center gap-3">
           <h2 className="font-display text-lg font-bold text-ink">Price History</h2>
         </div>
@@ -846,8 +847,8 @@ function PriceHistoryChart({ points }: { points: PriceHistoryPoint[] }) {
     coords.length === 1
       ? `M ${plotLeft} ${plotBottom} L ${plotLeft} ${first.y} L ${plotRight} ${first.y} L ${plotRight} ${plotBottom} Z`
       : `M ${plotLeft} ${plotBottom} ${coords
-          .map((point, index) => `${index === 0 ? 'L' : 'L'} ${point.x} ${point.y}`)
-          .join(' ')} L ${last.x} ${plotBottom} Z`;
+        .map((point, index) => `${index === 0 ? 'L' : 'L'} ${point.x} ${point.y}`)
+        .join(' ')} L ${last.x} ${plotBottom} Z`;
   const xTicks = chartTickPoints(points);
   const tooltipWidth = 112;
   const tooltipHeight = 62;

@@ -1,6 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { isGeniusLinkUrl } from '@/lib/commerce';
 import { type BestSeller, type Marketplace } from '@/components/BestSellerCard';
 
 export type BestSellerMarketplace = {
@@ -79,10 +78,8 @@ export function listBestSellersForMarketplace(marketplaceKey: Marketplace): Best
       .map((item) => ({
         ...item,
         marketplace: marketplace.key,
-        // A Google Shopping results page is not a destination, and a geni.us
-        // link is a dead one (see isGeniusLinkUrl). Both are replaced by a
-        // search on the marketplace the item actually came from.
-        url: isGoogleShoppingUrl(item.url) || isGeniusLinkUrl(item.url)
+        // Replace aggregator searches, but preserve existing affiliate links.
+        url: isGoogleShoppingUrl(item.url)
           ? marketplaceSearchUrl(marketplace.key, item.title)
           : item.url,
       }))

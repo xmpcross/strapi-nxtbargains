@@ -50,20 +50,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/category/:category/:productSlug',
-    '/smart-phones/:productSlug',
-    '/smart-home/:productSlug',
-    '/smartwatches/:productSlug',
-    '/tablets/:productSlug',
-    '/laptops/:productSlug',
-    '/smart-light-bulbs/:productSlug',
-    '/smart-tvs/:productSlug',
-    '/smart-cameras/:productSlug',
-    '/smart-speakers/:productSlug',
-    '/smart-door-locks/:productSlug',
-    '/smart-plugs/:productSlug',
-    '/video-doorbells/:productSlug',
-    '/headphones/:productSlug',
-    '/raspberry-pi/:productSlug',
+    '/((?!api|_next/static|_next/image|favicon.ico|vendor|uploads|.*\\..*).*)',
   ],
 };

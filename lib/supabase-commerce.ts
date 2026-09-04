@@ -205,11 +205,16 @@ export async function listSupabaseProducts(opts: { page?: number; pageSize?: num
 
   let comparisons: SupabaseComparison[] = [];
   try {
-    const [rawProducts, rawOffers] = await Promise.all([
+    const [rawProducts, ...offerBatches] = await Promise.all([
       rest<any[]>('canonical_products?select=id,title,brand,model,mpn,asin,gtin_upc_ean,category,image_url,description,specifications,updated_at,slug&is_active=eq.true&order=updated_at.desc&limit=1000'),
-      rest<any[]>('marketplace_products?select=id,canonical_product_id,marketplace,seller_name,current_price,original_price,discount_percent,currency,coupon_code,product_url,is_available&is_available=eq.true&limit=2000').catch(() => []),
+      rest<any[]>('marketplace_products?select=id,canonical_product_id,marketplace,seller_name,current_price,original_price,discount_percent,currency,coupon_code,product_url,is_available&is_available=eq.true&limit=1000&offset=0').catch(() => []),
+      rest<any[]>('marketplace_products?select=id,canonical_product_id,marketplace,seller_name,current_price,original_price,discount_percent,currency,coupon_code,product_url,is_available&is_available=eq.true&limit=1000&offset=1000').catch(() => []),
+      rest<any[]>('marketplace_products?select=id,canonical_product_id,marketplace,seller_name,current_price,original_price,discount_percent,currency,coupon_code,product_url,is_available&is_available=eq.true&limit=1000&offset=2000').catch(() => []),
+      rest<any[]>('marketplace_products?select=id,canonical_product_id,marketplace,seller_name,current_price,original_price,discount_percent,currency,coupon_code,product_url,is_available&is_available=eq.true&limit=1000&offset=3000').catch(() => []),
+      rest<any[]>('marketplace_products?select=id,canonical_product_id,marketplace,seller_name,current_price,original_price,discount_percent,currency,coupon_code,product_url,is_available&is_available=eq.true&limit=1000&offset=4000').catch(() => []),
     ]);
 
+    const rawOffers = offerBatches.flat();
     const offersByProduct = new Map<string, any[]>();
     for (const offer of rawOffers) {
       if (offer && offer.canonical_product_id) {

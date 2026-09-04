@@ -49,13 +49,17 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', var(--font-body), system-ui, sans-serif !important;
+  }
 }
 
 :root {
   color-scheme: light;
   /* One family for the whole site: body and display both resolve to Inter. */
   --font-body: 'Inter';
-  --font-heading: 'Bricolage Grotesque';
+  --font-heading: 'Inter';
 
   /* ------------------------------------------------------------------ */
   /* Brand palette (Best Buy scheme). Semantic tokens below map onto     */
