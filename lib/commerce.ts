@@ -213,12 +213,19 @@ export function conditionLabel(value?: CommerceOffer['condition']): string {
 }
 
 export function productImageUrl(product: CommerceProduct): string | null {
-  return mediaUrl(product.primaryImage ?? null) ?? mediaUrl(product.gallery?.[0] ?? null) ?? productSourceImageUrl(product);
+  return mediaUrl(product.primaryImage ?? null)
+    ?? mediaUrl(product.gallery?.[0] ?? null)
+    ?? validExternalImageUrl(product.imageUrl)
+    ?? productSourceImageUrl(product);
 }
 
 function productSourceImageUrl(product: CommerceProduct): string | null {
   const specs = product.specs ?? {};
   const value = specs.imageUrl || specs.sourceImageUrl;
+  return validExternalImageUrl(value);
+}
+
+function validExternalImageUrl(value: unknown): string | null {
   if (typeof value !== 'string') return null;
   if (!/^https?:\/\//i.test(value)) return null;
   return value;

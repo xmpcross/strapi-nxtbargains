@@ -203,6 +203,7 @@ export type CommerceProduct = {
   brandRef?: CommerceBrand | null;
   shortDescription?: string | null;
   description?: string | null;
+  imageUrl?: string | null;
   primaryImage?: StrapiImage;
   gallery?: NonNullable<StrapiImage>[];
   category?: string | null;
