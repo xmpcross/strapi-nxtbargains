@@ -25,7 +25,7 @@ const sourceStoreLogos: Array<[RegExp, string]> = [
   [/hp/, '/logos/hp-logo.svg'],
   [/dell/, '/logos/dell-logo.svg'],
   [/lenovo/, '/logos/lenovo-logo.svg'],
-  [/samsung/, '/logos/samsung-logo.svg'],
+  [/samsung/, '/logos/samsung-official.png'],
   [/apple/, '/logos/apple-logo.svg'],
   [/target/, '/logos/target-logo.svg'],
   [/nike/, '/logos/nike-logo.svg'],

@@ -13,6 +13,7 @@ import { sourceLogoForStore } from '@/lib/coupon-store-links';
  * no request at render time.
  */
 const LOCAL_MERCHANT_LOGOS: Array<[RegExp, string]> = [
+  [/samsung/i, '/logos/samsung-official.png'],
   [/micro\s*center/i, '/logos/micro-center-logo.svg'],
   [/oneplus/i, '/logos/oneplus-logo.png'],
   [/amazon/i, '/logos/amazon-logo.svg'],

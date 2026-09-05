@@ -101,8 +101,8 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
   let related = comparable.filter((p) => p.slug !== product.slug && sharesProductCategory(p)).slice(0, 10);
   // Sparse catalog: if no name-similar products share this category, fall back
   // to other products from the same category only.
-  if (related.length < 5 && relatedCategorySlug) {
-    const more = await listCommerceProducts({ category: relatedCategorySlug, pageSize: 12 })
+  if (related.length < 10 && relatedCategorySlug) {
+    const more = await listCommerceProducts({ category: relatedCategorySlug, pageSize: 24 })
       .then((r) => r.data)
       .catch(() => [] as CommerceProduct[]);
     const seen = new Set([product.slug, ...related.map((p) => p.slug)]);
@@ -153,7 +153,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
       ? `Compare current prices for this ${category.toLowerCase()} across trusted merchants.`
       : `Compare current prices for ${product.name} across trusted merchants.`);
   const highlights = productHighlightEntries(product);
-  const shortCopy = shortDescriptionCopy(product.shortDescription);
+  const shortCopy = shortDescriptionCopy(product);
   const discount = best ? discountPercent(best.offer) : null;
   const updatedLabel = product.updatedAt ? fmtDate(product.updatedAt) : 'Today';
   const updatedAtLabel = product.updatedAt ? fmtDateTime(product.updatedAt) : '';
@@ -206,6 +206,41 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
         : []),
     { name: product.name, url: `${SITE.url}${canonicalPath}` },
   ]);
+
+  const reviewsContent = (
+          <ProductReviewsSection
+            reviewSummary={product.reviewSummary}
+            reviewTopics={product.reviewTopics}
+            productName={product.name}
+            productDocumentId={product.documentId ?? ''}
+            reviews={reviews}
+            aggregateRating={product.rating != null ? Number(product.rating) : null}
+            aggregateCount={product.ratingCount != null ? Number(product.ratingCount) : null}
+          />
+  );
+  const priceHistorySection = (
+    <section className="border-t border-ink/10 bg-white pb-12 pt-6" data-testid="price-history">
+      <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
+        <PriceHistorySection
+          productName={product.name}
+          rows={rows}
+          snapshots={priceSnapshots}
+          fallbackDate={product.updatedAt}
+          hideHeading
+          fullWidthChart
+        />
+      </div>
+    </section>
+  );
+  const shortDescriptionContent = shortCopy.bullets.length ? (
+    <ul className="product-description-bullets product-short-description">
+      {shortCopy.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+    </ul>
+  ) : (
+    <p className="line-clamp-5 text-[14px] leading-7 text-ink/80">
+      {shortCopy.lead ?? summary}
+    </p>
+  );
 
   return (
     <main className="bg-white" data-testid={`product-price-${product.slug}`}>
@@ -300,23 +335,13 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                       ) : null}
                     </div>
                   ) : null}
+
                 </div>
 
                 <div className="grid lg:grid-cols-2">
                   <div className="border-b border-ink/10 px-6 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-4 lg:border-b-0 lg:border-r">
-                    {shortCopy.bullets.length ? (
-                      <ul className="product-description-bullets product-short-description">
-                        {shortCopy.bullets.map((bullet) => (
-                          <li key={bullet}>{bullet}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="line-clamp-5 text-[14px] leading-7 text-ink/80">
-                        {shortCopy.lead ?? summary}
-                      </p>
-                    )}
-
-                    <div className="mt-8">
+                    <div className="mb-5">{shortDescriptionContent}</div>
+                    <div>
                       {best?.offer.originalPrice && numericValue(best.offer.originalPrice) !== numericValue(best.offer.price) && (
                         <span className="mr-2 text-lg text-ink/25 line-through">
                           {formatMoney(best.offer.originalPrice, best.offer.currency ?? 'USD')}
@@ -401,9 +426,12 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
         </section>
       )}
 
+      {priceHistorySection}
+
       <section className="pb-6">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <ProductInfoTabs
+            reviewsContent={reviewsContent}
             product={product}
             productId={product.id}
             productName={product.name}
@@ -414,33 +442,6 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
             productDocumentId={product.documentId ?? ''}
             retailers={couponPageData.retailers}
             brandGroups={couponPageData.brandGroups}
-          />
-        </div>
-      </section>
-
-      <section className="border-t border-ink/10 bg-white pb-12 pt-6" data-testid="price-history">
-        <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <PriceHistorySection
-            productName={product.name}
-            rows={rows}
-            snapshots={priceSnapshots}
-            fallbackDate={product.updatedAt}
-          />
-        </div>
-      </section>
-
-      <section className="border-t border-ink/10 bg-white py-12" data-testid="product-reviews">
-        <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          {/* The section renders its own "Reviews" heading, as the reference
-              layout does — a second one here would duplicate it. */}
-          <ProductReviewsSection
-            reviewSummary={product.reviewSummary}
-            reviewTopics={product.reviewTopics}
-            productName={product.name}
-            productDocumentId={product.documentId ?? ''}
-            reviews={reviews}
-            aggregateRating={product.rating != null ? Number(product.rating) : null}
-            aggregateCount={product.ratingCount != null ? Number(product.ratingCount) : null}
           />
         </div>
       </section>
@@ -486,6 +487,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
             <div className="mt-6">
               <ProductCarousel
                 perView={6}
+                interval={3500}
                 items={related.slice(0, 10).map((p) => (
                   <CommerceProductCard key={p.id} product={p} showCompareButton={false} uniformImage />
                 ))}
@@ -499,6 +501,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
 }
 
 function ProductInfoTabs({
+  reviewsContent,
   product,
   productId,
   productName,
@@ -511,6 +514,7 @@ function ProductInfoTabs({
   brandGroups,
 }: {
   product: CommerceProduct;
+  reviewsContent?: ReactNode;
   productId: number | string;
   productName: string;
   summary: string;
@@ -546,24 +550,15 @@ function ProductInfoTabs({
             <details className="product-accordion-item" name={accordionId} open>
               <summary>Product details</summary>
               <div className="product-accordion-panel tab-panel-description">
-                {detailBullets.length ? (
-                  <ul className="product-description-bullets">
-                    {detailBullets.map((bullet) => (
-                      <li key={bullet}>{bullet}</li>
-                    ))}
-                  </ul>
-                ) : description ? (
+                {description ? (
                   <div className="leading-7 text-ink/70">
                     <ProductDescription markdown={description} />
                   </div>
                 ) : (
-                  // Not `summary`: that falls back to the short description,
-                  // which this panel must not repeat.
                   <p className="leading-7 text-ink/70">
                     {`Compare current prices for ${productName} across trusted merchants.`}
                   </p>
                 )}
-
               </div>
             </details>
 
@@ -607,6 +602,11 @@ function ProductInfoTabs({
                     </>
                   )
                 },
+                ...(reviewsContent ? [{
+                  id: 'reviews',
+                  label: 'Reviews',
+                  content: <div data-testid="product-reviews">{reviewsContent}</div>,
+                }] : []),
               ]}
             />
 
@@ -739,12 +739,16 @@ function PriceHistorySection({
   snapshots,
   fallbackDate,
   embedded = false,
+  hideHeading = false,
+  fullWidthChart = false,
 }: {
   productName: string;
   rows: CommerceOfferRow[];
   snapshots: CommercePriceSnapshot[];
   fallbackDate?: string;
   embedded?: boolean;
+  hideHeading?: boolean;
+  fullWidthChart?: boolean;
 }) {
   const entries = collectPriceHistoryEntries(snapshots, rows, fallbackDate);
   const points = buildDailyLowestPricePoints(entries);
@@ -759,13 +763,13 @@ function PriceHistorySection({
   const content = (
     <div className={embedded ? 'p-6 sm:p-8' : ''}>
       <div className="border border-ink/10 bg-white">
-        <div className="bg-muted px-5 py-4 text-center font-display text-base font-bold text-ink">
+        {!hideHeading && <div className="bg-muted px-5 py-4 text-center font-display text-base font-bold text-ink">
           Price history for {productName}
-        </div>
+        </div>}
 
         {points.length > 0 ? (
-          <div className="grid lg:grid-cols-[190px_minmax(0,1fr)]">
-            <aside className="bg-gradient-to-r from-paper to-white px-4 py-6 text-xs text-ink">
+          <div className={fullWidthChart ? 'flex w-full flex-col' : 'grid lg:grid-cols-[190px_minmax(0,1fr)]'}>
+            {!fullWidthChart && <aside className="bg-gradient-to-r from-paper to-white px-4 py-6 text-xs text-ink">
               <p className="font-bold">Latest updates:</p>
               <div className="mt-5 space-y-5">
                 {latestUpdates.map((entry, index) => (
@@ -776,11 +780,11 @@ function PriceHistorySection({
                 ))}
               </div>
               {since && <p className="mt-8">Since: {fmtDate(since)}</p>}
-            </aside>
+            </aside>}
 
-            <div className="min-w-0 px-4 py-6 sm:px-6">
+            <div className="min-w-0 w-full px-4 py-6">
               <PriceHistoryChart points={points} />
-              <div className="mt-6 space-y-3 text-base">
+              <div className="mt-6 flex flex-wrap items-start justify-between gap-x-6 gap-y-3 text-base">
                 {highest && (
                   <p>
                     <span className="font-medium text-red-600">Highest Price:</span>{' '}
@@ -788,7 +792,7 @@ function PriceHistorySection({
                   </p>
                 )}
                 {lowest && (
-                  <p>
+                  <p className="ml-auto text-right">
                     <span className="font-medium text-green-600">Lowest Price:</span>{' '}
                     <span className="text-ink">{formatMoney(lowest.price, lowest.currency)} - {fmtDate(lowest.checkedAt)}</span>
                   </p>
@@ -951,7 +955,9 @@ function PriceHistoryChart({ points }: { points: PriceHistoryPoint[] }) {
           {formatPlainPrice(last.price, last.currency)}
         </text>
         <text x={plotRight} y={plotTop - 10} textAnchor="end" fontSize="11" fontWeight="700" fill="#667085">
-          {last.dateKey}
+          Latest updates: {new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC',
+          }).format(new Date(`${last.dateKey}T00:00:00Z`)).replace('Sept', 'Sep').replace(/ (\d{4})$/, ', $1')}
         </text>
       </svg>
     </div>
@@ -1326,17 +1332,37 @@ function productHighlightEntries(product: CommerceProduct): SpecificationEntry[]
  * The rare prose one is cut at sentence boundaries instead, and a single
  * sentence stays a paragraph rather than becoming a lone bullet.
  */
-function shortDescriptionCopy(shortDescription?: string | null): { bullets: string[]; lead: string | null } {
-  const short = (shortDescription ?? '').trim();
-  if (!short) return { bullets: [], lead: null };
+function shortDescriptionCopy(product: CommerceProduct): { bullets: string[]; lead: string | null } {
+  const bullets: string[] = [];
+  const seen = new Set<string>();
+  const add = (value: string) => {
+    const text = value.replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
+    const key = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!key || text.length > 240 || /https?:\/\/|<[^>]+>/.test(text)) return;
+    if (seen.has(key) || bullets.length >= 3) return;
+    seen.add(key);
+    bullets.push(text);
+  };
+  const fromDescription = (value?: string | null) => {
+    const text = (value ?? '').trim();
+    const authored = markdownBulletLines(text);
+    if (authored.length) authored.forEach(add);
+    else text.split(/\n+/).filter((line) => !/^\s*#/.test(line)).forEach((line) => {
+      sentenceBullets(line.replace(/^\s*[-*]\s+/, '')).forEach(add);
+    });
+  };
 
-  const authored = markdownBulletLines(short);
-  if (authored.length) return { bullets: authored, lead: null };
-
-  const split = sentenceBullets(short);
-  if (split.length > 1) return { bullets: split, lead: null };
-
-  return { bullets: [], lead: short };
+  fromDescription(product.shortDescription);
+  const specs = productHighlightEntries(product);
+  specs.filter((entry) => !/^(brand|model|category)$/i.test(entry.label))
+    .forEach((entry) => {
+      // Avoid repeating a feature already expressed by an imported summary.
+      if (!bullets.some((bullet) => bullet.toLowerCase().includes(entry.value.toLowerCase()))) {
+        add(`${entry.label}: ${entry.value}.`);
+      }
+    });
+  fromDescription(product.description);
+  return { bullets, lead: null };
 }
 
 /**
