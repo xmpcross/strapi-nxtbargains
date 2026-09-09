@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/legal/notice' },
 };
 
-const MODIFIED = '2026-08-26';
+const MODIFIED = '2026-09-09';
 
 export default function Page() {
   return (
