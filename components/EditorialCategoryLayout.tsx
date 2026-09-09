@@ -65,7 +65,7 @@ export default function EditorialCategoryLayout({
             <span style={{ color: config.accentColor }}>{config.breadcrumbLabel}</span>
           </nav>
 
-          <div className="mt-8 max-w-4xl">
+          <div className="mt-8 w-full">
             <p
               className="text-xs font-bold uppercase tracking-[0.18em]"
               style={{ color: config.accentColor }}
@@ -75,20 +75,9 @@ export default function EditorialCategoryLayout({
             <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl lg:text-[2.65rem]">
               {categoryName}
             </h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-ink/75 sm:text-lg">
+            <p className="mt-4 w-full text-base leading-7 text-ink/75 sm:text-lg sm:leading-8">
               {categoryBlurb ?? config.glanceDescription}
             </p>
-
-            <ul className="mt-6 max-w-3xl space-y-3 text-sm leading-6 text-ink/80 sm:text-base">
-              {config.bullets.map((bullet) => (
-                <li key={bullet} className="flex gap-3">
-                  <span className="mt-0.5 shrink-0 font-bold" style={{ color: config.accentColor }} aria-hidden>
-                    ✓
-                  </span>
-                  <span>{bullet}</span>
-                </li>
-              ))}
-            </ul>
 
             <div className="mt-8 flex flex-wrap gap-2">
               <Link
