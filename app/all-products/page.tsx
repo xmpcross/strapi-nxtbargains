@@ -269,10 +269,7 @@ function ProductsHero({
           <span className="text-ink/70">All products</span>
         </nav>
 
-        <p className="mt-6 text-xs font-bold uppercase tracking-[0.14em] text-[#118757]">
-          {SITE.name} catalog
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
+        <h1 className="mt-6 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
           {activeCategory ?? 'Every product. Every marketplace. One place to compare.'}
         </h1>
         {/* The counts the old "At a glance" card carried, folded into the intro

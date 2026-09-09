@@ -18,7 +18,6 @@ import {
   listCommerceCategoriesForSite,
   listCommerceProducts,
 } from '@/lib/strapi';
-import { SITE } from '@/lib/site';
 import { categoryDescriptionSummary, categoryDescriptionTeaser } from '@/lib/category-descriptions';
 import { pageOpenGraph } from '@/lib/seo';
 
@@ -124,10 +123,7 @@ export default async function ProductCategoryPage({
             <span className="text-ink/70">{category.name}</span>
           </nav>
 
-          <p className="mt-6 text-xs font-bold uppercase tracking-[0.14em] text-[#118757]">
-            {SITE.name} catalog
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
+          <h1 className="mt-6 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
             {category.name}
           </h1>
           {/* Two sentences, then the rest behind a disclosure. A CSS-only
