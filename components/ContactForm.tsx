@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const CONTACT_EMAIL = 'hello@nxt.bargains';
+const CONTACT_EMAIL = 'contact@nxt.bargains';
 
 /**
  * Contact form. Posts to /api/contact, which sends through Brevo.

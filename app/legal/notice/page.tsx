@@ -38,7 +38,7 @@ export default function Page() {
         <li><strong>Principal jurisdiction:</strong> Western Australia, Australia</li>
         <li><strong>Australian Business Number:</strong> To be inserted after verification</li>
         <li><strong>Geographic business address:</strong> To be inserted after verification</li>
-        <li><strong>General contact:</strong> <a href="mailto:hello@nxt.bargains">hello@nxt.bargains</a></li>
+        <li><strong>General contact:</strong> <a href="mailto:contact@nxt.bargains">contact@nxt.bargains</a></li>
         <li><strong>Legal notices:</strong> <a href="mailto:legal@nxt.bargains">legal@nxt.bargains</a></li>
         <li><strong>Privacy requests:</strong> <a href="mailto:privacy@nxt.bargains">privacy@nxt.bargains</a></li>
       </ul>
