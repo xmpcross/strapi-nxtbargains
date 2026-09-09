@@ -23,7 +23,7 @@ const shopLinks: FooterItem[] = [
       { href: '/category/smart-light-bulbs', label: 'Smart Light Bulbs' },
       { href: '/category/smart-door-locks', label: 'Smart Door Locks' },
       { href: '/category/smart-plugs', label: 'Smart Plugs' },
-      { href: '/category/video-doorbells', label: 'Smart Doorbells' },
+      { href: '/category/smart-doorbells', label: 'Smart Doorbells' },
     ],
   },
   { href: '/category/headphones', label: 'Headphones' },

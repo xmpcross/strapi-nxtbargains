@@ -13,7 +13,7 @@ export const COMMERCE_PRODUCT_CATEGORY_SLUGS = [
   'smart-speakers',
   'smart-door-locks',
   'smart-plugs',
-  'video-doorbells',
+  'smart-doorbells',
   'headphones',
   'raspberry-pi',
   'climate-comfort',

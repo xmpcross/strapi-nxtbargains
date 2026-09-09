@@ -33,6 +33,24 @@ const nextConfig = {
       },
       {
         /*
+         * "Video Doorbells" was renamed "Smart Doorbells" in the CMS, and Strapi
+         * regenerated the slug from the name, so the old category URL now 404s.
+         * The nav had carried the label "Smart Doorbells" against the
+         * video-doorbells href for a while, so that path is what anything
+         * external will have picked up.
+         */
+        source: '/category/video-doorbells',
+        destination: '/category/smart-doorbells',
+        permanent: true,
+      },
+      {
+        /* Product URLs under the old category slug, for the same reason. */
+        source: '/video-doorbells/:slug',
+        destination: '/smart-doorbells/:slug',
+        permanent: true,
+      },
+      {
+        /*
          * Same move for the article index. As with /products, only the exact
          * path: posts themselves live at /:category/:slug, not under /posts.
          */

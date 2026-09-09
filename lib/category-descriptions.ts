@@ -51,7 +51,7 @@ const CATEGORY_DESCRIPTIONS: Record<string, CategoryCopy> = {
     'The catalogue covers Ring, eufy, Google and eufyCam, with prices compared across eBay, Newegg, Best Buy, Walmart and eufy directly. Specifications including field of view, night vision and audio support are surfaced on each product page.',
     'The important question is where footage is stored. Local storage on a card avoids a recurring fee, cloud storage usually does not, and the difference over a few years frequently exceeds the price of the camera. Check power too — wired and battery models suit very different mounting positions.',
   ],
-  'video-doorbells': [
+  'smart-doorbells': [
     'A video doorbell is the most-used smart home device in most households, which makes reliability worth more than features. A doorbell that misses events or lags on the live view fails at the only job it has.',
     'This category covers Ring, eufy and Google, compared across Best Buy, eufy, Newegg, eBay and Walmart. Product pages list resolution, field of view and whether the model supports existing doorbell wiring.',
     'Wiring decides most of this purchase. A wired doorbell replacing existing chimes never needs charging; a battery model can go anywhere but comes down periodically. As with cameras, confirm whether recorded clips need a subscription before you buy.',
