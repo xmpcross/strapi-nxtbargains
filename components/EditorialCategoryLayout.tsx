@@ -164,7 +164,7 @@ export default function EditorialCategoryLayout({
         </div>
       </section>
 
-      <section className="bg-[#f0f2f4] pb-12 pt-8 sm:pb-16 sm:pt-10">
+      <section className="bg-[#f8fafc] pb-12 pt-8 sm:pb-16 sm:pt-10">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[minmax(220px,24%)_minmax(0,76%)] lg:items-start">
             <ArticleFiltersSidebar
@@ -182,11 +182,11 @@ export default function EditorialCategoryLayout({
 
             <div className="min-w-0">
               {filters.q || activeFilterCount > 0 || page > 1 ? (
-                <div className="border border-ink/10 bg-white p-5 sm:p-6">
-                  <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
+                <div className="rounded-2xl border border-ink/10 bg-white p-5 sm:p-6 shadow-xs">
+                  <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
                     {filters.q ? 'Search results' : 'Articles'}
-                  </p>
-                  <h2 className="mt-2 font-display text-2xl font-bold text-ink sm:text-3xl">
+                  </span>
+                  <h2 className="mt-2.5 font-display text-2xl font-bold text-ink sm:text-3xl">
                     {filters.q
                       ? `${total} result${total === 1 ? '' : 's'} for "${filters.q}"`
                       : `${total} article${total === 1 ? '' : 's'}`}
@@ -201,8 +201,14 @@ export default function EditorialCategoryLayout({
               ) : null}
 
               {posts.length === 0 ? (
-                <div className="mt-8 border border-dashed border-ink/15 bg-white px-6 py-16 text-center text-ink/55">
-                  {filters.q ? config.emptySearchMessage : config.emptyDefaultMessage}
+                <div className="mt-8 rounded-2xl border border-dashed border-ink/20 bg-white px-6 py-16 text-center shadow-2xs">
+                  <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary/10 font-display text-xl font-bold text-primary">
+                    ?
+                  </div>
+                  <h3 className="mt-4 font-display text-xl font-bold text-ink">No articles found</h3>
+                  <p className="mt-2 text-sm text-ink/60">
+                    {filters.q ? config.emptySearchMessage : config.emptyDefaultMessage}
+                  </p>
                 </div>
               ) : (
                 <>
@@ -211,18 +217,18 @@ export default function EditorialCategoryLayout({
                   ) : null}
 
                   {spotlight.length > 0 ? (
-                    <section className="mt-8" data-testid="editorial-category-spotlight">
-                      <div className="flex flex-wrap items-end justify-between gap-3">
+                    <section className="mt-10" data-testid="editorial-category-spotlight">
+                      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-ink/10 pb-4">
                         <div>
-                          <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
+                          <span className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
                             {config.spotlightEyebrow}
-                          </p>
-                          <h2 className="mt-2 font-display text-xl font-bold text-ink sm:text-2xl">
+                          </span>
+                          <h2 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">
                             {config.spotlightTitle}
                           </h2>
                         </div>
                       </div>
-                      <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                      <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
                         {spotlight.map((post) => (
                           <EditorialSpotlightCard key={post.id} post={post} cardLabel={config.cardLabel} />
                         ))}
@@ -232,25 +238,25 @@ export default function EditorialCategoryLayout({
 
                   {gridPosts.length > 0 ? (
                     <section
-                      className={featured || spotlight.length > 0 ? 'mt-10' : ''}
+                      className={featured || spotlight.length > 0 ? 'mt-12' : ''}
                       data-testid="editorial-category-grid"
                     >
                       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-ink/10 pb-4">
                         <div>
-                          <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
+                          <span className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
                             {showEditorialLead ? 'More to read' : 'All articles'}
-                          </p>
-                          <h2 className="mt-2 font-display text-xl font-bold text-ink sm:text-2xl">
+                          </span>
+                          <h2 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">
                             {showEditorialLead ? config.gridArchiveTitle : `${total} article${total === 1 ? '' : 's'}`}
                           </h2>
                         </div>
                         {!showEditorialLead ? (
-                          <p className="text-sm text-ink/55">
+                          <span className="rounded-full bg-slate-200/60 px-3 py-1 text-xs font-semibold text-ink/60">
                             Page {page} of {pageCount}
-                          </p>
+                          </span>
                         ) : null}
                       </div>
-                      <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                      <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                         {gridPosts.map((post) => (
                           <EditorialGridCard key={post.id} post={post} cardLabel={config.cardLabel} />
                         ))}
@@ -262,27 +268,27 @@ export default function EditorialCategoryLayout({
 
               {pageCount > 1 ? (
                 <nav
-                  className="mt-12 flex flex-wrap items-center justify-center gap-3 text-sm"
+                  className="mt-12 flex flex-wrap items-center justify-center gap-4 rounded-2xl border border-ink/10 bg-white p-5 shadow-2xs"
                   data-testid="pagination"
                   aria-label="Article pagination"
                 >
                   {page > 1 ? (
                     <Link
                       href={`${action}${articlePageQuery(filters, page - 1)}`}
-                      className="inline-flex min-h-11 items-center justify-center border border-ink/15 px-6 py-3 text-sm font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-primary hover:text-primary"
+                      className="inline-flex min-h-11 items-center justify-center rounded-xl border border-ink/15 bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-primary hover:bg-primary/5 hover:text-primary shadow-2xs"
                     >
-                      Previous
+                      ← Previous
                     </Link>
                   ) : null}
-                  <span className="text-ink/55">
-                    Page {page} of {pageCount}
+                  <span className="text-sm font-semibold text-ink/65">
+                    Page <strong className="font-bold text-ink">{page}</strong> of {pageCount}
                   </span>
                   {page < pageCount ? (
                     <Link
                       href={`${action}${articlePageQuery(filters, page + 1)}`}
-                      className="inline-flex min-h-11 items-center justify-center bg-ink px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white transition hover:bg-primary"
+                      className="inline-flex min-h-11 items-center justify-center rounded-xl bg-ink px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-2xs transition hover:bg-primary"
                     >
-                      Next
+                      Next →
                     </Link>
                   ) : null}
                 </nav>
