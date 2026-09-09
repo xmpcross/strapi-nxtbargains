@@ -23,11 +23,10 @@ import {
 } from '@/lib/commerce';
 import AutoCarousel from '@/components/AutoCarousel';
 import Hero from '@/components/Hero';
-import MarketplaceBestSellers from '@/components/MarketplaceBestSellers';
 import BestSellerCard from '@/components/BestSellerCard';
 import { listCouponPageData } from '@/lib/coupon-data';
 import HomepageCouponsSection from '@/components/HomepageCouponsSection';
-import { listAmazonNewReleases, listBestSellerGroups } from '@/lib/best-sellers';
+import { listAmazonNewReleases } from '@/lib/best-sellers';
 import { productHref } from '@/lib/product-url';
 
 export const revalidate = 60;
@@ -138,8 +137,6 @@ export default async function HomePage() {
   }
   const trending = products.slice(0, 6);
 
-  // Best Sellers — one daily JSON cache per marketplace (scripts/fetch-*.mjs).
-  const bestSellerGroups = listBestSellerGroups({ includeEmpty: true });
   const newReleases = listAmazonNewReleases();
 
   const guideFeature = posts[0];
@@ -187,20 +184,6 @@ export default async function HomePage() {
                 ))}
               </AutoCarousel>
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* ---------- BEST SELLERS ---------- */}
-      {bestSellerGroups.length > 0 && (
-        <section className="pt-[30px] pb-14 sm:pb-[72px]" data-testid="home-best-sellers">
-          <div className="mx-auto max-w-[1366px] px-6">
-            <MarketplaceBestSellers
-              groups={bestSellerGroups}
-              eyebrow="Top picks"
-              title="Best Sellers"
-              intro="The top-ranked products across the major marketplaces, refreshed daily."
-            />
           </div>
         </section>
       )}
