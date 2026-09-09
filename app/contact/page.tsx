@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const channels = [
-  { ic: '✉', t: 'Email', s: 'hello@nxt.bargains', href: 'mailto:hello@nxt.bargains' },
+  { ic: '✉', t: 'Email', s: 'contact@nxt.bargains', href: 'mailto:contact@nxt.bargains' },
   { ic: '𝕏', t: 'On X', s: '@nxtbargains', href: SITE.social.twitter },
   { ic: 'f', t: 'On Facebook', s: '/nxtbargains', href: SITE.social.facebook },
 ];
@@ -60,7 +60,7 @@ export default function ContactPage() {
               <p className="mb-[22px] text-[0.9rem] leading-[1.55] text-ink/55">
                 Fill in the form and we&apos;ll get back to you by email, usually within a couple of working
                 days. Prefer to write to us directly?{' '}
-                <a href="mailto:hello@nxt.bargains" className="font-semibold text-primary hover:underline">hello@nxt.bargains</a>
+                <a href="mailto:contact@nxt.bargains" className="font-semibold text-primary hover:underline">contact@nxt.bargains</a>
               </p>
               <ContactForm />
             </div>
