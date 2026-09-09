@@ -277,6 +277,46 @@ export function getEditorialCategoryConfig(slug: string): EditorialCategoryConfi
   return EXTENDED_EDITORIAL_CATEGORY_CONFIG[slug] ?? EDITORIAL_CATEGORY_CONFIG[slug as SectionKey] ?? null;
 }
 
+export function buildDefaultCategoryConfig(
+  slug: string,
+  name: string,
+  description?: string | null,
+): EditorialCategoryConfig {
+  const existing = getEditorialCategoryConfig(slug);
+  if (existing) return existing;
+
+  return {
+    slug,
+    breadcrumbLabel: name,
+    eyebrow: `Editorial · ${name}`,
+    heroGradient:
+      'radial-gradient(at 80% 18%, rgba(0,70,190,0.35) 0%, transparent 52%), radial-gradient(at 16% 84%, rgba(16,185,129,0.18) 0%, transparent 48%)',
+    accentColor: '#8ec5ff',
+    bullets: [
+      `Expert analysis, in-depth breakdowns, and practical advice on ${name.toLowerCase()}.`,
+      'Hands-on specs, comparison insights, and real-world buyer advice.',
+      'Updated coverage to help you decide faster before checking live deals.',
+    ],
+    primaryCta: { href: '/best-deals', label: 'Best deals' },
+    secondaryCta: { href: '/all-products', label: 'Compare products' },
+    glanceDescription:
+      description ||
+      `Comprehensive product guides, reviews, and article coverage on ${name} from the NXT.Bargains editorial team.`,
+    focusLabel: name,
+    topicChips: ['Guides', 'Reviews', 'Comparisons', 'Top Picks', 'Deals'],
+    featuredLabel: 'Featured article',
+    spotlightEyebrow: `Latest ${name} articles`,
+    spotlightTitle: `Fresh coverage in ${name}`,
+    gridArchiveTitle: `Browse all ${name} articles`,
+    cardLabel: name,
+    searchPlaceholder: `Search ${name.toLowerCase()}...`,
+    emptySearchMessage: `No ${name.toLowerCase()} articles match your search.`,
+    emptyDefaultMessage: `No articles in ${name} yet.`,
+    hidePostType: false,
+  };
+}
+
 export function isEditorialCategory(slug: string): slug is SectionKey {
   return slug in EDITORIAL_CATEGORY_CONFIG || slug in EXTENDED_EDITORIAL_CATEGORY_CONFIG;
 }
+

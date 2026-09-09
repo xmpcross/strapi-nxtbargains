@@ -306,15 +306,18 @@ function EditorialFeatureArticle({
   const href = postPath(post);
 
   return (
-    <article className="group overflow-hidden border border-ink/10 bg-white" data-testid={`editorial-feature-${post.slug}`}>
+    <article
+      className="group overflow-hidden rounded-3xl border border-ink/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl"
+      data-testid={`editorial-feature-${post.slug}`}
+    >
       <div className="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-stretch">
-        <Link href={href} className="editorial-feature-image-box block bg-white">
+        <Link href={href} className="editorial-feature-image-box relative block overflow-hidden bg-[#f8fafc] p-6 lg:p-8">
           {img ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={img}
               alt={post.coverImage?.alternativeText || post.title}
-              className="editorial-feature-image aspect-[16/10] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.02] lg:aspect-auto lg:h-full lg:min-h-[320px]"
+              className="editorial-feature-image aspect-[16/10] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-105 lg:aspect-auto lg:h-full lg:min-h-[320px]"
             />
           ) : (
             <div className="grid aspect-[16/10] w-full place-items-center bg-[#f3f6fa] font-display text-3xl font-bold text-ink/15 lg:min-h-[320px]">
@@ -323,31 +326,33 @@ function EditorialFeatureArticle({
           )}
         </Link>
 
-        <div className="flex flex-col justify-center p-6 sm:p-8">
-          <p className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-primary">{featuredLabel}</p>
+        <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+          <span className="w-fit rounded-full bg-primary/10 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-primary">
+            {featuredLabel}
+          </span>
           <Link href={href}>
-            <h2 className="editorial-feature-title mt-3 font-display text-2xl font-bold leading-tight text-ink transition group-hover:text-primary sm:text-3xl">
+            <h2 className="editorial-feature-title mt-3 font-display text-2xl font-bold leading-tight text-ink transition-colors group-hover:text-primary sm:text-3xl lg:text-3xl">
               {post.title}
             </h2>
           </Link>
           {post.excerpt ? (
-            <p className="mt-4 line-clamp-4 text-sm leading-7 text-ink/70 sm:text-base">{post.excerpt}</p>
+            <p className="mt-4 line-clamp-3 text-sm leading-7 text-ink/70 sm:text-base">{post.excerpt}</p>
           ) : null}
-          <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-ink/55">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent font-display text-sm font-bold text-ink">
+          <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-ink/55">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary font-display text-xs font-bold text-white">
               N
             </span>
-            <span>{SITE.name} Editorial</span>
+            <span className="font-semibold text-ink/80">{SITE.name} Editorial</span>
             <span className="text-ink/30">|</span>
             <span>{fmtDate(post.publishedAt)}</span>
             <span className="text-ink/30">|</span>
-            <span>{readMinutes(post)} min read</span>
+            <span className="font-medium text-primary">{readMinutes(post)} min read</span>
           </div>
           <Link
             href={href}
-            className="mt-6 inline-flex w-fit min-h-10 items-center justify-center bg-ink px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary"
+            className="mt-6 inline-flex w-fit min-h-11 items-center justify-center rounded-xl bg-ink px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-primary"
           >
-            Read article
+            Read full article →
           </Link>
         </div>
       </div>
@@ -358,40 +363,44 @@ function EditorialFeatureArticle({
 function EditorialSpotlightCard({ post, cardLabel }: { post: NxtPost; cardLabel: string }) {
   const img = postImage(post);
   const href = postPath(post);
+  const cat = post.categories?.[0]?.name ?? cardLabel;
 
   return (
     <article
-      className="group flex h-full flex-col border border-ink/10 bg-white transition hover:-translate-y-0.5 hover:shadow-[0_18px_32px_-24px_rgba(3,3,3,0.35)]"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
       data-testid={`editorial-spotlight-${post.slug}`}
     >
-      <Link href={href} className="editorial-spotlight-image-box block bg-white">
+      <Link href={href} className="editorial-spotlight-image-box relative block aspect-[16/10] w-full overflow-hidden rounded-xl bg-[#f8fafc]">
         {img ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={img}
             alt={post.coverImage?.alternativeText || post.title}
             loading="lazy"
-              className="editorial-spotlight-image aspect-[16/10] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.03]"
+            className="editorial-spotlight-image h-full w-full object-contain p-3 transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="grid aspect-[16/10] w-full place-items-center bg-[#f3f6fa] font-display text-xl font-bold text-ink/15">
+          <div className="grid h-full w-full place-items-center bg-[#f3f6fa] font-display text-xl font-bold text-ink/15">
             NXT
           </div>
         )}
+        <span className="absolute top-3 left-3 rounded-md bg-primary px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-white shadow-xs">
+          {cat}
+        </span>
       </Link>
-      <div className="flex flex-1 flex-col p-5">
-        <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-primary">{cardLabel}</p>
+      <div className="flex flex-1 flex-col pt-4">
         <Link href={href}>
-          <h3 className="editorial-spotlight-title mt-2 line-clamp-3 font-display font-bold leading-snug text-ink transition group-hover:text-primary">
+          <h3 className="editorial-spotlight-title line-clamp-2 font-display text-lg font-bold leading-snug text-ink transition-colors group-hover:text-primary">
             {post.title}
           </h3>
         </Link>
         {post.excerpt ? (
-          <p className="mt-3 line-clamp-3 flex-1 text-sm leading-6 text-ink/65">{post.excerpt}</p>
+          <p className="mt-2.5 line-clamp-3 flex-1 text-xs leading-6 text-ink/70">{post.excerpt}</p>
         ) : null}
-        <p className="mt-4 text-xs text-ink/45">
-          {fmtDate(post.publishedAt)} · {readMinutes(post)} min
-        </p>
+        <div className="mt-4 flex items-center justify-between border-t border-ink/5 pt-3 text-xs text-ink/50">
+          <span>{fmtDate(post.publishedAt)}</span>
+          <span className="font-semibold text-primary">{readMinutes(post)} min read</span>
+        </div>
       </div>
     </article>
   );
@@ -400,38 +409,46 @@ function EditorialSpotlightCard({ post, cardLabel }: { post: NxtPost; cardLabel:
 function EditorialGridCard({ post, cardLabel }: { post: NxtPost; cardLabel: string }) {
   const img = postImage(post);
   const href = postPath(post);
+  const cat = post.categories?.[0]?.name ?? cardLabel;
 
   return (
-    <article className="group flex h-full flex-col" data-testid={`editorial-grid-${post.slug}`}>
-      <Link href={href} className="editorial-grid-image-box block overflow-hidden rounded-2xl bg-white">
+    <article
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white p-4 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
+      data-testid={`editorial-grid-${post.slug}`}
+    >
+      <Link href={href} className="editorial-grid-image-box relative block aspect-[4/3] w-full overflow-hidden rounded-xl bg-[#f8fafc]">
         {img ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={img}
             alt={post.coverImage?.alternativeText || post.title}
             loading="lazy"
-              className="editorial-grid-image aspect-[4/3] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.02]"
+            className="editorial-grid-image h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="grid aspect-[4/3] w-full place-items-center bg-[#f3f6fa] font-display text-lg font-bold text-ink/15">
+          <div className="grid h-full w-full place-items-center bg-[#f3f6fa] font-display text-lg font-bold text-ink/15">
             NXT
           </div>
         )}
+        <span className="absolute top-2.5 left-2.5 rounded-md bg-ink/80 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-white backdrop-blur-xs">
+          {cat}
+        </span>
       </Link>
       <div className="mt-4 flex flex-1 flex-col">
-        <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-primary">{cardLabel}</p>
         <Link href={href}>
-          <h3 className="editorial-grid-title mt-2 line-clamp-2 font-display font-bold leading-snug text-ink transition group-hover:text-primary">
+          <h3 className="editorial-grid-title line-clamp-2 font-display text-base font-bold leading-snug text-ink transition-colors group-hover:text-primary">
             {post.title}
           </h3>
         </Link>
         {post.excerpt ? (
-          <p className="mt-2 line-clamp-2 flex-1 text-sm leading-6 text-ink/65">{post.excerpt}</p>
+          <p className="mt-2 line-clamp-2 flex-1 text-xs leading-5 text-ink/65">{post.excerpt}</p>
         ) : null}
-        <p className="mt-3 text-xs text-ink/45">
-          {fmtDate(post.publishedAt)} · {readMinutes(post)} min
-        </p>
+        <div className="mt-4 flex items-center justify-between border-t border-ink/5 pt-3 text-[0.7rem] text-ink/45">
+          <span>{fmtDate(post.publishedAt)}</span>
+          <span className="font-semibold text-primary">{readMinutes(post)} min read</span>
+        </div>
       </div>
     </article>
   );
 }
+
