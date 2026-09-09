@@ -14,15 +14,33 @@ import {
 } from '@/lib/product-filters';
 import {
   getCommerceCategory,
-  listCommerceCategories,
   listCommerceCategoriesForSite,
   listCommerceProducts,
 } from '@/lib/strapi';
 import { categoryDescriptionSummary, categoryDescriptionTeaser } from '@/lib/category-descriptions';
 import { pageOpenGraph } from '@/lib/seo';
 
-export const revalidate = 300;
-export const dynamicParams = true;
+/*
+ * Dynamic, not ISR, because this page reads searchParams — the filter rail,
+ * the sort and the pager all come off the query string.
+ *
+ * With `revalidate` instead, any slug that generateStaticParams had not already
+ * prerendered took the on-demand ISR path, and ISR generation renders without
+ * searchParams: reading them threw DYNAMIC_SERVER_USAGE and the request 500'd.
+ * That was survivable only while every category happened to be in the
+ * prerendered list — an unknown slug always 500'd instead of 404ing. It stopped
+ * being survivable when the catalogue was emptied: listCommerceCategories scopes
+ * categories by the products inside them, so with no products it returns [],
+ * nothing prerendered, and every category page took the failing path.
+ *
+ * /all-products reads searchParams too and never had this problem — it has no
+ * generateStaticParams, so Next marks it dynamic at build.
+ *
+ * The revalidate window was buying less than it appeared to: the product fetch
+ * here returns ~3.7MB, over Next's 2MB data-cache limit, so it was already
+ * re-issued on every render ("items over 2MB can not be cached" in the log).
+ */
+export const dynamic = 'force-dynamic';
 
 /** Six rows of three in the three-column grid. */
 const PAGE_SIZE = 18;
@@ -39,10 +57,16 @@ type SearchParams = {
   sort?: string;
 };
 
-export async function generateStaticParams() {
-  const categories = await listCommerceCategories().catch(() => []);
-  return categories.map((category) => ({ slug: category.slug }));
-}
+/*
+ * No generateStaticParams. It has to go for `dynamic = 'force-dynamic'` above to
+ * mean anything — with it present Next still built this route as SSG (`●` in the
+ * build output) and kept sending unprerendered slugs down the ISR path that
+ * cannot read searchParams.
+ *
+ * Nothing is lost: prerendering only ever covered slugs known at build time, and
+ * a page whose contents depend on the query string cannot be served from a
+ * prerender anyway.
+ */
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
