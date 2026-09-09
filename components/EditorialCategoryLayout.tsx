@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import ArticleFiltersSidebar from '@/components/ArticleFiltersSidebar';
 import { articlePageQuery, type ArticleFilters } from '@/lib/article-filters';
@@ -25,6 +28,50 @@ function postImage(post: NxtPost): string | null {
 
 function readMinutes(post: NxtPost): number {
   return post.readingTimeMinutes ?? 5;
+}
+
+function CategoryHeroDescription({ text }: { text: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  if (!text) return null;
+
+  const words = text.trim().split(/\s+/);
+  if (words.length <= 20) {
+    return (
+      <p className="mt-4 w-full text-base leading-7 text-ink/75 sm:text-lg sm:leading-8">
+        {text}
+      </p>
+    );
+  }
+
+  const first20 = words.slice(0, 20).join(' ');
+
+  return (
+    <p className="mt-4 w-full text-base leading-7 text-ink/75 sm:text-lg sm:leading-8">
+      {isExpanded ? (
+        <>
+          {text}{' '}
+          <button
+            type="button"
+            onClick={() => setIsExpanded(false)}
+            className="inline-flex items-center font-bold text-primary transition hover:underline cursor-pointer"
+          >
+            Show Less <span aria-hidden="true" className="ml-1">↑</span>
+          </button>
+        </>
+      ) : (
+        <>
+          {first20}…{' '}
+          <button
+            type="button"
+            onClick={() => setIsExpanded(true)}
+            className="inline-flex items-center font-bold text-primary transition hover:underline cursor-pointer"
+          >
+            Read More <span aria-hidden="true" className="ml-1">↓</span>
+          </button>
+        </>
+      )}
+    </p>
+  );
 }
 
 export default function EditorialCategoryLayout({
@@ -75,15 +122,7 @@ export default function EditorialCategoryLayout({
             <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl lg:text-[2.65rem]">
               {categoryName}
             </h1>
-            <p className="mt-4 w-full text-base leading-7 text-ink/75 sm:text-lg sm:leading-8">
-              {config.glanceDescription ?? categoryBlurb}{' '}
-              <a
-                href="#editorial-category-articles"
-                className="inline-flex items-center font-bold text-primary transition hover:underline"
-              >
-                Read More <span aria-hidden="true" className="ml-1">↓</span>
-              </a>
-            </p>
+            <CategoryHeroDescription text={config.glanceDescription ?? categoryBlurb ?? ''} />
 
             {(() => {
               const quickLinks = config.quickLinks ?? config.marketplaceLinks;
