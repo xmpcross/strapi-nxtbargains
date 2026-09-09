@@ -1987,16 +1987,36 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
   color: #475569;
 }
 
-.category-card-image-box { background: #f8fafc; border-radius: 8px; }
+/* Category listing image.
 
-/* Category listing image. Every tile is the same 1/1 frame whatever the source
-   file is; `contain` fits the whole product inside it rather than cropping to
-   fill, so a photo that is not square letterboxes against the tile background
-   instead of losing its edges. */
-.category-card-image {
-  width: 100%;
+   The frame is a 1/1 square whatever the source file is, and `contain` fits the
+   whole product inside it rather than cropping to fill, so a photo that is not
+   square letterboxes against the tile background instead of losing its edges.
+
+   The image is inset to 82% of that square rather than filling it, which is
+   what makes the spacing even. At 100% a wide photo touches the left and right
+   edges while a tall one touches top and bottom, so products appeared to sit in
+   differently sized frames even though the frames were identical. Insetting
+   leaves a 9% margin on all four sides no matter the aspect ratio, and the grid
+   centring holds the product in the middle of it.
+
+   82% matches .uniform-product-image, used by the home price-drop and trending
+   carousels, so a product looks the same size wherever it appears. */
+.category-card-image-box {
+  background: #f8fafc;
+  border-radius: 8px;
   aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+}
+
+.category-card-image {
+  block-size: 82%;
+  inline-size: 82%;
+  max-block-size: 82%;
+  max-inline-size: 82%;
   object-fit: contain;
+  object-position: center;
   display: block;
 }
 
