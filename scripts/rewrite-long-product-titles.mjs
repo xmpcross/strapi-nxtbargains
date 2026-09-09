@@ -1,23 +1,22 @@
 #!/usr/bin/env node
 /**
- * SEO Product Title, Meta Title & Slug Rewriter for nxt.bargains
+ * Long Product Title Rewriter (>15 words) for nxt.bargains
  *
- * Location: /opt/projects/nxt.bargains/scripts/rewrite-product-titles.mjs
+ * Location: /opt/projects/nxt.bargains/scripts/rewrite-long-product-titles.mjs
  *
  * Features:
- * - Prompts interactively for product category selection (or accepts --category CLI flag).
- * - Rewrites raw product titles into clean, concise, human-readable titles.
+ * - Scans Strapi commerce products specifically targeting titles containing 15 or more words.
+ * - Rewrites oversized product titles into clean, concise titles strictly under 15 words (< 15 words).
  * - Generates high-converting, SEO-optimized Meta Titles (for search engines).
  * - Generates clean, lowercased, hyphenated URL slugs.
- * - Detects already-rewritten product titles and automatically skips them (unless --force / --overwrite is used).
  * - Supports AI optimization via Anthropic Claude API (with intelligent rule-based fallback).
  * - Offers CLI flags: --dry-run, --limit, --slugs, --category, --force/--overwrite.
  *
  * Usage:
- *   node scripts/rewrite-product-titles.mjs                             # Interactive category selection
- *   node scripts/rewrite-product-titles.mjs --category headphones        # Target specific category
- *   node scripts/rewrite-product-titles.mjs --dry-run --limit 10        # Preview mode
- *   node scripts/rewrite-product-titles.mjs --slugs google-pixel-10-... # Target specific product
+ *   node scripts/rewrite-long-product-titles.mjs                             # Interactive category selection
+ *   node scripts/rewrite-long-product-titles.mjs --category headphones        # Target specific category
+ *   node scripts/rewrite-long-product-titles.mjs --dry-run --limit 10        # Preview mode
+ *   node scripts/rewrite-long-product-titles.mjs --slugs google-pixel-10-... # Target specific product
  */
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -65,11 +64,11 @@ const TARGET_SLUGS = getArgVal('--slugs') ? getArgVal('--slugs').split(',').map(
 let TARGET_CATEGORY = getArgVal('--category');
 
 console.log('---------------------------------------------------------');
-console.log('  NXT.Bargains — SEO Product Title Rewriter & Slug Manager');
+console.log('  NXT.Bargains — Long Product Title Rewriter (>=15 Words)');
 console.log('---------------------------------------------------------');
 console.log(` Mode:           ${DRY_RUN ? 'DRY-RUN (no updates will be saved)' : 'LIVE WRITE'}`);
-console.log(` Force Overwrite:${FORCE ? ' YES (--force active)' : ' NO (skipping already rewritten)'}`);
-console.log(` Limit:          ${LIMIT} products`);
+console.log(` Target Filter:  Titles containing 15 or more words`);
+console.log(` Limit:          ${LIMIT} matching products`);
 if (TARGET_SLUGS) console.log(` Target Slugs:   ${TARGET_SLUGS.join(', ')}`);
 console.log('---------------------------------------------------------\n');
 
@@ -158,29 +157,6 @@ function enforceMaxWords(text, maxWords = 14) {
     return title;
   }
   return text.trim();
-}
-
-function isAlreadyRewritten(product) {
-  if (FORCE) return false;
-
-  const specs = product.specs || {};
-
-  // Check 1: Explicit flag set by this script or CMS
-  if (specs.titleRewritten === true || specs.isTitleRewritten === true) {
-    return true;
-  }
-
-  // Check 2: Presence of custom metaTitle in specs & clean product name (< 15 words)
-  if (specs.metaTitle && typeof specs.metaTitle === 'string' && specs.metaTitle.length > 10) {
-    const name = product.name || '';
-    const wordCount = name.trim().split(/\s+/).filter(Boolean).length;
-    const hasRawNoise = /(?:\bUPC\b|\bASIN\b|\bB0[A-Z0-9]{8}\b|\|\s*Free|\[NEW\]|\bOFFICIAL STORE\b)/i.test(name);
-    if (!hasRawNoise && name.length <= 80 && wordCount < 15) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 // 6. Algorithmic Fallback & Slugifier
@@ -290,7 +266,7 @@ Return ONLY strict valid JSON with no markdown formatting:
   return cleanTitleAlgorithmic(rawName, brand);
 }
 
-// 8. Fetch Products from Strapi
+// 8. Fetch Products from Strapi (Targeting titles >= 15 words)
 async function getProductsToProcess() {
   const base = '/api/commerce-products';
   const out = [];
@@ -299,26 +275,47 @@ async function getProductsToProcess() {
     for (const slug of TARGET_SLUGS) {
       const q = `?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[categories][fields][0]=name&populate[brandRef][fields][0]=name&pagination[pageSize]=1`;
       const res = await strapiApi(`${base}${q}`);
-      if (res.data?.[0]) out.push(res.data[0]);
-      else console.warn(`⚠️  No product found for target slug "${slug}"`);
+      if (res.data?.[0]) {
+        const p = res.data[0];
+        const wordCount = (p.name || '').trim().split(/\s+/).filter(Boolean).length;
+        if (wordCount >= 15) {
+          out.push(p);
+        } else {
+          console.log(`ℹ️  Target product "${slug}" has ${wordCount} words (< 15 words). Skipping.`);
+        }
+      } else {
+        console.warn(`⚠️  No product found for target slug "${slug}"`);
+      }
     }
     return out;
   }
 
   let page = 1;
   const pageSize = 50;
+  let scannedTotal = 0;
+
   while (out.length < LIMIT) {
     const catFilter = (TARGET_CATEGORY && TARGET_CATEGORY !== 'all') ? `filters[categories][slug][$eq]=${encodeURIComponent(TARGET_CATEGORY)}&` : '';
     const q = `?${catFilter}populate[categories][fields][0]=name&populate[brandRef][fields][0]=name&pagination[page]=${page}&pagination[pageSize]=${pageSize}&sort[0]=updatedAt:desc`;
     const res = await strapiApi(`${base}${q}`);
     const rows = res.data || [];
-    out.push(...rows);
+    scannedTotal += rows.length;
+
+    for (const p of rows) {
+      const wordCount = (p.name || '').trim().split(/\s+/).filter(Boolean).length;
+      if (wordCount >= 15) {
+        out.push(p);
+        if (out.length >= LIMIT) break;
+      }
+    }
+
     const pageCount = res.meta?.pagination?.pageCount || 1;
     if (page >= pageCount || rows.length === 0) break;
     page += 1;
   }
 
-  return out.slice(0, LIMIT);
+  console.log(`Scanned ${scannedTotal} products across ${page} page(s). Found ${out.length} product(s) with titles >= 15 words.\n`);
+  return out;
 }
 
 // 9. Main Execution Loop
@@ -333,9 +330,7 @@ async function main() {
 
   console.log('Fetching products from Strapi...');
   const products = await getProductsToProcess();
-  console.log(`Found ${products.length} products to check.\n`);
 
-  let skippedCount = 0;
   let rewrittenCount = 0;
   let errorCount = 0;
 
@@ -344,21 +339,16 @@ async function main() {
     const docId = p.documentId || p.id;
     const currentName = p.name || '';
     const currentSlug = p.slug || '';
+    const wordCount = currentName.trim().split(/\s+/).filter(Boolean).length;
 
     console.log(`[${i + 1}/${products.length}] Product ID: ${docId} ("${currentSlug}")`);
-
-    if (isAlreadyRewritten(p)) {
-      console.log(`  ➔ ⏭️  [SKIP] Title already rewritten: "${currentName.slice(0, 60)}..."\n`);
-      skippedCount++;
-      continue;
-    }
-
-    console.log(`  ➔ ✏️  Raw Title:  "${currentName}"`);
+    console.log(`  ➔ ✏️  Long Title (${wordCount} words): "${currentName}"`);
 
     try {
       const rewritten = await rewriteTitleWithAI(p);
+      const newWordCount = rewritten.name.trim().split(/\s+/).filter(Boolean).length;
 
-      console.log(`  ➔ ✨ New Title:  "${rewritten.name}"`);
+      console.log(`  ➔ ✨ New Title (${newWordCount} words): "${rewritten.name}"`);
       console.log(`  ➔ 🔍 Meta Title: "${rewritten.metaTitle}"`);
       console.log(`  ➔ 🔗 New Slug:   "${rewritten.slug}"`);
 
@@ -403,7 +393,6 @@ async function main() {
   console.log('---------------------------------------------------------');
   console.log(' Execution Summary:');
   console.log(`   Rewritten: ${rewrittenCount}`);
-  console.log(`   Skipped:   ${skippedCount}`);
   console.log(`   Errors:    ${errorCount}`);
   console.log('---------------------------------------------------------');
 }

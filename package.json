@@ -9,6 +9,7 @@
     "start": "next start -p 3001",
     "lint": "next lint",
     "rewrite-product-titles": "node scripts/rewrite-product-titles.mjs",
+    "rewrite-long-product-titles": "node scripts/rewrite-long-product-titles.mjs",
     "enrich-product-descriptions": "node scripts/enrich-product-descriptions.mjs"
   },
   "dependencies": {
