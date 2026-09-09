@@ -135,7 +135,8 @@ export default async function HomePage() {
   if (priceDrops.length < 3) {
     priceDrops = deals.slice(0, 10);
   }
-  const trending = products.slice(0, 6);
+  // Ten: two full rows of five, matching the grid below.
+  const trending = products.slice(0, 10);
 
   const newReleases = listAmazonNewReleases();
 
@@ -212,7 +213,10 @@ export default async function HomePage() {
         <section className="pb-14 sm:pb-[72px]" data-testid="home-trending">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead eyebrow="Most compared" title="Trending products" intro="Popular picks shoppers are comparing across Amazon, eBay and more." cta={{ href: '/all-products', label: 'Browse all' }} />
-            <div className="mt-9 grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-6">
+            {/* Five across on desktop. The card carries a title, a price range
+                and three merchant tiles, so at six per row the tiles were too
+                narrow for a merchant name to read. */}
+            <div className="mt-9 grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-5">
               {trending.map((p) => <TrendingCard key={p.id} product={p} />)}
             </div>
           </div>
