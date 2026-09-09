@@ -119,12 +119,13 @@ export const ARTICLE_SIDEBAR_CATEGORIES: ArticleCategoryNavItem[] = BLOG_NAV_LIN
   title: link.href === '/nxt-bargains-informative-articles' ? 'Informative' : link.label,
 }));
 
-/** Hero descriptions for article categories outside SECTIONS. */
 export const ARTICLE_CATEGORY_BLURBS: Record<string, string> = {
+  'smart-home':
+    'Upgrade your living space with NXT.Bargains smart home coverage, featuring in-depth setup guides, device reviews, and ecosystem compatibility breakdowns. We evaluate smart security cameras, connected lighting, automated thermostats, and voice control hubs to help you build a seamless, reliable home automation system. Our editorial team tests inter-device interoperability, privacy settings, and real-world response times so you invest only in gear that genuinely adds convenience. Explore our latest smart home guides and product roundups below to discover top-rated devices and track live price drops.',
   'best-sellers-articles':
-    'Follow what shoppers are buying most across Amazon, eBay, Newegg, Walmart, Target, and Best Buy. Our Best Sellers articles spotlight top-ranked products from each marketplace, explain why they are trending, and help you compare live prices before you buy.',
+    'Stay ahead of shopping trends with NXT.Bargains best-seller guides, tracking top-ranking consumer electronics across Amazon, Best Buy, Walmart, Target, and eBay. We analyze why products ascend marketplace charts, who they suit best, and whether their popularity reflects genuine quality or temporary hype. Each guide links back to live price tracking and deal alerts so you never pay full price for trending gear. Browse our best-seller coverage below to shop popular items with confidence.',
   'buying-guides':
-    'Make confident purchase decisions with NXT.Bargains buying guides — budget tiers, spec checklists, and practical advice for phones, laptops, audio, tablets, smart home gear, and more before you compare live prices.',
+    'Shorten your tech research phase with practical buying guides from NXT.Bargains, designed to help you navigate crowded tech markets with confidence. We outline realistic budget tiers, essential feature checklists, and crucial trade-offs across laptops, phones, audio gear, and smart home devices. Our frameworks guide you toward the ideal model for your specific workflow without overspending on unnecessary extras. Explore our full library of buying guides below to make a smarter purchasing decision.',
 };
 
 export function resolveArticleCategoryBlurb(

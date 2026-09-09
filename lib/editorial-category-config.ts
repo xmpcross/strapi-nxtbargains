@@ -35,7 +35,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Product comparisons',
     eyebrow: 'Editorial · Comparisons',
     heroGradient:
-      'linear-gradient(135deg, #eef5ff 0%, #e0ecff 50%, #f4f8ff 100%)',
+      'linear-gradient(135deg, #f4f8ff 0%, #e9f2ff 50%, #f8fafc 100%)',
     accentColor: '#0046be',
     bullets: [],
     primaryCta: { href: '/all-products', label: 'Compare products' },
@@ -59,7 +59,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Product reviews',
     eyebrow: 'Editorial · Reviews',
     heroGradient:
-      'linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fffdf0 100%)',
+      'linear-gradient(135deg, #fffdf2 0%, #fef9c3 50%, #fffdfa 100%)',
     accentColor: '#d97706',
     bullets: [],
     primaryCta: { href: '/all-products', label: 'Shop compared' },
@@ -83,7 +83,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Product roundups',
     eyebrow: 'Editorial · Roundups',
     heroGradient:
-      'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #f0fdf4 100%)',
+      'linear-gradient(135deg, #f0fdf4 0%, #e6f4ea 50%, #f8fafc 100%)',
     accentColor: '#059669',
     bullets: [],
     primaryCta: { href: '/best-deals', label: 'Best deals' },
@@ -107,7 +107,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'How-to guides',
     eyebrow: 'Editorial · How-to',
     heroGradient:
-      'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #faf5ff 100%)',
+      'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #faf8ff 100%)',
     accentColor: '#7c3aed',
     bullets: [],
     primaryCta: { href: '/all-products', label: 'Find products' },
@@ -131,7 +131,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Top-rated products',
     eyebrow: 'Editorial · Top rated',
     heroGradient:
-      'linear-gradient(135deg, #fefce8 0%, #fef08a 50%, #fffdf0 100%)',
+      'linear-gradient(135deg, #fffdf0 0%, #fef3c7 50%, #fffdf8 100%)',
     accentColor: '#b45309',
     bullets: [],
     primaryCta: { href: '/best-sellers', label: 'Best sellers' },
@@ -155,7 +155,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Informative articles',
     eyebrow: 'Editorial · Explainers',
     heroGradient:
-      'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f7ff 100%)',
+      'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%)',
     accentColor: '#0284c7',
     bullets: [],
     primaryCta: { href: '/product-reviews', label: 'Product reviews' },
@@ -177,12 +177,43 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
 };
 
 const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig> = {
+  'smart-home': {
+    slug: 'smart-home',
+    breadcrumbLabel: 'Smart home',
+    eyebrow: 'Editorial · Connected living',
+    heroGradient:
+      'linear-gradient(135deg, #f0fdf4 0%, #e6f4ea 50%, #f8fafc 100%)',
+    accentColor: '#059669',
+    bullets: [],
+    primaryCta: { href: '/product-reviews', label: 'Read reviews' },
+    secondaryCta: { href: '/how-to-guides', label: 'How-to guides' },
+    glanceDescription:
+      'Upgrade your living space with NXT.Bargains smart home coverage, featuring in-depth setup guides, device reviews, and ecosystem compatibility breakdowns. We evaluate smart security cameras, connected lighting, automated thermostats, and voice control hubs to help you build a seamless, reliable home automation system. Our editorial team tests inter-device interoperability, privacy settings, and real-world response times so you invest only in gear that genuinely adds convenience. Explore our latest smart home guides and product roundups below to discover top-rated devices and track live price drops.',
+    focusLabel: 'Smart home',
+    topicChips: ['Automation', 'Security', 'Lighting', 'Thermostats', 'Hubs', 'Ecosystems'],
+    quickLinks: [
+      { href: '/category/smart-security', label: 'Security' },
+      { href: '/category/smart-lighting', label: 'Lighting' },
+      { href: '/category/climate-comfort', label: 'Climate & Comfort' },
+      { href: '/how-to-guides', label: 'Setup Guides' },
+    ],
+    quickLinksLabel: 'Explore smart home topics',
+    featuredLabel: 'Featured guide',
+    spotlightEyebrow: 'Latest smart home reads',
+    spotlightTitle: 'Fresh coverage in smart home automation',
+    gridArchiveTitle: 'Browse every smart home article',
+    cardLabel: 'Smart home',
+    searchPlaceholder: 'Search smart home articles...',
+    emptySearchMessage: 'No smart home articles match your search.',
+    emptyDefaultMessage: 'No smart home articles here yet.',
+    hidePostType: true,
+  },
   'best-sellers-articles': {
     slug: 'best-sellers-articles',
     breadcrumbLabel: 'Best Sellers',
     eyebrow: 'Editorial · Marketplace picks',
     heroGradient:
-      'linear-gradient(135deg, #fffdf0 0%, #fef08a 50%, #fffbeb 100%)',
+      'linear-gradient(135deg, #fffdf0 0%, #fef3c7 50%, #fffdfa 100%)',
     accentColor: '#b45309',
     bullets: [],
     primaryCta: { href: '/best-sellers', label: 'Live best-seller lists' },
@@ -211,7 +242,7 @@ const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig
     breadcrumbLabel: 'Buying guides',
     eyebrow: 'Editorial · Buy smarter',
     heroGradient:
-      'linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #f0fdf9 100%)',
+      'linear-gradient(135deg, #f0fdfa 0%, #e6fffa 50%, #f8fafc 100%)',
     accentColor: '#0d9488',
     bullets: [],
     primaryCta: { href: '/product-comparisons', label: 'Compare products' },
@@ -258,7 +289,7 @@ export function buildDefaultCategoryConfig(
     breadcrumbLabel: name,
     eyebrow: `Editorial · ${name}`,
     heroGradient:
-      'linear-gradient(135deg, #eef5ff 0%, #e0ecff 50%, #f4f8ff 100%)',
+      'linear-gradient(135deg, #f4f8ff 0%, #e9f2ff 50%, #f8fafc 100%)',
     accentColor: '#0046be',
     bullets: [],
     primaryCta: { href: '/best-deals', label: 'Best deals' },
