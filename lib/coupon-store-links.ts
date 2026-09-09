@@ -30,11 +30,19 @@ const knownStoreDomains: Array<[RegExp, string]> = [
   [/hp/, 'hp.com'],
 ];
 
+// Patterns are tested against the store name lowercased with every
+// non-alphanumeric stripped, so "Best Buy" arrives as "bestbuy". First match
+// wins, so put the more specific pattern first where two could both hit.
 export const sourceStoreLogos: Array<[RegExp, string]> = [
   [/amazon/, '/logos/amazon-logo.svg'],
   [/ebay/, '/logos/ebay-logo.svg'],
   [/walmart/, '/logos/walmart-logo.svg'],
   [/newegg/, '/logos/newegg-logo.svg'],
+  // best-buy-logo.svg and bjs-wholesale-club-logo.svg were committed but never
+  // referenced from either logo map, so both merchants fell through to a 128px
+  // Google favicon. Best Buy is the second-largest merchant in the catalogue.
+  [/bestbuy/, '/logos/best-buy-logo.svg'],
+  [/bjs/, '/logos/bjs-wholesale-club-logo.svg'],
   [/hp/, '/logos/hp-logo.svg'],
   [/dell/, '/logos/dell-logo.svg'],
   [/lenovo/, '/logos/lenovo-logo.svg'],
@@ -43,6 +51,51 @@ export const sourceStoreLogos: Array<[RegExp, string]> = [
   [/target/, '/logos/target-logo.svg'],
   [/nike/, '/logos/nike-logo.svg'],
   [/argos/, '/logos/argos-logo.svg'],
+
+  // Fetched from each merchant's own site by ops/fetch-merchant-logos.mjs.
+  // Before this, 55 of the 72 merchants carrying offers had no entry here and
+  // fell through to a 128px Google favicon, sitting beside crisp SVGs in the
+  // same price table.
+  //
+  // Regional variants come first: /eufy/ also matches "eufyau", so the more
+  // specific pattern has to be reached first or it is dead code.
+  [/eufyau/, '/logos/eufy-au-logo.png'],
+  [/reolinkau/, '/logos/reolink-au-logo.png'],
+  [/koganau/, '/logos/kogan-au-logo.ico'],
+  [/reebeloau/, '/logos/reebelo-au-logo.png'],
+  [/lifxau/, '/logos/lifx-au-logo.png'],
+  [/ankerau/, '/logos/anker-au-logo.png'],
+
+  [/jbhifi/, '/logos/jb-hi-fi-logo.png'],
+  [/adorama/, '/logos/adorama-logo.ico'],
+  [/thegoodguys/, '/logos/the-good-guys-logo.png'],
+  [/crutchfield/, '/logos/crutchfield-logo.ico'],
+  [/harveynorman/, '/logos/harvey-norman-logo.ico'],
+  [/officeworks/, '/logos/officeworks-logo.ico'],
+  [/bunnings/, '/logos/bunnings-logo.png'],
+  [/staples/, '/logos/staples-logo.ico'],
+  [/binglee/, '/logos/bing-lee-logo.ico'],
+  [/eufy/, '/logos/eufy-logo.png'],
+  [/mwave/, '/logos/mwave-logo.ico'],
+  [/mercari/, '/logos/mercari-logo.ico'],
+  [/telstra/, '/logos/telstra-logo.png'],
+  [/swappa/, '/logos/swappa-logo.ico'],
+  [/dicksmith/, '/logos/dick-smith-logo.ico'],
+  [/poshmark/, '/logos/poshmark-logo.png'],
+  [/zoro/, '/logos/zoro-logo.png'],
+  [/samsclub/, '/logos/sam-s-club-logo.ico'],
+  [/appliancesonline/, '/logos/appliances-online-logo.png'],
+  [/beaconlighting/, '/logos/beacon-lighting-logo.png'],
+  [/jaycar/, '/logos/jaycar-logo.ico'],
+  [/mobileciti/, '/logos/mobileciti-logo.ico'],
+  [/domayne/, '/logos/domayne-logo.ico'],
+  [/videopro/, '/logos/videopro-logo.ico'],
+  [/kmart/, '/logos/kmart-logo.ico'],
+  [/googlefi/, '/logos/google-fi-logo.ico'],
+  [/reolink/, '/logos/reolink-logo.png'],
+  [/motorola/, '/logos/motorola-logo.ico'],
+  // Anchored: a bare /abt/ would also match any name containing those letters.
+  [/^abt$/, '/logos/abt-logo.ico'],
 ];
 
 function storePageHref(name: string) {
