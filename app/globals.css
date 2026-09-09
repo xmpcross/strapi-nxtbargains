@@ -2315,6 +2315,21 @@ select.filter-field { background: #ffffff; font-weight: 500; }
    is how a reader moves between them, so hiding half of it behind an inner
    scrollbar — inside a page that already scrolls — cost more than the height
    saved. The Store list keeps the cap: that one runs to hundreds of rows. */
+/* "Smart Home" in the category list is a grouping, not a category: it has no
+   page of its own, so it renders as a label rather than a row, with its
+   children indented under it. Matches the header menu's nesting. */
+.filter-group-label {
+  margin: 0.4rem 0 0.1rem;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgb(13 27 42 / 0.55);
+}
+
+.filter-group-children {
+  padding-inline-start: 0.6rem;
+  border-inline-start: 1px solid rgb(13 27 42 / 0.1);
+}
+
 .filter-category-list {
   max-height: none;
   height: auto;

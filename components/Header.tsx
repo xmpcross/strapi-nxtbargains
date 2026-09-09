@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { BLOG_NAV_LINKS, SITE } from '@/lib/site';
+import { PRODUCT_CATEGORY_TREE } from '@/lib/product-nav';
 import { listCategories, listPosts, mediaUrl } from '@/lib/strapi';
 import { postPath, fmtDate } from '@/lib/format';
 import SearchDialog from './SearchDialog';
@@ -28,26 +29,11 @@ function buildNav(blogCategories: Array<{ slug: string; name: string }>): NavIte
   {
     href: '/all-products',
     label: 'All Products',
-    children: [
-      { href: '/category/smart-phones', label: 'Smart Phones' },
-      { href: '/category/smartwatches', label: 'Smartwatches' },
-      { href: '/category/tablets', label: 'Tablets' },
-      { href: '/category/laptops', label: 'Laptops' },
-      { href: '/category/smart-tvs', label: 'Smart TVs' },
-      { href: '/category/smart-cameras', label: 'Smart Cameras' },
-      { href: '/category/smart-speakers', label: 'Smart Speakers' },
-      {
-        label: 'Smart Home',
-        children: [
-          { href: '/category/smart-light-bulbs', label: 'Smart Light Bulbs' },
-          { href: '/category/smart-door-locks', label: 'Smart Door Locks' },
-          { href: '/category/smart-plugs', label: 'Smart Plugs' },
-          { href: '/category/smart-doorbells', label: 'Smart Doorbells' },
-        ],
-      },
-      { href: '/category/headphones', label: 'Headphones' },
-      { href: '/category/raspberry-pi', label: 'Raspberry PI' },
-    ],
+    // Read from lib/product-nav so the filter sidebar renders the same tree.
+    children: PRODUCT_CATEGORY_TREE.map((node) =>
+      'children' in node
+        ? { label: node.label, children: node.children.map((child) => ({ href: `/category/${child.slug}`, label: child.label })) }
+        : { href: `/category/${node.slug}`, label: node.label }),
   },
   { href: '/best-deals', label: 'Best Deals' },
   {

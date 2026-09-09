@@ -6,6 +6,7 @@ import {
   type FilterOption,
   type ProductFilters,
 } from '@/lib/product-filters';
+import { PRODUCT_CATEGORY_TREE } from '@/lib/product-nav';
 
 /**
  * Product filter sidebar, following the layout of the nxtsmarthome.com.au
@@ -115,6 +116,8 @@ export default function ProductFiltersSidebar({
   const hrefFor = (patch: Partial<ProductFilters>) =>
     `${action}${productPageQuery({ ...filters, ...patch })}`;
 
+  const countBySlug = new Map(categories.map((category) => [category.value, category]));
+
   const categoryHref = (value: string) =>
     action === '/all-products' && value
       ? `/category/${value}`
@@ -150,6 +153,18 @@ export default function ProductFiltersSidebar({
       {categories.length > 0 ? (
         <div className="filter-section mt-5">
           <p className={SECTION_LABEL}>Categories &amp; Subcategories</p>
+          {/*
+            Rendered from PRODUCT_CATEGORY_TREE, the same tree the header's
+            Products menu uses, so the two agree on both order and nesting.
+            Previously this listed whatever Strapi returned, in Strapi's order,
+            which put Smart Doorbells loose between Smart Plugs and Headphones
+            while the menu showed it under Smart Home.
+
+            Counts still come from the `categories` prop, since those are
+            per-site product totals the tree does not carry. A category absent
+            from that prop holds nothing for this storefront and is skipped —
+            the tree names what may appear, the data decides what does.
+          */}
           <nav aria-label="Product categories" className="filter-category-list grid gap-1">
             <FilterRow
               href={categoryHref('')}
@@ -158,16 +173,43 @@ export default function ProductFiltersSidebar({
               active={!filters.category}
               tone="primary"
             />
-            {categories.map((category) => (
-              <FilterRow
-                key={category.value}
-                href={categoryHref(category.value)}
-                label={category.label}
-                count={category.count}
-                active={filters.category === category.value}
-                tone="primary"
-              />
-            ))}
+            {PRODUCT_CATEGORY_TREE.map((node) => {
+              if (!('children' in node)) {
+                const found = countBySlug.get(node.slug);
+                if (!found) return null;
+                return (
+                  <FilterRow
+                    key={node.slug}
+                    href={categoryHref(node.slug)}
+                    label={node.label}
+                    count={found.count}
+                    active={filters.category === node.slug}
+                    tone="primary"
+                  />
+                );
+              }
+              const children = node.children.filter((child) => countBySlug.has(child.slug));
+              if (children.length === 0) return null;
+              return (
+                <div key={node.label} className="grid gap-1">
+                  {/* A group heading, not a link: "Smart Home" is an editorial
+                      grouping in the menu and has no category page of its own. */}
+                  <p className="filter-group-label">{node.label}</p>
+                  <div className="filter-group-children grid gap-1">
+                    {children.map((child) => (
+                      <FilterRow
+                        key={child.slug}
+                        href={categoryHref(child.slug)}
+                        label={child.label}
+                        count={countBySlug.get(child.slug)?.count}
+                        active={filters.category === child.slug}
+                        tone="primary"
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </nav>
         </div>
       ) : null}
