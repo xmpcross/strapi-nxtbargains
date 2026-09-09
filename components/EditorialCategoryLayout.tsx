@@ -79,21 +79,6 @@ export default function EditorialCategoryLayout({
               {categoryBlurb ?? config.glanceDescription}
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-2">
-              <Link
-                href={config.primaryCta.href}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#0046be] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-xs transition hover:bg-[#003899]"
-              >
-                {config.primaryCta.label}
-              </Link>
-              <Link
-                href={config.secondaryCta.href}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-ink/20 bg-white/70 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/85 transition hover:border-primary hover:bg-white hover:text-primary"
-              >
-                {config.secondaryCta.label}
-              </Link>
-            </div>
-
             {(() => {
               const quickLinks = config.quickLinks ?? config.marketplaceLinks;
               if (!quickLinks?.length) return null;
