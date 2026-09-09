@@ -65,101 +65,69 @@ export default function EditorialCategoryLayout({
             <span style={{ color: config.accentColor }}>{config.breadcrumbLabel}</span>
           </nav>
 
-          <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-start">
-            <div>
-              <p
-                className="text-xs font-bold uppercase tracking-[0.18em]"
-                style={{ color: config.accentColor }}
+          <div className="mt-8 max-w-4xl">
+            <p
+              className="text-xs font-bold uppercase tracking-[0.18em]"
+              style={{ color: config.accentColor }}
+            >
+              {config.eyebrow}
+            </p>
+            <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl lg:text-[2.65rem]">
+              {categoryName}
+            </h1>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-ink/75 sm:text-lg">
+              {categoryBlurb ?? config.glanceDescription}
+            </p>
+
+            <ul className="mt-6 max-w-3xl space-y-3 text-sm leading-6 text-ink/80 sm:text-base">
+              {config.bullets.map((bullet) => (
+                <li key={bullet} className="flex gap-3">
+                  <span className="mt-0.5 shrink-0 font-bold" style={{ color: config.accentColor }} aria-hidden>
+                    ✓
+                  </span>
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-8 flex flex-wrap gap-2">
+              <Link
+                href={config.primaryCta.href}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#0046be] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-xs transition hover:bg-[#003899]"
               >
-                {config.eyebrow}
-              </p>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl lg:text-[2.65rem]">
-                {categoryName}
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-ink/75 sm:text-lg">
-                {categoryBlurb ?? config.glanceDescription}
-              </p>
-
-              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-ink/80 sm:text-base">
-                {config.bullets.map((bullet) => (
-                  <li key={bullet} className="flex gap-3">
-                    <span className="mt-0.5 shrink-0 font-bold" style={{ color: config.accentColor }} aria-hidden>
-                      ✓
-                    </span>
-                    <span>{bullet}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-8 flex flex-wrap gap-2">
-                <Link
-                  href={config.primaryCta.href}
-                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#0046be] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-xs transition hover:bg-[#003899]"
-                >
-                  {config.primaryCta.label}
-                </Link>
-                <Link
-                  href={config.secondaryCta.href}
-                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-ink/20 bg-white/70 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/85 transition hover:border-primary hover:bg-white hover:text-primary"
-                >
-                  {config.secondaryCta.label}
-                </Link>
-              </div>
-
-              {(() => {
-                const quickLinks = config.quickLinks ?? config.marketplaceLinks;
-                if (!quickLinks?.length) return null;
-                const quickLinksLabel = config.quickLinksLabel ?? 'Shop by marketplace';
-                return (
-                <div className="mt-8 border-t border-ink/10 pt-6">
-                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-ink/55">
-                    {quickLinksLabel}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {quickLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        className="inline-flex min-h-9 items-center rounded-lg border border-ink/15 bg-white/80 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.08em] text-ink/80 shadow-2xs transition hover:border-primary hover:bg-white hover:text-primary"
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-                );
-              })()}
+                {config.primaryCta.label}
+              </Link>
+              <Link
+                href={config.secondaryCta.href}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-ink/20 bg-white/70 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/85 transition hover:border-primary hover:bg-white hover:text-primary"
+              >
+                {config.secondaryCta.label}
+              </Link>
             </div>
 
-            <aside className="rounded-2xl border border-ink/10 bg-white/80 p-5 shadow-xs backdrop-blur-sm">
-              <p
-                className="text-[0.68rem] font-bold uppercase tracking-[0.18em]"
-                style={{ color: config.accentColor }}
-              >
-                At a glance
-              </p>
-              <p className="mt-3 text-sm leading-6 text-ink/75">{config.glanceDescription}</p>
-              <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-xl border border-ink/10 bg-white px-3.5 py-3 shadow-2xs">
-                  <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-ink/55">Articles</dt>
-                  <dd className="mt-1 font-display text-2xl font-bold text-ink">{total}</dd>
+            {(() => {
+              const quickLinks = config.quickLinks ?? config.marketplaceLinks;
+              if (!quickLinks?.length) return null;
+              const quickLinksLabel = config.quickLinksLabel ?? 'Shop by marketplace';
+              return (
+              <div className="mt-8 border-t border-ink/10 pt-6">
+                <p className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-ink/55">
+                  {quickLinksLabel}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {quickLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="inline-flex min-h-9 items-center rounded-lg border border-ink/15 bg-white/80 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.08em] text-ink/80 shadow-2xs transition hover:border-primary hover:bg-white hover:text-primary"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
                 </div>
-                <div className="rounded-xl border border-ink/10 bg-white px-3.5 py-3 shadow-2xs">
-                  <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-ink/55">Focus</dt>
-                  <dd className="mt-1 font-display text-lg font-bold text-ink">{config.focusLabel}</dd>
-                </div>
-              </dl>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {config.topicChips.map((topic) => (
-                  <span
-                    key={topic}
-                    className="inline-flex rounded-md border border-ink/10 bg-white px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink/75 shadow-2xs"
-                  >
-                    {topic}
-                  </span>
-                ))}
               </div>
-            </aside>
+              );
+            })()}
           </div>
         </div>
       </section>
