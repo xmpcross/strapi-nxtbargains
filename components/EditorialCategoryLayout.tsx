@@ -106,9 +106,9 @@ export default function EditorialCategoryLayout({
         </div>
       </section>
 
-      <section className="bg-[#f8fafc] pb-12 pt-8 sm:pb-16 sm:pt-10">
+      <section className="border-t border-ink/10 bg-[#f8fafc] pb-14 pt-8 sm:pb-20 sm:pt-10">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <div className="grid gap-8 lg:grid-cols-[minmax(220px,24%)_minmax(0,76%)] lg:items-start">
+          <div className="grid gap-8 lg:grid-cols-[minmax(240px,24%)_minmax(0,76%)] lg:items-start">
             <ArticleFiltersSidebar
               action={action}
               clearHref={action}
@@ -123,10 +123,26 @@ export default function EditorialCategoryLayout({
             />
 
             <div className="min-w-0">
+              {config.topicChips?.length ? (
+                <div className="mb-6 flex flex-wrap items-center gap-2 rounded-2xl border border-ink/10 bg-white p-3.5 sm:p-4 shadow-2xs">
+                  <span className="mr-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-ink/50">
+                    Topics:
+                  </span>
+                  {config.topicChips.map((chip) => (
+                    <span
+                      key={chip}
+                      className="inline-flex items-center rounded-full border border-ink/10 bg-slate-50 px-3.5 py-1 text-xs font-semibold text-ink/80 transition hover:border-primary/40 hover:bg-white hover:text-primary hover:shadow-2xs"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+
               {filters.q || activeFilterCount > 0 || page > 1 ? (
-                <div className="rounded-2xl border border-ink/10 bg-white p-5 sm:p-6 shadow-xs">
+                <div className="mb-8 rounded-2xl border border-ink/10 bg-white p-5 shadow-xs sm:p-6">
                   <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
-                    {filters.q ? 'Search results' : 'Articles'}
+                    {filters.q ? 'Search results' : 'Filtered articles'}
                   </span>
                   <h2 className="mt-2.5 font-display text-2xl font-bold text-ink sm:text-3xl">
                     {filters.q
@@ -143,7 +159,7 @@ export default function EditorialCategoryLayout({
               ) : null}
 
               {posts.length === 0 ? (
-                <div className="mt-8 rounded-2xl border border-dashed border-ink/20 bg-white px-6 py-16 text-center shadow-2xs">
+                <div className="mt-4 rounded-2xl border border-dashed border-ink/20 bg-white px-6 py-16 text-center shadow-2xs">
                   <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary/10 font-display text-xl font-bold text-primary">
                     ?
                   </div>
@@ -159,13 +175,13 @@ export default function EditorialCategoryLayout({
                   ) : null}
 
                   {spotlight.length > 0 ? (
-                    <section className="mt-10" data-testid="editorial-category-spotlight">
+                    <section className="mt-12" data-testid="editorial-category-spotlight">
                       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-ink/10 pb-4">
                         <div>
-                          <span className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
+                          <span className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-primary">
                             {config.spotlightEyebrow}
                           </span>
-                          <h2 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">
+                          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
                             {config.spotlightTitle}
                           </h2>
                         </div>
@@ -180,25 +196,25 @@ export default function EditorialCategoryLayout({
 
                   {gridPosts.length > 0 ? (
                     <section
-                      className={featured || spotlight.length > 0 ? 'mt-12' : ''}
+                      className={featured || spotlight.length > 0 ? 'mt-14' : ''}
                       data-testid="editorial-category-grid"
                     >
                       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-ink/10 pb-4">
                         <div>
-                          <span className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
+                          <span className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-primary">
                             {showEditorialLead ? 'More to read' : 'All articles'}
                           </span>
-                          <h2 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">
+                          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
                             {showEditorialLead ? config.gridArchiveTitle : `${total} article${total === 1 ? '' : 's'}`}
                           </h2>
                         </div>
                         {!showEditorialLead ? (
-                          <span className="rounded-full bg-slate-200/60 px-3 py-1 text-xs font-semibold text-ink/60">
+                          <span className="rounded-full bg-slate-200/70 px-3.5 py-1 text-xs font-bold text-ink/70">
                             Page {page} of {pageCount}
                           </span>
                         ) : null}
                       </div>
-                      <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                      <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {gridPosts.map((post) => (
                           <EditorialGridCard key={post.id} post={post} cardLabel={config.cardLabel} />
                         ))}
@@ -210,18 +226,20 @@ export default function EditorialCategoryLayout({
 
               {pageCount > 1 ? (
                 <nav
-                  className="mt-12 flex flex-wrap items-center justify-center gap-4 rounded-2xl border border-ink/10 bg-white p-5 shadow-2xs"
+                  className="mt-14 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-ink/10 bg-white p-5 shadow-xs"
                   data-testid="pagination"
                   aria-label="Article pagination"
                 >
                   {page > 1 ? (
                     <Link
                       href={`${action}${articlePageQuery(filters, page - 1)}`}
-                      className="inline-flex min-h-11 items-center justify-center rounded-xl border border-ink/15 bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/70 transition hover:border-primary hover:bg-primary/5 hover:text-primary shadow-2xs"
+                      className="inline-flex min-h-11 items-center justify-center rounded-xl border border-ink/15 bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/80 transition hover:border-primary hover:bg-primary/5 hover:text-primary shadow-2xs"
                     >
                       ← Previous
                     </Link>
-                  ) : null}
+                  ) : (
+                    <span />
+                  )}
                   <span className="text-sm font-semibold text-ink/65">
                     Page <strong className="font-bold text-ink">{page}</strong> of {pageCount}
                   </span>
@@ -232,7 +250,9 @@ export default function EditorialCategoryLayout({
                     >
                       Next →
                     </Link>
-                  ) : null}
+                  ) : (
+                    <span />
+                  )}
                 </nav>
               ) : null}
             </div>
@@ -255,50 +275,50 @@ function EditorialFeatureArticle({
 
   return (
     <article
-      className="group overflow-hidden rounded-3xl border border-ink/10 bg-white shadow-md transition-all duration-300 hover:shadow-xl"
+      className="group overflow-hidden rounded-3xl border border-ink/10 bg-white shadow-sm transition-all duration-500 hover:border-primary/40 hover:shadow-2xl"
       data-testid={`editorial-feature-${post.slug}`}
     >
-      <div className="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-stretch">
-        <Link href={href} className="editorial-feature-image-box relative block overflow-hidden bg-[#f8fafc] p-6 lg:p-8">
+      <div className="grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-stretch">
+        <Link href={href} className="editorial-feature-image-box relative block overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 p-6 lg:p-8">
           {img ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={img}
               alt={post.coverImage?.alternativeText || post.title}
-              className="editorial-feature-image aspect-[16/10] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-105 lg:aspect-auto lg:h-full lg:min-h-[320px]"
+              className="editorial-feature-image aspect-[16/10] w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-105 lg:aspect-auto lg:h-full lg:min-h-[340px]"
             />
           ) : (
-            <div className="grid aspect-[16/10] w-full place-items-center bg-[#f3f6fa] font-display text-3xl font-bold text-ink/15 lg:min-h-[320px]">
+            <div className="grid aspect-[16/10] w-full place-items-center bg-[#f3f6fa] font-display text-3xl font-bold text-ink/15 lg:min-h-[340px]">
               NXT
             </div>
           )}
         </Link>
 
         <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
-          <span className="w-fit rounded-full bg-primary/10 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-primary">
+          <span className="w-fit rounded-full bg-primary/10 px-3.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-primary">
             {featuredLabel}
           </span>
           <Link href={href}>
-            <h2 className="editorial-feature-title mt-3 font-display text-2xl font-bold leading-tight text-ink transition-colors group-hover:text-primary sm:text-3xl lg:text-3xl">
+            <h2 className="editorial-feature-title mt-3.5 font-display text-2xl font-bold leading-tight text-ink transition-colors group-hover:text-primary sm:text-3xl lg:text-[2rem]">
               {post.title}
             </h2>
           </Link>
           {post.excerpt ? (
-            <p className="mt-4 line-clamp-3 text-sm leading-7 text-ink/70 sm:text-base">{post.excerpt}</p>
+            <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-ink/75 sm:text-base">{post.excerpt}</p>
           ) : null}
-          <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-ink/55">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary font-display text-xs font-bold text-white">
+          <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-ink/55 border-t border-ink/10 pt-5">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary font-display text-xs font-bold text-white shadow-2xs">
               N
             </span>
-            <span className="font-semibold text-ink/80">{SITE.name} Editorial</span>
-            <span className="text-ink/30">|</span>
+            <span className="font-bold text-ink/80">{SITE.name} Editorial</span>
+            <span className="text-ink/30">•</span>
             <span>{fmtDate(post.publishedAt)}</span>
-            <span className="text-ink/30">|</span>
-            <span className="font-medium text-primary">{readMinutes(post)} min read</span>
+            <span className="text-ink/30">•</span>
+            <span className="font-semibold text-primary">{readMinutes(post)} min read</span>
           </div>
           <Link
             href={href}
-            className="mt-6 inline-flex w-fit min-h-11 items-center justify-center rounded-xl bg-ink px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-primary"
+            className="mt-6 inline-flex w-fit min-h-11 items-center justify-center rounded-xl bg-ink px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-2xs transition hover:bg-primary hover:shadow-md"
           >
             Read full article →
           </Link>
@@ -315,7 +335,7 @@ function EditorialSpotlightCard({ post, cardLabel }: { post: NxtPost; cardLabel:
 
   return (
     <article
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white p-5 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-xl"
       data-testid={`editorial-spotlight-${post.slug}`}
     >
       <Link href={href} className="editorial-spotlight-image-box relative block aspect-[16/10] w-full overflow-hidden rounded-xl bg-[#f8fafc]">
@@ -371,7 +391,7 @@ function EditorialGridCard({ post, cardLabel }: { post: NxtPost; cardLabel: stri
             src={img}
             alt={post.coverImage?.alternativeText || post.title}
             loading="lazy"
-            className="editorial-grid-image h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+            className="editorial-grid-image h-full w-full object-contain p-2.5 transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="grid h-full w-full place-items-center bg-[#f3f6fa] font-display text-lg font-bold text-ink/15">
