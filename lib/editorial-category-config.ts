@@ -37,15 +37,11 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     heroGradient:
       'linear-gradient(135deg, #eef5ff 0%, #e0ecff 50%, #f4f8ff 100%)',
     accentColor: '#0046be',
-    bullets: [
-      'Side-by-side specs, pricing, and trade-offs across the products you are actually considering.',
-      'Clear winner signals without wading through long spec sheets on your own.',
-      'Built to help you decide faster before checking live marketplace prices.',
-    ],
+    bullets: [],
     primaryCta: { href: '/all-products', label: 'Compare products' },
     secondaryCta: { href: '/product-reviews', label: 'Read reviews' },
     glanceDescription:
-      'Head-to-head comparison articles from the NXT.Bargains editorial team — built for shoppers who want the differences spelled out plainly.',
+      'Explore side-by-side product comparisons from the NXT.Bargains editorial team, featuring detailed spec breakdowns, key performance trade-offs, price history tracking, and clear verdicts to help you choose the best device before shopping live marketplace deals.',
     focusLabel: 'Comparisons',
     topicChips: ['Specs', 'Value', 'Features', 'Use cases', 'Winner picks'],
     featuredLabel: 'Featured comparison',
@@ -65,15 +61,11 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     heroGradient:
       'linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fffdf0 100%)',
     accentColor: '#d97706',
-    bullets: [
-      'Hands-on takes on what works, what does not, and what is worth paying for.',
-      'Practical verdicts with the caveats that matter before you buy.',
-      'Updated editorial coverage across phones, laptops, audio, and smart home gear.',
-    ],
+    bullets: [],
     primaryCta: { href: '/all-products', label: 'Shop compared' },
     secondaryCta: { href: '/product-comparisons', label: 'See comparisons' },
     glanceDescription:
-      'Honest product reviews from NXT.Bargains — focused on real-world use, value, and whether the product earns a recommendation.',
+      'Read comprehensive hands-on product reviews from NXT.Bargains, focusing on real-world usability, long-term build quality, value for money, and honest recommendations across smartphones, laptops, audio gear, and smart home tech.',
     focusLabel: 'Reviews',
     topicChips: ['Hands-on', 'Pros & cons', 'Value', 'Verdict', 'Long-term use'],
     featuredLabel: 'Featured review',
@@ -93,15 +85,11 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     heroGradient:
       'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #f0fdf4 100%)',
     accentColor: '#059669',
-    bullets: [
-      'Best-of lists for the categories you are actively shopping in right now.',
-      'Editor favorites, budget picks, and premium standouts in one place.',
-      'A fast starting point before you compare live prices across stores.',
-    ],
+    bullets: [],
     primaryCta: { href: '/best-deals', label: 'Best deals' },
     secondaryCta: { href: '/product-reviews', label: 'Read reviews' },
     glanceDescription:
-      'Curated roundup articles that narrow crowded categories down to the products worth your attention.',
+      'Discover curated product roundups and best-of lists on NXT.Bargains, designed to help you quickly identify editor favorites, top budget picks, and standout category leaders across major electronics brands.',
     focusLabel: 'Roundups',
     topicChips: ['Best overall', 'Budget picks', 'Premium', 'Editor picks', 'Category leaders'],
     featuredLabel: 'Featured roundup',
@@ -121,15 +109,11 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     heroGradient:
       'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #faf5ff 100%)',
     accentColor: '#7c3aed',
-    bullets: [
-      'Step-by-step setup, troubleshooting, and optimization walkthroughs.',
-      'Practical instructions for getting more from the gear you already own.',
-      'Written to save time when manuals and forums leave you guessing.',
-    ],
+    bullets: [],
     primaryCta: { href: '/all-products', label: 'Find products' },
     secondaryCta: { href: '/nxt-bargains-informative-articles', label: 'Read explainers' },
     glanceDescription:
-      'Actionable how-to guides from NXT.Bargains — setup help, fixes, and smarter ways to use your tech.',
+      'Save time with step-by-step how-to guides from NXT.Bargains, packed with actionable setup instructions, tech optimization tips, and troubleshooting solutions for the devices you rely on every day.',
     focusLabel: 'How-to',
     topicChips: ['Setup', 'Fixes', 'Tips', 'Optimization', 'Walkthroughs'],
     featuredLabel: 'Featured guide',
@@ -149,15 +133,11 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     heroGradient:
       'linear-gradient(135deg, #fefce8 0%, #fef08a 50%, #fffdf0 100%)',
     accentColor: '#b45309',
-    bullets: [
-      'Highest-scoring standouts across the smart electronics categories we cover.',
-      'Editor-backed picks with the performance and value signals that matter most.',
-      'A shortcut to the products that consistently rise to the top.',
-    ],
+    bullets: [],
     primaryCta: { href: '/best-sellers', label: 'Best sellers' },
     secondaryCta: { href: '/product-reviews', label: 'Read reviews' },
     glanceDescription:
-      'Top-rated product coverage from NXT.Bargains — the standouts, category leaders, and highest-scoring picks worth checking first.',
+      'Browse the highest-scoring smart electronics and tech devices on NXT.Bargains, vetted by our editorial team for exceptional performance, high customer satisfaction, and outstanding overall value.',
     focusLabel: 'Top rated',
     topicChips: ['Editors choice', 'Top score', 'Standouts', 'Category leaders', 'Best rated'],
     featuredLabel: 'Featured pick',
@@ -177,15 +157,11 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     heroGradient:
       'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f7ff 100%)',
     accentColor: '#0284c7',
-    bullets: [
-      'Clear explainers on how products, platforms, and pricing actually work.',
-      'Context before you compare — so deals and specs make more sense.',
-      'Updated editorial picks from the NXT.Bargains team.',
-    ],
+    bullets: [],
     primaryCta: { href: '/product-reviews', label: 'Product reviews' },
     secondaryCta: { href: '/how-to-guides', label: 'How-to guides' },
     glanceDescription:
-      'Long-form context articles that sit alongside comparisons, reviews, and deal coverage on NXT.Bargains.',
+      'Gain deeper tech insights with NXT.Bargains explainers and informative articles, breaking down complex specs, industry trends, and smart shopping strategy to give you full context before checkout.',
     focusLabel: 'Explainers',
     topicChips: ['Trends', 'Primers', 'Industry news', 'Tech explainers', 'Buying context'],
     featuredLabel: 'Featured explainer',
@@ -208,15 +184,11 @@ const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig
     heroGradient:
       'linear-gradient(135deg, #fffdf0 0%, #fef08a 50%, #fffbeb 100%)',
     accentColor: '#b45309',
-    bullets: [
-      'Coverage tied to live best-seller lists from Amazon, eBay, Newegg, Walmart, Target, and Best Buy.',
-      'Quick reads on why a product is ranking, who it suits, and what to check before you buy.',
-      'Every article links back to compare prices so you can shop the trend without overpaying.',
-    ],
+    bullets: [],
     primaryCta: { href: '/best-sellers', label: 'Live best-seller lists' },
     secondaryCta: { href: '/best-deals', label: 'Best deals today' },
     glanceDescription:
-      'Shopping guides built around the products shoppers are buying most on major US marketplaces — updated as rankings shift.',
+      'Stay informed on top-trending best sellers across Amazon, eBay, Walmart, Best Buy, and Target with NXT.Bargains guides detailing why products rank, who they suit best, and where to score the best deals.',
     focusLabel: 'Trending',
     topicChips: ['Amazon', 'eBay', 'Walmart', 'Target', 'Best Buy', 'Newegg'],
     quickLinks: BEST_SELLER_MARKETPLACES.map((marketplace) => ({
@@ -241,15 +213,11 @@ const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig
     heroGradient:
       'linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #f0fdf9 100%)',
     accentColor: '#0d9488',
-    bullets: [
-      'What to look for, what to skip, and how to match a product to how you actually shop and use it.',
-      'Budget tiers, must-have features, and trade-offs worth understanding before checkout.',
-      'Built to shorten the research phase — then compare live prices across major stores.',
-    ],
+    bullets: [],
     primaryCta: { href: '/product-comparisons', label: 'Compare products' },
     secondaryCta: { href: '/top-rated-smart-electronics-devices', label: 'Top-rated picks' },
     glanceDescription:
-      'Practical buying guides from NXT.Bargains — budget advice, spec checklists, and decision frameworks for phones, laptops, audio, smart home, and more.',
+      'Shorten your tech research phase with practical buying guides from NXT.Bargains, offering budget frameworks, key spec checklists, and clear decision guidance for your next major electronics purchase.',
     focusLabel: 'Buy smarter',
     topicChips: ['Budget tiers', 'Key specs', 'Use cases', 'Trade-offs', 'Checklists'],
     quickLinks: [
@@ -292,16 +260,12 @@ export function buildDefaultCategoryConfig(
     heroGradient:
       'linear-gradient(135deg, #eef5ff 0%, #e0ecff 50%, #f4f8ff 100%)',
     accentColor: '#0046be',
-    bullets: [
-      `Expert analysis, in-depth breakdowns, and practical advice on ${name.toLowerCase()}.`,
-      'Hands-on specs, comparison insights, and real-world buyer advice.',
-      'Updated coverage to help you decide faster before checking live deals.',
-    ],
+    bullets: [],
     primaryCta: { href: '/best-deals', label: 'Best deals' },
     secondaryCta: { href: '/all-products', label: 'Compare products' },
     glanceDescription:
-      description ||
-      `Comprehensive product guides, reviews, and article coverage on ${name} from the NXT.Bargains editorial team.`,
+      (description ? description.replace(/\s+/g, ' ').trim() : null) ||
+      `Discover in-depth article coverage, expert buying advice, and price tracking for ${name} from the NXT.Bargains editorial team.`,
     focusLabel: name,
     topicChips: ['Guides', 'Reviews', 'Comparisons', 'Top Picks', 'Deals'],
     featuredLabel: 'Featured article',
@@ -316,8 +280,8 @@ export function buildDefaultCategoryConfig(
   };
 }
 
-
 export function isEditorialCategory(slug: string): slug is SectionKey {
   return slug in EDITORIAL_CATEGORY_CONFIG || slug in EXTENDED_EDITORIAL_CATEGORY_CONFIG;
 }
+
 
