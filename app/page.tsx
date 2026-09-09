@@ -196,7 +196,7 @@ export default async function HomePage() {
               eyebrow="Just launched"
               title="New on Amazon"
               intro="The newest electronics releases on Amazon, refreshed weekly."
-              cta={{ href: '/best-sellers/amazon', label: 'View all' }}
+              cta={{ href: '/best-sellers/amazon', label: 'View all', variant: 'outline' }}
             />
             <div className="mt-6 grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
               {newReleases.slice(0, 8).map((item) => (
@@ -258,7 +258,11 @@ function SectionHead({
   title: string;
   intro?: string;
   introClassName?: string;
-  cta?: { href: string; label: string };
+  /* 'outline' draws the button in the primary colour with a matching border,
+     for sections that should pull more attention than the default quiet
+     grey-bordered link. Kept as a variant rather than restyling SectionHead
+     itself, which four sections share. */
+  cta?: { href: string; label: string; variant?: 'default' | 'outline' };
 }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-5">
@@ -268,7 +272,14 @@ function SectionHead({
         {intro && <p className={`mt-2 text-[0.98rem] leading-relaxed text-ink/55 ${introClassName}`}>{intro}</p>}
       </div>
       {cta && (
-        <Link href={cta.href} className="inline-flex shrink-0 items-center gap-[7px] rounded-[10px] border border-ink/10 bg-white px-4 py-2.5 font-display text-[0.9rem] font-semibold text-ink transition hover:-translate-y-px hover:border-primary hover:text-primary">
+        <Link
+          href={cta.href}
+          className={
+            cta.variant === 'outline'
+              ? 'inline-flex shrink-0 items-center gap-[7px] rounded-[10px] border border-primary bg-transparent px-4 py-2.5 font-display text-[0.9rem] font-semibold text-primary transition hover:-translate-y-px hover:bg-primary hover:text-white'
+              : 'inline-flex shrink-0 items-center gap-[7px] rounded-[10px] border border-ink/10 bg-white px-4 py-2.5 font-display text-[0.9rem] font-semibold text-ink transition hover:-translate-y-px hover:border-primary hover:text-primary'
+          }
+        >
           {cta.label} →
         </Link>
       )}
@@ -329,10 +340,14 @@ function OfferComparison({ product }: { product: CommerceProduct }) {
               /* Was h-3.5 (14px), which rendered a wordmark like "appliances
                    online" as an illegible smear. h-6 with a wider cap lets the
                    mark read at the width the tile actually has. */
-                <img src={o.logo} alt={o.name} loading="lazy" referrerPolicy="no-referrer" className="h-6 max-w-[68px] object-contain" />
-            ) : (
-              <span className="line-clamp-1 text-[0.62rem] font-semibold uppercase tracking-wide text-ink/55">{o.name}</span>
-            )}
+                <img src={o.logo} alt="" aria-hidden="true" loading="lazy" referrerPolicy="no-referrer" className="h-5 max-w-[68px] object-contain" />
+            ) : null}
+            {/* The merchant is always named, not just pictured. Only a handful
+                of merchants carry a logo — the ones added from Google Shopping
+                have none — so a logo-only tile left most of them anonymous, and
+                a price with no seller beside it is not a comparison. The logo
+                is decorative once the name is present, hence alt="". */}
+            <span className="line-clamp-1 text-[0.62rem] font-semibold uppercase tracking-wide text-ink/55">{o.name}</span>
           </div>
         ))}
       </div>
