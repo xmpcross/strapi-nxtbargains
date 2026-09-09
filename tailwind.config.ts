@@ -34,7 +34,7 @@ export default {
       },
       fontFamily: {
         sans: ['var(--font-body)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-heading)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
       },
       maxWidth: {
         '7xl': '1366px',

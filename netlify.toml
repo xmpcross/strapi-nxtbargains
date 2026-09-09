@@ -4,6 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  COMMERCE_DATA_SOURCE = "supabase"
   NEXT_TELEMETRY_DISABLED = "1"
 
 [[plugins]]

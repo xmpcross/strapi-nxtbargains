@@ -1,4 +1,3 @@
-import { productDescriptions } from '@/lib/product-descriptions';
 import type {
   CommerceCategory,
   CommerceOffer,
@@ -42,7 +41,7 @@ type SupabaseOffer = {
 };
 
 export function useSupabaseCommerce(): boolean {
-  return process.env.COMMERCE_DATA_SOURCE === 'supabase';
+  return (process.env.COMMERCE_DATA_SOURCE || 'supabase') === 'supabase';
 }
 
 export function assertSupabaseCommerceConfigured(): void {
@@ -148,7 +147,7 @@ function mapProduct(row: SupabaseComparison): CommerceProduct {
     slug: row.slug?.trim() || slugify(row.canonical_title),
     brand: row.brand,
     shortDescription: row.description,
-    description: productDescriptions[row.slug?.trim() || slugify(row.canonical_title)] || row.description,
+    description: row.description,
     primaryImage: row.canonical_image ? { url: row.canonical_image } : null,
     category: categoryName,
     categories: [category],

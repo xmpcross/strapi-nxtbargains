@@ -1,3 +1,4 @@
+import { useSupabaseCommerce } from '@/lib/supabase-commerce';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { readFileSync, existsSync } from 'node:fs';
@@ -129,7 +130,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
   let liveCapturedAt: string | null = null;
   try {
     const p = join(process.cwd(), 'data', 'live-offers.json');
-    if (existsSync(p)) {
+    if (!useSupabaseCommerce() && existsSync(p)) {
       const entry = (JSON.parse(readFileSync(p, 'utf8')).items ?? {})[slug];
       const usable = (Array.isArray(entry?.offers) ? entry.offers : []).filter(
         (offer: LiveOffer) => Boolean(offer.url),

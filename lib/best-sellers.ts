@@ -1,3 +1,4 @@
+import { useSupabaseCommerce } from '@/lib/supabase-commerce';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { type BestSeller, type Marketplace } from '@/components/BestSellerCard';
@@ -59,6 +60,7 @@ export function getBestSellerMarketplace(key: string) {
 }
 
 export function listBestSellerGroups({ includeEmpty = false }: { includeEmpty?: boolean } = {}) {
+  if (useSupabaseCommerce()) return [];
   return BEST_SELLER_MARKETPLACES.map((marketplace) => ({
     key: marketplace.key,
     items: listBestSellersForMarketplace(marketplace.key),
@@ -66,6 +68,8 @@ export function listBestSellerGroups({ includeEmpty = false }: { includeEmpty?: 
 }
 
 export function listBestSellersForMarketplace(marketplaceKey: Marketplace): BestSeller[] {
+  // Supabase has no sales-rank feed yet; do not show cached products or prices.
+  if (useSupabaseCommerce()) return [];
   const marketplace = getBestSellerMarketplace(marketplaceKey);
   if (!marketplace) return [];
 
@@ -184,6 +188,7 @@ export function categoryDescription(key: string, label?: string): string {
 
 /** Amazon "New Releases" (OpenWeb Ninja Real-Time E-commerce Data). */
 export function listAmazonNewReleases(): BestSeller[] {
+  if (useSupabaseCommerce()) return [];
   try {
     const path = join(process.cwd(), 'data', 'amazon-new-releases.json');
     if (!existsSync(path)) return [];

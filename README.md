@@ -6,11 +6,15 @@ history, surfaces the best deals and coupon codes, and publishes editorial
 buying guides — with every outbound link monetized through affiliate programs.
 
 This repo is the **Next.js frontend**. Editorial content remains in **Strapi**.
-Product comparisons, retailer offers, and price history can be read from the
-Supabase comparison view by setting `COMMERCE_DATA_SOURCE=supabase`; Supabase is
-the sole production database for that commerce data. Keep the setting at
-`strapi` until `schema.sql` is applied, migration counts are verified, and the
-comparison view contains launch-ready products from at least three marketplaces.
+Products, retailer offers, categories, and price history use **Supabase only** by
+default (`COMMERCE_DATA_SOURCE=supabase`). The frontend reads `canonical_products`,
+`marketplace_products`, and `price_history` through the Supabase REST API. Configure
+`SUPABASE_URL` and a server-side Supabase key in the deployment environment.
+Product descriptions also come from Supabase. There is no Strapi product/offer
+fallback and no local JSON price fallback in this mode. Best Deals uses the
+Supabase catalogue; cached best-seller/new-release sections stay empty until a
+Supabase ranking feed is available. Editorial content and curated coupons remain
+in Strapi. The explicit `strapi` setting retains the legacy commerce mode.
 
 ---
 
