@@ -18,15 +18,6 @@ const TOKEN = process.env.STRAPI_API_TOKEN;
 // JSON-array operator Strapi serves reliably here; $contains 500s).
 const SITE_PRODUCT_TAG = process.env.NEXT_PUBLIC_SITE_PRODUCT_TAG || 'nxt-bargains';
 
-/** Commerce categories hidden on NXT.Bargains (shared Strapi taxonomy includes other storefronts). */
-const EXCLUDED_COMMERCE_CATEGORY_SLUGS = new Set([
-  'exfoliators-and-scrubs',
-]);
-
-function isVisibleCommerceCategory(category: Pick<CommerceCategory, 'slug'>): boolean {
-  return !EXCLUDED_COMMERCE_CATEGORY_SLUGS.has(category.slug);
-}
-
 export type StrapiImage = { url: string; alternativeText?: string; width?: number; height?: number } | null;
 
 export type NxtPostType =
@@ -398,12 +389,31 @@ export async function listCommerceProducts(
   });
 }
 
+/**
+ * Categories this storefront sells into.
+ *
+ * commerce-categories carries no site field — nothing on the record says which
+ * storefront owns it — so ownership is derived from the products inside it: a
+ * category belongs to this site when it holds at least one product tagged for
+ * this site. Strapi filters through the relation, so this is one query.
+ *
+ * This replaces EXCLUDED_COMMERCE_CATEGORY_SLUGS, a hand-maintained denylist
+ * that named exactly one slug ('exfoliators-and-scrubs') while the shared pool
+ * held six more skincare categories belonging to bestlooking.skin. Those stayed
+ * out of nxt.bargains only because no product here happened to sit in them —
+ * one mis-tagged product would have surfaced a skincare category in this
+ * storefront. A denylist has to be updated every time another site adds a
+ * category; this cannot leak by default.
+ */
 export async function listCommerceCategories(): Promise<CommerceCategory[]> {
   const strapiCategories = await strapiFetch<ListResponse<CommerceCategory>>('commerce-categories', {
-    filters: { categoryStatus: { $eq: 'active' } },
+    filters: {
+      categoryStatus: { $eq: 'active' },
+      products: { tags: { $containsi: SITE_PRODUCT_TAG } },
+    },
     sort: ['name:asc'],
     pagination: { pageSize: 100 },
-  }).then((res) => res.data.filter(isVisibleCommerceCategory)).catch(() => []);
+  }).then((res) => res.data).catch(() => []);
 
   if (useSupabaseCommerce()) {
     const supabaseCategories = await listSupabaseCategories().catch(() => []);
@@ -505,12 +515,10 @@ export async function getCommerceCategory(slug: string): Promise<CommerceCategor
   const found = allCategories.find((c) => c.slug === slug || c.slug.toLowerCase() === slug.toLowerCase());
   if (found) return found;
 
-  if (!isVisibleCommerceCategory({ slug })) return null;
-  const res = await strapiFetch<ListResponse<CommerceCategory>>('commerce-categories', {
-    filters: { slug: { $eqi: slug }, categoryStatus: { $eq: 'active' } },
-    pagination: { pageSize: 1 },
-  }).catch(() => null);
-  if (res?.data?.[0]) return res.data[0];
+  // No unscoped fallback. This previously looked the slug up across the whole
+  // shared taxonomy, gated only by the denylist, so /category/<any bestlooking
+  // or nxtsmarthome slug> would resolve and render an empty category page here.
+  // If a slug is not among this site's categories, this site does not have it.
 
   if (useSupabaseCommerce()) {
     const supaCat = (await listSupabaseCategories().catch(() => [])).find((category) => category.slug === slug);
