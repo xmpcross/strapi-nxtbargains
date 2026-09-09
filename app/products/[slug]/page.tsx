@@ -233,26 +233,21 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
     </section>
   );
   const shortDescriptionContent = (
+    /* Shown in full. It was capped at 400px with a fade, which made sense while
+       a "Read More" link sat under it; with that link gone the cap only hid
+       copy with nothing to reveal it. The block is short by design — one or two
+       sentences, or a handful of bullets — so the full text costs little
+       height, and the detailed copy is still in the accordion below. */
     <div>
-      {/* Capped at 400px. A fixed height rather than a line clamp because this
-          block holds either a bullet list or a paragraph, and a line count
-          means a different depth for each — the cap keeps the offer table at
-          the same place on the page whichever it renders.
-
-          No "Read More" link sits under it: the full copy is in the "Product
-          details" accordion further down, so the text is reachable without one
-          and the fade is what signals it continues. */}
-      <div className="product-short-description-clip">
-        {shortCopy.bullets.length ? (
-          <ul className="product-description-bullets product-short-description">
-            {shortCopy.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
-          </ul>
-        ) : (
-          <p className="text-[14px] leading-7 text-ink/80">
-            {shortCopy.lead ?? summary}
-          </p>
-        )}
-      </div>
+      {shortCopy.bullets.length ? (
+        <ul className="product-description-bullets product-short-description">
+          {shortCopy.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+        </ul>
+      ) : (
+        <p className="text-[14px] leading-7 text-ink/80">
+          {shortCopy.lead ?? summary}
+        </p>
+      )}
     </div>
   );
 

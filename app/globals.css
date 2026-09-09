@@ -1951,31 +1951,6 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 
 /* Short description under the product title: same bullet treatment as the
    Product details list, at the smaller size the summary paragraph used. */
-/* Short description on the product page: show 400px, then "Read More".
-
-   A height cap rather than a line clamp because this block renders either a
-   bullet list or a paragraph, and the same line count is a different depth for
-   each — capping the box keeps the offer table at a consistent position on the
-   page whichever one a product has.
-
-   The fade signals that the text continues; without it a cap mid-sentence
-   reads as a rendering fault. */
-.product-short-description-clip {
-  position: relative;
-  max-height: 400px;
-  overflow: hidden;
-}
-
-.product-short-description-clip::after {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  height: 3rem;
-  background: linear-gradient(to bottom, rgb(255 255 255 / 0), #fff);
-  pointer-events: none;
-}
-
 .product-short-description {
   font-size: 14px;
   gap: 0.4rem;
