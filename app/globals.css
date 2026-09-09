@@ -1,7 +1,21 @@
-/* Inter, self-hosted from public/fonts — one variable file per style covers
-   every weight the site uses, and nothing is fetched from Google at runtime.
-   The Outfit .ttf faces and the Urbanist face that used to sit here are gone:
-   nine TrueType files were being served for weights Inter carries in one. */
+/* Self-hosted variable fonts served from public/fonts. */
+@font-face {
+  font-family: 'Rawest';
+  src: url('/fonts/Rawest-Medium.woff2') format('woff2'),
+       url('/fonts/Rawest-Medium.woff') format('woff');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/ManropeVariable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'Inter';
   src: url('/fonts/InterVariable.woff2') format('woff2');
@@ -50,16 +64,45 @@
     border-color: var(--color-gray-200, currentColor);
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', var(--font-body), system-ui, sans-serif !important;
+  /* Every heading and every title renders in the heading face (Manrope).
+     The title classes used to point at --font-display (Rawest); they were the
+     reason hero and post titles did not match the h1-h6 rule above. */
+  h1, h2, h3, h4, h5, h6,
+  .page-hero-title,
+  .post-title-h1,
+  .home-best-seller-title,
+  .related-posts-title,
+  .read-also-title,
+  .nextup-title,
+  .post-prevnext-title,
+  .nxt-product-carousel__title {
+    font-family: var(--font-heading), system-ui, sans-serif !important;
+  }
+
+  h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    font-family: inherit !important;
+  }
+
+  /* A heading keeps the heading face even when it also carries the
+     `font-display` utility — several h2/h3 in app/page.tsx do. Specificity
+     (0,1,1) beats the bare `.font-display` rule below, so order is irrelevant. */
+  :is(h1, h2, h3, h4, h5, h6).font-display {
+    font-family: var(--font-heading), system-ui, sans-serif !important;
+  }
+
+  /* Rawest is kept for non-heading display use only: buttons, price badges,
+     discount pills, the "NXT" placeholder mark. */
+  .font-display {
+    font-family: var(--font-display), system-ui, sans-serif !important;
   }
 }
 
 :root {
   color-scheme: light;
-  /* One family for the whole site: body and display both resolve to Inter. */
-  --font-body: 'Inter';
-  --font-heading: 'Inter';
+  /* Regular headings share the base font; display titles use Rawest. */
+  --font-body: 'Manrope';
+  --font-heading: var(--font-body);
+  --font-display: 'Rawest';
 
   /* ------------------------------------------------------------------ */
   /* Brand palette (Best Buy scheme). Semantic tokens below map onto     */
@@ -1220,7 +1263,7 @@ main[data-testid^="product-price-"] .product-offer-toggle:checked ~ * .show-less
   margin: 1.25rem 0;
 }
 .post-content > :where(h2) {
-  font-family: theme('fontFamily.display');
+  font-family: var(--font-heading), system-ui, sans-serif;
   font-size: 1.75rem;
   font-weight: 700;
   line-height: 1.2;
@@ -1233,7 +1276,7 @@ main[data-testid^="product-price-"] .product-offer-toggle:checked ~ * .show-less
   display: none;
 }
 .post-content > :where(h3) {
-  font-family: theme('fontFamily.display');
+  font-family: var(--font-heading), system-ui, sans-serif;
   font-size: 1.375rem;
   font-weight: 700;
   line-height: 1.25;
@@ -1242,7 +1285,7 @@ main[data-testid^="product-price-"] .product-offer-toggle:checked ~ * .show-less
   color: theme('colors.ink');
 }
 .post-content > :where(h4) {
-  font-family: theme('fontFamily.display');
+  font-family: var(--font-heading), system-ui, sans-serif;
   font-size: 1.125rem;
   font-weight: 700;
   margin-top: 1.5rem;
@@ -1315,7 +1358,7 @@ main[data-testid^="product-price-"] .product-offer-toggle:checked ~ * .show-less
 .post-content .nxt-product-card h3,
 .post-content .nxt-product-card h4 {
   margin: 0;
-  font-family: theme('fontFamily.display');
+  font-family: var(--font-heading), system-ui, sans-serif;
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.25;
@@ -1389,7 +1432,7 @@ main[data-testid^="product-price-"] .product-offer-toggle:checked ~ * .show-less
 }
 .post-content .nxt-product-carousel__heading {
   margin: 0;
-  font-family: theme('fontFamily.display');
+  font-family: var(--font-heading), system-ui, sans-serif;
   font-size: 1.2rem !important;
   font-weight: 700;
   line-height: 1.2;
@@ -1880,7 +1923,7 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
 
 /* best-sellers-articles: product title promoted to <h1> but kept at h4 size */
 .post-content > :where(h1.post-title-h1) {
-  font-family: theme('fontFamily.display');
+  font-family: var(--font-heading), system-ui, sans-serif;
   font-size: 1.125rem;
   font-weight: 700;
   line-height: 1.25;
@@ -2415,7 +2458,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   width: 100%;
   padding: 1rem 0.25rem;
   border-bottom: 1px solid rgb(13 27 42 / 0.1);
-  font-family: var(--font-display, inherit);
+  font-family: var(--font-heading), system-ui, sans-serif;
   /* Matches `.product-info-accordion summary` and the Highlights h2: these read
      as one stack of tab titles, so a size set on only some of them splits the
      row. Colour is pinned too — the triggers inherited the body ink, a shade
@@ -2470,7 +2513,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   border-bottom: 1px solid rgb(13 27 42 / 0.1);
 }
 
-.product-peek-title { font-family: var(--font-display, inherit); font-weight: 800; font-size: 1.05rem; }
+.product-peek-title { font-family: var(--font-heading), system-ui, sans-serif; font-weight: 800; font-size: 1.05rem; }
 
 .product-peek-close {
   font-size: 1.6rem;
@@ -2519,7 +2562,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 .review-bar-fill { display: block; height: 100%; background: #1f5fd0; border-radius: 999px; }
 .review-bar-count { font-size: 0.78rem; opacity: 0.6; text-align: right; }
 
-.review-saying-title { font-family: var(--font-display, inherit); font-weight: 700; margin-bottom: 0.5rem; }
+.review-saying-title { font-family: var(--font-heading), system-ui, sans-serif; font-weight: 700; margin-bottom: 0.5rem; }
 .review-saying-body { line-height: 1.6; font-size: 0.925rem; opacity: 0.85; }
 .review-saying-note { margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.5; }
 .review-topics { display: flex; gap: 0.5rem; margin-top: 0.9rem; overflow-x: auto; padding-bottom: 0.35rem; }
@@ -2529,7 +2572,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 }
 .review-topic.is-negative { background: #fdeceb; color: #8f2018; border-color: #f4cbc7; }
 
-.review-images-title { font-family: var(--font-display, inherit); font-weight: 700; margin-bottom: 0.6rem; }
+.review-images-title { font-family: var(--font-heading), system-ui, sans-serif; font-weight: 700; margin-bottom: 0.6rem; }
 .review-images-strip { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.35rem; }
 .review-images-strip li { flex: 0 0 auto; }
 .review-images-strip img { width: 84px; height: 84px; object-fit: cover; border: 1px solid rgb(13 27 42 / 0.1); }
@@ -2639,7 +2682,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   display: flex; flex-direction: column; gap: 0.5rem;
   padding: 1.15rem; border: 1px solid rgb(13 27 42 / 0.12); background: #fff;
 }
-.review-card-title { font-family: var(--font-display, inherit); font-weight: 700; font-size: 0.98rem; }
+.review-card-title { font-family: var(--font-heading), system-ui, sans-serif; font-weight: 700; font-size: 0.98rem; }
 .review-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .review-badge {
   font-size: 0.68rem; padding: 0.15rem 0.45rem; border: 1px solid rgb(13 27 42 / 0.18);
