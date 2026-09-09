@@ -41,7 +41,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     primaryCta: { href: '/all-products', label: 'Compare products' },
     secondaryCta: { href: '/product-reviews', label: 'Read reviews' },
     glanceDescription:
-      'Explore side-by-side product comparisons from the NXT.Bargains editorial team, featuring detailed spec breakdowns, key performance trade-offs, price history tracking, and clear verdicts to help you choose the best device before shopping live marketplace deals.',
+      'Welcome to the NXT.Bargains product comparison hub, where our editorial team breaks down specs, performance metrics, and real-world value side by side. We evaluate every product across build quality, key features, pricing trends, and practical use cases to highlight clear winner picks for your specific budget. Instead of forcing you to decipher complex spec sheets on your own, our head-to-head articles simplify your shopping decision with transparent pros, cons, and historical price context. Browse our full archive of side-by-side breakdowns below to choose the right model before checking live retailer discounts.',
     focusLabel: 'Comparisons',
     topicChips: ['Specs', 'Value', 'Features', 'Use cases', 'Winner picks'],
     featuredLabel: 'Featured comparison',
@@ -65,7 +65,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     primaryCta: { href: '/all-products', label: 'Shop compared' },
     secondaryCta: { href: '/product-comparisons', label: 'See comparisons' },
     glanceDescription:
-      'Read comprehensive hands-on product reviews from NXT.Bargains, focusing on real-world usability, long-term build quality, value for money, and honest recommendations across smartphones, laptops, audio gear, and smart home tech.',
+      'NXT.Bargains delivers hands-on, objective product reviews designed to give you an accurate look at what works, what falls short, and whether a device is worth your hard-earned money. Our editorial team evaluates smartphones, laptops, audio gear, and smart home appliances in real-world scenarios rather than synthetic benchmarks alone. Every review details daily usability, long-term durability, key trade-offs, and competitive alternatives across major price points. Read our comprehensive coverage below to find unbiased verdicts and editor recommendations before making your next purchase.',
     focusLabel: 'Reviews',
     topicChips: ['Hands-on', 'Pros & cons', 'Value', 'Verdict', 'Long-term use'],
     featuredLabel: 'Featured review',
@@ -89,7 +89,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     primaryCta: { href: '/best-deals', label: 'Best deals' },
     secondaryCta: { href: '/product-reviews', label: 'Read reviews' },
     glanceDescription:
-      'Discover curated product roundups and best-of lists on NXT.Bargains, designed to help you quickly identify editor favorites, top budget picks, and standout category leaders across major electronics brands.',
+      'Our curated product roundups consolidate the most crowded tech categories into clear, actionable recommendations tailored for every type of buyer. We analyze dozens of market options to highlight editor favorites, top budget-friendly choices, and premium category leaders in one convenient guide. Each roundup features spec highlights, price-to-performance analysis, and direct comparisons to ensure you find the right fit quickly. Browse our updated best-of collections below to discover top-rated devices before comparing live retailer offers.',
     focusLabel: 'Roundups',
     topicChips: ['Best overall', 'Budget picks', 'Premium', 'Editor picks', 'Category leaders'],
     featuredLabel: 'Featured roundup',
@@ -113,7 +113,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     primaryCta: { href: '/all-products', label: 'Find products' },
     secondaryCta: { href: '/nxt-bargains-informative-articles', label: 'Read explainers' },
     glanceDescription:
-      'Save time with step-by-step how-to guides from NXT.Bargains, packed with actionable setup instructions, tech optimization tips, and troubleshooting solutions for the devices you rely on every day.',
+      'NXT.Bargains how-to guides offer clear, step-by-step instructions to help you set up, troubleshoot, and optimize the electronics you use every day. Whether you are configuring smart home automation, extending laptop battery life, or fixing common connectivity issues, our practical walkthroughs eliminate the guesswork. We test every method firsthand to provide accurate advice, helpful software tips, and hardware optimization hacks. Explore our complete guide library below to get the absolute most performance out of your technology investment.',
     focusLabel: 'How-to',
     topicChips: ['Setup', 'Fixes', 'Tips', 'Optimization', 'Walkthroughs'],
     featuredLabel: 'Featured guide',
@@ -137,7 +137,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     primaryCta: { href: '/best-sellers', label: 'Best sellers' },
     secondaryCta: { href: '/product-reviews', label: 'Read reviews' },
     glanceDescription:
-      'Browse the highest-scoring smart electronics and tech devices on NXT.Bargains, vetted by our editorial team for exceptional performance, high customer satisfaction, and outstanding overall value.',
+      'Discover the highest-scoring smart electronics and tech devices reviewed by the NXT.Bargains editorial desk. We highlight standout products that consistently deliver top-tier performance, exceptional build quality, and superior overall value across consumer electronics. Our team tracks user ratings, long-term reliability signals, and market pricing to curate recommendations you can trust. Explore our top-rated product guides below to quickly identify category leaders and editor-backed picks.',
     focusLabel: 'Top rated',
     topicChips: ['Editors choice', 'Top score', 'Standouts', 'Category leaders', 'Best rated'],
     featuredLabel: 'Featured pick',
@@ -161,7 +161,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     primaryCta: { href: '/product-reviews', label: 'Product reviews' },
     secondaryCta: { href: '/how-to-guides', label: 'How-to guides' },
     glanceDescription:
-      'Gain deeper tech insights with NXT.Bargains explainers and informative articles, breaking down complex specs, industry trends, and smart shopping strategy to give you full context before checkout.',
+      'Gain essential technology context with NXT.Bargains explainers and informative articles covering industry trends, hardware architecture, and smart shopping strategies. We simplify complex spec jargon, emerging standards, and pricing dynamics so you understand what features genuinely matter before you buy. Our deep-dive guides prepare you to evaluate sales, compare specs accurately, and avoid common marketing traps. Read our full archive of informative reads below to become a more informed consumer.',
     focusLabel: 'Explainers',
     topicChips: ['Trends', 'Primers', 'Industry news', 'Tech explainers', 'Buying context'],
     featuredLabel: 'Featured explainer',
@@ -188,7 +188,7 @@ const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig
     primaryCta: { href: '/best-sellers', label: 'Live best-seller lists' },
     secondaryCta: { href: '/best-deals', label: 'Best deals today' },
     glanceDescription:
-      'Stay informed on top-trending best sellers across Amazon, eBay, Walmart, Best Buy, and Target with NXT.Bargains guides detailing why products rank, who they suit best, and where to score the best deals.',
+      'Stay ahead of shopping trends with NXT.Bargains best-seller guides, tracking top-ranking consumer electronics across Amazon, Best Buy, Walmart, Target, and eBay. We analyze why products ascend marketplace charts, who they suit best, and whether their popularity reflects genuine quality or temporary hype. Each guide links back to live price tracking and deal alerts so you never pay full price for trending gear. Browse our best-seller coverage below to shop popular items with confidence.',
     focusLabel: 'Trending',
     topicChips: ['Amazon', 'eBay', 'Walmart', 'Target', 'Best Buy', 'Newegg'],
     quickLinks: BEST_SELLER_MARKETPLACES.map((marketplace) => ({
@@ -217,7 +217,7 @@ const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig
     primaryCta: { href: '/product-comparisons', label: 'Compare products' },
     secondaryCta: { href: '/top-rated-smart-electronics-devices', label: 'Top-rated picks' },
     glanceDescription:
-      'Shorten your tech research phase with practical buying guides from NXT.Bargains, offering budget frameworks, key spec checklists, and clear decision guidance for your next major electronics purchase.',
+      'Shorten your tech research phase with practical buying guides from NXT.Bargains, designed to help you navigate crowded tech markets with confidence. We outline realistic budget tiers, essential feature checklists, and crucial trade-offs across laptops, phones, audio gear, and smart home devices. Our frameworks guide you toward the ideal model for your specific workflow without overspending on unnecessary extras. Explore our full library of buying guides below to make a smarter purchasing decision.',
     focusLabel: 'Buy smarter',
     topicChips: ['Budget tiers', 'Key specs', 'Use cases', 'Trade-offs', 'Checklists'],
     quickLinks: [
@@ -265,7 +265,7 @@ export function buildDefaultCategoryConfig(
     secondaryCta: { href: '/all-products', label: 'Compare products' },
     glanceDescription:
       (description ? description.replace(/\s+/g, ' ').trim() : null) ||
-      `Discover in-depth article coverage, expert buying advice, and price tracking for ${name} from the NXT.Bargains editorial team.`,
+      `Welcome to the NXT.Bargains editorial hub for ${name}, featuring in-depth buying advice, product breakdowns, and market price tracking. Our editorial team evaluates key features, build quality, and real-world value to help you make informed purchasing decisions. Every guide is designed to simplify your research before you check live retailer discounts across major online stores. Explore our full archive of ${name.toLowerCase()} articles below to find top-rated recommendations and buying tips.`,
     focusLabel: name,
     topicChips: ['Guides', 'Reviews', 'Comparisons', 'Top Picks', 'Deals'],
     featuredLabel: 'Featured article',

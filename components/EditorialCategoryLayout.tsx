@@ -76,7 +76,7 @@ export default function EditorialCategoryLayout({
               {categoryName}
             </h1>
             <p className="mt-4 w-full text-base leading-7 text-ink/75 sm:text-lg sm:leading-8">
-              {categoryBlurb ?? config.glanceDescription}
+              {config.glanceDescription ?? categoryBlurb}
             </p>
 
             {(() => {

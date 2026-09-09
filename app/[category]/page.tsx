@@ -53,9 +53,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return { title: 'Page not found', robots: { index: false, follow: false } };
   }
   const name = await resolveCategoryName(category, cmsCategory?.name);
-  const description = clampDescription(
-    resolveArticleCategoryBlurb(category, cmsCategory?.description) ?? `${name} from ${SITE.name} — ${SITE.tagline}`,
-  );
+  const editorialConfig = getEditorialCategoryConfig(category);
+  const fullDescription =
+    editorialConfig?.glanceDescription ??
+    resolveArticleCategoryBlurb(category, cmsCategory?.description) ??
+    `${name} from ${SITE.name} — ${SITE.tagline}`;
+  const description = clampDescription(fullDescription);
   return {
     title: name,
     description,
