@@ -2020,11 +2020,26 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] img[alt="
   display: block;
 }
 
+/* Two lines, always. Titles here are marketplace names -- "Samsung Galaxy A17
+   5G Smart Phone 128GB, US 1 Yr Manufacturer Warranty, Unlocked" -- and left to
+   run they take four or five lines, pushing the price and offer count of that
+   one card below its neighbours and breaking the row.
+
+   min-height reserves both lines whether or not the title needs them, so a
+   one-line title does not pull its card's price up out of line with the rest.
+   The clamp needs the -webkit- box properties: line-clamp on its own is not yet
+   universally honoured, and these are what Tailwind's own line-clamp emits. */
 .category-card-title {
   font-size: 15px !important;
   font-weight: 700 !important;
   line-height: 1.35;
   color: #0f172a;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: calc(2 * 1.35 * 15px);
 }
 
 .category-card-title a:hover { color: var(--color-primary, #0046be); }
