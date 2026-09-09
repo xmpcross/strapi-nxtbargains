@@ -331,6 +331,7 @@ export async function getCategory(slug: string): Promise<NxtCategory | null> {
 export async function listCommerceProducts(
   opts: { page?: number; pageSize?: number; q?: string; category?: string } = {},
 ) {
+  if (useSupabaseCommerce()) return listSupabaseProducts(opts);
   const page = Math.max(1, opts.page ?? 1);
   const pageSize = Math.max(1, opts.pageSize ?? 24);
 
@@ -354,42 +355,6 @@ export async function listCommerceProducts(
     ];
   }
 
-  if (useSupabaseCommerce()) {
-    const [supaRes, strapiRes] = await Promise.all([
-      listSupabaseProducts({ ...opts, page: 1, pageSize: 1000 }).catch(() => null),
-      strapiFetch<ListResponse<CommerceProduct>>('commerce-products', {
-        sort: ['updatedAt:desc'],
-        populate: COMMERCE_PRODUCT_POPULATE,
-        pagination: { page: 1, pageSize: 1000 },
-        filters,
-      }).catch(() => null),
-    ]);
-
-    const supaProducts = supaRes?.data ?? [];
-    const strapiProducts = strapiRes?.data ?? [];
-
-    const supaBySlug = new Map(supaProducts.map((p) => [p.slug, p]));
-    const strapiSlugs = new Set(strapiProducts.map((p) => p.slug));
-
-    const enrichedStrapiProducts = strapiProducts.map((p) => {
-      const supaMatch = supaBySlug.get(p.slug);
-      if (supaMatch && supaMatch.offers && supaMatch.offers.length > 0) {
-        return { ...p, offers: supaMatch.offers };
-      }
-      return p;
-    });
-
-    const merged = [...enrichedStrapiProducts, ...supaProducts.filter((p) => !strapiSlugs.has(p.slug))];
-
-    const total = merged.length;
-    const pageCount = Math.max(1, Math.ceil(total / pageSize));
-
-    return {
-      data: merged.slice((page - 1) * pageSize, page * pageSize),
-      meta: { pagination: { page, pageSize, pageCount, total } },
-    };
-  }
-
   return strapiFetch<ListResponse<CommerceProduct>>('commerce-products', {
     sort: ['updatedAt:desc'],
     populate: COMMERCE_PRODUCT_POPULATE,
@@ -399,19 +364,13 @@ export async function listCommerceProducts(
 }
 
 export async function listCommerceCategories(): Promise<CommerceCategory[]> {
+  if (useSupabaseCommerce()) return (await listSupabaseCategories()).filter(isVisibleCommerceCategory);
   const strapiCategories = await strapiFetch<ListResponse<CommerceCategory>>('commerce-categories', {
     filters: { categoryStatus: { $eq: 'active' } },
     sort: ['name:asc'],
     pagination: { pageSize: 100 },
   }).then((res) => res.data.filter(isVisibleCommerceCategory)).catch(() => []);
 
-  if (useSupabaseCommerce()) {
-    const supabaseCategories = await listSupabaseCategories().catch(() => []);
-    const categoryMap = new Map<string, CommerceCategory>();
-    for (const c of strapiCategories) categoryMap.set(c.slug, c);
-    for (const c of supabaseCategories) categoryMap.set(c.slug, c);
-    return [...categoryMap.values()].sort((a, b) => a.name.localeCompare(b.name));
-  }
   return strapiCategories;
 }
 
@@ -435,6 +394,16 @@ export async function listCommerceCategories(): Promise<CommerceCategory[]> {
  */
 async function countProductsPerCategory(): Promise<Map<string, number>> {
   const counts = new Map<string, number>();
+
+  if (useSupabaseCommerce()) {
+    const { data } = await listSupabaseProducts({ pageSize: 1000 });
+    for (const product of data) {
+      for (const category of product.categories ?? []) {
+        counts.set(category.slug, (counts.get(category.slug) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }
 
   for (let page = 1; ; page += 1) {
     const res = await strapiFetch<ListResponse<{ categories?: Array<{ slug?: string }> }>>(
@@ -478,24 +447,7 @@ export async function listCommerceCategoriesForSite(): Promise<
     countProductsPerCategory().catch(() => new Map<string, number>()),
   ]);
 
-  let result = categories.map((category) => ({ ...category, productCount: counts.get(category.slug) ?? 0 }));
-
-  if (useSupabaseCommerce()) {
-    const supabaseProducts = await listSupabaseProducts({ pageSize: 1000 }).catch(() => ({ data: [] }));
-    const supaCounts = new Map<string, number>();
-    for (const product of supabaseProducts.data) {
-      for (const cat of product.categories ?? []) {
-        supaCounts.set(cat.slug, (supaCounts.get(cat.slug) ?? 0) + 1);
-      }
-    }
-    result = result.map((category) => {
-      const supaCnt = supaCounts.get(category.slug) ?? 0;
-      return {
-        ...category,
-        productCount: Math.max(category.productCount, supaCnt),
-      };
-    });
-  }
+  const result = categories.map((category) => ({ ...category, productCount: counts.get(category.slug) ?? 0 }));
 
   return result.filter((category) => category.productCount > 0);
 }
@@ -505,6 +457,7 @@ export async function getCommerceCategory(slug: string): Promise<CommerceCategor
   const found = allCategories.find((c) => c.slug === slug || c.slug.toLowerCase() === slug.toLowerCase());
   if (found) return found;
 
+  if (useSupabaseCommerce()) return null;
   if (!isVisibleCommerceCategory({ slug })) return null;
   const res = await strapiFetch<ListResponse<CommerceCategory>>('commerce-categories', {
     filters: { slug: { $eqi: slug }, categoryStatus: { $eq: 'active' } },
@@ -512,10 +465,6 @@ export async function getCommerceCategory(slug: string): Promise<CommerceCategor
   }).catch(() => null);
   if (res?.data?.[0]) return res.data[0];
 
-  if (useSupabaseCommerce()) {
-    const supaCat = (await listSupabaseCategories().catch(() => [])).find((category) => category.slug === slug);
-    if (supaCat) return supaCat;
-  }
   return null;
 }
 
@@ -572,6 +521,7 @@ export async function listNxtCoupons(
 }
 
 export async function getCommerceProduct(slug: string): Promise<CommerceProduct | null> {
+  if (useSupabaseCommerce()) return getSupabaseProduct(slug);
   const strapiRes = await strapiFetch<ListResponse<CommerceProduct>>('commerce-products', {
     filters: { slug: { $eq: slug }, productStatus: { $eq: 'active' }, tags: { $containsi: SITE_PRODUCT_TAG } },
     populate: COMMERCE_PRODUCT_POPULATE,
@@ -580,16 +530,6 @@ export async function getCommerceProduct(slug: string): Promise<CommerceProduct 
 
   const strapiProd = strapiRes?.data?.[0];
 
-  if (useSupabaseCommerce()) {
-    const supaProd = await getSupabaseProduct(slug).catch(() => null);
-    if (strapiProd) {
-      if (supaProd && supaProd.offers && supaProd.offers.length > 0) {
-        return { ...strapiProd, offers: supaProd.offers };
-      }
-      return strapiProd;
-    }
-    if (supaProd) return supaProd;
-  }
   return strapiProd ?? null;
 }
 

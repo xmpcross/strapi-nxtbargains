@@ -1,3 +1,4 @@
+import { useSupabaseCommerce } from '@/lib/supabase-commerce';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -117,6 +118,7 @@ function detectMerchant(post: NxtPost): MerchantConfig | null {
 }
 
 async function listMerchantTopProducts(post: NxtPost): Promise<{ merchant: MerchantConfig; products: SidebarProduct[] } | null> {
+  if (useSupabaseCommerce()) return null;
   const merchant = detectMerchant(post);
   if (!merchant) return null;
 

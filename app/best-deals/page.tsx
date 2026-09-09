@@ -1,3 +1,4 @@
+import { useSupabaseCommerce } from '@/lib/supabase-commerce';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import fs from 'node:fs/promises';
@@ -307,6 +308,7 @@ function merchantDealUrl(store: string, title: string, fallback: string): string
 }
 
 async function loadRealTimeBestDeals() {
+  if (useSupabaseCommerce()) return { items: [] as RealTimeBestDeal[], capturedAt: undefined, queries: [] as string[] };
   try {
     const file = await fs.readFile(path.join(process.cwd(), 'data', 'best-deals-realtime.json'), 'utf8');
     const cache = JSON.parse(file) as RealTimeBestDealsCache;
