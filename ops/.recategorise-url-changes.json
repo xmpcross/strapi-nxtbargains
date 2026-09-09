@@ -1,6 +1,466 @@
 [
  {
-  "from": "/smart-phones/apple-macbook-pro-14-inch-m5-pro-1tb",
-  "to": "/laptops/apple-macbook-pro-14-inch-m5-pro-1tb"
+  "from": "/smart-phones/hp-omnibook-5-16-inch-512gb",
+  "to": "/laptops/hp-omnibook-5-16-inch-512gb"
+ },
+ {
+  "from": "/smart-phones/dell-14-plus-2025-1tb",
+  "to": "/laptops/dell-14-plus-2025-1tb"
+ },
+ {
+  "from": "/smart-phones/hp-omnibook-5-16-inch-1tb",
+  "to": "/laptops/hp-omnibook-5-16-inch-1tb"
+ },
+ {
+  "from": "/smart-phones/hp-omnibook-x-14-inch-512gb",
+  "to": "/laptops/hp-omnibook-x-14-inch-512gb"
+ },
+ {
+  "from": "/smart-phones/dell-14-premium-2025-1tb",
+  "to": "/laptops/dell-14-premium-2025-1tb"
+ },
+ {
+  "from": "/smart-phones/hp-omnibook-x-14-inch-1tb",
+  "to": "/laptops/hp-omnibook-x-14-inch-1tb"
+ },
+ {
+  "from": "/smart-phones/dell-14-plus-2025-512gb",
+  "to": "/laptops/dell-14-plus-2025-512gb"
+ },
+ {
+  "from": "/smart-phones/dell-16-plus-2025-512gb",
+  "to": "/laptops/dell-16-plus-2025-512gb"
+ },
+ {
+  "from": "/smart-phones/hp-omnibook-5-14-inch-1tb",
+  "to": "/laptops/hp-omnibook-5-14-inch-1tb"
+ },
+ {
+  "from": "/smart-phones/dell-16-plus-2025-1tb",
+  "to": "/laptops/dell-16-plus-2025-1tb"
+ },
+ {
+  "from": "/smart-phones/hp-spectre-x360-14-14-inch-1tb",
+  "to": "/laptops/hp-spectre-x360-14-14-inch-1tb"
+ },
+ {
+  "from": "/smart-phones/dell-14-premium-2025-2tb",
+  "to": "/laptops/dell-14-premium-2025-2tb"
+ },
+ {
+  "from": "/smart-phones/sony-ult-wear-wh-ult900n",
+  "to": "/headphones/sony-ult-wear-wh-ult900n"
+ },
+ {
+  "from": "/smart-phones/eufycam-s3-pro",
+  "to": "/smart-cameras/eufycam-s3-pro"
+ },
+ {
+  "from": "/smart-phones/google-nest-cam-indoor-3rd-gen-wired",
+  "to": "/smart-cameras/google-nest-cam-indoor-3rd-gen-wired"
+ },
+ {
+  "from": "/smart-phones/eufycam-s4",
+  "to": "/smart-cameras/eufycam-s4"
+ },
+ {
+  "from": "/smart-phones/google-nest-cam-outdoor-2nd-gen-wired",
+  "to": "/smart-cameras/google-nest-cam-outdoor-2nd-gen-wired"
+ },
+ {
+  "from": "/smart-phones/eufy-wall-light-cam-s4",
+  "to": "/smart-cameras/eufy-wall-light-cam-s4"
+ },
+ {
+  "from": "/smart-phones/amazon-echo-spot-2024",
+  "to": "/smart-speakers/amazon-echo-spot-2024"
+ },
+ {
+  "from": "/smart-phones/amazon-echo-studio-2025",
+  "to": "/smart-speakers/amazon-echo-studio-2025"
+ },
+ {
+  "from": "/smart-phones/philips-hue-a19-white-and-color-ambiance-next-gen",
+  "to": "/smart-light-bulbs/philips-hue-a19-white-and-color-ambiance-next-gen"
+ },
+ {
+  "from": "/smart-phones/philips-hue-a19-white-ambiance-next-gen",
+  "to": "/smart-light-bulbs/philips-hue-a19-white-ambiance-next-gen"
+ },
+ {
+  "from": "/smart-phones/philips-hue-essential-br30-white-and-color-ambiance",
+  "to": "/smart-light-bulbs/philips-hue-essential-br30-white-and-color-ambiance"
+ },
+ {
+  "from": "/smart-phones/philips-hue-essential-a19-white-and-color-ambiance-starter-kit-with-bridge",
+  "to": "/smart-light-bulbs/philips-hue-essential-a19-white-and-color-ambiance-starter-kit-with-bridge"
+ },
+ {
+  "from": "/smart-phones/govee-g25-smart-edison-bulb-matter",
+  "to": "/smart-light-bulbs/govee-g25-smart-edison-bulb-matter"
+ },
+ {
+  "from": "/smart-phones/govee-st19-smart-edison-bulb-matter",
+  "to": "/smart-light-bulbs/govee-st19-smart-edison-bulb-matter"
+ },
+ {
+  "from": "/smart-phones/sony-bravia-9-ii-75-inch",
+  "to": "/smart-tvs/sony-bravia-9-ii-75-inch"
+ },
+ {
+  "from": "/smart-phones/sony-bravia-9-ii-85-inch",
+  "to": "/smart-tvs/sony-bravia-9-ii-85-inch"
+ },
+ {
+  "from": "/smart-phones/sony-bravia-9-ii-65-inch",
+  "to": "/smart-tvs/sony-bravia-9-ii-65-inch"
+ },
+ {
+  "from": "/smart-phones/sony-bravia-5-98-inch",
+  "to": "/smart-tvs/sony-bravia-5-98-inch"
+ },
+ {
+  "from": "/smart-phones/sony-bravia-5-85-inch",
+  "to": "/smart-tvs/sony-bravia-5-85-inch"
+ },
+ {
+  "from": "/smart-phones/ring-battery-doorbell-pro",
+  "to": "/video-doorbells/ring-battery-doorbell-pro"
+ },
+ {
+  "from": "/smart-phones/ring-wired-doorbell-plus-2k",
+  "to": "/video-doorbells/ring-wired-doorbell-plus-2k"
+ },
+ {
+  "from": "/smart-phones/ring-battery-doorbell-2024",
+  "to": "/video-doorbells/ring-battery-doorbell-2024"
+ },
+ {
+  "from": "/smart-phones/ring-wired-doorbell-elite-4k-poe",
+  "to": "/video-doorbells/ring-wired-doorbell-elite-4k-poe"
+ },
+ {
+  "from": "/smart-phones/yale-approach-lock-with-wi-fi-keypad",
+  "to": "/smart-door-locks/yale-approach-lock-with-wi-fi-keypad"
+ },
+ {
+  "from": "/smart-phones/yale-approach-lock-with-wi-fi-keypad-touch",
+  "to": "/smart-door-locks/yale-approach-lock-with-wi-fi-keypad-touch"
+ },
+ {
+  "from": "/smart-phones/google-nest-doorbell-3rd-gen-wired",
+  "to": "/video-doorbells/google-nest-doorbell-3rd-gen-wired"
+ },
+ {
+  "from": "/smart-phones/google-home-speaker-2026",
+  "to": "/smart-speakers/google-home-speaker-2026"
+ },
+ {
+  "from": "/smart-phones/samsung-s95h-oled-83-inch",
+  "to": "/smart-tvs/samsung-s95h-oled-83-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90d-oled-83-inch",
+  "to": "/smart-tvs/samsung-s90d-oled-83-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s95d-oled-55-inch",
+  "to": "/smart-tvs/samsung-s95d-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90f-oled-83-inch",
+  "to": "/smart-tvs/samsung-s90f-oled-83-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90f-oled-77-inch",
+  "to": "/smart-tvs/samsung-s90f-oled-77-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90f-oled-55-inch",
+  "to": "/smart-tvs/samsung-s90f-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90f-oled-42-inch",
+  "to": "/smart-tvs/samsung-s90f-oled-42-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90d-oled-65-inch",
+  "to": "/smart-tvs/samsung-s90d-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90d-neo-qled-98-inch",
+  "to": "/smart-tvs/samsung-qn90d-neo-qled-98-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90d-oled-42-inch",
+  "to": "/smart-tvs/samsung-s90d-oled-42-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90d-neo-qled-75-inch",
+  "to": "/smart-tvs/samsung-qn90d-neo-qled-75-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90d-neo-qled-55-inch",
+  "to": "/smart-tvs/samsung-qn90d-neo-qled-55-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s95h-oled-77-inch",
+  "to": "/smart-tvs/samsung-s95h-oled-77-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90f-oled-48-inch",
+  "to": "/smart-tvs/samsung-s90f-oled-48-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s95h-oled-55-inch",
+  "to": "/smart-tvs/samsung-s95h-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90d-neo-qled-65-inch",
+  "to": "/smart-tvs/samsung-qn90d-neo-qled-65-inch"
+ },
+ {
+  "from": "/smart-phones/lg-g4-oled-97-inch",
+  "to": "/smart-tvs/lg-g4-oled-97-inch"
+ },
+ {
+  "from": "/smart-phones/lg-g6-oled-55-inch",
+  "to": "/smart-tvs/lg-g6-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/lg-g4-oled-83-inch",
+  "to": "/smart-tvs/lg-g4-oled-83-inch"
+ },
+ {
+  "from": "/smart-phones/lg-b4-oled-65-inch",
+  "to": "/smart-tvs/lg-b4-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/lg-b4-oled-55-inch",
+  "to": "/smart-tvs/lg-b4-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/sony-bravia-8-ii-oled-65-inch",
+  "to": "/smart-tvs/sony-bravia-8-ii-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/sony-bravia-8-oled-65-inch",
+  "to": "/smart-tvs/sony-bravia-8-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/lg-g5-oled-55-inch",
+  "to": "/smart-tvs/lg-g5-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c6-oled-65-inch",
+  "to": "/smart-tvs/lg-c6-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/lg-b4-oled-77-inch",
+  "to": "/smart-tvs/lg-b4-oled-77-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c6-oled-42-inch",
+  "to": "/smart-tvs/lg-c6-oled-42-inch"
+ },
+ {
+  "from": "/smart-phones/sony-bravia-8-oled-55-inch",
+  "to": "/smart-tvs/sony-bravia-8-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c5-oled-55-inch",
+  "to": "/smart-tvs/lg-c5-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90f-oled-65-inch",
+  "to": "/smart-tvs/samsung-s90f-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c6-oled-83-inch",
+  "to": "/smart-tvs/lg-c6-oled-83-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c6-oled-77-inch",
+  "to": "/smart-tvs/lg-c6-oled-77-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s95d-oled-65-inch",
+  "to": "/smart-tvs/samsung-s95d-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90d-oled-55-inch",
+  "to": "/smart-tvs/samsung-s90d-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c5-oled-83-inch",
+  "to": "/smart-tvs/lg-c5-oled-83-inch"
+ },
+ {
+  "from": "/smart-phones/sony-bravia-8-oled-77-inch",
+  "to": "/smart-tvs/sony-bravia-8-oled-77-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c5-oled-42-inch",
+  "to": "/smart-tvs/lg-c5-oled-42-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c4-oled-55-inch",
+  "to": "/smart-tvs/lg-c4-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c4-oled-65-inch",
+  "to": "/smart-tvs/lg-c4-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c4-oled-48-inch",
+  "to": "/smart-tvs/lg-c4-oled-48-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s90d-oled-77-inch",
+  "to": "/smart-tvs/samsung-s90d-oled-77-inch"
+ },
+ {
+  "from": "/smart-phones/google-pixel-watch-4-41mm-lte",
+  "to": "/smartwatches/google-pixel-watch-4-41mm-lte"
+ },
+ {
+  "from": "/smart-phones/google-pixel-watch-4-41mm-wi-fi",
+  "to": "/smartwatches/google-pixel-watch-4-41mm-wi-fi"
+ },
+ {
+  "from": "/smart-phones/google-pixel-watch-3-45mm-wi-fi",
+  "to": "/smartwatches/google-pixel-watch-3-45mm-wi-fi"
+ },
+ {
+  "from": "/smart-phones/google-pixel-watch-3-45mm-lte",
+  "to": "/smartwatches/google-pixel-watch-3-45mm-lte"
+ },
+ {
+  "from": "/smart-phones/oneplus-watch-3-46mm-bluetooth",
+  "to": "/smartwatches/oneplus-watch-3-46mm-bluetooth"
+ },
+ {
+  "from": "/smart-phones/google-pixel-watch-3-41mm-wi-fi",
+  "to": "/smartwatches/google-pixel-watch-3-41mm-wi-fi"
+ },
+ {
+  "from": "/smart-phones/google-pixel-watch-4-45mm-lte",
+  "to": "/smartwatches/google-pixel-watch-4-45mm-lte"
+ },
+ {
+  "from": "/smart-phones/google-pixel-watch-3-41mm-lte",
+  "to": "/smartwatches/google-pixel-watch-3-41mm-lte"
+ },
+ {
+  "from": "/smart-phones/google-pixel-watch-4-45mm-wi-fi",
+  "to": "/smartwatches/google-pixel-watch-4-45mm-wi-fi"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90f-neo-qled-50-inch",
+  "to": "/smart-tvs/samsung-qn90f-neo-qled-50-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90f-neo-qled-43-inch",
+  "to": "/smart-tvs/samsung-qn90f-neo-qled-43-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c5-oled-77-inch",
+  "to": "/smart-tvs/lg-c5-oled-77-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c5-oled-65-inch",
+  "to": "/smart-tvs/lg-c5-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/oneplus-watch-2r-46mm-bluetooth",
+  "to": "/smartwatches/oneplus-watch-2r-46mm-bluetooth"
+ },
+ {
+  "from": "/smart-phones/sony-bravia-8-ii-oled-55-inch",
+  "to": "/smart-tvs/sony-bravia-8-ii-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/lg-g5-oled-97-inch",
+  "to": "/smart-tvs/lg-g5-oled-97-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c5-oled-48-inch",
+  "to": "/smart-tvs/lg-c5-oled-48-inch"
+ },
+ {
+  "from": "/smart-phones/lg-g5-oled-65-inch",
+  "to": "/smart-tvs/lg-g5-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c4-oled-42-inch",
+  "to": "/smart-tvs/lg-c4-oled-42-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c4-oled-83-inch",
+  "to": "/smart-tvs/lg-c4-oled-83-inch"
+ },
+ {
+  "from": "/smart-phones/lg-c4-oled-77-inch",
+  "to": "/smart-tvs/lg-c4-oled-77-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90f-neo-qled-85-inch",
+  "to": "/smart-tvs/samsung-qn90f-neo-qled-85-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90f-neo-qled-98-inch",
+  "to": "/smart-tvs/samsung-qn90f-neo-qled-98-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90f-neo-qled-75-inch",
+  "to": "/smart-tvs/samsung-qn90f-neo-qled-75-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90f-neo-qled-65-inch",
+  "to": "/smart-tvs/samsung-qn90f-neo-qled-65-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-qn90f-neo-qled-55-inch",
+  "to": "/smart-tvs/samsung-qn90f-neo-qled-55-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s95f-oled-83-inch",
+  "to": "/smart-tvs/samsung-s95f-oled-83-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s95f-oled-55-inch",
+  "to": "/smart-tvs/samsung-s95f-oled-55-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s95f-oled-65-inch",
+  "to": "/smart-tvs/samsung-s95f-oled-65-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s95f-oled-77-inch",
+  "to": "/smart-tvs/samsung-s95f-oled-77-inch"
+ },
+ {
+  "from": "/smart-phones/samsung-s95d-oled-77-inch",
+  "to": "/smart-tvs/samsung-s95d-oled-77-inch"
+ },
+ {
+  "from": "/entertainment-audio/jbl-authentics-200-smart-home-speaker",
+  "to": "/smart-speakers/jbl-authentics-200-smart-home-speaker"
+ },
+ {
+  "from": "/security-cameras/google-nest-doorbell-battery",
+  "to": "/video-doorbells/google-nest-doorbell-battery"
+ },
+ {
+  "from": "/security-cameras/google-nest-cam-outdoor-or-indoor-battery",
+  "to": "/smart-cameras/google-nest-cam-outdoor-or-indoor-battery"
+ },
+ {
+  "from": "/security-cameras/eufy-eufycam-2c-pro-2k-wireless-security-system",
+  "to": "/smart-cameras/eufy-eufycam-2c-pro-2k-wireless-security-system"
+ },
+ {
+  "from": "/security-cameras/eufy-indoor-cam-e30",
+  "to": "/smart-cameras/eufy-indoor-cam-e30"
  }
 ]

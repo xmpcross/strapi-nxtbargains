@@ -39,19 +39,41 @@ const RULES = [
   // Specific device types before the generic buckets.
   ['raspberry-pi',     /\braspberry\s*pi\b|\bpi\s*(zero|pico|400|[45])\b|compute module/i],
   ['robot-vacuums',    /robot vacuum|robotic vacuum|\broomba\b|robot mop/i],
-  ['video-doorbells',  /video doorbell|doorbell cam/i],
-  ['smart-door-locks', /smart lock|door lock|deadbolt/i],
+  // Ring and Nest name the product "<line> Doorbell <variant>" — the word
+  // "video" never appears — so requiring "video doorbell" matched none of them.
+  ['video-doorbells',  /\bdoorbell\b/i],
+  // Yale's line is "Approach Lock with Wi-Fi", not "smart lock". A bare \block\b
+  // is too greedy — scraped names carry feature lists, and "Safety lock" in an
+  // air fryer's blurb filed it as a door lock. Require lock-product context.
+  ['smart-door-locks', /smart lock|door lock|deadbolt|\byale\b.*\block\b|\block\b.*\b(wi-?fi|keypad)\b/i],
   ['smart-plugs',      /smart plug|smart outlet|power strip.*(smart|wifi)/i],
-  ['smart-light-bulbs',/smart bulb|light bulb|led bulb|\bhue\b.*bulb/i],
-  ['smart-speakers',   /smart speaker|echo dot|echo show|echo pop|\bnest (mini|audio)\b|homepod/i],
+  // Hue names the fitting (A19/BR30) and the light mode ("White and Color
+  // Ambiance") rather than saying "bulb"; Govee says "Smart Edison Bulb".
+  ['smart-light-bulbs',/smart bulb|light bulb|led bulb|\bhue\b.*bulb|edison bulb|\bhue\b.*\b(a19|br30)\b|white (and color )?ambiance/i],
+  ['smart-speakers',   /smart speaker|echo dot|echo show|echo pop|echo studio|echo spot|\bhome speaker\b|\bnest (mini|audio)\b|homepod/i],
+  // smart-cameras before security-cameras: the latter is "Security & Cameras
+  // AU", one of nxtsmarthome's categories, and listCommerceCategories' comment
+  // is explicit that AU categories should not surface in this storefront.
+  // Brand lines that name no generic noun ("eufyCam S4") need brand patterns.
+  ['smart-cameras',    /\beufycam\b|\bnest cam\b|\bwall light cam\b|\beufy\b.*\bcam\b/i],
   ['security-cameras', /security camera|surveillance|\bcctv\b|indoor cam|outdoor cam|\bring\b.*cam|floodlight cam|wyze cam|blink (mini|outdoor)/i],
-  ['smartwatches',     /smart ?watch|\bgalaxy watch\b|apple watch|\bfitbit\b|\bgarmin\b|amazfit|fitness tracker|\bband \d|\bwatch (ultra|se|series)\b/i],
+  // "Pixel Watch" / "OnePlus Watch" carry neither "smartwatch" nor a series
+  // word, and `pixel \d` in the phone rule does not reach them either, so they
+  // sat in smart-phones. Both must stay ahead of the smart-phones rule.
+  ['smartwatches',     /smart ?watch|\bgalaxy watch\b|apple watch|\bpixel watch\b|\boneplus watch\b|\bfitbit\b|\bgarmin\b|amazfit|fitness tracker|\bband \d|\bwatch (ultra|se|series)\b/i],
   // Sony's headphone model families (WH-/WF-) and Beats/Bose/Sennheiser lines
   // carry no generic noun, so name-only rules miss them without brand patterns.
-  ['headphones',       /headphone|earbud|\bairpods\b|\bheadset\b|\bearphone|noise cancelling|\bbuds\b|linkbuds|\bsony w[hfi]-?\d|\bbose (quietcomfort|soundlink)\b|\bbeats (studio|fit|solo)\b|sennheiser|\bjabra\b|\bgalaxy buds\b/i],
+  // WH- is followed by a letter on some lines (WH-ULT900N), not only a digit.
+  ['headphones',       /headphone|earbud|\bairpods\b|\bheadset\b|\bearphone|noise cancelling|\bbuds\b|linkbuds|\bsony w[hfi]-?\w|\bult wear\b|\bbose (quietcomfort|soundlink)\b|\bbeats (studio|fit|solo)\b|sennheiser|\bjabra\b|\bgalaxy buds\b/i],
   ['tablets',          /\bipad\b|\btablet\b|galaxy tab|\bfire hd\b|surface pro|\bmatepad\b/i],
-  ['laptops',          /\blaptop\b|macbook|chromebook|notebook pc|\bthinkpad\b|\bideapad\b|\bzenbook\b|\bvivobook\b|gaming laptop|\bxps \d|\bswift go\b|\bnitro \d/i],
-  ['smart-tvs',        /\b(oled|qled|uhd|led)\b.*\btv\b|\btv\b.*\b(oled|qled|4k|uhd)\b|smart tv|roku tv|fire tv|\d{2}[- ]inch.*\btv\b|\bsoundbar\b/i],
+  // HP and Dell drop "laptop" from the model name entirely ("HP OmniBook X
+  // 14-inch", "Dell 14 Premium (2025)"). These must precede the TV rule below,
+  // which also keys on a screen size.
+  ['laptops',          /\blaptop\b|macbook|chromebook|notebook pc|\bthinkpad\b|\bideapad\b|\bzenbook\b|\bvivobook\b|gaming laptop|\bxps \d|\bswift go\b|\bnitro \d|\bomnibook\b|\bspectre x360\b|\bdell \d+ (plus|premium)\b/i],
+  // TV model lines name the panel and the size but never the word "TV" —
+  // "LG C4 OLED 55-inch", "Samsung QN90F Neo QLED 65-inch", "Sony Bravia 9 II
+  // 65-inch" — which is why 67 televisions sat in smart-phones untouched.
+  ['smart-tvs',        /\b(oled|qled|uhd|led)\b.*\btv\b|\btv\b.*\b(oled|qled|4k|uhd)\b|smart tv|roku tv|fire tv|\d{2}[- ]inch.*\btv\b|\bsoundbar\b|\boled \d{2}-inch\b|\bneo qled\b|\bbravia\b/i],
   // Monitors are not TVs, but the site has no monitor category; group with displays.
   ['smart-tvs',        /\bmonitor\b.*(inch|hz|qhd|fhd|ips)|gaming monitor|computer monitor/i],
   // OnePlus names its handsets Nord / Ace / N-series, not "OnePlus <number>",
