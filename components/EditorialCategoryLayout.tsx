@@ -76,7 +76,13 @@ export default function EditorialCategoryLayout({
               {categoryName}
             </h1>
             <p className="mt-4 w-full text-base leading-7 text-ink/75 sm:text-lg sm:leading-8">
-              {config.glanceDescription ?? categoryBlurb}
+              {config.glanceDescription ?? categoryBlurb}{' '}
+              <a
+                href="#editorial-category-articles"
+                className="inline-flex items-center font-bold text-primary transition hover:underline"
+              >
+                Read More <span aria-hidden="true" className="ml-1">↓</span>
+              </a>
             </p>
 
             {(() => {
@@ -106,7 +112,7 @@ export default function EditorialCategoryLayout({
         </div>
       </section>
 
-      <section className="border-t border-ink/10 bg-[#f8fafc] pb-14 pt-8 sm:pb-20 sm:pt-10">
+      <section id="editorial-category-articles" className="border-t border-ink/10 bg-[#f8fafc] pb-14 pt-8 sm:pb-20 sm:pt-10">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[minmax(240px,24%)_minmax(0,76%)] lg:items-start">
             <ArticleFiltersSidebar
