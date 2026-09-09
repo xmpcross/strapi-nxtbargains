@@ -54,11 +54,14 @@ async function allPages(path, onRow) {
 }
 
 const offers = [];
-await allPages('commerce-offers?fields[0]=productUrl&fields[1]=title&fields[2]=status&populate[product][fields][0]=slug', (row) => {
+await allPages('commerce-offers?fields[0]=productUrl&fields[1]=title&fields[2]=status&fields[3]=linkFailures&populate[product][fields][0]=slug', (row) => {
   const a = row.attributes ?? row;
   const pr = a.product?.data ?? a.product;
   if (!pr) return;                       // orphans are handled elsewhere
-  offers.push({ doc: row.documentId ?? a.documentId, url: a.productUrl || '', slug: pr.slug, title: a.title });
+  offers.push({
+    doc: row.documentId ?? a.documentId, url: a.productUrl || '', slug: pr.slug, title: a.title,
+    failures: Number(a.linkFailures) || 0,
+  });
 });
 const work = LIMIT ? offers.slice(0, LIMIT) : offers;
 console.log(`  offers to check : ${work.length}`);
@@ -127,8 +130,19 @@ await Promise.all(Array.from({ length: 3 }, async () => {
         body: JSON.stringify({ data: {
           linkStatusCode: r.code,
           lastLinkCheckAt: now,
-          linkFailures: live ? 0 : 1,
-          status: live ? 'active' : 'inactive',
+          // The schema calls this "consecutive failed link checks", and says an
+          // offer is only retired once it passes a threshold. Assigning 1 on
+          // every failure would peg it there forever and that threshold could
+          // never be reached, so a run that fails increments and a run that
+          // succeeds resets.
+          linkFailures: live ? 0 : (r.failures ?? 0) + 1,
+          // The enum is ["active","expired","stale","error"] — there is no
+          // "inactive", and sending one fails validation silently per row.
+          // A destination that 404s, will not resolve, or answers with a search
+          // page instead of the product is an error, not a stale price. Which
+          // of those it was stays recoverable from linkStatusCode: 0 for a dead
+          // host, 900 for a search page, the real code otherwise.
+          status: live ? 'active' : 'error',
         } }),
       });
     } catch (e) { errors.push(String(e).slice(0, 120)); }

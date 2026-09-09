@@ -91,6 +91,15 @@ if (DRY) {
 
 mkdirSync(OUT, { recursive: true });
 
+/** Real image bytes, not an HTML error page or a JSON body with a 200. */
+function looksLikeImage(b) {
+  if (b.length < 100) return false;
+  const sig = [[0x00, 0x00, 0x01, 0x00], [0x89, 0x50, 0x4e, 0x47], [0xff, 0xd8, 0xff], [0x47, 0x49, 0x46, 0x38], [0x52, 0x49, 0x46, 0x46]];
+  if (sig.some((s) => s.every((byte, i) => b[i] === byte))) return true;
+  const head = b.subarray(0, 400).toString('utf8').trimStart();
+  return head.startsWith('<svg') || head.startsWith('<?xml') || head.startsWith('<!--');
+}
+
 const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; nxtbargains-logo-fetch/1.0)' };
 const abs = (href, base) => { try { return new URL(href, base).toString(); } catch { return null; } };
 
@@ -121,8 +130,20 @@ for (const m of work) {
       const r = await fetch(url, { headers: UA, redirect: 'follow', signal: AbortSignal.timeout(20000) });
       if (!r.ok) continue;
       const ct = (r.headers.get('content-type') || '').toLowerCase();
-      const buf = Buffer.from(await r.arrayBuffer());
+      let buf = Buffer.from(await r.arrayBuffer());
       if (buf.length < 200) continue;                       // 1px trackers, empty responses
+
+      // Some sites serve an icon as a base64 body rather than binary — Bing Lee
+      // returned an ICO that way, and saving it verbatim produced a file that
+      // begins "AAABAAEAEBAA…" and renders as nothing. Decode when the payload
+      // is base64 that unwraps to a real image.
+      if (/^[A-Za-z0-9+/\r\n]+=*\s*$/.test(buf.subarray(0, 120).toString('ascii'))) {
+        try {
+          const dec = Buffer.from(buf.toString('ascii'), 'base64');
+          if (looksLikeImage(dec)) buf = dec;
+        } catch { /* not base64 after all; keep the original bytes */ }
+      }
+      if (!looksLikeImage(buf)) continue;                   // HTML error pages, JSON, junk
       const ext = ct.includes('svg') ? 'svg' : ct.includes('png') ? 'png'
         : ct.includes('jpeg') || ct.includes('jpg') ? 'jpg' : ct.includes('icon') ? 'ico' : null;
       if (!ext) continue;
