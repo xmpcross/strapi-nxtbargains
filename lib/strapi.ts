@@ -183,6 +183,7 @@ export type CommercePriceSnapshot = {
   source?: string | null;
   merchant?: CommerceMerchant | null;
   product?: Pick<CommerceProduct, 'id' | 'documentId' | 'name' | 'slug' | 'updatedAt'> | null;
+  offer?: Pick<CommerceOffer, 'id' | 'documentId'> | null;
 };
 
 export type CommerceProduct = {
@@ -629,6 +630,62 @@ export async function listCommercePriceSnapshots(
       pagination: { pageSize },
     },
     300,
+  );
+  return res.data;
+}
+
+/**
+ * Products with only the fields a list row needs: name, slug, image, category
+ * for the href, and offer prices.
+ *
+ * listCommerceProductsForDeals populates images, gallery, brand and every
+ * offer's merchant and merchant logo. That is 5.4MB for 500 products, over the
+ * 2MB ceiling Next will cache, so the response is silently re-fetched on every
+ * request and the page can only afford a small slice of the catalogue. The same
+ * 800 products cost 0.7MB here, which is what lets the price tracker show the
+ * whole catalogue instead of 120 of it.
+ */
+/**
+ * The most recent price snapshots across the whole catalogue.
+ *
+ * listCommercePriceSnapshots filters by product and returns [] for an empty id
+ * list, which is right for a product page but wrong for a tracker that wants
+ * whatever is newest. Filtering by 700+ documentIds would also put every id in
+ * the query string.
+ */
+export async function listRecentPriceSnapshots(pageSize = 5000): Promise<CommercePriceSnapshot[]> {
+  if (useSupabaseCommerce()) return [];
+  const res = await strapiFetch<ListResponse<CommercePriceSnapshot>>(
+    'commerce-price-snapshots',
+    {
+      fields: ['price', 'originalPrice', 'currency', 'checkedAt'],
+      // The offer is essential, not decorative: a product's snapshots span every
+      // merchant selling it, so a series grouped only by product mixes one
+      // shop's price with another's and any "change" computed from it is noise.
+      populate: { product: { fields: ['documentId'] }, offer: { fields: ['documentId'] } },
+      sort: ['checkedAt:desc'],
+      pagination: { pageSize },
+    },
+    120,
+  );
+  return res.data;
+}
+
+export async function listCommerceProductsLean(pageSize = 800): Promise<CommerceProduct[]> {
+  if (useSupabaseCommerce()) return (await listSupabaseProducts({ pageSize })).data;
+  const res = await strapiFetch<ListResponse<CommerceProduct>>(
+    'commerce-products',
+    {
+      filters: { productStatus: { $eq: 'active' }, tags: { $containsi: SITE_PRODUCT_TAG } },
+      fields: ['name', 'slug', 'imageUrl', 'brand', 'updatedAt'],
+      populate: {
+        categories: { fields: ['slug', 'name'] },
+        offers: { fields: ['price', 'originalPrice', 'currency', 'status', 'productUrl', 'affiliateUrl'] },
+      },
+      sort: ['updatedAt:desc'],
+      pagination: { pageSize },
+    },
+    120,
   );
   return res.data;
 }

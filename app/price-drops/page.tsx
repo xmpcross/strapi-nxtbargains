@@ -3,20 +3,10 @@ import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
 import { collectionPageJsonLd } from '@/lib/jsonld';
 import { JsonLd } from '@/components/JsonLd';
+import { formatMoney, numericValue, productImageUrl } from '@/lib/commerce';
 import {
-  bestOffer,
-  collectOfferRows,
-  formatMoney,
-  merchantName,
-  numericValue,
-  offerPrice,
-  productImageUrl,
-  type CommerceOfferRow,
-} from '@/lib/commerce';
-import {
-  listCommercePriceSnapshots,
-  listCommerceProductsForDeals,
-  mediaUrl,
+  listCommerceProductsLean,
+  listRecentPriceSnapshots,
   type CommercePriceSnapshot,
   type CommerceProduct,
 } from '@/lib/strapi';
@@ -25,124 +15,168 @@ import { productHref } from '@/lib/product-url';
 export const revalidate = 120;
 
 export const metadata: Metadata = {
-  title: 'Price Drops',
-  description: 'See recently tracked product price drops and compare current merchant offers on NXT.Bargains.',
+  title: 'Price Tracker',
+  description:
+    'Every product we track, with its current price and what it was at the previous check. Prices that have fallen are listed first.',
   alternates: { canonical: '/price-drops' },
 };
 
-type PriceDrop = {
+/**
+ * One product's tracked price history, reduced to what a row needs.
+ *
+ * `direction` is measured latest-vs-previous reading, which is a different
+ * question from where the price sits in its range: something can tick up today
+ * and still be near its recorded low.
+ */
+type TrackedPrice = {
   product: CommerceProduct;
-  row: CommerceOfferRow;
-  dropPercent: number;
-  dropAmount: number;
-  currentPrice: number;
-  previousPrice: number;
+  current: number;
+  previous: number | null;
+  low: number;
+  high: number;
+  readings: number;
+  changePercent: number;
+  direction: 'down' | 'up' | 'flat';
+  /** 0 = at the recorded low, 100 = at the recorded high. */
+  positionInRange: number;
+  currency: string;
   checkedAt: string;
 };
 
+const MAX_ROWS = 400;
+
 export default async function PriceDropsPage() {
-  const products = await listCommerceProductsForDeals(120).catch(() => [] as CommerceProduct[]);
-  const productIds = products.map((product) => product.documentId).filter(Boolean) as string[];
-  const snapshots = await listCommercePriceSnapshots(productIds, 1200).catch(() => [] as CommercePriceSnapshot[]);
-  const productsByDocumentId = new Map(products.map((product) => [product.documentId, product]));
-  const snapshotsByProduct = groupSnapshotsByProduct(snapshots);
-  const drops = Array.from(snapshotsByProduct.entries())
-    .map(([documentId, productSnapshots]) => {
-      const product = productsByDocumentId.get(documentId);
-      if (!product) return null;
-      return buildPriceDrop(product, productSnapshots);
-    })
-    .filter((drop): drop is PriceDrop => Boolean(drop))
-    .sort((a, b) => b.dropPercent - a.dropPercent || b.dropAmount - a.dropAmount)
-    .slice(0, 36);
+  // Lean fetches on both sides. The previous version pulled 120 products with full
+  // offer/merchant/image population (5.4MB, over Next's 2MB cache ceiling) and
+  // the oldest 1,200 snapshots, which between them surfaced 18 products out of
+  // 85,216 stored readings.
+  const [products, snapshots] = await Promise.all([
+    listCommerceProductsLean(800).catch(() => [] as CommerceProduct[]),
+    listRecentPriceSnapshots(5000).catch(() => [] as CommercePriceSnapshot[]),
+  ]);
 
-  const dropCount = drops.length;
-  const topDrop = drops[0]?.dropPercent ?? 0;
-  const avgDrop = dropCount > 0
-    ? Math.round(drops.reduce((sum, d) => sum + d.dropPercent, 0) / dropCount)
-    : 0;
-  const totalSavings = drops.reduce((sum, d) => sum + d.dropAmount, 0);
-  const latestCheckedAt = drops.reduce((latest, d) => {
-    const time = new Date(d.checkedAt).getTime();
-    return time > latest ? time : latest;
+  const byProduct = new Map<string, CommercePriceSnapshot[]>();
+  for (const snapshot of snapshots) {
+    const id = snapshot.product?.documentId;
+    if (!id) continue;
+    const list = byProduct.get(id);
+    if (list) list.push(snapshot);
+    else byProduct.set(id, [snapshot]);
+  }
+
+  const tracked = products
+    .map((product) => buildTrackedPrice(product, byProduct.get(product.documentId ?? '') ?? []))
+    .filter((row): row is TrackedPrice => Boolean(row));
+
+  // Falls first, largest first; then everything else by how far it sits below
+  // its recorded high, so the most interesting rows are always at the top.
+  const ordered = [...tracked].sort((a, b) => {
+    if (a.direction === 'down' && b.direction !== 'down') return -1;
+    if (b.direction === 'down' && a.direction !== 'down') return 1;
+    if (a.direction === 'down' && b.direction === 'down') return a.changePercent - b.changePercent;
+    return a.positionInRange - b.positionInRange;
+  });
+
+  const fallen = ordered.filter((row) => row.direction === 'down');
+  const rows = ordered.slice(0, MAX_ROWS);
+  // One series per product today (each offer holds two readings), so this is
+  // the number of distinct merchant price series behind the list.
+  const merchantsTracked = tracked.length;
+  const readings = tracked.reduce((sum, row) => sum + row.readings, 0);
+  const deepest = fallen[0] ?? null;
+
+  const latestCheckedAt = tracked.reduce((latest, row) => {
+    const time = new Date(row.checkedAt).getTime();
+    return Number.isFinite(time) && time > latest ? time : latest;
   }, 0);
-  const updatedLabel = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(latestCheckedAt ? new Date(latestCheckedAt) : new Date());
-
-  const featuredDrops = drops.slice(0, 4);
+  const updatedLabel = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    .format(latestCheckedAt ? new Date(latestCheckedAt) : new Date());
 
   const pageJsonLd = collectionPageJsonLd({
-    name: 'Price Drops',
+    name: 'Price Tracker',
     url: `${SITE.url}/price-drops`,
     description: metadata.description,
-    numberOfItems: dropCount,
+    numberOfItems: tracked.length,
   });
 
   return (
     <main data-testid="price-drops-page">
       <JsonLd graph={[pageJsonLd]} />
 
-      <Hero
-        dropCount={dropCount}
-        topDrop={topDrop}
-        avgDrop={avgDrop}
-        productsTracked={products.length}
-        snapshotsCount={snapshots.length}
-        updatedLabel={updatedLabel}
-        totalSavings={totalSavings > 0 ? formatPlainMoney(totalSavings, 'USD') : null}
-      />
+      <section className="page-hero">
+        <div className="page-hero-inner">
+          <nav className="page-hero-crumbs">
+            <Link href="/">Home</Link>
+            <span aria-hidden>/</span>
+            <span className="page-hero-crumbs-current">Price tracker</span>
+          </nav>
 
-      {dropCount > 0 ? (
-        <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="featured-drops">
-          <div className="mx-auto max-w-[1366px] px-6">
-            <SectionHead
-              eyebrow="Largest movement"
-              title="Biggest tracked drops"
-              subtitle="The sharpest recent moves from the saved price-history feed."
-            />
-            <div className="mt-6 grid gap-4 lg:grid-cols-4">
-              {featuredDrops.map((drop) => (
-                <PriceDropCard key={`featured-${drop.product.id}-${drop.row.offer.id}-${drop.checkedAt}`} drop={drop} featured />
-              ))}
-            </div>
+          <div className="mt-8 max-w-3xl">
+            <p className="page-hero-eyebrow">Tracked price history</p>
+            <h1 className="page-hero-title">Every price we track, and where it sits today</h1>
+            <p className="page-hero-desc">
+              We record what each product costs each time we check, and keep the readings. Every row shows
+              today&apos;s price next to the one before it, so a fall is something you can see rather than
+              take our word for. Prices that have dropped since the last check are listed first.
+            </p>
           </div>
-        </section>
-      ) : null}
 
-      <section className="bg-white py-10 sm:py-14" id="all-drops">
+          <dl className="mt-9 grid gap-px overflow-hidden rounded-[5px] border border-ink/10 bg-ink/10 sm:grid-cols-2 lg:grid-cols-4">
+            <Stat label="Products tracked" value={tracked.length.toLocaleString()} />
+            <Stat label="Price readings" value={readings.toLocaleString()} />
+            <Stat label="Fell since last reading" value={fallen.length.toLocaleString()} />
+            <Stat label="Merchants tracked" value={merchantsTracked.toLocaleString()} />
+          </dl>
+
+          <p className="mt-4 text-xs text-ink/55">
+            Last reading {updatedLabel}
+            {deepest ? ` · biggest fall ${Math.abs(deepest.changePercent)}% on ${deepest.product.name.slice(0, 48)}` : ''}
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-white py-10 sm:py-14" id="tracked">
         <div className="mx-auto max-w-[1366px] px-6">
           <div className="flex flex-wrap items-end justify-between gap-5">
-            <SectionHead
-              eyebrow="Live tracker"
-              title="All tracked drops"
-              subtitle={
-                dropCount > 0
-                  ? `${dropCount} products ranked by drop percentage. Each compares the latest tracked price against the highest earlier snapshot.`
-                  : 'No tracked price drops are available right now.'
-              }
-            />
-            {dropCount > 0 ? (
-              <Link href="/all-products" className="inline-flex border border-ink/15 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition hover:border-primary hover:text-primary">
-                Compare all products
-              </Link>
-            ) : null}
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-primary">Live tracker</p>
+              <h2 className="mt-2 font-display text-[1.6rem] font-extrabold leading-tight text-ink">
+                {rows.length.toLocaleString()} tracked prices
+              </h2>
+              <p className="mt-1.5 max-w-2xl text-sm text-ink/65">
+                Falls first, then the prices sitting lowest against what we last recorded. Each row shows
+                the current price and what it was at the previous check.
+              </p>
+            </div>
+            <Link
+              href="/all-products"
+              className="inline-flex border border-ink/15 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink transition hover:border-primary hover:text-primary"
+            >
+              Compare all products
+            </Link>
           </div>
 
-          {dropCount > 0 ? (
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {drops.map((drop) => (
-                <PriceDropCard key={`${drop.product.id}-${drop.row.offer.id}-${drop.checkedAt}`} drop={drop} />
+          {rows.length > 0 ? (
+            <ul className="mt-8 grid gap-3 lg:grid-cols-2">
+              {rows.map((row) => (
+                <TrackedRow key={row.product.documentId ?? row.product.slug} row={row} />
               ))}
-            </div>
+            </ul>
           ) : (
-            <EmptyState
-              title="No price drops yet"
-              body="This page will populate after products have at least two tracked price snapshots with a lower latest price."
-            />
+            <div className="mt-8 border border-dashed border-ink/20 bg-[#f7f8f9] p-10 text-center">
+              <p className="font-display text-lg font-bold text-ink">Nothing tracked yet</p>
+              <p className="mx-auto mt-2 max-w-md text-sm text-ink/65">
+                A product appears here once we hold at least two price readings for it.
+              </p>
+            </div>
           )}
+
+          {tracked.length > rows.length ? (
+            <p className="mt-6 text-center text-xs text-ink/55">
+              Showing the {rows.length.toLocaleString()} most notable of {tracked.length.toLocaleString()} tracked
+              products.
+            </p>
+          ) : null}
         </div>
       </section>
 
@@ -156,280 +190,163 @@ export default async function PriceDropsPage() {
           </div>
         </div>
       </section>
-
-      <ValueStrip dropCount={dropCount} />
     </main>
-  );
-}
-
-function Hero({
-  dropCount,
-  topDrop,
-  avgDrop,
-  productsTracked,
-  snapshotsCount,
-  updatedLabel,
-  totalSavings,
-}: {
-  dropCount: number;
-  topDrop: number;
-  avgDrop: number;
-  productsTracked: number;
-  snapshotsCount: number;
-  updatedLabel: string;
-  totalSavings: string | null;
-}) {
-  return (
-    <section className="page-hero">
-      <div className="page-hero-inner">
-        <nav className="page-hero-crumbs">
-          <Link href="/">Home</Link>
-          <span aria-hidden>/</span>
-          <span className="page-hero-crumbs-current">Price drops</span>
-        </nav>
-
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
-          <div>
-            <p className="page-hero-eyebrow">Tracked price history</p>
-            <h1 className="page-hero-title">
-              Price drops worth checking before they move again
-            </h1>
-            <p className="page-hero-desc">
-              Products whose tracked price has fallen, ranked from our saved price-history snapshots. Each
-              card pulls in current merchant offers alongside the drop, so you can compare the old price with
-              what the marketplace is charging today. A product only appears once we hold enough history to
-              confirm the drop is real.
-            </p>
-          </div>
-
-          <aside className="page-hero-panel p-5 sm:p-6" aria-label="Price drop statistics">
-            <p className="page-hero-eyebrow">At a glance</p>
-            <p className="mt-3 text-sm leading-6 text-ink/65">
-              {dropCount > 0
-                ? `Tracking ${dropCount} recent price drops across ${productsTracked} products, ranked by how far each price has fallen.`
-                : 'Drops appear here once tracked products have at least two price snapshots with a lower latest price.'}
-            </p>
-            <div className="mt-5 grid grid-cols-2 gap-4 border-t border-ink/12 pt-5">
-              <Stat label="Price drops" value={String(dropCount)} />
-              <Stat label="Biggest drop" value={dropCount > 0 ? `${topDrop}%` : '—'} />
-              <Stat label="Avg. drop" value={dropCount > 0 ? `${avgDrop}%` : '—'} />
-              <Stat label="Products tracked" value={String(productsTracked)} />
-            </div>
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-ink/12 pt-4 text-xs text-ink/55">
-              <span>{snapshotsCount} snapshots · updated {updatedLabel}</span>
-              {totalSavings ? <span className="font-semibold text-primary">{totalSavings} tracked savings</span> : null}
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
   );
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <p className="font-display text-2xl font-bold text-white">{value}</p>
-      <p className="mt-1 text-sm text-white/55">{label}</p>
+    <div className="bg-white px-5 py-4">
+      <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink/50">{label}</dt>
+      <dd className="mt-1 font-display text-[1.7rem] font-extrabold leading-none text-ink tabular-nums">{value}</dd>
     </div>
   );
 }
 
-function SectionHead({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle?: string }) {
+function TrackedRow({ row }: { row: TrackedPrice }) {
+  const image = productImageUrl(row.product);
+  const href = productHref(row.product);
+  const down = row.direction === 'down';
+  const up = row.direction === 'up';
+
   return (
-    <div className="max-w-3xl">
-      <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">{eyebrow}</p>
-      <h2 className="mt-2 font-display font-bold text-ink">{title}</h2>
-      {subtitle ? <p className="mt-3 text-sm leading-7 text-ink/60 sm:text-base">{subtitle}</p> : null}
-    </div>
+    <li className="flex items-center gap-4 border border-ink/10 bg-white p-3 transition hover:border-primary/40">
+      <Link href={href} className="flex min-w-0 flex-1 items-center gap-4">
+        <span className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden border border-ink/10 bg-[#f7f8f9]">
+          {image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={image} alt="" className="h-full w-full object-contain" loading="lazy" />
+          ) : (
+            <span className="font-display text-xs font-bold text-ink/25">NXT</span>
+          )}
+        </span>
+
+        <span className="min-w-0 flex-1">
+          <span className="line-clamp-2 text-[0.92rem] font-semibold leading-snug text-ink">
+            {row.product.name}
+          </span>
+
+          <span className="mt-2 flex items-baseline gap-2">
+            <span className="font-display text-[1.15rem] font-extrabold text-ink tabular-nums">
+              {formatMoney(row.current, row.currency)}
+            </span>
+            {row.previous !== null && !Number.isNaN(row.changePercent) && row.direction !== 'flat' ? (
+              <span
+                className={`text-[0.72rem] font-bold tabular-nums ${down ? 'text-[#1f6d3f]' : 'text-[#a3251c]'}`}
+              >
+                {down ? '▼' : '▲'} {Math.abs(row.changePercent)}%
+              </span>
+            ) : (
+              <span className="text-[0.72rem] font-semibold text-ink/40">no change</span>
+            )}
+          </span>
+
+          {/*
+            The range bar only appears once a merchant's series has three or
+            more readings. Today every offer holds exactly two, and drawing a
+            low/high range across two points presents a single comparison as
+            price history — the same overstatement this page exists to avoid.
+            With two readings we state the two prices and nothing more.
+          */}
+          <span className="mt-2 block">
+            {row.readings >= 3 ? (
+              <>
+                <span className="relative block h-1.5 w-full overflow-hidden rounded-full bg-ink/10">
+                  <span
+                    className={`absolute top-0 h-full w-1.5 rounded-full ${down ? 'bg-[#1f6d3f]' : up ? 'bg-[#a3251c]' : 'bg-primary'}`}
+                    style={{ left: `calc(${row.positionInRange}% - 3px)` }}
+                  />
+                </span>
+                <span className="mt-1 flex justify-between text-[0.68rem] tabular-nums text-ink/45">
+                  <span>low {formatMoney(row.low, row.currency)}</span>
+                  <span>{row.readings} readings</span>
+                  <span>high {formatMoney(row.high, row.currency)}</span>
+                </span>
+              </>
+            ) : (
+              <span className="text-[0.68rem] tabular-nums text-ink/45">
+                {row.previous !== null
+                  ? `was ${formatMoney(row.previous, row.currency)} at the previous check`
+                  : 'first recorded price'}
+              </span>
+            )}
+          </span>
+        </span>
+      </Link>
+    </li>
   );
 }
 
 function BrowseCard({ href, title, subtitle }: { href: string; title: string; subtitle: string }) {
   return (
-    <Link
-      href={href}
-      className="group flex flex-col border border-ink/10 bg-white p-5 transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_14px_28px_-20px_rgba(13,27,42,0.35)]"
-    >
-      <h4 className="font-display text-base font-bold text-ink group-hover:text-primary">{title}</h4>
-      <p className="mt-1 text-sm text-ink/55">{subtitle}</p>
-      <span className="mt-3 text-xs font-bold uppercase tracking-[0.1em] text-primary">Browse →</span>
+    <Link href={href} className="border border-ink/10 bg-white p-5 transition hover:border-primary hover:shadow-sm">
+      <p className="font-display text-[1.05rem] font-bold text-ink">{title}</p>
+      <p className="mt-1 text-sm text-ink/60">{subtitle}</p>
     </Link>
   );
 }
 
-function PriceDropCard({ drop, featured = false }: { drop: PriceDrop; featured?: boolean }) {
-  const product = drop.product;
-  const offer = drop.row.offer;
-  const currency = offer.currency ?? 'USD';
-  const image = productImageUrl(product);
-  const logo = mediaUrl(offer.merchant?.logo ?? null);
-  const merchant = merchantName(offer);
-  const current = formatMoney(drop.currentPrice, currency);
-  const previous = formatPlainMoney(drop.previousPrice, currency);
-  const savings = formatPlainMoney(drop.dropAmount, currency);
-  const checked = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(drop.checkedAt));
-  const progress = Math.min(100, Math.max(6, drop.dropPercent));
-  const href = productHref(product);
-
-  return (
-    <article className={`group flex h-full flex-col border bg-white transition hover:-translate-y-0.5 hover:shadow-[0_18px_32px_-24px_rgba(3,3,3,0.4)] ${featured ? 'border-primary/25 shadow-[0_12px_24px_-18px_rgba(0,70,190,0.2)]' : 'border-ink/10 hover:border-primary/30'}`}>
-      <Link href={href} className="grid aspect-[4/3] place-items-center border-b border-ink/10 bg-white p-5">
-        {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={image}
-            alt={product.primaryImage?.alternativeText || product.name}
-            className="h-full max-h-44 w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <span className="flex h-36 w-full items-center justify-center bg-muted px-4 text-center font-display text-xl font-bold text-ink/25">
-            {product.brandRef?.name ?? product.brand ?? 'NXT'}
-          </span>
-        )}
-      </Link>
-
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-start justify-between gap-3">
-          <span className="inline-flex rounded bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
-            Save {drop.dropPercent}%
-          </span>
-          {featured ? <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-primary">Featured</span> : null}
-        </div>
-
-        <Link href={href} className="mt-4 block">
-          <h4 className="line-clamp-2 font-display !text-[1rem] font-bold leading-tight text-ink transition group-hover:text-primary">
-            {product.name}
-          </h4>
-        </Link>
-
-        <div className="mt-4">
-          <div className="h-1.5 bg-[#eef0f3]">
-            <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink/40">Now</p>
-              <p className="font-display text-xl font-bold text-ink">{current}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink/40">Was</p>
-              <p className="font-display text-base font-bold text-ink/35 line-through">{previous}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-auto flex items-end justify-between gap-4 pt-5">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold text-ink/50">Saved {savings} · checked {checked}</p>
-            <div className="mt-2 flex h-5 items-center">
-              {logo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={logo} alt={`${merchant} logo`} referrerPolicy="no-referrer" className="h-5 max-w-[96px] object-contain object-left" />
-              ) : (
-                <p className="line-clamp-1 text-xs font-bold uppercase tracking-[0.12em] text-primary">{merchant}</p>
-              )}
-            </div>
-          </div>
-
-          <Link
-            href={href}
-            className="shrink-0 border border-primary px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em] text-primary transition hover:bg-primary hover:text-white"
-          >
-            Compare
-          </Link>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function groupSnapshotsByProduct(snapshots: CommercePriceSnapshot[]) {
-  const map = new Map<string, CommercePriceSnapshot[]>();
+/**
+ * A product's readings, restricted to one merchant's series.
+ *
+ * A product's snapshots span every merchant selling it. Pooling them produces
+ * ranges like "low $0.60, high $251.09" for a single item, and a percentage
+ * computed between two consecutive readings is then just the gap between two
+ * shops rather than a price that moved. Comparing like with like means picking
+ * one offer's series — the longest, which is the one we have actually watched —
+ * and reading the change from that.
+ */
+function buildTrackedPrice(
+  product: CommerceProduct,
+  snapshots: CommercePriceSnapshot[],
+): TrackedPrice | null {
+  const byOffer = new Map<string, CommercePriceSnapshot[]>();
   for (const snapshot of snapshots) {
-    const documentId = snapshot.product?.documentId;
-    if (!documentId) continue;
-    if (!map.has(documentId)) map.set(documentId, []);
-    map.get(documentId)!.push(snapshot);
+    const offerId = snapshot.offer?.documentId;
+    if (!offerId) continue;
+    const list = byOffer.get(offerId);
+    if (list) list.push(snapshot);
+    else byOffer.set(offerId, [snapshot]);
   }
-  return map;
-}
+  const series = [...byOffer.values()].sort((a, b) => b.length - a.length)[0];
+  if (!series) return null;
 
-function buildPriceDrop(product: CommerceProduct, snapshots: CommercePriceSnapshot[]): PriceDrop | null {
-  const priced = snapshots
+  const priced = series
     .map((snapshot) => ({
-      snapshot,
       price: numericValue(snapshot.price) ?? numericValue(snapshot.originalPrice),
+      checkedAt: snapshot.checkedAt,
+      currency: snapshot.currency,
     }))
-    .filter((entry): entry is { snapshot: CommercePriceSnapshot; price: number } => entry.price !== null)
-    .sort((a, b) => new Date(a.snapshot.checkedAt).getTime() - new Date(b.snapshot.checkedAt).getTime());
+    .filter((entry) => entry.price !== null && entry.price > 0)
+    .map((entry) => ({ ...entry, price: entry.price as number }))
+    .sort((a, b) => new Date(a.checkedAt).getTime() - new Date(b.checkedAt).getTime());
+
   if (priced.length < 2) return null;
 
-  const latest = priced[priced.length - 1];
-  const previousHighest = priced.slice(0, -1).reduce((max, entry) => (entry.price > max.price ? entry : max), priced[0]);
-  if (latest.price >= previousHighest.price) return null;
+  const current = priced[priced.length - 1]!;
+  const previous = priced[priced.length - 2]!;
+  const values = priced.map((entry) => entry.price);
+  const low = Math.min(...values);
+  const high = Math.max(...values);
 
-  const row = bestOffer(collectOfferRows(product));
-  if (!row) return null;
-
-  const currentOfferPrice = offerPrice(row.offer);
-  const currentPrice = currentOfferPrice ?? latest.price;
-  const dropAmount = previousHighest.price - currentPrice;
-  if (dropAmount <= 0) return null;
+  const changePercent = previous.price > 0
+    ? Math.round(((current.price - previous.price) / previous.price) * 100)
+    : 0;
+  const direction: TrackedPrice['direction'] =
+    current.price < previous.price ? 'down' : current.price > previous.price ? 'up' : 'flat';
 
   return {
     product,
-    row,
-    currentPrice,
-    previousPrice: previousHighest.price,
-    dropAmount,
-    dropPercent: Math.round((dropAmount / previousHighest.price) * 100),
-    checkedAt: latest.snapshot.checkedAt,
+    current: current.price,
+    previous: previous.price,
+    low,
+    high,
+    readings: priced.length,
+    changePercent,
+    direction,
+    // A flat range would divide by zero; pin it to the low end instead.
+    positionInRange: high > low ? Math.round(((current.price - low) / (high - low)) * 100) : 0,
+    currency: current.currency || 'USD',
+    checkedAt: current.checkedAt,
   };
-}
-
-function formatPlainMoney(value: number, currency: string) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency || 'USD',
-    maximumFractionDigits: value % 1 === 0 ? 0 : 2,
-  }).format(value);
-}
-
-function EmptyState({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="mt-8 border border-dashed border-ink/15 bg-[#f7f7f7] p-10 text-center">
-      <h2 className="font-display text-lg font-bold text-ink">{title}</h2>
-      <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/60">{body}</p>
-    </div>
-  );
-}
-
-function ValueStrip({ dropCount }: { dropCount: number }) {
-  const items = [
-    {
-      ic: '01',
-      t: 'Tracked price history',
-      s: dropCount > 0
-        ? 'Drops are calculated from saved snapshots comparing latest vs. peak tracked prices.'
-        : 'Snapshots are collected as products are checked; drops appear once prices fall.',
-    },
-    { ic: '02', t: 'Compare before you buy', s: 'Each card links to the full product page with live merchant offers.' },
-    { ic: '03', t: 'More ways to save', s: 'Browse best deals, coupons, and buying guides on NXT.Bargains.' },
-  ];
-  return (
-    <div className="bg-white">
-      <div className="mx-auto grid max-w-[1366px] gap-6 px-6 py-10 sm:grid-cols-3">
-        {items.map((v) => (
-          <div key={v.t} className="flex items-start gap-3.5">
-            <span className="grid h-11 w-11 shrink-0 place-items-center bg-primary/10 font-display text-xs font-bold text-primary">{v.ic}</span>
-            <div>
-              <div className="font-display text-[0.96rem] font-semibold text-ink">{v.t}</div>
-              <div className="mt-0.5 text-[0.85rem] leading-6 text-ink/55">{v.s}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 }
