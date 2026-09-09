@@ -1,0 +1,86 @@
+{
+  "version": "0.1.20260902",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "0.1100 sec.",
+  "cost": 0,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "09050719-2228-0183-0000-61d066495008",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "0.0308 sec.",
+      "cost": 0,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "sellers",
+        "task_get",
+        "advanced",
+        "09050719-2228-0183-0000-61d066495008"
+      ],
+      "data": {
+        "se_type": "sellers",
+        "se": "google",
+        "api": "merchant",
+        "function": "sellers",
+        "location_code": 2840,
+        "language_code": "en",
+        "product_id": "9287417951193044851",
+        "data_docid": "3866065693643836952",
+        "gid": "10252459383459855293",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": [
+        {
+          "product_id": "9287417951193044851",
+          "type": "shops_list",
+          "se_domain": "google.com",
+          "location_code": 2840,
+          "language_code": "en",
+          "check_url": "https://google.com/search?ibp=oshop&q=oid%3A3866065693643836952&gl=US&hl=en&udm=28&prds=headlineOfferDocid:3866065693643836952,gpcid:10252459383459855293,rds:PC_10252459383459855293%7CPROD_PC_10252459383459855293,catalogid:9287417951193044851,pvt:hg,pvo:3&&gws_rd=cr&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc",
+          "datetime": "2026-09-05 07:19:58 +00:00",
+          "title": "Raspberry Pi 3 Model B",
+          "url": "https://www.waveshare.com/rpi3-b.htm?srsltid=AfmBOopnuh8YvW8048XMTzRuckxYnOCCFO4w-vZ4WIWPzIdPc7SA-_dJGcQ",
+          "image_url": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRGEIKf-vFF0q1k8_CUXOzcs-z7RxtISt1q6FYYliGPBuLS-qhpy7AK7QhOkMfDest2oXv9A_ctbH2TY35yBLWidNgHatlx1BwYyL9JWt-13NYLKae8RpSss_I",
+          "rating": null,
+          "item_types": [
+            "shops_list"
+          ],
+          "items_count": 1,
+          "items": [
+            {
+              "type": "shops_list",
+              "rank_group": 1,
+              "rank_absolute": 1,
+              "position": "left",
+              "xpath": null,
+              "domain": "www.waveshare.com",
+              "title": "Waveshare",
+              "url": "https://www.waveshare.com/rpi3-b.htm?srsltid=AfmBOopnuh8YvW8048XMTzRuckxYnOCCFO4w-vZ4WIWPzIdPc7SA-_dJGcQ",
+              "details": "Raspberry Pi 3 Model B",
+              "base_price": 46.99,
+              "tax": null,
+              "shipping_price": 15,
+              "total_price": 61.99,
+              "currency": "USD",
+              "price_multiplier": null,
+              "displayed_payment_breakdown": null,
+              "seller_name": "Waveshare",
+              "rating": null,
+              "shop_ad_aclk": null,
+              "product_condition": null,
+              "product_annotation": null,
+              "product_availability": "in_stock"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

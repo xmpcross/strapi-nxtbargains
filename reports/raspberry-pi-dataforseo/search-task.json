@@ -1,0 +1,39 @@
+{
+  "version": "0.1.20260902",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "0.0367 sec.",
+  "cost": 0.003,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "09050718-2228-0179-0000-62a2e4322ac0",
+      "status_code": 20100,
+      "status_message": "Task Created.",
+      "time": "0.0044 sec.",
+      "cost": 0.003,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "products",
+        "task_post"
+      ],
+      "data": {
+        "api": "merchant",
+        "function": "products",
+        "keyword": "raspberry pi",
+        "location_code": 2840,
+        "language_code": "en",
+        "depth": 100,
+        "se_type": "products",
+        "se": "google",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": null
+    }
+  ]
+}

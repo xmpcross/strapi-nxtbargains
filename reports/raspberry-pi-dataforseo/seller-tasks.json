@@ -1,0 +1,243 @@
+{
+  "version": "0.1.20260902",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "0.1237 sec.",
+  "cost": 0.008,
+  "tasks_count": 8,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "09050719-2228-0183-0000-caa6a81a5bcb",
+      "status_code": 20100,
+      "status_message": "Task Created.",
+      "time": "0.0000 sec.",
+      "cost": 0.001,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "sellers",
+        "task_post"
+      ],
+      "data": {
+        "api": "merchant",
+        "function": "sellers",
+        "location_code": 2840,
+        "language_code": "en",
+        "product_id": "10112476156642094252",
+        "data_docid": "8124287148222474061",
+        "gid": "17916862898082255347",
+        "se_type": "sellers",
+        "se": "google",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": null
+    },
+    {
+      "id": "09050719-2228-0183-0000-8350aa12a863",
+      "status_code": 20100,
+      "status_message": "Task Created.",
+      "time": "0.0000 sec.",
+      "cost": 0.001,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "sellers",
+        "task_post"
+      ],
+      "data": {
+        "api": "merchant",
+        "function": "sellers",
+        "location_code": 2840,
+        "language_code": "en",
+        "product_id": "12324661786226432009",
+        "data_docid": "495545684496800544",
+        "gid": "288800502680866068",
+        "se_type": "sellers",
+        "se": "google",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": null
+    },
+    {
+      "id": "09050719-2228-0183-0000-d21e15c6d2b4",
+      "status_code": 20100,
+      "status_message": "Task Created.",
+      "time": "0.0000 sec.",
+      "cost": 0.001,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "sellers",
+        "task_post"
+      ],
+      "data": {
+        "api": "merchant",
+        "function": "sellers",
+        "location_code": 2840,
+        "language_code": "en",
+        "product_id": "8024133571905051808",
+        "data_docid": "6450696282991412782",
+        "gid": "3902192935802825401",
+        "se_type": "sellers",
+        "se": "google",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": null
+    },
+    {
+      "id": "09050719-2228-0183-0000-ba82d8f066b4",
+      "status_code": 20100,
+      "status_message": "Task Created.",
+      "time": "0.0000 sec.",
+      "cost": 0.001,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "sellers",
+        "task_post"
+      ],
+      "data": {
+        "api": "merchant",
+        "function": "sellers",
+        "location_code": 2840,
+        "language_code": "en",
+        "product_id": "9544226808912893225",
+        "data_docid": "13286665409647337065",
+        "gid": "8115763039698137324",
+        "se_type": "sellers",
+        "se": "google",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": null
+    },
+    {
+      "id": "09050719-2228-0183-0000-f0f7fe4e0d7e",
+      "status_code": 20100,
+      "status_message": "Task Created.",
+      "time": "0.0000 sec.",
+      "cost": 0.001,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "sellers",
+        "task_post"
+      ],
+      "data": {
+        "api": "merchant",
+        "function": "sellers",
+        "location_code": 2840,
+        "language_code": "en",
+        "product_id": "850697607480040675",
+        "data_docid": "17214941477128322439",
+        "gid": "410355647256569003",
+        "se_type": "sellers",
+        "se": "google",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": null
+    },
+    {
+      "id": "09050719-2228-0183-0000-9de30ec8e8a8",
+      "status_code": 20100,
+      "status_message": "Task Created.",
+      "time": "0.0000 sec.",
+      "cost": 0.001,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "sellers",
+        "task_post"
+      ],
+      "data": {
+        "api": "merchant",
+        "function": "sellers",
+        "location_code": 2840,
+        "language_code": "en",
+        "product_id": "8918300883556576288",
+        "data_docid": "3428004641746936590",
+        "gid": "11166566155030882207",
+        "se_type": "sellers",
+        "se": "google",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": null
+    },
+    {
+      "id": "09050719-2228-0183-0000-61d066495008",
+      "status_code": 20100,
+      "status_message": "Task Created.",
+      "time": "0.0000 sec.",
+      "cost": 0.001,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "sellers",
+        "task_post"
+      ],
+      "data": {
+        "api": "merchant",
+        "function": "sellers",
+        "location_code": 2840,
+        "language_code": "en",
+        "product_id": "9287417951193044851",
+        "data_docid": "3866065693643836952",
+        "gid": "10252459383459855293",
+        "se_type": "sellers",
+        "se": "google",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": null
+    },
+    {
+      "id": "09050719-2228-0183-0000-0bc9b946ffea",
+      "status_code": 20100,
+      "status_message": "Task Created.",
+      "time": "0.0171 sec.",
+      "cost": 0.001,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "sellers",
+        "task_post"
+      ],
+      "data": {
+        "api": "merchant",
+        "function": "sellers",
+        "location_code": 2840,
+        "language_code": "en",
+        "product_id": "4775552365768340185",
+        "data_docid": "14062186136637989986",
+        "gid": "1041025896749431060",
+        "se_type": "sellers",
+        "se": "google",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": null
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "version": "0.1.20260902",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "0.0254 sec.",
+  "cost": 0,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "09050719-2228-0183-0000-d21e15c6d2b4",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "0.0101 sec.",
+      "cost": 0,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "merchant",
+        "google",
+        "sellers",
+        "task_get",
+        "advanced",
+        "09050719-2228-0183-0000-d21e15c6d2b4"
+      ],
+      "data": {
+        "se_type": "sellers",
+        "se": "google",
+        "api": "merchant",
+        "function": "sellers",
+        "location_code": 2840,
+        "language_code": "en",
+        "product_id": "8024133571905051808",
+        "data_docid": "6450696282991412782",
+        "gid": "3902192935802825401",
+        "device": "desktop",
+        "os": "windows"
+      },
+      "result": [
+        {
+          "product_id": "8024133571905051808",
+          "type": "shops_list",
+          "se_domain": "google.com",
+          "location_code": 2840,
+          "language_code": "en",
+          "check_url": "https://google.com/search?ibp=oshop&q=oid%3A6450696282991412782&gl=US&hl=en&udm=28&prds=headlineOfferDocid:6450696282991412782,gpcid:3902192935802825401,rds:PC_3902192935802825401%7CPROD_PC_3902192935802825401,catalogid:8024133571905051808,pvt:hg,pvo:3&&gws_rd=cr&uule=w+CAIQIFISCQs2MuSEtepUEUK33kOSuTsc",
+          "datetime": "2026-09-05 07:19:58 +00:00",
+          "title": "CanaKit Raspberry Pi 5 Starter Kit",
+          "url": "https://www.bestbuy.com/product/canakit-raspberry-pi-5-starter-kit-turbine-8gb-black/JXS4YQCXZF/sku/6633697?utm_source=feed",
+          "image_url": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSzR5l-finCTOBEzWCdrHsavFsHjIXhcoxxkKTcFw7Iug9fYK9jdRgPVddQ7ZxvOojCaslFoJPapdt2KFqnXGdUreNijmK70jgSsSRzpB0cnJ6CWT828veF",
+          "rating": {
+            "type": "rating_element",
+            "position": "left",
+            "rating_type": "Max5",
+            "value": 4.61,
+            "votes_count": 21,
+            "rating_max": 5
+          },
+          "item_types": [
+            "shops_list"
+          ],
+          "items_count": 3,
+          "items": [
+            {
+              "type": "shops_list",
+              "rank_group": 1,
+              "rank_absolute": 1,
+              "position": "left",
+              "xpath": null,
+              "domain": "www.bestbuy.com",
+              "title": "Best Buy",
+              "url": "https://www.bestbuy.com/product/canakit-raspberry-pi-5-starter-kit-turbine-8gb-black/JXS4YQCXZF/sku/6633697?utm_source=feed",
+              "details": "CanaKit - Raspberry Pi 5 Starter Kit - Turbine (8GB) - Black",
+              "base_price": 269.95,
+              "tax": null,
+              "shipping_price": null,
+              "total_price": 269.95,
+              "currency": "USD",
+              "price_multiplier": null,
+              "displayed_payment_breakdown": null,
+              "seller_name": "Best Buy",
+              "rating": {
+                "type": "rating_element",
+                "position": "left",
+                "rating_type": "Max5",
+                "value": 4.635,
+                "votes_count": 1806,
+                "rating_max": 5
+              },
+              "shop_ad_aclk": null,
+              "product_condition": null,
+              "product_annotation": "Best price",
+              "product_availability": "in_stock"
+            },
+            {
+              "type": "shops_list",
+              "rank_group": 2,
+              "rank_absolute": 2,
+              "position": "left",
+              "xpath": null,
+              "domain": "www.doordash.com",
+              "title": "DoorDash - Best Buy US",
+              "url": "https://www.doordash.com/products/-/ugp_d243462b-5950-4ee1-ab4d-a93590b277cd?business_id=11630312&ms_id=6633697&utm_source=Google&utm_medium=PLA&utm_campaign=organic_product_listing&srsltid=AfmBOorrHQhlLwWx6vERXlfmPWn8_FYrgLC2IoyamU5o6NeWjfyPLpGS2HU&region_id=26060569",
+              "details": "CanaKit - Raspberry Pi 5 Starter Kit - Turbine (8GB) - Black | Best Buy",
+              "base_price": 269.95,
+              "tax": null,
+              "shipping_price": 5.99,
+              "total_price": 275.94,
+              "currency": "USD",
+              "price_multiplier": null,
+              "displayed_payment_breakdown": null,
+              "seller_name": "DoorDash - Best Buy US",
+              "rating": null,
+              "shop_ad_aclk": null,
+              "product_condition": null,
+              "product_annotation": null,
+              "product_availability": "in_stock"
+            },
+            {
+              "type": "shops_list",
+              "rank_group": 3,
+              "rank_absolute": 3,
+              "position": "left",
+              "xpath": null,
+              "domain": "www.ubereats.com",
+              "title": "Uber Eats",
+              "url": "https://www.ubereats.com/product/b/e212e13a-5372-5c23-9e8a-2b7904e5ed64?utm_campaign=google-shopping-free-listings&utm_medium=organic&utm_source=google&srsltid=AfmBOoqO1vrDDclC5fEcJ78B8CArs5P0F04cEGA9mjpFQbf4VqWiKaVVigg&region_id=1041922810087651580200060506020811150705070504130411031504151108080111000203020615",
+              "details": "CanaKit Raspberry Pi 5 Starter Turbine Kit, Black",
+              "base_price": 269.95,
+              "tax": null,
+              "shipping_price": 15,
+              "total_price": 284.95,
+              "currency": "USD",
+              "price_multiplier": null,
+              "displayed_payment_breakdown": null,
+              "seller_name": "Uber Eats",
+              "rating": null,
+              "shop_ad_aclk": null,
+              "product_condition": null,
+              "product_annotation": null,
+              "product_availability": "out_of_stock"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

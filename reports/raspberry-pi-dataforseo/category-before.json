@@ -1,0 +1,16 @@
+[
+  {
+    "id": "51b829d9-33ec-426f-a339-9e2758c1aff3",
+    "title": "Raspberry Pi 5 16GB",
+    "slug": "raspberry-pi-5-16gb",
+    "category": "Smartphones",
+    "is_active": true
+  },
+  {
+    "id": "b32c2996-a15d-4180-bfb9-97d114dc4c1b",
+    "title": "Raspberry Pi 5 8GB",
+    "slug": "raspberry-pi-5-8gb",
+    "category": "Smartphones",
+    "is_active": true
+  }
+]
