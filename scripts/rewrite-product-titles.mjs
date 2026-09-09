@@ -145,8 +145,8 @@ async function promptForCategory() {
   return answer;
 }
 
-// 5. Helper to enforce word count limit (< 15 words)
-function enforceMaxWords(text, maxWords = 14) {
+// 5. Helper to enforce word count limit (< 12 words)
+function enforceMaxWords(text, maxWords = 11) {
   if (!text || typeof text !== 'string') return '';
   let words = text.trim().split(/\s+/).filter(Boolean);
   if (words.length > maxWords) {
@@ -170,12 +170,12 @@ function isAlreadyRewritten(product) {
     return true;
   }
 
-  // Check 2: Presence of custom metaTitle in specs & clean product name (< 15 words)
+  // Check 2: Presence of custom metaTitle in specs & clean product name (< 12 words)
   if (specs.metaTitle && typeof specs.metaTitle === 'string' && specs.metaTitle.length > 10) {
     const name = product.name || '';
     const wordCount = name.trim().split(/\s+/).filter(Boolean).length;
     const hasRawNoise = /(?:\bUPC\b|\bASIN\b|\bB0[A-Z0-9]{8}\b|\|\s*Free|\[NEW\]|\bOFFICIAL STORE\b)/i.test(name);
-    if (!hasRawNoise && name.length <= 80 && wordCount < 15) {
+    if (!hasRawNoise && name.length <= 80 && wordCount < 12) {
       return true;
     }
   }
@@ -212,7 +212,7 @@ function cleanTitleAlgorithmic(rawName, brand) {
     clean = `${brand} ${clean}`;
   }
 
-  clean = enforceMaxWords(clean, 14);
+  clean = enforceMaxWords(clean, 11);
 
   const metaTitle = `${clean} - Best Deals & Price Comparison`;
   const slug = slugify(clean);
@@ -239,7 +239,7 @@ Category: "${category}"
 Product Specs: ${JSON.stringify(specs).slice(0, 300)}
 
 Requirements:
-1. "name": Clean, concise, human-readable product title (MUST be strictly less than 15 words, max 14 words, 40-70 chars). Include Brand, Model Name, and key distinction (e.g. storage size, color, or primary spec). Remove ALL merchant clutter, seller codes, ASINs, UPCs, "Free Shipping", "Unlocked", or duplicate keywords. Title Case.
+1. "name": Clean, concise, human-readable product title (MUST be strictly less than 12 words, max 11 words, 30-60 chars). Include Brand, Model Name, and key distinction (e.g. storage size, color, or primary spec). Remove ALL merchant clutter, seller codes, ASINs, UPCs, "Free Shipping", "Unlocked", or duplicate keywords. Title Case.
 2. "metaTitle": High-converting SEO meta title suitable for Google Search (50-60 chars max). Format: "[Clean Product Name] - Best Deals & Price Comparison".
 3. "slug": Clean, URL-friendly slug based on the new product title (lowercased, hyphenated, alphanumeric only, max 70 chars).
 
@@ -276,7 +276,7 @@ Return ONLY strict valid JSON with no markdown formatting:
     const parsed = JSON.parse(cleanedJsonText);
 
     if (parsed.name && parsed.metaTitle && parsed.slug) {
-      const finalName = enforceMaxWords(parsed.name, 14);
+      const finalName = enforceMaxWords(parsed.name, 11);
       return {
         name: finalName,
         metaTitle: parsed.metaTitle.trim(),

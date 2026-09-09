@@ -150,7 +150,7 @@ export default function ProductFiltersSidebar({
       {categories.length > 0 ? (
         <div className="filter-section mt-5">
           <p className={SECTION_LABEL}>Categories &amp; Subcategories</p>
-          <nav aria-label="Product categories" className="filter-scroll grid gap-1">
+          <nav aria-label="Product categories" className="filter-category-list grid gap-1">
             <FilterRow
               href={categoryHref('')}
               label="All Categories"

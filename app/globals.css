@@ -2310,6 +2310,17 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 
 .filter-scroll { max-height: 15rem; overflow-y: auto; }
 
+/* Categories & Subcategories runs to its natural height rather than sharing
+   .filter-scroll's 15rem cap. There are a dozen or so categories and the list
+   is how a reader moves between them, so hiding half of it behind an inner
+   scrollbar — inside a page that already scrolls — cost more than the height
+   saved. The Store list keeps the cap: that one runs to hundreds of rows. */
+.filter-category-list {
+  max-height: none;
+  height: auto;
+  overflow: visible;
+}
+
 /* --------------------------------------------------------- catalog results --
    Count on the left, active-filter chips on the right. */
 .catalog-results-bar {
