@@ -35,7 +35,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Product comparisons',
     eyebrow: 'Editorial · Comparisons',
     heroGradient:
-      'linear-gradient(135deg, #f4f8ff 0%, #e9f2ff 50%, #f8fafc 100%)',
+      'linear-gradient(135deg, #ffffff 0%, #f0f6ff 60%, #f8fafc 100%)',
     accentColor: '#0046be',
     bullets: [],
     primaryCta: { href: '/all-products', label: 'Compare products' },
@@ -59,7 +59,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Product reviews',
     eyebrow: 'Editorial · Reviews',
     heroGradient:
-      'linear-gradient(135deg, #fffdf2 0%, #fef9c3 50%, #fffdfa 100%)',
+      'linear-gradient(135deg, #ffffff 0%, #fffbeb 60%, #fffdfa 100%)',
     accentColor: '#d97706',
     bullets: [],
     primaryCta: { href: '/all-products', label: 'Shop compared' },
@@ -83,7 +83,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Product roundups',
     eyebrow: 'Editorial · Roundups',
     heroGradient:
-      'linear-gradient(135deg, #f0fdf4 0%, #e6f4ea 50%, #f8fafc 100%)',
+      'linear-gradient(135deg, #ffffff 0%, #f0fdf4 60%, #f8fafc 100%)',
     accentColor: '#059669',
     bullets: [],
     primaryCta: { href: '/best-deals', label: 'Best deals' },
@@ -107,7 +107,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'How-to guides',
     eyebrow: 'Editorial · How-to',
     heroGradient:
-      'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #faf8ff 100%)',
+      'linear-gradient(135deg, #ffffff 0%, #faf5ff 60%, #faf8ff 100%)',
     accentColor: '#7c3aed',
     bullets: [],
     primaryCta: { href: '/all-products', label: 'Find products' },
@@ -131,7 +131,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Top-rated products',
     eyebrow: 'Editorial · Top rated',
     heroGradient:
-      'linear-gradient(135deg, #fffdf0 0%, #fef3c7 50%, #fffdf8 100%)',
+      'linear-gradient(135deg, #ffffff 0%, #fffbeb 60%, #fffdf8 100%)',
     accentColor: '#b45309',
     bullets: [],
     primaryCta: { href: '/best-sellers', label: 'Best sellers' },
@@ -155,7 +155,7 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Informative articles',
     eyebrow: 'Editorial · Explainers',
     heroGradient:
-      'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%)',
+      'linear-gradient(135deg, #ffffff 0%, #f0f9ff 60%, #f8fafc 100%)',
     accentColor: '#0284c7',
     bullets: [],
     primaryCta: { href: '/product-reviews', label: 'Product reviews' },
@@ -182,7 +182,7 @@ const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig
     breadcrumbLabel: 'Smart home',
     eyebrow: 'Editorial · Connected living',
     heroGradient:
-      'linear-gradient(135deg, #f0fdf4 0%, #e6f4ea 50%, #f8fafc 100%)',
+      'linear-gradient(135deg, #ffffff 0%, #f0fdf4 60%, #f8fafc 100%)',
     accentColor: '#059669',
     bullets: [],
     primaryCta: { href: '/product-reviews', label: 'Read reviews' },
@@ -213,7 +213,7 @@ const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig
     breadcrumbLabel: 'Best Sellers',
     eyebrow: 'Editorial · Marketplace picks',
     heroGradient:
-      'linear-gradient(135deg, #fffdf0 0%, #fef3c7 50%, #fffdfa 100%)',
+      'linear-gradient(135deg, #ffffff 0%, #fffbeb 60%, #fffdfa 100%)',
     accentColor: '#b45309',
     bullets: [],
     primaryCta: { href: '/best-sellers', label: 'Live best-seller lists' },
@@ -242,7 +242,7 @@ const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig
     breadcrumbLabel: 'Buying guides',
     eyebrow: 'Editorial · Buy smarter',
     heroGradient:
-      'linear-gradient(135deg, #f0fdfa 0%, #e6fffa 50%, #f8fafc 100%)',
+      'linear-gradient(135deg, #ffffff 0%, #f0fdfa 60%, #f8fafc 100%)',
     accentColor: '#0d9488',
     bullets: [],
     primaryCta: { href: '/product-comparisons', label: 'Compare products' },
@@ -289,7 +289,7 @@ export function buildDefaultCategoryConfig(
     breadcrumbLabel: name,
     eyebrow: `Editorial · ${name}`,
     heroGradient:
-      'linear-gradient(135deg, #f4f8ff 0%, #e9f2ff 50%, #f8fafc 100%)',
+      'linear-gradient(135deg, #ffffff 0%, #f0f6ff 60%, #f8fafc 100%)',
     accentColor: '#0046be',
     bullets: [],
     primaryCta: { href: '/best-deals', label: 'Best deals' },

@@ -50,10 +50,10 @@ export default function EditorialCategoryLayout({
       className="article-category-page editorial-category-page"
       data-testid={`editorial-category-${categorySlug}`}
     >
-      <section className="relative overflow-hidden border-b border-ink/10 bg-slate-50 text-ink">
+      <section className="relative overflow-hidden border-b border-ink/10 bg-white text-ink">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-90"
+          className="pointer-events-none absolute inset-0 opacity-70"
           style={{ background: config.heroGradient }}
         />
         <div className="editorial-category-hero-inner relative mx-auto px-4 py-10 sm:px-6 sm:py-14">
