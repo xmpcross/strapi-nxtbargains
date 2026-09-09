@@ -138,8 +138,42 @@ export default function ProductFiltersSidebar({
         )}
       </div>
 
+      {/*
+        Categories sit above the search form: browsing by category is the more
+        common way into the catalogue, and it is a list of links rather than
+        something to fill in.
+
+        It is the whole form that moves below, not the search field on its own —
+        the field posts alongside sort, brand, availability and condition, so
+        lifting it out would submit a search without the other filters.
+      */}
+      {categories.length > 0 ? (
+        <div className="filter-section mt-5">
+          <p className={SECTION_LABEL}>Categories &amp; Subcategories</p>
+          <nav aria-label="Product categories" className="filter-scroll grid gap-1">
+            <FilterRow
+              href={categoryHref('')}
+              label="All Categories"
+              count={totalItems}
+              active={!filters.category}
+              tone="primary"
+            />
+            {categories.map((category) => (
+              <FilterRow
+                key={category.value}
+                href={categoryHref(category.value)}
+                label={category.label}
+                count={category.count}
+                active={filters.category === category.value}
+                tone="primary"
+              />
+            ))}
+          </nav>
+        </div>
+      ) : null}
+
       {/* Search and sort post the whole form; the lists below are plain links. */}
-      <form action={action} className="filter-section mt-5 grid gap-4">
+      <form action={action} className="filter-section grid gap-4">
         {categoryMode === 'list' && filters.category ? (
           <input type="hidden" name="category" value={filters.category} />
         ) : null}
@@ -169,31 +203,6 @@ export default function ProductFiltersSidebar({
           Apply
         </button>
       </form>
-
-      {categories.length > 0 ? (
-        <div className="filter-section">
-          <p className={SECTION_LABEL}>Categories &amp; Subcategories</p>
-          <nav aria-label="Product categories" className="filter-scroll grid gap-1">
-            <FilterRow
-              href={categoryHref('')}
-              label="All Categories"
-              count={totalItems}
-              active={!filters.category}
-              tone="primary"
-            />
-            {categories.map((category) => (
-              <FilterRow
-                key={category.value}
-                href={categoryHref(category.value)}
-                label={category.label}
-                count={category.count}
-                active={filters.category === category.value}
-                tone="primary"
-              />
-            ))}
-          </nav>
-        </div>
-      ) : null}
 
       <div className="filter-section">
         <p className={SECTION_LABEL}>Price</p>
