@@ -64,10 +64,28 @@
     border-color: var(--color-gray-200, currentColor);
   }
 
-  /* Every heading and every title renders in the heading face (Manrope).
-     The title classes used to point at --font-display (Rawest); they were the
-     reason hero and post titles did not match the h1-h6 rule above. */
+  html,
+  body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  }
+
+  body,
+  p,
+  span,
+  a,
+  li,
+  div,
+  button,
+  input,
+  select,
+  textarea {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* All headings, titles, and display elements use Inter default font */
   h1, h2, h3, h4, h5, h6,
+  .heading,
+  .title,
   .page-hero-title,
   .post-title-h1,
   .home-best-seller-title,
@@ -75,34 +93,26 @@
   .read-also-title,
   .nextup-title,
   .post-prevnext-title,
-  .nxt-product-carousel__title {
-    font-family: var(--font-heading), system-ui, sans-serif !important;
+  .nxt-product-carousel__title,
+  .font-display {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   }
 
   h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     font-family: inherit !important;
   }
 
-  /* A heading keeps the heading face even when it also carries the
-     `font-display` utility — several h2/h3 in app/page.tsx do. Specificity
-     (0,1,1) beats the bare `.font-display` rule below, so order is irrelevant. */
   :is(h1, h2, h3, h4, h5, h6).font-display {
-    font-family: var(--font-heading), system-ui, sans-serif !important;
-  }
-
-  /* Rawest is kept for non-heading display use only: buttons, price badges,
-     discount pills, the "NXT" placeholder mark. */
-  .font-display {
-    font-family: var(--font-display), system-ui, sans-serif !important;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   }
 }
 
 :root {
   color-scheme: light;
-  /* Regular headings share the base font; display titles use Rawest. */
-  --font-body: 'Manrope';
-  --font-heading: var(--font-body);
-  --font-display: 'Rawest';
+  /* Default font family set to Inter across body, headings, and display text */
+  --font-body: 'Inter';
+  --font-heading: 'Inter';
+  --font-display: 'Inter';
 
   /* ------------------------------------------------------------------ */
   /* Brand palette (Best Buy scheme). Semantic tokens below map onto     */
