@@ -7,7 +7,9 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "next lint"
+    "lint": "next lint",
+    "rewrite-product-titles": "node scripts/rewrite-product-titles.mjs",
+    "enrich-product-descriptions": "node scripts/enrich-product-descriptions.mjs"
   },
   "dependencies": {
     "date-fns": "^4.1.0",

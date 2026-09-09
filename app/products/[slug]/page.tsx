@@ -232,14 +232,33 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
       </div>
     </section>
   );
-  const shortDescriptionContent = shortCopy.bullets.length ? (
-    <ul className="product-description-bullets product-short-description">
-      {shortCopy.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
-    </ul>
-  ) : (
-    <p className="line-clamp-5 text-[14px] leading-7 text-ink/80">
-      {shortCopy.lead ?? summary}
-    </p>
+  const detailsAnchorId = `product-info-accordion-${product.id}`;
+  const shortDescriptionContent = (
+    <div>
+      {/* Capped at 400px, then "Read More". A fixed height rather than a line
+          clamp because this block holds either a bullet list or a paragraph,
+          and a line count means a different depth for each — the cap keeps the
+          offer table at the same place on the page whichever it renders. */}
+      <div className="product-short-description-clip">
+        {shortCopy.bullets.length ? (
+          <ul className="product-description-bullets product-short-description">
+            {shortCopy.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+          </ul>
+        ) : (
+          <p className="text-[14px] leading-7 text-ink/80">
+            {shortCopy.lead ?? summary}
+          </p>
+        )}
+      </div>
+      <div className="mt-3">
+        <a
+          href={`#${detailsAnchorId}`}
+          className="inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:text-primary/80 hover:underline"
+        >
+          Read More <span aria-hidden="true">&darr;</span>
+        </a>
+      </div>
+    </div>
   );
 
   return (
@@ -1691,22 +1710,26 @@ function ProductDescription({ markdown }: { markdown: string }) {
   const blocks: ReactNode[] = [];
   let i = 0;
   let key = 0;
+  let lastHeadingText = '';
+
   while (i < lines.length) {
     const line = lines[i];
     if (!line.trim()) { i += 1; continue; }
     if (line.startsWith('### ')) {
+      lastHeadingText = line.slice(4).trim();
       blocks.push(
         <h3 key={key++} className="mt-6 pt-1 font-display text-base font-bold text-ink first:mt-0">
-          {inline(line.slice(4).trim())}
+          {inline(lastHeadingText)}
         </h3>,
       );
       i += 1;
       continue;
     }
     if (line.startsWith('## ')) {
+      lastHeadingText = line.slice(3).trim();
       blocks.push(
         <h3 key={key++} className="mt-6 font-display text-lg font-bold text-ink first:mt-0">
-          {inline(line.slice(3).trim())}
+          {inline(lastHeadingText)}
         </h3>,
       );
       i += 1;
@@ -1718,11 +1741,24 @@ function ProductDescription({ markdown }: { markdown: string }) {
         items.push(lines[i].replace(/^\s*[-*]\s+/, ''));
         i += 1;
       }
+      const isKeyFeatures = /key\s+feature/i.test(lastHeadingText);
       blocks.push(
         <ul key={key++} className="mt-3 list-disc space-y-1.5 pl-5">
           {items.map((it, idx) => <li key={idx}>{inline(it)}</li>)}
         </ul>,
       );
+      if (isKeyFeatures) {
+        blocks.push(
+          <div key={key++} className="mt-3">
+            <a
+              href="#specifications"
+              className="inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:text-primary/80 hover:underline"
+            >
+              Read More <span aria-hidden="true">&darr;</span>
+            </a>
+          </div>
+        );
+      }
       continue;
     }
     const para: string[] = [];
