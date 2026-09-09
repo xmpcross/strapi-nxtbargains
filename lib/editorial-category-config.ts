@@ -35,8 +35,8 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Product comparisons',
     eyebrow: 'Editorial · Comparisons',
     heroGradient:
-      'radial-gradient(at 82% 18%, rgba(71,120,230,0.3) 0%, transparent 52%), radial-gradient(at 12% 88%, rgba(16,185,129,0.16) 0%, transparent 48%)',
-    accentColor: '#8ec5ff',
+      'linear-gradient(135deg, #eef5ff 0%, #e0ecff 50%, #f4f8ff 100%)',
+    accentColor: '#0046be',
     bullets: [
       'Side-by-side specs, pricing, and trade-offs across the products you are actually considering.',
       'Clear winner signals without wading through long spec sheets on your own.',
@@ -63,8 +63,8 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Product reviews',
     eyebrow: 'Editorial · Reviews',
     heroGradient:
-      'radial-gradient(at 78% 20%, rgba(245,158,11,0.24) 0%, transparent 52%), radial-gradient(at 14% 86%, rgba(71,120,230,0.18) 0%, transparent 48%)',
-    accentColor: '#f5c26b',
+      'linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fffdf0 100%)',
+    accentColor: '#d97706',
     bullets: [
       'Hands-on takes on what works, what does not, and what is worth paying for.',
       'Practical verdicts with the caveats that matter before you buy.',
@@ -91,8 +91,8 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Product roundups',
     eyebrow: 'Editorial · Roundups',
     heroGradient:
-      'radial-gradient(at 80% 18%, rgba(16,185,129,0.26) 0%, transparent 52%), radial-gradient(at 16% 84%, rgba(71,120,230,0.16) 0%, transparent 48%)',
-    accentColor: '#6ee7b7',
+      'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #f0fdf4 100%)',
+    accentColor: '#059669',
     bullets: [
       'Best-of lists for the categories you are actively shopping in right now.',
       'Editor favorites, budget picks, and premium standouts in one place.',
@@ -119,8 +119,8 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'How-to guides',
     eyebrow: 'Editorial · How-to',
     heroGradient:
-      'radial-gradient(at 82% 16%, rgba(139,92,246,0.26) 0%, transparent 52%), radial-gradient(at 10% 88%, rgba(71,120,230,0.14) 0%, transparent 48%)',
-    accentColor: '#c4b5fd',
+      'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #faf5ff 100%)',
+    accentColor: '#7c3aed',
     bullets: [
       'Step-by-step setup, troubleshooting, and optimization walkthroughs.',
       'Practical instructions for getting more from the gear you already own.',
@@ -147,8 +147,8 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Top-rated products',
     eyebrow: 'Editorial · Top rated',
     heroGradient:
-      'radial-gradient(at 84% 18%, rgba(234,179,8,0.24) 0%, transparent 52%), radial-gradient(at 12% 86%, rgba(71,120,230,0.16) 0%, transparent 48%)',
-    accentColor: '#fcd34d',
+      'linear-gradient(135deg, #fefce8 0%, #fef08a 50%, #fffdf0 100%)',
+    accentColor: '#b45309',
     bullets: [
       'Highest-scoring standouts across the smart electronics categories we cover.',
       'Editor-backed picks with the performance and value signals that matter most.',
@@ -175,8 +175,8 @@ const EDITORIAL_CATEGORY_CONFIG: Record<SectionKey, EditorialCategoryConfig> = {
     breadcrumbLabel: 'Informative articles',
     eyebrow: 'Editorial · Explainers',
     heroGradient:
-      'radial-gradient(at 82% 18%, rgba(71,120,230,0.28) 0%, transparent 52%), radial-gradient(at 12% 88%, rgba(16,185,129,0.14) 0%, transparent 48%)',
-    accentColor: '#8ec5ff',
+      'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f7ff 100%)',
+    accentColor: '#0284c7',
     bullets: [
       'Clear explainers on how products, platforms, and pricing actually work.',
       'Context before you compare — so deals and specs make more sense.',
@@ -206,8 +206,8 @@ const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig
     breadcrumbLabel: 'Best Sellers',
     eyebrow: 'Editorial · Marketplace picks',
     heroGradient:
-      'radial-gradient(at 82% 16%, rgba(251,191,36,0.32) 0%, transparent 52%), radial-gradient(at 10% 88%, rgba(71,120,230,0.18) 0%, transparent 48%)',
-    accentColor: '#fbbf24',
+      'linear-gradient(135deg, #fffdf0 0%, #fef08a 50%, #fffbeb 100%)',
+    accentColor: '#b45309',
     bullets: [
       'Coverage tied to live best-seller lists from Amazon, eBay, Newegg, Walmart, Target, and Best Buy.',
       'Quick reads on why a product is ranking, who it suits, and what to check before you buy.',
@@ -239,8 +239,8 @@ const EXTENDED_EDITORIAL_CATEGORY_CONFIG: Record<string, EditorialCategoryConfig
     breadcrumbLabel: 'Buying guides',
     eyebrow: 'Editorial · Buy smarter',
     heroGradient:
-      'radial-gradient(at 84% 14%, rgba(45,212,191,0.3) 0%, transparent 52%), radial-gradient(at 8% 88%, rgba(71,120,230,0.2) 0%, transparent 48%)',
-    accentColor: '#5eead4',
+      'linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #f0fdf9 100%)',
+    accentColor: '#0d9488',
     bullets: [
       'What to look for, what to skip, and how to match a product to how you actually shop and use it.',
       'Budget tiers, must-have features, and trade-offs worth understanding before checkout.',
@@ -290,8 +290,8 @@ export function buildDefaultCategoryConfig(
     breadcrumbLabel: name,
     eyebrow: `Editorial · ${name}`,
     heroGradient:
-      'radial-gradient(at 80% 18%, rgba(0,70,190,0.35) 0%, transparent 52%), radial-gradient(at 16% 84%, rgba(16,185,129,0.18) 0%, transparent 48%)',
-    accentColor: '#8ec5ff',
+      'linear-gradient(135deg, #eef5ff 0%, #e0ecff 50%, #f4f8ff 100%)',
+    accentColor: '#0046be',
     bullets: [
       `Expert analysis, in-depth breakdowns, and practical advice on ${name.toLowerCase()}.`,
       'Hands-on specs, comparison insights, and real-world buyer advice.',
@@ -315,6 +315,7 @@ export function buildDefaultCategoryConfig(
     hidePostType: false,
   };
 }
+
 
 export function isEditorialCategory(slug: string): slug is SectionKey {
   return slug in EDITORIAL_CATEGORY_CONFIG || slug in EXTENDED_EDITORIAL_CATEGORY_CONFIG;

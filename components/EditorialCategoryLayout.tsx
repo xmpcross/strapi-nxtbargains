@@ -50,15 +50,15 @@ export default function EditorialCategoryLayout({
       className="article-category-page editorial-category-page"
       data-testid={`editorial-category-${categorySlug}`}
     >
-      <section className="relative overflow-hidden border-b border-ink/10 bg-[#101828] text-white">
+      <section className="relative overflow-hidden border-b border-ink/10 bg-slate-50 text-ink">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-90"
           style={{ background: config.heroGradient }}
         />
         <div className="editorial-category-hero-inner relative mx-auto px-4 py-10 sm:px-6 sm:py-14">
-          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/45">
-            <Link href="/" className="transition hover:text-white">
+          <nav className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink/55">
+            <Link href="/" className="transition hover:text-ink">
               Home
             </Link>
             <span aria-hidden>/</span>
@@ -73,17 +73,17 @@ export default function EditorialCategoryLayout({
               >
                 {config.eyebrow}
               </p>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.65rem]">
+              <h1 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl lg:text-[2.65rem]">
                 {categoryName}
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">
+              <p className="mt-4 max-w-2xl text-base leading-7 text-ink/75 sm:text-lg">
                 {categoryBlurb ?? config.glanceDescription}
               </p>
 
-              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-white/78 sm:text-base">
+              <ul className="mt-6 max-w-2xl space-y-3 text-sm leading-6 text-ink/80 sm:text-base">
                 {config.bullets.map((bullet) => (
                   <li key={bullet} className="flex gap-3">
-                    <span className="mt-0.5 shrink-0" style={{ color: config.accentColor }} aria-hidden>
+                    <span className="mt-0.5 shrink-0 font-bold" style={{ color: config.accentColor }} aria-hidden>
                       ✓
                     </span>
                     <span>{bullet}</span>
@@ -94,13 +94,13 @@ export default function EditorialCategoryLayout({
               <div className="mt-8 flex flex-wrap gap-2">
                 <Link
                   href={config.primaryCta.href}
-                  className="inline-flex min-h-11 items-center justify-center bg-[#4778e6] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#3a67d4]"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#0046be] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-xs transition hover:bg-[#003899]"
                 >
                   {config.primaryCta.label}
                 </Link>
                 <Link
                   href={config.secondaryCta.href}
-                  className="inline-flex min-h-11 items-center justify-center border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/85 transition hover:border-white/40 hover:text-white"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-ink/20 bg-white/70 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-ink/85 transition hover:border-primary hover:bg-white hover:text-primary"
                 >
                   {config.secondaryCta.label}
                 </Link>
@@ -111,8 +111,8 @@ export default function EditorialCategoryLayout({
                 if (!quickLinks?.length) return null;
                 const quickLinksLabel = config.quickLinksLabel ?? 'Shop by marketplace';
                 return (
-                <div className="mt-8 border-t border-white/10 pt-6">
-                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-white/45">
+                <div className="mt-8 border-t border-ink/10 pt-6">
+                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-ink/55">
                     {quickLinksLabel}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -120,7 +120,7 @@ export default function EditorialCategoryLayout({
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="inline-flex min-h-9 items-center border border-white/15 bg-white/8 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.08em] text-white/85 transition hover:border-white/35 hover:bg-white/12 hover:text-white"
+                        className="inline-flex min-h-9 items-center rounded-lg border border-ink/15 bg-white/80 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.08em] text-ink/80 shadow-2xs transition hover:border-primary hover:bg-white hover:text-primary"
                       >
                         {link.label}
                       </Link>
@@ -131,29 +131,29 @@ export default function EditorialCategoryLayout({
               })()}
             </div>
 
-            <aside className="border border-white/12 bg-white/5 p-5 backdrop-blur-sm">
+            <aside className="rounded-2xl border border-ink/10 bg-white/80 p-5 shadow-xs backdrop-blur-sm">
               <p
                 className="text-[0.68rem] font-bold uppercase tracking-[0.18em]"
                 style={{ color: config.accentColor }}
               >
                 At a glance
               </p>
-              <p className="mt-3 text-sm leading-6 text-white/72">{config.glanceDescription}</p>
+              <p className="mt-3 text-sm leading-6 text-ink/75">{config.glanceDescription}</p>
               <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
-                <div className="border border-white/10 bg-white/5 px-3 py-3">
-                  <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-white/45">Articles</dt>
-                  <dd className="mt-1 font-display text-2xl font-bold text-white">{total}</dd>
+                <div className="rounded-xl border border-ink/10 bg-white px-3.5 py-3 shadow-2xs">
+                  <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-ink/55">Articles</dt>
+                  <dd className="mt-1 font-display text-2xl font-bold text-ink">{total}</dd>
                 </div>
-                <div className="border border-white/10 bg-white/5 px-3 py-3">
-                  <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-white/45">Focus</dt>
-                  <dd className="mt-1 font-display text-lg font-bold text-white">{config.focusLabel}</dd>
+                <div className="rounded-xl border border-ink/10 bg-white px-3.5 py-3 shadow-2xs">
+                  <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-ink/55">Focus</dt>
+                  <dd className="mt-1 font-display text-lg font-bold text-ink">{config.focusLabel}</dd>
                 </div>
               </dl>
               <div className="mt-5 flex flex-wrap gap-2">
                 {config.topicChips.map((topic) => (
                   <span
                     key={topic}
-                    className="inline-flex border border-white/12 bg-white/5 px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-white/70"
+                    className="inline-flex rounded-md border border-ink/10 bg-white px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink/75 shadow-2xs"
                   >
                     {topic}
                   </span>
