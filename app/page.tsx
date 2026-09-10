@@ -226,11 +226,11 @@ export default async function HomePage() {
 
       {/* ---------- DAILY DEALS ---------- */}
       {dailyDeals.length > 0 && (
-        <section className="pb-14 sm:pb-[72px]" data-testid="home-daily-deals">
+        <section className="pb-14 sm:pb-[72px]" data-testid="home-popular-deals">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Today only"
-              title="Daily Deals"
+              title="Popular Deals"
               intro="Amazon's Today's Deals, refreshed every morning."
               cta={{ href: '/best-deals', label: 'All deals', variant: 'outline' }}
             />

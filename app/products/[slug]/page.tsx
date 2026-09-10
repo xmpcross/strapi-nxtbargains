@@ -49,6 +49,7 @@ import ProductReviewsSection from '@/components/ProductReviewsSection';
 import { couponMerchantLogo, localMerchantLogo } from '@/lib/merchant-logos';
 import CommerceProductCard from '@/components/CommerceProductCard';
 import ProductCarousel from '@/components/ProductCarousel';
+import ProductDescription from '@/components/ProductDescription';
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -1677,86 +1678,7 @@ function schemaCondition(value?: CommerceOffer['condition']): string {
   }
 }
 
-/* Tiny markdown renderer for the product description format we generate
-   (### headings + "- " bullets + paragraphs separated by blank lines).
-   No external dependency; the format is constrained so a hand-rolled parser
-   is shorter than wiring up `marked` and safer than dangerouslySetInnerHTML. */
 
-function ProductDescription({ markdown }: { markdown: string }) {
-  function inline(text: string): ReactNode {
-    const parts: ReactNode[] = [];
-    const re = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
-    let last = 0;
-    let m: RegExpExecArray | null;
-    let key = 0;
-    while ((m = re.exec(text)) !== null) {
-      if (m.index > last) parts.push(text.slice(last, m.index));
-      const tok = m[0];
-      if (tok.startsWith('**')) parts.push(<strong key={key++}>{tok.slice(2, -2)}</strong>);
-      else parts.push(<em key={key++}>{tok.slice(1, -1)}</em>);
-      last = m.index + tok.length;
-    }
-    if (last < text.length) parts.push(text.slice(last));
-    return parts;
-  }
-
-  const lines = markdown.replace(/\r\n/g, '\n').split('\n');
-  const blocks: ReactNode[] = [];
-  let i = 0;
-  let key = 0;
-  let lastHeadingText = '';
-
-  while (i < lines.length) {
-    const line = lines[i];
-    if (!line.trim()) { i += 1; continue; }
-    if (line.startsWith('### ')) {
-      lastHeadingText = line.slice(4).trim();
-      blocks.push(
-        <h3 key={key++} className="mt-6 pt-1 font-display text-base font-bold text-ink first:mt-0">
-          {inline(lastHeadingText)}
-        </h3>,
-      );
-      i += 1;
-      continue;
-    }
-    if (line.startsWith('## ')) {
-      lastHeadingText = line.slice(3).trim();
-      blocks.push(
-        <h3 key={key++} className="mt-6 font-display text-lg font-bold text-ink first:mt-0">
-          {inline(lastHeadingText)}
-        </h3>,
-      );
-      i += 1;
-      continue;
-    }
-    if (/^\s*[-*]\s+/.test(line)) {
-      const items: string[] = [];
-      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
-        items.push(lines[i].replace(/^\s*[-*]\s+/, ''));
-        i += 1;
-      }
-      blocks.push(
-        <ul key={key++} className="mt-3 list-disc space-y-1.5 pl-5">
-          {items.map((it, idx) => <li key={idx}>{inline(it)}</li>)}
-        </ul>,
-      );
-      continue;
-    }
-    const para: string[] = [];
-    while (
-      i < lines.length
-      && lines[i].trim()
-      && !lines[i].startsWith('### ')
-      && !lines[i].startsWith('## ')
-      && !/^\s*[-*]\s+/.test(lines[i])
-    ) {
-      para.push(lines[i]);
-      i += 1;
-    }
-    blocks.push(<p key={key++} className="mt-3 first:mt-0">{inline(para.join(' '))}</p>);
-  }
-  return <div>{blocks}</div>;
-}
 
 type LiveOffer = {
   store: string;

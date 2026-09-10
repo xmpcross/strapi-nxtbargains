@@ -3,7 +3,7 @@
  * Amazon Today's Deals + eBay Daily Deals + Walmart Flash Deals
  * -> data/amazon-daily-deals.json
  *
- * Feeds the homepage "Daily Deals" section. Written as a JSON cache rather than
+ * Feeds the homepage "Popular Deals" section. Written as a JSON cache rather than
  * Strapi records because these are not catalogue products: they are whatever
  * Amazon is discounting today, they turn over daily, and none of them are
  * price-compared against other merchants. That is the same shape as
