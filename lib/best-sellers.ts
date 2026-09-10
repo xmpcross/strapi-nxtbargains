@@ -193,3 +193,36 @@ export function listAmazonNewReleases(): BestSeller[] {
     return [];
   }
 }
+
+export type DailyDeal = {
+  asin: string;
+  title: string;
+  price: number;
+  wasPrice: number | null;
+  percentOff: number;
+  currency: string;
+  image: string | null;
+  badge: string | null;
+  url: string;
+};
+
+/**
+ * Amazon's Today's Deals, refreshed daily by scripts/fetch-amazon-daily-deals.mjs.
+ *
+ * A JSON cache rather than Strapi records: these are not catalogue products.
+ * They are whatever Amazon is discounting today, they turn over daily, and none
+ * is price-compared across merchants — the same shape as amazon-new-releases.
+ *
+ * Returns [] rather than throwing when the file is missing or malformed, so a
+ * failed fetch costs the homepage a section instead of the whole page.
+ */
+export function listAmazonDailyDeals(): DailyDeal[] {
+  try {
+    const path = join(process.cwd(), 'data', 'amazon-daily-deals.json');
+    if (!existsSync(path)) return [];
+    const parsed = JSON.parse(readFileSync(path, 'utf8')) as { deals?: DailyDeal[] };
+    return Array.isArray(parsed.deals) ? parsed.deals : [];
+  } catch {
+    return [];
+  }
+}

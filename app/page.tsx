@@ -23,10 +23,9 @@ import {
 } from '@/lib/commerce';
 import AutoCarousel from '@/components/AutoCarousel';
 import Hero from '@/components/Hero';
-import BestSellerCard from '@/components/BestSellerCard';
 import { listCouponPageData } from '@/lib/coupon-data';
 import HomepageCouponsSection from '@/components/HomepageCouponsSection';
-import { listAmazonNewReleases } from '@/lib/best-sellers';
+import { listAmazonDailyDeals, type DailyDeal } from '@/lib/best-sellers';
 import { productHref } from '@/lib/product-url';
 
 export const revalidate = 60;
@@ -138,7 +137,7 @@ export default async function HomePage() {
   // Ten: two full rows of five, matching the grid below.
   const trending = products.slice(0, 10);
 
-  const newReleases = listAmazonNewReleases();
+  const dailyDeals = listAmazonDailyDeals();
 
   const guideFeature = posts[0];
   const guideSidebarPosts = pickRandomPosts(posts.slice(1), 6);
@@ -189,19 +188,19 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ---------- NEW ON AMAZON ---------- */}
-      {newReleases.length > 0 && (
-        <section className="pb-14 sm:pb-[72px]" data-testid="home-new-releases">
+      {/* ---------- DAILY DEALS ---------- */}
+      {dailyDeals.length > 0 && (
+        <section className="pb-14 sm:pb-[72px]" data-testid="home-daily-deals">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
-              eyebrow="Just launched"
-              title="New on Amazon"
-              intro="The newest electronics releases on Amazon, refreshed weekly."
-              cta={{ href: '/best-sellers/amazon', label: 'View all', variant: 'outline' }}
+              eyebrow="Today only"
+              title="Daily Deals"
+              intro="Amazon's Today's Deals, refreshed every morning."
+              cta={{ href: '/best-deals', label: 'All deals', variant: 'outline' }}
             />
-            <div className="mt-6 grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
-              {newReleases.slice(0, 8).map((item) => (
-                <BestSellerCard key={`home-nr-${item.asin || item.rank}`} item={item} />
+            <div className="mt-6 grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-5">
+              {dailyDeals.slice(0, 10).map((deal) => (
+                <DailyDealCard key={`home-dd-${deal.asin}`} deal={deal} />
               ))}
             </div>
           </div>
@@ -404,6 +403,52 @@ function DealCard({ deal }: { deal: Deal }) {
         <OfferComparison product={deal.product} />
       </div>
     </Link>
+  );
+}
+
+/* ------------------------------------------------------------- Daily deal */
+/* Amazon's own discount, not a cross-merchant comparison: these products are
+   not in the catalogue and have no other merchant to compare against, so the
+   card shows the saving and links straight out rather than offering a
+   "Compare N prices" button it could not honour. */
+function DailyDealCard({ deal }: { deal: DailyDeal }) {
+  return (
+    <a
+      href={deal.url}
+      target="_blank"
+      rel="nofollow sponsored noopener noreferrer"
+      className="group flex h-full flex-col overflow-hidden rounded-[8px] border border-ink/10 bg-white transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]"
+      data-testid={`dailydeal-${deal.asin}`}
+    >
+      <div className="uniform-product-image-box relative grid aspect-square w-full place-items-center overflow-hidden bg-white p-4">
+        <span className="absolute left-2.5 top-2.5 z-10 rounded-[7px] bg-primary px-[9px] py-1 font-display text-[0.74rem] font-bold text-white">
+          -{deal.percentOff}%
+        </span>
+        {deal.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={deal.image} alt={deal.title} loading="lazy" referrerPolicy="no-referrer" className="uniform-product-image block h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.04]" />
+        ) : (
+          <span className="font-display text-lg font-bold text-ink/25">NXT</span>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col px-[15px] pb-4 pt-3.5">
+        <h3 className="product-card-title line-clamp-2 h-[2.6em] leading-[1.3] text-ink transition group-hover:text-primary">{deal.title}</h3>
+        <div className="mt-auto pt-3">
+          <div className="flex items-baseline justify-center gap-2">
+            <span className="font-display text-[1.05rem] font-extrabold text-ink">{formatMoney(deal.price, deal.currency)}</span>
+            {deal.wasPrice ? (
+              <span className="text-[0.78rem] font-semibold text-ink/40 line-through">{formatMoney(deal.wasPrice, deal.currency)}</span>
+            ) : null}
+          </div>
+          <p className="mt-1 text-center text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink/40">
+            {deal.badge ?? 'Amazon deal'}
+          </p>
+          <span className="mt-2.5 block rounded-[10px] bg-[#2ba24b] px-4 py-2.5 text-center font-display text-[0.85rem] font-bold text-white transition group-hover:bg-[#238a3f]">
+            View deal
+          </span>
+        </div>
+      </div>
+    </a>
   );
 }
 
