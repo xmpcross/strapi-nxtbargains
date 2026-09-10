@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import PostContent from '@/components/PostContent';
 import styles from './PillarPageTemplate.module.css';
 
 type PillarMetric = {
@@ -59,7 +58,6 @@ export type PillarPageContent = {
   matrix: PillarMatrixRow[];
   steps: PillarStep[];
   faqs: PillarFaq[];
-  bodyHtml?: string;
 };
 
 const merchantLogos = [
@@ -71,17 +69,24 @@ const merchantLogos = [
   { name: 'Newegg', domain: 'newegg.com' },
 ];
 
+/**
+ * The pillar page as a hub, not an article.
+ *
+ * These pages no longer carry a body: the prose lives in the cluster, and the
+ * pillar's job is to say what the topic covers and route the reader into it.
+ * Three things follow from that, and they are the whole redesign:
+ *
+ *   The full-guide section is gone. It rendered `bodyHtml` and there is none.
+ *
+ *   The contents rail is gone with it. A sticky table of contents earns its
+ *     column against a long article; against six short sections it was
+ *     furniture, and it cost every section a third of the page width.
+ *
+ *   Supporting articles move up, directly under the paths. On a hub the
+ *     cluster is the destination, not an afterthought below the reading
+ *     material — it was the seventh of eight blocks and is now the third.
+ */
 export default function PillarPageTemplate({ content }: { content: PillarPageContent }) {
-  const tocItems = [
-    { href: '#start-here', label: 'Start here' },
-    { href: '#decision-table', label: 'Decision table' },
-    { href: '#core-guides', label: 'Core guides' },
-    ...(content.supportingArticles?.length ? [{ href: '#supporting-articles', label: 'Supporting articles' }] : []),
-    ...(content.bodyHtml ? [{ href: '#full-guide', label: 'Full guide' }] : []),
-    { href: '#buying-playbook', label: 'Buying playbook' },
-    { href: '#answers', label: 'Answers' },
-  ];
-
   return (
     <main className={styles.pillar} data-testid="pillar-page">
       <section className={styles.hero}>
@@ -125,20 +130,7 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
         </div>
       </section>
 
-      <div className={styles.bodyFrame}>
-        <aside className={styles.tocRail} aria-label="Table of contents">
-          <nav className={styles.tocCard}>
-            <span>Contents</span>
-            {tocItems.map((item) => (
-              <Link href={item.href} key={item.href}>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </aside>
-
-        <div className={styles.bodyStack}>
-          <section className={styles.section} id="start-here">
+      <section className={styles.section} id="start-here">
         <div className={styles.shell}>
           <SectionHeader
             eyebrow="Start here"
@@ -157,6 +149,28 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
           </div>
         </div>
       </section>
+
+      {content.supportingArticles?.length ? (
+        <section className={styles.sectionAlt} id="supporting-articles">
+          <div className={styles.shell}>
+            <SectionHeader
+              eyebrow="Supporting articles"
+              title="Keep reading around this topic"
+              body="Articles tagged to this guide's topic, hand-picked first and then by keyword."
+            />
+            <div className={styles.supportingGrid}>
+              {content.supportingArticles.map((article) => (
+                <Link className={styles.supportingCard} href={article.href} key={article.href}>
+                  <ArticleThumb label={article.meta} />
+                  <span>{article.meta}</span>
+                  <h2>{article.title}</h2>
+                  <p>{article.body}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className={styles.sectionAlt} id="decision-table">
         <div className={styles.shell}>
@@ -202,43 +216,6 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
         </div>
       </section>
 
-      {content.supportingArticles?.length ? (
-        <section className={styles.sectionAlt} id="supporting-articles">
-          <div className={styles.shell}>
-            <SectionHeader
-              eyebrow="Supporting articles"
-              title="Keep reading around this topic"
-              body="Articles tagged to this guide's topic, hand-picked first and then by keyword."
-            />
-            <div className={styles.supportingGrid}>
-              {content.supportingArticles.map((article) => (
-                <Link className={styles.supportingCard} href={article.href} key={article.href}>
-                  <ArticleThumb label={article.meta} />
-                  <span>{article.meta}</span>
-                  <h2>{article.title}</h2>
-                  <p>{article.body}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      {content.bodyHtml ? (
-        <section className={styles.articleSection} id="full-guide">
-          <div className={styles.shell}>
-            <SectionHeader
-              eyebrow="Full guide"
-              title="Read the complete pillar guide"
-              body="The reusable pillar layout keeps the original article content in a focused reading section below the decision tools."
-            />
-            <div className={styles.articleBody}>
-              <PostContent html={content.bodyHtml} />
-            </div>
-          </div>
-        </section>
-      ) : null}
-
       <section className={styles.playbookSection} id="buying-playbook">
         <div className={styles.shell}>
           <div className={styles.playbookGrid}>
@@ -278,8 +255,6 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
           </div>
         </div>
       </section>
-        </div>
-      </div>
     </main>
   );
 }

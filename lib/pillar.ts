@@ -89,9 +89,16 @@ export function pillarPathForPost(post: Pick<NxtPost, 'slug'>): string | null {
   return PILLAR_PATHS_BY_SLUG[post.slug] ?? null;
 }
 
+/**
+ * Content for the pillar template.
+ *
+ * The article body is no longer a parameter: the template renders a hub, not
+ * an article, and there is no section left to put it in. Removing it from the
+ * signature rather than ignoring it means the caller stops fetching and
+ * enriching HTML that nothing displays.
+ */
 export function buildPillarContent(
   post: NxtPost,
-  bodyHtml: string,
   category: string,
   supportingArticles: PillarPageContent['supportingArticles'] = [],
 ): PillarPageContent {
@@ -241,7 +248,6 @@ export function buildPillarContent(
           'Yes. Store codes, cashback, loyalty pricing, and open-box deals can produce a better final price than a headline sale.',
       },
     ],
-    bodyHtml,
   };
 }
 

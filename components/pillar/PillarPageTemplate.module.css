@@ -523,6 +523,9 @@
 }
 
 @media (max-width: 1100px) {
+  /* Dead since the pillar became a hub: the contents rail and the two-column
+     body frame were removed with the article section. Kept only so a future
+     redesign can see what the layout used to be. */
   .bodyFrame {
     grid-template-columns: 1fr;
   }
