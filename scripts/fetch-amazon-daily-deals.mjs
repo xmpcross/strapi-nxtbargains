@@ -19,6 +19,7 @@
  *   node scripts/fetch-amazon-daily-deals.mjs --dry-run
  */
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { isOnTopicDeal } from './lib/deal-categories.mjs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,7 +28,7 @@ const DRY = process.argv.includes('--dry-run');
 const OUT = join(ROOT, 'data', 'amazon-daily-deals.json');
 const SOURCES = [
   { merchant: 'Amazon', url: 'https://www.amazon.com/gp/goldbox?ref_=nav_cs_gb', parse: parseAmazonDeals },
-  { merchant: 'eBay', url: 'https://www.ebay.com/deals', parse: parseEbayDeals },
+  { merchant: 'eBay', url: 'https://www.ebay.com/deals/tech', parse: parseEbayDeals },
   { merchant: 'Walmart', url: 'https://www.walmart.com/shop/deals/flash-deals-shopall', parse: parseWalmartDeals },
 ];
 
@@ -221,8 +222,11 @@ const deals = [];
 for (const source of SOURCES) {
   const html = await fetchThrough(source.url);
   if (!html) continue;
-  const found = source.parse(html).map((d) => ({ ...d, merchant: source.merchant }));
-  console.log(`${source.merchant}: ${found.length} deals (${found.filter((d) => d.image).length} with an image)`);
+  /* Same category filter as /best-deals — the homepage strip was showing
+     bathroom mirrors, patio furniture and Yu-Gi-Oh cards. */
+  const parsed = source.parse(html).map((d) => ({ ...d, merchant: source.merchant }));
+  const found = parsed.filter((d) => isOnTopicDeal(d.title));
+  console.log(`${source.merchant}: ${found.length} on-topic of ${parsed.length} parsed (${found.filter((d) => d.image).length} with an image)`);
   for (const d of found.slice(0, 3)) {
     console.log(`  -${d.percentOff}%  $${d.price.toFixed(2)}  ${d.title.slice(0, 46)}`);
   }

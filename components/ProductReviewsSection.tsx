@@ -175,7 +175,21 @@ export default function ProductReviewsSection({
   const rating = reviews.length
     ? reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / reviews.length
     : Number(aggregateRating ?? 0) || null;
-  const reviewCount = reviews.length || Number(aggregateCount ?? 0) || null;
+  /* Only reviews we actually hold are called reviews.
+     
+     This used to be `reviews.length || aggregateCount`, so a product with no
+     stored reviews fell through to the retailer's rating count and the panel
+     announced "156,504 reviews" above an empty list. That was true of 148 of
+     271 product pages — a majority of the catalogue claiming reviews it did
+     not have.
+     
+     The retailer's aggregate is still worth showing, but it is a count of
+     RATINGS at a retailer, not reviews on this page, and it is labelled as
+     such below. */
+  const reviewCount = reviews.length || null;
+  const ratingsElsewhere = !reviews.length && Number(aggregateCount ?? 0) > 0
+    ? Number(aggregateCount)
+    : null;
 
   const summary = (reviewSummary ?? '').trim();
   const topics = reviewTopics ?? [];
@@ -210,6 +224,13 @@ export default function ProductReviewsSection({
             {reviewCount ? (
               <p className="mt-2 text-sm text-[#55555a]">
                 {reviewCount.toLocaleString('en-US')} review{reviewCount === 1 ? '' : 's'}
+              </p>
+            ) : null}
+            {ratingsElsewhere ? (
+              <p className="mt-2 text-sm text-[#55555a]">
+                {ratingsElsewhere.toLocaleString('en-US')} rating{ratingsElsewhere === 1 ? '' : 's'} at retailers
+                <br />
+                <span className="text-[0.6875rem]">No individual reviews available for this listing.</span>
               </p>
             ) : null}
             {stats.positivePct !== null && stats.rated > 0 ? (

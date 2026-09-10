@@ -37,6 +37,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseAmazonDeals, parseEbayDeals, parseEbayDealsIntl, parseWalmartDeals, parseNeweggDeals } from './lib/deal-parsers.mjs';
+import { dealCategory, isOnTopicDeal } from './lib/deal-categories.mjs';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DRY = process.argv.includes('--dry-run');
@@ -45,7 +46,7 @@ const OUT = join(ROOT, 'data', 'best-deals-realtime.json');
 const SOURCES = [
   // United States
   { store: 'Amazon', query: 'amazon deals', region: 'US', currency: 'USD', country: 'us', url: 'https://www.amazon.com/gp/goldbox?ref_=nav_cs_gb', parse: parseAmazonDeals, favicon: 'https://www.amazon.com/favicon.ico' },
-  { store: 'eBay', query: 'ebay deals', region: 'US', currency: 'USD', country: 'us', url: 'https://www.ebay.com/deals', parse: parseEbayDeals, favicon: 'https://www.ebay.com/favicon.ico' },
+  { store: 'eBay', query: 'ebay deals', region: 'US', currency: 'USD', country: 'us', url: 'https://www.ebay.com/deals/tech', parse: parseEbayDeals, favicon: 'https://www.ebay.com/favicon.ico' },
   { store: 'Walmart', query: 'walmart deals', region: 'US', currency: 'USD', country: 'us', url: 'https://www.walmart.com/shop/deals/flash-deals-shopall', parse: parseWalmartDeals, favicon: 'https://www.walmart.com/favicon.ico' },
   { store: 'Newegg.com', query: 'newegg deals', region: 'US', currency: 'USD', country: 'us', url: 'https://www.newegg.com/todays-deals', parse: parseNeweggDeals, favicon: 'https://www.newegg.com/favicon.ico' },
 
@@ -134,15 +135,25 @@ for (const source of SOURCES) {
     console.log(`${source.store}: unreachable, skipped`);
     continue;
   }
-  const found = source.parse(html);
-  console.log(`${source.store}: ${found.length} deals`);
+  /* Filtered to the site's thirteen stated categories.
+     
+     These are general-merchandise deals pages: the unfiltered feed carried
+     cowboy boots, earrings, patio furniture and Lego onto a consumer-
+     electronics price-comparison site. Publishing those is what makes a deals
+     section read as an untargeted affiliate dump rather than a catalogue.
+     
+     The yield is low by design — roughly one deal in five even on eBay's tech
+     page — and a short honest feed is worth more than a long off-topic one. */
+  const parsed = source.parse(html);
+  const found = parsed.filter((deal) => isOnTopicDeal(deal.title));
+  console.log(`${source.store}: ${found.length} on-topic of ${parsed.length} parsed`);
 
   for (const deal of found) {
     if (!deal.url || !deal.title || deal.price === null) continue;
     items.push({
       id: `${source.store.toLowerCase().replace(/[^a-z0-9]/g, '')}-${deal.id}`,
       query: source.query,
-      category: categoryOf(deal.title),
+      category: dealCategory(deal.title),
       title: deal.title,
       store: source.store,
       price: formatPrice(deal.price, source.currency),

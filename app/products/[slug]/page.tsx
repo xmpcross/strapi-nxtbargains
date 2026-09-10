@@ -32,6 +32,7 @@ import {
   type CommerceReview,
 } from '@/lib/strapi';
 import { buyUrl } from '@/lib/offer-links';
+import { productIsIndexable } from '@/lib/product-url';
 import BestBuyPromoCard from '@/components/BestBuyPromoCard';
 import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/coupon-data';
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
@@ -73,6 +74,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     title: `${product.name} Prices`,
     description,
     alternates: { canonical: canonicalPath },
+    // One merchant means nothing to compare; follow is kept so the offer and
+    // category links on the page still pass through.
+    ...(productIsIndexable(product) ? {} : { robots: { index: false, follow: true } }),
     ...pageOpenGraph({
       title: `${product.name} Prices`,
       description,
@@ -172,6 +176,12 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
   const catalogueRating = positiveRating(product.rating);
   const titleRating = catalogueRating ?? positiveRating(averageRating);
   const titleRatingCount = catalogueRating != null ? product.ratingCount || null : reviewCount || null;
+  /* Whether that number is reviews we hold or ratings at a retailer.
+     
+     When the count comes from the catalogue aggregate it is a retailer's
+     RATING count, and calling it "reviews" claimed 156,504 reviews on a page
+     carrying none. The word follows the source. */
+  const titleRatingNoun = catalogueRating != null ? 'ratings' : 'reviews';
 
   const productLd = productJsonLd({
     name: product.name,
@@ -320,7 +330,7 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
                       {titleRating != null ? (
                         <span
                           className="product-title-rating"
-                          aria-label={`${titleRating.toFixed(1)} out of 5 stars${titleRatingCount ? ` from ${titleRatingCount.toLocaleString()} reviews` : ''}`}
+                          aria-label={`${titleRating.toFixed(1)} out of 5 stars${titleRatingCount ? ` from ${titleRatingCount.toLocaleString()} ${titleRatingNoun}` : ''}`}
                         >
                           {/* Five stars filled to the rounded rating, rather
                               than one star beside the number. */}
@@ -791,6 +801,19 @@ function PriceHistorySection({
   const lowest = lowestPricePoint(points);
   const since = points[0]?.checkedAt;
 
+  /* A chart needs at least two distinct days to be a chart.
+     
+     The guard below was `points.length > 0`, so a product with a single
+     observation rendered a line chart containing one dot, above a "Highest
+     Price" and a "Lowest Price" that were necessarily the same number on the
+     same date. Only 29 price snapshots exist across the whole catalogue, so
+     for most products that single point is today's price restated three times.
+     
+     With one point the panel says what is actually known — the price, and when
+     it was recorded — and says that history is still being collected. */
+  const distinctDays = new Set(points.map((point) => point.checkedAt.slice(0, 10))).size;
+  const hasChart = distinctDays >= 2;
+
   const content = (
     <div className={embedded ? 'p-6 sm:p-8' : ''}>
       <div className="border border-ink/10 bg-white">
@@ -798,7 +821,7 @@ function PriceHistorySection({
           Price history for {productName}
         </div>}
 
-        {points.length > 0 ? (
+        {hasChart ? (
           <div className={fullWidthChart ? 'flex w-full flex-col' : 'grid lg:grid-cols-[190px_minmax(0,1fr)]'}>
             {!fullWidthChart && <aside className="bg-gradient-to-r from-paper to-white px-4 py-6 text-xs text-ink">
               <p className="font-bold">Latest updates:</p>
@@ -830,6 +853,17 @@ function PriceHistorySection({
                 )}
               </div>
             </div>
+          </div>
+        ) : points.length > 0 ? (
+          <div className="px-6 py-8 text-center text-sm leading-6 text-ink/70">
+            <p>
+              <span className="font-bold text-ink">{formatMoney(points[0].price, points[0].currency)}</span>
+              {' '}recorded {fmtDate(points[0].checkedAt)}
+            </p>
+            <p className="mt-2 text-ink/60">
+              This is the only price recorded so far, so there is no history to chart yet. Prices are
+              checked daily and a trend will appear here once there is more than one day of data.
+            </p>
           </div>
         ) : (
           <div className="px-6 py-10 text-center text-sm leading-6 text-ink/60">
@@ -1185,6 +1219,28 @@ const HIDDEN_SPEC_KEYS = new Set([
   'gsmarena',
   'gsmarenaImportedAt',
   'additionalInfo',
+
+  /* Enrichment-pipeline bookkeeping. These are written into `specs` by
+     scripts/enrich-product-descriptions.mjs and the title rewriter to record
+     that a product has been processed — they are not specifications, and they
+     were rendering in the public spec table as rows reading
+     "titleRewritten: true" and "originalSlug: samsung-55-inch-...".
+     
+     On the products with no real specs they were the *only* rows in the table,
+     so the specification section consisted entirely of the pipeline talking
+     about itself. */
+  'titleRewritten',
+  'titleRewrittenAt',
+  'descriptionEnriched',
+  'descriptionEnrichedAt',
+  'descriptionRewritten',
+  'isDescriptionRewritten',
+  'originalName',
+  'originalSlug',
+  'metaTitle',
+  'metaTitleRewritten',
+  'slugRewritten',
+  'seoRewrittenAt',
 ]);
 
 /**
@@ -1230,7 +1286,10 @@ function productAdditionalInfoEntries(product: CommerceProduct): SpecificationEn
       label: field.label,
       value: identifierValue(product, field),
     })),
-    { label: 'Rating', value: rating && ratingCount ? `${rating} (${ratingCount} reviews)` : rating },
+    /* `ratingCount` is the retailer's count of RATINGS, not reviews held on
+       this page — the two are wired to different sources and calling it
+       "reviews" overstated what the page has. */
+    { label: 'Rating', value: rating && ratingCount ? `${rating} (${ratingCount} ratings)` : rating },
     { label: 'Status', value: product.status || undefined },
     { label: 'Last Updated', value: product.updatedAt ? fmtDate(product.updatedAt) : undefined },
   ];

@@ -21,11 +21,11 @@ const knownStoreDomains: Array<[RegExp, string]> = [
   [/newegg/, 'newegg.com'],
   [/bestbuy/, 'bestbuy.com'],
   [/target/, 'target.com'],
-  [/dell/, 'dell.com'],
+  [/^dell/, 'dell.com'],
   [/lenovo/, 'lenovo.com'],
   [/samsung/, 'samsung.com'],
   [/apple/, 'apple.com'],
-  [/nike/, 'nike.com'],
+  [/^nike/, 'nike.com'],
   [/dyson/, 'dyson.com'],
   [/hp/, 'hp.com'],
 ];
@@ -42,8 +42,26 @@ export const sourceStoreLogos: Array<[RegExp, string]> = [
   // referenced from either logo map, so both merchants fell through to a 128px
   // Google favicon. Best Buy is the second-largest merchant in the catalogue.
   [/bestbuy/, '/logos/best-buy-logo.svg'],
-  [/bjs/, '/logos/bjs-wholesale-club-logo.svg'],
-  [/hp/, '/logos/hp-logo.svg'],
+  [/^bjs/, '/logos/bjs-wholesale-club-logo.svg'],
+  /* B&H must be matched before HP and anchored.
+     
+     sourceLogoForStore strips every non-alphanumeric before testing, so
+     "B&H Photo-Video-Audio" becomes "bhphotovideoaudio" — and the unanchored
+     /hp/ below matched the "hp" inside "b·hp·hoto". Every B&H offer in the
+     price table was rendering HP's logo.
+     
+     Listed first because the list returns its first match, and anchored so it
+     cannot repeat the same trick on some other merchant. */
+  /* Anchored. sourceLogoForStore strips every non-alphanumeric before testing,
+     so "B&H Photo-Video-Audio" becomes "bhphotovideoaudio" and an unanchored
+     /hp/ matched the "hp" inside "b·hp·hoto" — every B&H offer in the price
+     table rendered HP's logo.
+     
+     Anchoring is the whole fix: with no curated match, B&H falls through to
+     the favicon leg of couponMerchantLogo and gets its own mark from
+     bhphotovideo.com. Committing a hand-drawn B&H wordmark would be inventing
+     someone's brand asset. */
+  [/^hp/, '/logos/hp-logo.svg'],
   [/dell/, '/logos/dell-logo.svg'],
   [/lenovo/, '/logos/lenovo-logo.svg'],
   [/samsung/, '/logos/samsung-official.png'],
@@ -75,14 +93,14 @@ export const sourceStoreLogos: Array<[RegExp, string]> = [
   [/bunnings/, '/logos/bunnings-logo.png'],
   [/staples/, '/logos/staples-logo.ico'],
   [/binglee/, '/logos/bing-lee-logo.ico'],
-  [/eufy/, '/logos/eufy-logo.png'],
+  [/^eufy/, '/logos/eufy-logo.png'],
   [/mwave/, '/logos/mwave-logo.ico'],
   [/mercari/, '/logos/mercari-logo.ico'],
   [/telstra/, '/logos/telstra-logo.png'],
   [/swappa/, '/logos/swappa-logo.ico'],
   [/dicksmith/, '/logos/dick-smith-logo.ico'],
   [/poshmark/, '/logos/poshmark-logo.png'],
-  [/zoro/, '/logos/zoro-logo.png'],
+  [/^zoro/, '/logos/zoro-logo.png'],
   [/samsclub/, '/logos/sam-s-club-logo.ico'],
   [/appliancesonline/, '/logos/appliances-online-logo.png'],
   [/beaconlighting/, '/logos/beacon-lighting-logo.png'],

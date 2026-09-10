@@ -118,3 +118,27 @@ export function productHref(
 ): string {
   return productCanonicalPath(product);
 }
+
+/**
+ * Whether a product page is worth indexing.
+ *
+ * The page's entire proposition is "compare prices across merchants". With one
+ * merchant there is nothing to compare — it restates a single retailer's
+ * listing, which is what Google's thin-affiliate policy is about. Ten products
+ * are in that state, all Amazon-only.
+ *
+ * A predicate rather than a list of slugs: a product that picks up a second
+ * merchant on the next price run becomes indexable again by itself, and one
+ * that loses its offers drops out without anyone remembering to edit a file.
+ */
+export function productIsIndexable(
+  product: { offers?: Array<{ merchant?: { slug?: string | null } | null; status?: string | null }> | null },
+): boolean {
+  const merchants = new Set(
+    (product.offers ?? [])
+      .filter((offer) => !offer?.status || offer.status === 'active')
+      .map((offer) => offer?.merchant?.slug)
+      .filter(Boolean),
+  );
+  return merchants.size >= 2;
+}

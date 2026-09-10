@@ -23,6 +23,43 @@ const nextConfig = {
     return [
       {
         /*
+         * The "Best Sellers" post category and its 34 articles were deleted
+         * from the CMS. The category page kept returning 200 with 65 words and
+         * index,follow — an empty page still inviting crawlers — and all 34
+         * post URLs, which had been in the sitemap that morning, began 404ing
+         * for anyone holding a link.
+         *
+         * 301 rather than 410: these were individual deal write-ups, and
+         * /best-deals is the live equivalent, so the redirect lands somewhere
+         * topically related instead of a dead end. Use 410 instead if the
+         * intent ever becomes "this content should leave the index entirely".
+         *
+         * The :slug* pattern requires a segment after the prefix, so the
+         * separate /best-sellers marketplace route and /best-sellers/:merchant
+         * are untouched — different path, and matched by neither rule.
+         */
+        source: '/best-sellers-articles/:slug*',
+        destination: '/best-deals',
+        permanent: true,
+      },
+      {
+        source: '/best-sellers-articles',
+        destination: '/best-deals',
+        permanent: true,
+      },
+      {
+        /*
+         * The Legal Notice page was replaced by the Affiliate Disclosure, which
+         * carries the operator-identification section it held. It was linked
+         * from the footer of every page, so it is indexed and cannot simply
+         * 404.
+         */
+        source: '/legal/notice',
+        destination: '/legal/affiliate-disclosure',
+        permanent: true,
+      },
+      {
+        /*
          * /deals was a listing page for Strapi posts in a "Deals" category
          * that never had any: it rendered "No Deals articles yet" over 50
          * words of content while sitting in the sitemap as a daily-changing

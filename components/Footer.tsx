@@ -45,7 +45,7 @@ const aboutLinks = [
 const MARKETPLACES = ['Amazon', 'eBay', 'Walmart', 'AliExpress', 'Best Buy', 'Target', 'Newegg'];
 
 const legalLinks = [
-  { href: '/legal/notice', label: 'Legal Notice' },
+  { href: '/legal/affiliate-disclosure', label: 'Affiliate Disclosure' },
   { href: '/legal/terms', label: 'Terms & Conditions' },
   { href: '/legal/privacy', label: 'Privacy Policy' },
   { href: '/legal/cookies', label: 'Cookie Policy' },
@@ -117,7 +117,7 @@ export default function Footer() {
       {/* bottom */}
       <div className="site-footer-bottom mt-6">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-xs text-ink/70 sm:text-sm">
-          <span>© {year} {SITE.name}. Independent price comparison — we may earn a commission on some links.</span>
+          <span>© {year} {SITE.name}. All Rights Reserved.</span>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             {legalLinks.map((l) => (
               <Link key={l.href} href={l.href} className="transition hover:text-ink">{l.label}</Link>

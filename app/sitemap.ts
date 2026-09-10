@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { couponStoreCanonicalSlug, indexableCouponStoreIds, listCouponStores } from '@/lib/coupon-stores';
 import { listAllCommerceProductSlugs, listAllPostSlugs, listCategories, listCommerceCategories } from '@/lib/strapi';
-import { productCanonicalPath } from '@/lib/product-url';
+import { productCanonicalPath, productIsIndexable } from '@/lib/product-url';
 import { SECTIONS, SITE } from '@/lib/site';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -36,7 +36,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE.url}/brands`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${SITE.url}/best-sellers`, lastModified: now, changeFrequency: 'daily', priority: 0.7 },
     { url: `${SITE.url}/sitemap`, lastModified: now, changeFrequency: 'weekly', priority: 0.3 },
-    { url: `${SITE.url}/legal/notice`, lastModified: now, changeFrequency: 'yearly', priority: 0.2 },
+    /* Pillar pages. Their underlying posts 308 here, so these are the URLs
+       that should be indexed. */
+    { url: `${SITE.url}/best-deals-and-bargains`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITE.url}/coupon-codes`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITE.url}/legal/affiliate-disclosure`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${SITE.url}/legal/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.2 },
     { url: `${SITE.url}/legal/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.2 },
     { url: `${SITE.url}/legal/cookies`, lastModified: now, changeFrequency: 'yearly', priority: 0.2 },
@@ -70,7 +74,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const productEntries: MetadataRoute.Sitemap = products.map((product) => ({
+  /* A one-merchant product page has no price comparison on it, which is the
+     only reason the page exists. Kept out of the sitemap and marked noindex on
+     the page itself, by the same predicate so the two cannot disagree. */
+  const productEntries: MetadataRoute.Sitemap = products.filter(productIsIndexable).map((product) => ({
     url: `${SITE.url}${productCanonicalPath(product)}`,
     lastModified: product.updatedAt ? new Date(product.updatedAt) : now,
     changeFrequency: 'daily',

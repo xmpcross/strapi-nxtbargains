@@ -72,6 +72,24 @@ export function organizationJsonLd() {
     name: SITE.name,
     url: SITE.url,
     description: SITE.description,
+    /* The logo is what search and answer engines attach to the brand entity,
+       and it has its own constraints: a raster of at least 112x112 — an SVG is
+       not accepted for this property, which is why the PNG the header uses is
+       named here and not nxt_bargains_logo_light.svg. Dimensions are stated so
+       the image does not have to be fetched to be validated. */
+    logo: {
+      '@type': 'ImageObject',
+      '@id': `${SITE.url}/#logo`,
+      url: `${SITE.url}/nxt_bargains_logo.png`,
+      contentUrl: `${SITE.url}/nxt_bargains_logo.png`,
+      width: 450,
+      height: 218,
+      caption: SITE.name,
+    },
+    image: { '@id': `${SITE.url}/#logo` },
+    /* Profiles that corroborate the entity. Only accounts that genuinely exist
+       belong here — sameAs pointing at a dead profile weakens the entity
+       rather than strengthening it. */
     sameAs: Object.values(SITE.social),
   };
 }

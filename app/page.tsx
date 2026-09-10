@@ -175,13 +175,26 @@ export default async function HomePage() {
      render. */
   const trending = pickAcrossCategories(products, 10);
 
-  /* Grouped by retailer for the tabs, in the order the deals file lists them,
-     and only retailers that actually returned deals today — an empty tab is
-     worse than a missing one. */
+  /* Grouped by retailer for the tabs, in the order the deals file lists them.
+     
+     A tab has to be able to fill the layout to earn a place. The panel is a
+     spotlight plus a row of five, so six is the threshold: below that the tab
+     renders a spotlight and a half-empty row, which reads as broken rather
+     than sparse. This bites now that the feed is filtered to the site's own
+     categories — a general deals page yields only a handful of electronics, so
+     Amazon and Walmart routinely come back with one or two. */
+  const DEALS_PER_TAB = 6;
   const dailyDeals = listAmazonDailyDeals();
   const dealTabs = ['Amazon', 'eBay', 'Walmart']
     .map((merchant) => ({ merchant, deals: dailyDeals.filter((d) => (d.merchant ?? 'Amazon') === merchant) }))
-    .filter((tab) => tab.deals.length > 0);
+    .filter((tab) => tab.deals.length >= DEALS_PER_TAB);
+
+  /* "Amazon, eBay and Walmart" — or whichever of them actually qualified. */
+  const dealRetailerLabel = dealTabs.length === 0
+    ? 'top retailers'
+    : dealTabs.length === 1
+      ? dealTabs[0].merchant
+      : `${dealTabs.slice(0, -1).map((t) => t.merchant).join(', ')} and ${dealTabs[dealTabs.length - 1].merchant}`;
 
   const guideFeature = posts[0];
   const guideSidebarPosts = pickRandomPosts(posts.slice(1), 6);
@@ -253,10 +266,16 @@ export default async function HomePage() {
                   <span className="text-[0.75rem] font-semibold text-ink/45">Updated daily</span>
                 </div>
                 <h2 className="mt-2 font-display text-[clamp(1.75rem,3vw,2.4rem)] font-extrabold leading-tight text-ink">
-                  Popular Deals Across Top Retailers
+                  {dealTabs.length > 1 ? 'Popular Deals Across Top Retailers' : `Popular Deals at ${dealTabs[0]?.merchant ?? 'Top Retailers'}`}
                 </h2>
                 <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/70">
-                  Verified discounts and handpicked price drops from Amazon, eBay, and Walmart.
+                  {/* Names the retailers actually on the page. The copy used to
+                      promise "Amazon, eBay, and Walmart" unconditionally, which
+                      stopped being true once the feed was filtered to this
+                      site's categories — a general deals page yields only a
+                      handful of electronics, so on most days one or two of
+                      those three have too few to show. */}
+                  Verified discounts and handpicked price drops from {dealRetailerLabel}.
                 </p>
               </div>
               <div className="shrink-0">
@@ -304,10 +323,10 @@ export default async function HomePage() {
 
               {dealTabs.map((tab) => {
                 const spotlightDeal = tab.deals[0];
-                // One spotlight on the top row, then two rows of five beneath
-                // it. Ten is the exact fill for those two rows — a partial
-                // third row reads as a truncation rather than a layout.
-                const gridDeals = tab.deals.slice(1, 11);
+                // Six per tab: the spotlight plus a single row of five. The
+                // second row of five is dropped — five is the exact fill for
+                // one row, so nothing renders as a partial row.
+                const gridDeals = tab.deals.slice(1, 6);
 
                 return (
                   <div key={`dt-panel-${tab.merchant}`} className="deal-tab-panel">

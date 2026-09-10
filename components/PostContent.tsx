@@ -160,7 +160,13 @@ export default function PostContent({
  */
 function withFaqAccordion(value: string) {
   const html = String(value || '');
-  const heading = /<h2\b[^>]*>\s*(?:<[^>]+>\s*)*Buyer(?:&#8217;|&rsquo;|&#39;|['\u2019])?s\s+Guide\s*(?:&amp;|&|and)\s*Troubleshooting[^<]*<\/h2>/i;
+  /* Any FAQ heading, not just the one this started with.
+     
+     The library uses at least ten wordings — "FAQs", "Phone FAQs", "Security
+     Camera FAQs", "Buyer's Guide & Troubleshooting FAQ", "Keeping Your Space
+     Safe: FAQ About Security Cameras". Matching the literal first one converted
+     two posts and left the rest as flat walls of text. */
+  const heading = /<h([23])\b[^>]*>(?:(?!<\/h\1>).)*(?:FAQ|Frequently\s+Asked)(?:(?!<\/h\1>).)*<\/h\1>/i;
   const start = html.search(heading);
   if (start === -1) return html;
 
@@ -257,6 +263,61 @@ function MarkdownContent({
       const children = renderInline(heading[2]);
 
       headingAt.push(blocks.length);
+
+      /* An FAQ heading turns the rest of its section into an accordion.
+         
+         The HTML bodies get this from withFaqAccordion(); markdown bodies
+         reach here instead, so the same treatment is applied to the
+         "### Question" / answer pairs that follow. Built from <details>, so
+         every answer stays in the server-rendered HTML whether or not it is
+         open — which is what keeps the FAQ structured data and the text itself
+         visible to crawlers. */
+      if (level <= 3 && /\b(FAQ|Frequently\s+Asked)/i.test(heading[2])) {
+        const items: Array<{ q: string; a: string[] }> = [];
+        let j = i + 1;
+        while (j < lines.length) {
+          const next = lines[j].trim();
+          // A same-or-higher-level heading ends the FAQ section.
+          const nextHeading = next.match(/^(#{1,6})\s+(.+)$/);
+          if (nextHeading && nextHeading[1].length <= level) break;
+          if (nextHeading && nextHeading[1].length === level + 1) {
+            items.push({ q: nextHeading[2].trim(), a: [] });
+            j += 1;
+            continue;
+          }
+          // Bold-line question form: **Question?**
+          const bold = next.match(/^\*\*(.+?)\*\*$/);
+          if (bold) {
+            items.push({ q: bold[1].trim(), a: [] });
+            j += 1;
+            continue;
+          }
+          if (next && items.length) items[items.length - 1].a.push(next);
+          j += 1;
+        }
+
+        if (items.length >= 2) {
+          if (level <= 2) blocks.push(<h2 key={key++} id={headingSlug(heading[2], usedIds)}>{children}</h2>);
+          else blocks.push(<h3 key={key++} id={headingSlug(heading[2], usedIds)}>{children}</h3>);
+          blocks.push(
+            <div className="faq-accordion" key={key++}>
+              {items.filter((item) => item.a.length).map((item, index) => (
+                <details className="faq-item" key={index}>
+                  <summary className="faq-question">
+                    {renderInline(item.q)}
+                    <span className="faq-icon" aria-hidden="true" />
+                  </summary>
+                  <div className="faq-answer">
+                    {item.a.map((paragraph, pIndex) => <p key={pIndex}>{renderInline(paragraph)}</p>)}
+                  </div>
+                </details>
+              ))}
+            </div>,
+          );
+          i = j;
+          continue;
+        }
+      }
 
       // Authored levels are kept: `#` and `##` become h2, `###` h3, deeper h4.
       // Each gets the same id the contents rail was built with.

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { BLOG_NAV_LINKS, SITE } from '@/lib/site';
+import { VISIBLE_BLOG_NAV_LINKS, SITE } from '@/lib/site';
 import { PRODUCT_CATEGORY_TREE } from '@/lib/product-nav';
 import { listCategories, listPosts, mediaUrl } from '@/lib/strapi';
 import { postPath, fmtDate } from '@/lib/format';
@@ -23,7 +23,7 @@ export type NavItem = {
 function buildNav(blogCategories: Array<{ slug: string; name: string }>): NavItem[] {
   const blogLinks = blogCategories.length > 0
     ? blogCategories.map((category) => ({ href: `/${category.slug}`, label: category.name }))
-    : BLOG_NAV_LINKS;
+    : VISIBLE_BLOG_NAV_LINKS;
 
   return [
   {

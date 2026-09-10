@@ -208,7 +208,7 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
             <SectionHeader
               eyebrow="Supporting articles"
               title="Keep reading around this topic"
-              body="These articles are selected automatically from related NXT Bargains posts, with same-category articles shown first."
+              body="Articles tagged to this guide's topic, hand-picked first and then by keyword."
             />
             <div className={styles.supportingGrid}>
               {content.supportingArticles.map((article) => (

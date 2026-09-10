@@ -738,14 +738,21 @@ export async function listProductReviews(productDocumentId: string): Promise<Com
 }
 
 export async function listAllCommerceProductSlugs(): Promise<
-  { slug: string; updatedAt: string; categories?: CommerceProduct['categories']; category?: string | null }[]
+  { slug: string; updatedAt: string; categories?: CommerceProduct['categories']; category?: string | null; offers?: CommerceProduct['offers'] }[]
 > {
-  const all: { slug: string; updatedAt: string; categories?: CommerceProduct['categories']; category?: string | null }[] = [];
+  const all: { slug: string; updatedAt: string; categories?: CommerceProduct['categories']; category?: string | null; offers?: CommerceProduct['offers'] }[] = [];
   let page = 1;
   while (true) {
     const res = await strapiFetch<ListResponse<CommerceProduct>>('commerce-products', {
       fields: ['slug', 'updatedAt', 'category'],
-      populate: { categories: { fields: ['slug', 'name'] } },
+      /* Offers are pulled for the merchant count alone: a product carrying one
+         merchant has nothing to compare and is kept out of the sitemap. Only
+         the merchant slug and offer status are requested, so this stays a
+         cheap query rather than dragging every offer's full payload. */
+      populate: {
+        categories: { fields: ['slug', 'name'] },
+        offers: { fields: ['status'], populate: { merchant: { fields: ['slug'] } } },
+      },
       // Match the field/tag used everywhere else (listCommerceProducts). The old
       // `status` filter didn't match the `productStatus` field, so products were
       // silently excluded from the sitemap.
@@ -759,6 +766,7 @@ export async function listAllCommerceProductSlugs(): Promise<
         updatedAt: product.updatedAt,
         categories: product.categories,
         category: product.category,
+        offers: product.offers,
       });
     }
     const pageCount = res.meta?.pagination?.pageCount ?? 1;

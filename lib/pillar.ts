@@ -3,9 +3,69 @@ import { type NxtPost } from '@/lib/strapi';
 import { SECTIONS } from '@/lib/site';
 import { clampDescription, postPath, stripHtml } from '@/lib/format';
 
-const PILLAR_PATHS_BY_SLUG: Record<string, string> = {
-  'best-deals-and-bargains-guide': '/best-deals-and-bargains',
+/**
+ * The pillar pages, and how each one selects its supporting cluster.
+ *
+ * Cluster membership is deliberately NOT the post's category. Category answers
+ * "what shelf does this sit on" — it put five buying-guides under this pillar
+ * whether or not they were about finding deals, and excluded a how-to guide on
+ * spotting fake reviews that belongs here on subject. A pillar's cluster is an
+ * editorial claim about topic, so it is stated as one.
+ *
+ * Two mechanisms, in priority order:
+ *
+ *   supportingSlugs   — hand-picked, always first and in the order given. Use
+ *                       this when a specific article must appear.
+ *   supportingKeywords — matched against the post's seoKeywords field, which
+ *                       is the only tag-like field the CMS has (set on 44 of
+ *                       90 posts) and is editable per post in Strapi. Title
+ *                       and excerpt are searched too, so a post with no
+ *                       keywords set can still qualify on subject.
+ *
+ * Adding a post to a cluster is therefore a CMS edit (add the keyword) rather
+ * than a deploy, which is the point.
+ */
+type PillarConfig = {
+  path: string;
+  supportingSlugs?: string[];
+  supportingKeywords?: string[];
 };
+
+const PILLAR_PAGES: Record<string, PillarConfig> = {
+  'best-deals-and-bargains-guide': {
+    path: '/best-deals-and-bargains',
+    /* One tag, and nothing else.
+       
+       No hand-picked slugs: membership is entirely editorial and lives in the
+       CMS. To put an article in this cluster, add "best deals and bargains" to
+       its SEO Keywords field in Strapi; remove it to take the article out. The
+       cluster updates on the next revalidate, with no deploy.
+       
+       The cluster is empty until posts carry the tag, which is the intended
+       behaviour — an untagged cluster showing nothing is honest, and better
+       than one padded with articles that were never chosen for it. */
+    supportingKeywords: ['best deals and bargains'],
+  },
+
+  'coupon-codes-101-best-deals-and-bargains': {
+    path: '/coupon-codes',
+    /* This post carries no category at all, which is why its own URL was
+       /uncategorized/coupon-codes-101-... — a pillar cannot sit there. */
+    supportingSlugs: [
+      'best-deals-and-bargains-guide',
+      'how-deal-hunting-communities-work',
+      'ultimate-guide-reading-product-reviews-spot-fake-reviews',
+    ],
+    supportingKeywords: [
+      'coupon codes', 'promo code', 'cashback', 'discount code', 'voucher',
+      'price tracking', 'when to buy', 'black friday', 'prime day',
+    ],
+  },
+};
+
+const PILLAR_PATHS_BY_SLUG: Record<string, string> = Object.fromEntries(
+  Object.entries(PILLAR_PAGES).map(([slug, config]) => [slug, config.path]),
+);
 
 export function categoryName(slug?: string): string {
   if (!slug) return '';
@@ -185,24 +245,74 @@ export function buildPillarContent(
   };
 }
 
-export function buildSupportingArticles(post: NxtPost, posts: NxtPost[]): PillarPageContent['supportingArticles'] {
-  const currentCategorySlugs = new Set((post.categories ?? []).map((category) => category.slug));
-  const candidates = posts.filter((candidate) => candidate.id !== post.id && candidate.slug !== post.slug);
-  const sameCategory = candidates.filter((candidate) =>
-    (candidate.categories ?? []).some((category) => currentCategorySlugs.has(category.slug)),
-  );
-  const selected: NxtPost[] = [];
+/**
+ * The post's own keyword field, lowercased.
+ *
+ * Only seoKeywords — not the title or excerpt. Searching the body text pulled
+ * in every best-seller write-up that happens to use the word "deal" in a
+ * sentence: a JBL speaker listing and a USB-C charger both scored against this
+ * pillar. The keyword field is the deliberate signal; prose is incidental.
+ *
+ * The consequence is intentional: a post joins a cluster when someone tags it
+ * in the CMS, not when it happens to use the right vocabulary.
+ */
+function searchableText(post: NxtPost): string {
+  return String(post.seoKeywords ?? '').toLowerCase();
+}
 
-  for (const candidate of [...sameCategory, ...candidates]) {
-    if (selected.some((item) => item.id === candidate.id || item.slug === candidate.slug)) continue;
+/**
+ * How well a candidate matches the pillar's keywords.
+ *
+ * A count rather than a boolean so the closest articles lead: a post whose
+ * keywords name three of the pillar's terms is a better cluster member than
+ * one that mentions "sale" once. Word-boundary matching, because "deal" would
+ * otherwise match "dealer" and "idealised".
+ */
+function keywordScore(post: NxtPost, keywords: string[]): number {
+  const text = searchableText(post);
+  return keywords.reduce((score, keyword) => {
+    const pattern = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+    return pattern.test(text) ? score + 1 : score;
+  }, 0);
+}
+
+export function buildSupportingArticles(post: NxtPost, posts: NxtPost[]): PillarPageContent['supportingArticles'] {
+  const config = PILLAR_PAGES[post.slug];
+  const candidates = posts.filter((candidate) => candidate.id !== post.id && candidate.slug !== post.slug);
+  const selected: NxtPost[] = [];
+  const take = (candidate: NxtPost) => {
+    if (selected.length >= 6) return;
+    if (selected.some((item) => item.id === candidate.id || item.slug === candidate.slug)) return;
     selected.push(candidate);
-    if (selected.length >= 6) break;
+  };
+
+  // 1. Hand-picked, in the order given.
+  for (const slug of config?.supportingSlugs ?? []) {
+    const match = candidates.find((candidate) => candidate.slug === slug);
+    if (match) take(match);
   }
+
+  // 2. Keyword matches, strongest first.
+  const keywords = config?.supportingKeywords ?? [];
+  if (keywords.length) {
+    candidates
+      .map((candidate) => ({ candidate, score: keywordScore(candidate, keywords) }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .forEach((entry) => take(entry.candidate));
+  }
+
+  /* Deliberately no category fallback. An unrelated article padding the
+     cluster out to six is worse than a shorter, honest one — the section is a
+     claim that these pieces belong with this pillar. */
 
   return selected.map((article) => ({
     meta: categoryName(article.categories?.[0]?.slug) || 'Article',
     title: article.title,
     body: clampDescription(stripHtml(article.excerpt || article.content || article.title), 150),
-    href: postPath(article),
+    /* A pillar in someone else's cluster links to its pillar path. postPath()
+       would return the underlying post URL, which 308s to the same place — an
+       extra hop, and an internal link pointing at a redirect. */
+    href: pillarPathForPost(article) ?? postPath(article),
   }));
 }

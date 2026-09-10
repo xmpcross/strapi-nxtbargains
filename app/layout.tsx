@@ -109,6 +109,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href={cms} />
       </head>
       <body className="min-h-screen flex flex-col font-sans font-normal" data-testid="app-shell">
+        {/* Brand entity, declared once for the whole site.
+            
+            organizationJsonLd() and websiteJsonLd() have existed in
+            lib/jsonld.ts since the site was built, and JsonLd.tsx's own
+            docstring shows them being emitted from the root layout — but
+            nothing ever called them, so no Organization was published on any
+            page. Every per-page graph that references
+            `{'@id': '<site>/#organization'}` as its publisher was pointing at
+            a node that did not exist.
+            
+            Emitted here rather than on the homepage alone so the entity
+            resolves from whichever page a crawler or answer engine lands on
+            first, which for this site is far more often a product page. */}
+        <JsonLd graph={[organizationJsonLd(), websiteJsonLd()]} />
         <CookieConsentProvider>
           <GoogleAnalytics />
           <Geniuslink />

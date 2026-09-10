@@ -105,8 +105,33 @@ export const BLOG_NAV_LINKS = [
     label: section.title,
   })),
   { href: '/smart-home', label: 'Smart Home' },
-  { href: '/best-sellers-articles', label: 'Best Sellers' },
 ];
+
+/**
+ * Categories kept out of the header and footer menus.
+ *
+ * Hidden from navigation only — the entries stay in BLOG_NAV_LINKS because
+ * ARTICLE_SIDEBAR_CATEGORIES is derived from it, and app/[category]/page.tsx
+ * treats that list as its route-validity check. Removing a slug from
+ * BLOG_NAV_LINKS therefore does not just unlink the category, it 404s the
+ * category page and orphans every post in it.
+ *
+ * The pages remain reachable, indexable and linked from the HTML sitemap;
+ * they simply do not occupy a slot in the primary menus.
+ */
+export const NAV_HIDDEN_CATEGORY_HREFS = new Set<string>([
+  /* Empty. Kept because hiding a category from the menus without removing it
+     from BLOG_NAV_LINKS is the safe way to do it — that list also feeds
+     ARTICLE_SIDEBAR_CATEGORIES, which app/[category]/page.tsx uses as its
+     route-validity check, so deleting an entry there 404s the category page
+     rather than merely unlinking it. best-sellers-articles could be deleted
+     outright only because it now redirects at the edge. */
+]);
+
+/** BLOG_NAV_LINKS minus anything hidden — what the menus should render. */
+export const VISIBLE_BLOG_NAV_LINKS = BLOG_NAV_LINKS.filter(
+  (link) => !NAV_HIDDEN_CATEGORY_HREFS.has(link.href),
+);
 
 export type ArticleCategoryNavItem = {
   slug: string;
@@ -142,12 +167,10 @@ export function resolveArticleCategoryBlurb(
 /** Footer “All Articles” column — key links pinned to the top. */
 export const FOOTER_ARTICLE_NAV_LINKS = [
   { href: '/top-rated-smart-electronics-devices', label: 'Top-Rated Products' },
-  { href: '/best-sellers-articles', label: 'Best Sellers' },
   { href: '/smart-home', label: 'Smart Home' },
   { href: '/buying-guides', label: 'Buying Guides' },
-  ...BLOG_NAV_LINKS.filter(
+  ...VISIBLE_BLOG_NAV_LINKS.filter(
     (link) =>
-      link.href !== '/best-sellers-articles' &&
       link.href !== '/smart-home' &&
       link.href !== '/buying-guides' &&
       link.href !== '/top-rated-smart-electronics-devices' &&

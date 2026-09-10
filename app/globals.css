@@ -904,7 +904,7 @@ main[data-testid^="product-category-"] .product-category-grid article {
   place-items: center;
 }
 
-[data-testid="home-guides"] .guide-feature-image,
+/* The compact thumbnails keep cropping to fill their box. */
 [data-testid="home-guides"] .guide-compact-image {
   block-size: 100% !important;
   inline-size: 100% !important;
@@ -912,6 +912,25 @@ main[data-testid^="product-category-"] .product-category-grid article {
   max-inline-size: 100%;
   object-fit: cover !important;
   object-position: center;
+}
+
+/* The Editor-pick feature image is shown whole instead. These are product
+   shots on a plain ground, and `cover` on a 16/11 box was cutting the product
+   off at both edges — the camera in the reference lost its mount and half its
+   body. `contain` plus a 30px inset lets the whole object sit inside the tile
+   with the box colour reading as a mat around it.
+
+   Scoped to .guide-feature-image alone: it previously shared this rule with
+   .guide-compact-image, where cropping is still right because those thumbs are
+   too small to show a whole product legibly. */
+[data-testid="home-guides"] .guide-feature-image {
+  block-size: 100% !important;
+  inline-size: 100% !important;
+  max-block-size: 100%;
+  max-inline-size: 100%;
+  object-fit: contain !important;
+  object-position: center;
+  padding: 30px;
 }
 
 [data-testid="home-guides"] .guide-feature-card,

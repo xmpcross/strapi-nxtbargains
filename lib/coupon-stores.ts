@@ -133,8 +133,16 @@ let indexableCouponStoreIdCache: Set<number> | null = null;
 export function indexableCouponStoreIds(): Set<number> {
   if (indexableCouponStoreIdCache) return indexableCouponStoreIdCache;
 
-  const ids = new Set<number>();
-  for (const alias of highIntentStoreAliases()) ids.add(alias.storeId);
+  /* High-intent curation alone is not enough to index a page.
+     
+     These 41 stores were hand-picked as worth having a page for, and every one
+     of them was admitted here unconditionally — including five whose feed has
+     never returned a single coupon. Those five rendered "No live coupons right
+     now" over ~259 words and were up to 73% identical to one another, which is
+     the shape of duplicate thin content that AdSense rejects a site for.
+     
+     A curated store still has to have something on the page. */
+  const withCoupons = new Set<number>();
 
   if (existsSync(STORE_COUPON_CACHE_FILE)) {
     try {
@@ -143,13 +151,25 @@ export function indexableCouponStoreIds(): Set<number> {
       };
       for (const entry of Object.values(parsed.stores ?? {})) {
         if (entry?.storeId != null && Array.isArray(entry.coupons) && entry.coupons.length > 0) {
-          ids.add(Number(entry.storeId));
+          withCoupons.add(Number(entry.storeId));
         }
       }
     } catch {
-      // fall back to high-intent only
+      /* Cache unreadable. Fall back to the curated list rather than
+         deindexing every coupon page at once — a missing file is an
+         infrastructure problem, not evidence that 41 pages are empty. */
+      const fallback = new Set<number>();
+      for (const alias of highIntentStoreAliases()) fallback.add(alias.storeId);
+      indexableCouponStoreIdCache = fallback;
+      return fallback;
     }
   }
+
+  const ids = new Set<number>();
+  for (const alias of highIntentStoreAliases()) {
+    if (withCoupons.has(alias.storeId)) ids.add(alias.storeId);
+  }
+  for (const id of withCoupons) ids.add(id);
 
   indexableCouponStoreIdCache = ids;
   return ids;

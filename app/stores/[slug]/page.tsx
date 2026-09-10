@@ -12,14 +12,35 @@ import StoreFilter, { type StoreFilterItem } from '@/components/StoreFilter';
 
 export const revalidate = 120;
 
+/**
+ * A store page needs enough products to be worth browsing.
+ *
+ * 364 of these pages exist, one per merchant that has ever carried an offer,
+ * and 230 of them hold a single product — including marketplace-seller
+ * artifacts like `walmart-acer` and `ebay-yakovgood1`, which are not retailers
+ * at all. Every one was index,follow.
+ *
+ * The page's promise is "browse this retailer's products"; with one or two
+ * there is nothing to browse, and the page restates a product page that
+ * already exists. Three is the floor at which the listing does something the
+ * product page does not.
+ *
+ * A threshold rather than a fixed allowlist, so a merchant that grows past it
+ * becomes indexable on its own and one that shrinks drops out — the same
+ * self-healing shape as the coupon-store and single-merchant-product rules.
+ */
+const MIN_PRODUCTS_TO_INDEX = 3;
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const { store } = await listStoreProducts(slug).catch(() => ({ store: null, products: [] }));
+  const { store, products } = await listStoreProducts(slug).catch(() => ({ store: null, products: [] }));
   const name = store?.name ?? 'Store';
   return {
     title: `${name} — Prices & Products`,
     description: clampDescription(`Products available at ${name}, price-compared across marketplaces on ${SITE.name}.`),
     alternates: { canonical: `/stores/${slug}` },
+    // follow is kept so the product links on a thin store page still pass through.
+    ...(products.length >= MIN_PRODUCTS_TO_INDEX ? {} : { robots: { index: false, follow: true } }),
   };
 }
 
