@@ -7,8 +7,40 @@
   --pillar-rule: #d7deea;
   --pillar-green: #1f7a3d;
   --pillar-red: #bb0628;
+
+  /* Heading scale.
+  
+     h2 is the one fixed size; h3 and h4 are derived from it by a constant
+     step, so the subheading levels follow whatever h2 is set to instead of
+     being re-picked by hand. Change --h2 (or --heading-step) and the whole
+     hierarchy moves together, in proportion.
+  
+     1.3 is the step because it keeps the two levels visibly apart at this h2:
+     34 / 26 / 20. A smaller ratio runs h3 and h4 together; a larger one drops
+     h4 under the 17px body copy it is meant to head. */
+  --h2: 34px;
+  --heading-step: 1.3;
+  --h3: calc(var(--h2) / var(--heading-step));
+  --h4: calc(var(--h3) / var(--heading-step));
+
   background: #fff;
   color: var(--pillar-ink);
+}
+
+/* The scale applies to every heading in the page, so a section added later
+   is sized by its level rather than by a rule written for its class. The
+   per-block rules below set the same variables and exist only for the line
+   height, colour, and weight that differ by context. */
+.pillar h2 {
+  font-size: var(--h2) !important;
+}
+
+.pillar h3 {
+  font-size: var(--h3) !important;
+}
+
+.pillar h4 {
+  font-size: var(--h4) !important;
 }
 
 .shell {
@@ -67,10 +99,10 @@
   max-width: 760px;
   margin: 16px 0 0;
   color: var(--pillar-ink);
-  font-size: clamp(36px, 4.7vw, 64px) !important;
+  font-size: clamp(36px, 4.7vw, 40px) !important;
   line-height: 1.02 !important;
   letter-spacing: 0 !important;
-  font-weight: 780 !important;
+  font-weight: 700 !important;
 }
 
 .deck {
@@ -288,8 +320,8 @@
 .sectionTitle {
   margin: 10px 0 0;
   color: inherit;
-  font-size: clamp(30px, 4vw, 54px) !important;
-  line-height: 1 !important;
+  font-size: var(--h2) !important;
+  line-height: 1.08 !important;
   letter-spacing: 0 !important;
   font-weight: 760 !important;
 }
@@ -335,11 +367,11 @@
   text-transform: uppercase;
 }
 
-.pathCard h2,
-.guideCard h2 {
+.pathCard h3,
+.guideCard h3 {
   margin: 18px 0 0;
   color: var(--pillar-ink);
-  font-size: 24px !important;
+  font-size: var(--h3) !important;
   line-height: 1.08 !important;
   font-weight: 780 !important;
 }
@@ -469,10 +501,10 @@
   align-self: start;
 }
 
-.step h3 {
+.step h4 {
   margin: 0;
   color: #fff;
-  font-size: 21px !important;
+  font-size: var(--h4) !important;
   line-height: 1.16 !important;
 }
 
@@ -578,8 +610,10 @@
     min-height: auto;
   }
 
+  /* Scales with the phone width; the ceiling matches the desktop rule so
+     a 480px viewport cannot render the title larger than a 1440px one. */
   .heroTitle {
-    font-size: clamp(34px, 10vw, 48px) !important;
+    font-size: clamp(34px, 10vw, 40px) !important;
   }
 
   .heroActions,
@@ -725,10 +759,10 @@
   text-transform: uppercase;
 }
 
-.supportingCard h2 {
+.supportingCard h3 {
   margin: 16px 0 0;
   color: var(--pillar-ink);
-  font-size: 22px !important;
+  font-size: var(--h3) !important;
   line-height: 1.12 !important;
   font-weight: 780 !important;
 }
