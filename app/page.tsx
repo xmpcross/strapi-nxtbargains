@@ -39,6 +39,31 @@ function pickRandomPosts<T>(items: T[], count: number): T[] {
   return pool.slice(0, count);
 }
 
+/** One product per category in turn, so a mixed row rather than ten of one kind. */
+function pickAcrossCategories(items: CommerceProduct[], count: number): CommerceProduct[] {
+  const byCategory = new Map<string, CommerceProduct[]>();
+  for (const product of items) {
+    const key = product.categories?.[0]?.slug ?? product.category ?? 'other';
+    if (!byCategory.has(key)) byCategory.set(key, []);
+    byCategory.get(key)!.push(product);
+  }
+  // Shuffle within each category, and shuffle the category order too, so a
+  // category is not permanently first.
+  const buckets = pickRandomPosts([...byCategory.values()], byCategory.size)
+    .map((bucket) => pickRandomPosts(bucket, bucket.length));
+
+  const out: CommerceProduct[] = [];
+  for (let round = 0; out.length < count; round += 1) {
+    let placed = false;
+    for (const bucket of buckets) {
+      if (out.length >= count) break;
+      if (bucket[round]) { out.push(bucket[round]); placed = true; }
+    }
+    if (!placed) break;   // every bucket exhausted
+  }
+  return out;
+}
+
 const STRIP_MARKETPLACES = [
   { name: 'Amazon', domain: 'amazon.com' },
   { name: 'eBay', domain: 'ebay.com' },
@@ -134,8 +159,14 @@ export default async function HomePage() {
   if (priceDrops.length < 3) {
     priceDrops = deals.slice(0, 10);
   }
-  // Ten: two full rows of five, matching the grid below.
-  const trending = products.slice(0, 10);
+  /* Ten trending products, spread across categories.
+     `products` arrives sorted by updatedAt, so slicing the first ten returned
+     ten of whatever category was imported last -- the section was showing
+     nothing but Raspberry Pi kits. This takes one product from each category
+     in turn before taking a second from any, so ten cards mean roughly ten
+     categories, and shuffles within each so the same ones do not lead every
+     render. */
+  const trending = pickAcrossCategories(products, 10);
 
   const dailyDeals = listAmazonDailyDeals();
 
