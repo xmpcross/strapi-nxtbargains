@@ -4558,3 +4558,81 @@ img.read-next-avatar {
 .post-tile-media {
   border-radius: 8px;
 }
+
+/* ------------------------------------------------------- popular deal tabs --
+   Retailer tabs on the homepage deals section, driven by radio inputs rather
+   than client state: the page is a server component, and every tab's cards
+   ship in the HTML so they stay indexable and the tabs work without
+   JavaScript. Same approach as the filter sidebar and the offer accordions.
+
+   The panels are matched positionally — nth-of-type on the inputs against
+   nth-of-type on the panels — so adding a retailer needs no new CSS. */
+.deal-tabs { position: relative; }
+
+.deal-tab-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid rgb(13 27 42 / 0.1);
+  padding-bottom: 0.75rem;
+}
+
+.deal-tab-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  border: 1px solid rgb(13 27 42 / 0.12);
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0f172a;
+  background: #fff;
+  transition: color 120ms, border-color 120ms, background-color 120ms;
+}
+
+.deal-tab-label:hover { border-color: var(--color-primary, #0046be); color: var(--color-primary, #0046be); }
+
+.deal-tab-count {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgb(13 27 42 / 0.45);
+}
+
+/* Hide every panel, then reveal the one whose input is checked. */
+.deal-tab-panel { display: none; }
+
+.deal-tab-input:nth-of-type(1):checked ~ .deal-tab-panel:nth-of-type(1),
+.deal-tab-input:nth-of-type(2):checked ~ .deal-tab-panel:nth-of-type(2),
+.deal-tab-input:nth-of-type(3):checked ~ .deal-tab-panel:nth-of-type(3) {
+  display: block;
+}
+
+/* The checked tab's label. nth-of-type again, against the labels inside the
+   list, so the highlight follows the same positional mapping. */
+.deal-tab-input:nth-of-type(1):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(1),
+.deal-tab-input:nth-of-type(2):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(2),
+.deal-tab-input:nth-of-type(3):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(3) {
+  background: var(--color-primary, #0046be);
+  border-color: var(--color-primary, #0046be);
+  color: #fff;
+}
+
+.deal-tab-input:nth-of-type(1):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(1) .deal-tab-count,
+.deal-tab-input:nth-of-type(2):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(2) .deal-tab-count,
+.deal-tab-input:nth-of-type(3):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(3) .deal-tab-count {
+  color: rgb(255 255 255 / 0.7);
+}
+
+/* Keyboard focus has to be visible: the input itself is sr-only, so the ring
+   goes on its label instead. */
+.deal-tab-input:focus-visible ~ .deal-tab-list .deal-tab-label { outline: none; }
+.deal-tab-input:nth-of-type(1):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(1),
+.deal-tab-input:nth-of-type(2):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(2),
+.deal-tab-input:nth-of-type(3):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(3) {
+  outline: 2px solid var(--color-primary, #0046be);
+  outline-offset: 2px;
+}

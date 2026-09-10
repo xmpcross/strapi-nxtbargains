@@ -9,8 +9,12 @@ export default function ProductDescription({ markdown }: { markdown: string }) {
 
   useEffect(() => {
     if (contentRef.current) {
-      // Check if content exceeds 400px height threshold
-      if (contentRef.current.scrollHeight > 420) {
+      /* 620, not 600: the threshold has to sit just above the clamp height, or
+         copy between the two gets a Read More button with nothing hidden behind
+         it — max-h-[600px] would not clip a 610px block enough to notice. The
+         20px of slack also stops a block that is a hair over the limit from
+         showing a toggle that reveals one more line. */
+      if (contentRef.current.scrollHeight > 620) {
         setIsClamped(true);
       }
     }
@@ -135,7 +139,7 @@ export default function ProductDescription({ markdown }: { markdown: string }) {
         ref={contentRef}
         className={`transition-all duration-300 ${
           isClamped && !isExpanded
-            ? 'max-h-[400px] overflow-hidden relative'
+            ? 'max-h-[600px] overflow-hidden relative'
             : 'max-h-none'
         }`}
       >
@@ -147,7 +151,7 @@ export default function ProductDescription({ markdown }: { markdown: string }) {
         )}
       </div>
 
-      {/* Read More / Read Less toggle link after 400px */}
+      {/* Read More / Read Less toggle link after 600px */}
       {isClamped && (
         <div className="mt-3 pt-2 text-left">
           <button

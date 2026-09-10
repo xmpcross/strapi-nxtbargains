@@ -173,7 +173,13 @@ export default async function HomePage() {
      render. */
   const trending = pickAcrossCategories(products, 10);
 
+  /* Grouped by retailer for the tabs, in the order the deals file lists them,
+     and only retailers that actually returned deals today — an empty tab is
+     worse than a missing one. */
   const dailyDeals = listAmazonDailyDeals();
+  const dealTabs = ['Amazon', 'eBay', 'Walmart']
+    .map((merchant) => ({ merchant, deals: dailyDeals.filter((d) => (d.merchant ?? 'Amazon') === merchant) }))
+    .filter((tab) => tab.deals.length > 0);
 
   const guideFeature = posts[0];
   const guideSidebarPosts = pickRandomPosts(posts.slice(1), 6);
@@ -224,19 +230,53 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ---------- DAILY DEALS ---------- */}
-      {dailyDeals.length > 0 && (
+      {/* ---------- POPULAR DEALS ---------- */}
+      {dealTabs.length > 0 && (
         <section className="pb-14 sm:pb-[72px]" data-testid="home-popular-deals">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Today only"
               title="Popular Deals"
-              intro="Amazon's Today's Deals, refreshed every morning."
+              intro="Today's discounts from Amazon, eBay and Walmart, refreshed every morning."
               cta={{ href: '/best-deals', label: 'All deals', variant: 'outline' }}
             />
-            <div className="mt-6 grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-5">
-              {dailyDeals.slice(0, 10).map((deal) => (
-                <DailyDealCard key={`home-dd-${deal.asin}`} deal={deal} />
+            {/*
+              Radio inputs and CSS, not client state: this page is otherwise a
+              server component, and the filter sidebar and offer accordions are
+              already built this way. Every tab's cards are in the served HTML,
+              so they are indexable and the tabs work with JavaScript off.
+            */}
+            <div className="deal-tabs mt-6">
+              {dealTabs.map((tab, index) => (
+                <input
+                  key={`dt-input-${tab.merchant}`}
+                  type="radio"
+                  name="popular-deals-tab"
+                  id={`deal-tab-${tab.merchant.toLowerCase()}`}
+                  className="deal-tab-input sr-only"
+                  defaultChecked={index === 0}
+                />
+              ))}
+              <div className="deal-tab-list" role="tablist" aria-label="Deals by retailer">
+                {dealTabs.map((tab) => (
+                  <label
+                    key={`dt-label-${tab.merchant}`}
+                    htmlFor={`deal-tab-${tab.merchant.toLowerCase()}`}
+                    className="deal-tab-label"
+                  >
+                    {tab.merchant}
+                    <span className="deal-tab-count">{tab.deals.length}</span>
+                  </label>
+                ))}
+              </div>
+              {dealTabs.map((tab) => (
+                <div key={`dt-panel-${tab.merchant}`} className="deal-tab-panel">
+                  <div className="grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-5">
+                    {tab.deals.slice(0, 10).map((deal) => (
+                      <DailyDealCard key={`home-dd-${deal.merchant}-${deal.asin}`} deal={deal} />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
