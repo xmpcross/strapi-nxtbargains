@@ -4566,7 +4566,13 @@ img.read-next-avatar {
    JavaScript. Same approach as the filter sidebar and the offer accordions.
 
    The panels are matched positionally — nth-of-type on the inputs against
-   nth-of-type on the panels — so adding a retailer needs no new CSS. */
+   nth-of-type on the panels — so adding a retailer needs no new CSS.
+
+   That mapping depends on the panels being the only <div> siblings, which is
+   why the tab strip is a <nav>. nth-of-type counts by element type, not by
+   class, so a <div> tab strip made itself div #1 and shifted every panel by
+   one: eBay's input revealed Amazon's cards and Amazon's rule matched nothing
+   at all. */
 .deal-tabs { position: relative; }
 
 .deal-tab-list {

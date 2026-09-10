@@ -257,7 +257,11 @@ export default async function HomePage() {
                   defaultChecked={index === 0}
                 />
               ))}
-              <div className="deal-tab-list" role="tablist" aria-label="Deals by retailer">
+              {/* <nav>, not <div>: the panels below are matched by
+                  nth-of-type, which counts by element type, so a <div> here
+                  would be div #1 and shift every panel index by one — eBay's
+                  input revealed Amazon's panel and Amazon's matched nothing. */}
+              <nav className="deal-tab-list" role="tablist" aria-label="Deals by retailer">
                 {dealTabs.map((tab) => (
                   <label
                     key={`dt-label-${tab.merchant}`}
@@ -268,7 +272,7 @@ export default async function HomePage() {
                     <span className="deal-tab-count">{tab.deals.length}</span>
                   </label>
                 ))}
-              </div>
+              </nav>
               {dealTabs.map((tab) => (
                 <div key={`dt-panel-${tab.merchant}`} className="deal-tab-panel">
                   <div className="grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-5">
