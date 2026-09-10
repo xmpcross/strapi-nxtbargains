@@ -292,6 +292,26 @@ function SectionHead({
 }
 
 /* --------------------------------------------------------------- Deal card */
+/* A merchant label that fits the tile.
+
+   Names arrive in two shapes: curated ones like "Micro Center", and bare
+   domains like "canakit.com" from Google Shopping. Shown raw in a 68px tile
+   both truncated to "MICRO..." and "CENTRAL...", which identifies nothing.
+   Dropping the protocol, www. and the TLD gets most of them under the limit,
+   and the tile now allows two lines rather than clipping at one. */
+function merchantLabel(name: string): string {
+  const trimmed = name.trim().replace(/^https?:\/\//i, '').replace(/^www\./i, '');
+  const domainish = /^[a-z0-9-]+(\.[a-z]{2,}){1,3}$/i.test(trimmed);
+  if (!domainish) return trimmed;
+  /* Take the registrable label, not the first one: splitting on the first dot
+     turns store.google.com into "store", which names nothing. Trailing
+     suffixes are dropped instead, so it yields "google", and tmbud.com.pl
+     yields "tmbud". */
+  const labels = trimmed.toLowerCase().split('.');
+  while (labels.length > 1 && /^[a-z]{2,3}$/.test(labels[labels.length - 1])) labels.pop();
+  return (labels[labels.length - 1] || trimmed).replace(/[-_]+/g, ' ');
+}
+
 /* Multi-merchant price comparison block (price range → merchant price+logo tiles
    → "Compare N prices"), shown on the price-drop and trending cards. */
 function OfferComparison({ product }: { product: CommerceProduct }) {
@@ -336,22 +356,25 @@ function OfferComparison({ product }: { product: CommerceProduct }) {
         {tiles.map((o) => (
           <div
             key={o.name}
-            className="flex min-h-[68px] flex-col items-center justify-center gap-1.5 rounded-[9px] border border-ink/10 bg-white px-1.5 py-2 text-center"
+            className="flex min-h-[82px] flex-col items-center rounded-[9px] border border-ink/10 bg-white px-1 py-2 text-center"
           >
-            <span className="font-display text-[0.78rem] font-bold text-ink">{formatMoney(o.price, currency)}</span>
-            {o.logo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              /* Was h-3.5 (14px), which rendered a wordmark like "appliances
-                   online" as an illegible smear. h-6 with a wider cap lets the
-                   mark read at the width the tile actually has. */
-                <img src={o.logo} alt="" aria-hidden="true" loading="lazy" referrerPolicy="no-referrer" className="h-5 max-w-[68px] object-contain" />
-            ) : null}
-            {/* The merchant is always named, not just pictured. Only a handful
-                of merchants carry a logo — the ones added from Google Shopping
-                have none — so a logo-only tile left most of them anonymous, and
-                a price with no seller beside it is not a comparison. The logo
-                is decorative once the name is present, hence alt="". */}
-            <span className="line-clamp-1 text-[0.62rem] font-semibold uppercase tracking-wide text-ink/55">{o.name}</span>
+            <span className="font-display text-[0.78rem] font-bold leading-none text-ink">{formatMoney(o.price, currency)}</span>
+            {/* The logo row is always present, with or without a logo, so a tile
+                that has one lines up with a tile that does not — only 53 of 400
+                merchants carry a logo, so mixed rows were the normal case and
+                the prices sat at different heights across a card. */}
+            <span className="mt-1.5 flex h-[18px] w-full items-center justify-center">
+              {o.logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={o.logo} alt="" aria-hidden="true" loading="lazy" referrerPolicy="no-referrer" className="max-h-[18px] max-w-[60px] object-contain" />
+              ) : null}
+            </span>
+            {/* Always named, not just pictured: a price with no seller beside it
+                is not a comparison. Two lines rather than one, because a single
+                clipped line rendered "Micro Center" as "MICRO...". */}
+            <span className="mt-1 line-clamp-2 text-[0.58rem] font-semibold uppercase leading-[1.25] tracking-tight text-ink/55">
+              {merchantLabel(o.name)}
+            </span>
           </div>
         ))}
       </div>
