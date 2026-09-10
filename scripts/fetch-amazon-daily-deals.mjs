@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Amazon Today's Deals -> data/amazon-daily-deals.json
+ * Amazon Today's Deals + eBay Daily Deals + Walmart Flash Deals
+ * -> data/amazon-daily-deals.json
  *
  * Feeds the homepage "Daily Deals" section. Written as a JSON cache rather than
  * Strapi records because these are not catalogue products: they are whatever
@@ -24,7 +25,11 @@ import { fileURLToPath } from 'node:url';
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DRY = process.argv.includes('--dry-run');
 const OUT = join(ROOT, 'data', 'amazon-daily-deals.json');
-const DEALS_URL = 'https://www.amazon.com/gp/goldbox?ref_=nav_cs_gb';
+const SOURCES = [
+  { merchant: 'Amazon', url: 'https://www.amazon.com/gp/goldbox?ref_=nav_cs_gb', parse: parseAmazonDeals },
+  { merchant: 'eBay', url: 'https://www.ebay.com/deals', parse: parseEbayDeals },
+  { merchant: 'Walmart', url: 'https://www.walmart.com/shop/deals/flash-deals-shopall', parse: parseWalmartDeals },
+];
 
 function envFrom(file) {
   if (!existsSync(file)) return {};
@@ -52,7 +57,7 @@ const CARD_ANCHOR = /<a[^>]*class="[^"]*dcl-product-link[^"]*"[^>]*>/g;
 const strip = (s) => s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 const money = (v) => (v ? Number(v.replace(/,/g, '')) : null);
 
-function parseDeals(html) {
+function parseAmazonDeals(html) {
   const anchors = [...html.matchAll(CARD_ANCHOR)].map((m) => m.index);
   const out = [];
   const seen = new Set();
@@ -93,22 +98,142 @@ function parseDeals(html) {
   return out;
 }
 
-const params = new URLSearchParams({
-  apikey: KEY, url: DEALS_URL,
-  js_render: 'true', premium_proxy: 'true', proxy_country: 'us',
-});
 
-const res = await fetch(`https://api.zenrows.com/v1/?${params}`, { signal: AbortSignal.timeout(180_000) });
-if (!res.ok) {
-  console.error(`ZenRows ${res.status}: ${(await res.text()).slice(0, 160)}`);
-  process.exit(1);
+/* eBay's deals page shares no markup with Amazon's.
+
+   Tiles are located by their /itm/ link: the container class `dne-itemtile`
+   cannot be used, because `\b` also matches before the hyphen in
+   `dne-itemtile-title` and `dne-itemtile-price`, which returned 772 "tiles" for
+   101 products. The link appears 206 times for those 101 — each product is
+   linked twice, from its image and its title — so ids are deduplicated.
+
+   Unlike its search pages, which answer 422 through ZenRows on every attempt,
+   this page returns normally. */
+function parseEbayDeals(html) {
+  const links = [...html.matchAll(/href="https:\/\/www\.ebay\.com\/itm\/(\d+)[^"]*"/g)];
+  const out = [];
+  const seen = new Set();
+
+  for (const link of links) {
+    const id = link[1];
+    if (seen.has(id)) continue;
+    const block = html.slice(link.index, link.index + 3000);
+
+    const title = block.match(/title="([^"]{8,180})"/)?.[1];
+    if (!title) continue;
+
+    /* The amount is not the price node's own text: it sits inside a nested
+       <span itemprop="price">, behind a <meta> tag. Matching ">$" directly
+       after the class found nothing at all. */
+    const price = money(block.match(/dne-itemtile-price[\s\S]{0,240}?\$([\d,]+\.?\d{0,2})/)?.[1]);
+    if (price === null) continue;
+
+    // "Previous price: $74.99 17% off" — the was-price and the discount are
+    // stated together, so the page's own percentage is preferred to a derived
+    // one wherever it is present.
+    const was = money(block.match(/Previous price:\s*\$?([\d,]+\.?\d{0,2})/)?.[1]);
+    let pct = Number(block.match(/(\d{1,2})%\s*off/i)?.[1]) || null;
+    if (!pct && was && was > price) pct = Math.round((1 - price / was) * 100);
+    if (!pct) continue;   // a listing, not a deal
+
+    seen.add(id);
+    out.push({
+      asin: id,
+      title: title.replace(/&quot;/g, '"').replace(/&amp;/g, '&'),
+      price,
+      wasPrice: was,
+      percentOff: pct,
+      currency: 'USD',
+      image: block.match(/<img[^>]*src="(https:\/\/i\.ebayimg[^"]+)"/)?.[1] ?? null,
+      badge: block.match(/>(Almost gone|Free shipping|Trending)</i)?.[1] ?? null,
+      url: `https://www.ebay.com/itm/${id}`,
+    });
+  }
+  return out;
 }
-const html = await res.text();
-const deals = parseDeals(html);
 
-console.log(`parsed ${deals.length} deals (${deals.filter((d) => d.image).length} with an image)`);
-for (const d of deals.slice(0, 5)) {
-  console.log(`  ${d.asin}  -${d.percentOff}%  $${d.price.toFixed(2)}  ${d.title.slice(0, 48)}`);
+
+/* Walmart ships its data as JSON, so this reads __NEXT_DATA__ rather than the
+   markup. That is the difference between a parser that survives a redesign and
+   one that does not — the two above key on class names that have already
+   changed under us once each.
+
+   The page also mentions "captcha" three times in bundle filenames while
+   serving perfectly good content, so presence of that word is not a block
+   signal here; the real ones (px-captcha, "robot or human") are absent. */
+function parseWalmartDeals(html) {
+  const raw = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/)?.[1];
+  if (!raw) return [];
+
+  let stacks;
+  try {
+    stacks = JSON.parse(raw)?.props?.pageProps?.initialData?.searchResult?.itemStacks ?? [];
+  } catch {
+    return [];
+  }
+
+  const out = [];
+  const seen = new Set();
+  for (const stack of stacks) {
+    for (const item of stack.items ?? []) {
+      const id = item.usItemId;
+      if (!id || seen.has(id) || !item.name) continue;
+
+      const info = item.priceInfo ?? {};
+      const price = money(String(info.linePrice ?? info.currentPrice ?? '').replace(/[^\d.,]/g, ''));
+      const was = money(String(info.wasPrice ?? '').replace(/[^\d.,]/g, ''));
+      if (price === null) continue;
+      // Flash-deals pages carry filler rows with no saving; without a was-price
+      // above the current one there is no deal to show.
+      if (!was || was <= price) continue;
+
+      seen.add(id);
+      out.push({
+        asin: String(id),
+        title: item.name,
+        price,
+        wasPrice: was,
+        percentOff: Math.round((1 - price / was) * 100),
+        currency: 'USD',
+        image: item.imageInfo?.thumbnailUrl ?? null,
+        badge: item.badges?.flags?.[0]?.text ?? null,
+        url: item.canonicalUrl ? `https://www.walmart.com${item.canonicalUrl.split('?')[0]}` : null,
+      });
+    }
+  }
+  return out.filter((d) => d.url);
+}
+
+async function fetchThrough(url) {
+  const params = new URLSearchParams({
+    apikey: KEY, url,
+    js_render: 'true', premium_proxy: 'true', proxy_country: 'us',
+  });
+  const res = await fetch(`https://api.zenrows.com/v1/?${params}`, { signal: AbortSignal.timeout(180_000) });
+  if (!res.ok) {
+    console.error(`  ZenRows ${res.status} on ${url}: ${(await res.text()).slice(0, 120)}`);
+    return null;
+  }
+  return res.text();
+}
+
+const deals = [];
+for (const source of SOURCES) {
+  const html = await fetchThrough(source.url);
+  if (!html) continue;
+  const found = source.parse(html).map((d) => ({ ...d, merchant: source.merchant }));
+  console.log(`${source.merchant}: ${found.length} deals (${found.filter((d) => d.image).length} with an image)`);
+  for (const d of found.slice(0, 3)) {
+    console.log(`  -${d.percentOff}%  $${d.price.toFixed(2)}  ${d.title.slice(0, 46)}`);
+  }
+  deals.push(...found);
+}
+
+// Interleave the sources so one merchant does not fill the whole row.
+const byMerchant = SOURCES.map((s) => deals.filter((d) => d.merchant === s.merchant));
+const mixed = [];
+for (let i = 0; mixed.length < deals.length; i += 1) {
+  for (const list of byMerchant) if (list[i]) mixed.push(list[i]);
 }
 
 if (!deals.length) {
@@ -122,6 +247,6 @@ if (DRY) {
   console.log('\n[dry-run] nothing written');
 } else {
   mkdirSync(dirname(OUT), { recursive: true });
-  writeFileSync(OUT, JSON.stringify({ fetchedAt: new Date().toISOString(), deals }, null, 1));
+  writeFileSync(OUT, JSON.stringify({ fetchedAt: new Date().toISOString(), deals: mixed }, null, 1));
   console.log(`\nwrote ${OUT}`);
 }

@@ -440,8 +440,10 @@ function DailyDealCard({ deal }: { deal: DailyDeal }) {
               <span className="text-[0.78rem] font-semibold text-ink/40 line-through">{formatMoney(deal.wasPrice, deal.currency)}</span>
             ) : null}
           </div>
+          {/* Name the retailer: the section mixes several deals pages, so a
+              badge like "Almost gone" alone leaves it unclear who is selling. */}
           <p className="mt-1 text-center text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink/40">
-            {deal.badge ?? 'Amazon deal'}
+            {deal.merchant ?? 'Amazon'}{deal.badge ? ` · ${deal.badge}` : ''}
           </p>
           <span className="mt-2.5 block rounded-[10px] bg-[#2ba24b] px-4 py-2.5 text-center font-display text-[0.85rem] font-bold text-white transition group-hover:bg-[#238a3f]">
             View deal

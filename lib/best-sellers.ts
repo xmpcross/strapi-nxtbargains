@@ -204,6 +204,8 @@ export type DailyDeal = {
   image: string | null;
   badge: string | null;
   url: string;
+  /** Which retailer's deals page it came from — Amazon, eBay, Walmart. */
+  merchant?: string;
 };
 
 /**
