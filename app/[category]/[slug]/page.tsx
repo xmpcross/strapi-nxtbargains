@@ -28,9 +28,9 @@ import ReadAlso from '@/components/ReadAlso';
 import RelatedPosts from '@/components/RelatedPosts';
 import QuestionsAnswered from '@/components/QuestionsAnswered';
 import PostFooterNav from '@/components/PostFooterNav';
-import ReadNext from '@/components/ReadNext';
 import PostInfobar from '@/components/PostInfobar';
 import { isPillarPost, pillarPathForPost } from '@/lib/pillar';
+import BestBuyPromoCard from '@/components/BestBuyPromoCard';
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -217,9 +217,12 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
   );
   const suggestionPool = [...sameCategory, ...recentPool.filter((p) => !sameCategory.includes(p))];
   const readAlsoPosts = suggestionPool.slice(0, 2);
-  const relatedPostsList = suggestionPool.slice(2, 4);
   const nextUpPosts = suggestionPool.slice(0, 4);
-  const readNextPosts = suggestionPool.slice(0, 4);
+  /* The closing strip takes up to eight, starting past the two already shown
+     in Read Also so the reader is not offered the same article twice within a
+     screen of itself. The pool is ranked same-category-first, so these are
+     still the most relevant eight that remain. */
+  const relatedPostsList = suggestionPool.slice(2, 10);
 
   // One post per category, newest first. Without this the list is whichever
   // category published most recently -- five rows all reading "Best Sellers",
@@ -605,7 +608,6 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               Prices and availability are accurate as of {fmtDate(post.updatedAt)} and subject to change.
             </div>
             <>
-                <RelatedPosts posts={relatedPostsList} />
                 <QuestionsAnswered items={faqs} />
                 <PostFooterNav
                   nextUp={nextUpPosts}
@@ -675,22 +677,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
               </div>
             ) : null}
 
-            <aside className="trailcard" data-testid="sidebar-trailcard">
-                <p className="trailcard-badge">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M21 3L3 10.5l7 2.5 2.5 7L21 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-                  </svg>
-                  Deals Live Here
-                </p>
-
-                <div className="trailcard-body">
-                  <h2 className="trailcard-title">Follow the Price Trail</h2>
-                  <p className="trailcard-text">
-                    Explore every category and find the ones that matter to you.
-                  </p>
-                  <Link href="/category" className="trailcard-cta">Explore Categories</Link>
-                </div>
-            </aside>
+            <BestBuyPromoCard />
 
             {merchantProducts && (
               <div className="rounded p-5 shadow-[rgba(17,17,26,0.1)_0px_1px_0px]" data-testid="sidebar-merchant-products">
@@ -734,7 +721,7 @@ export default async function PostPage({ params }: { params: Promise<Params> }) 
 
       </div>
 
-      {readNextPosts.length > 0 ? <ReadNext posts={readNextPosts} /> : null}
+      {relatedPostsList.length > 0 ? <RelatedPosts posts={relatedPostsList} /> : null}
     </article>
   );
 }

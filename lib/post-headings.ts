@@ -181,7 +181,8 @@ function splitMarkdown(text: string): [string, string] | null {
   if (headings.length < 3) return null;
 
   const preferred = headings.find((i) => PREFERRED_SPLIT.test(lines[i]));
-  const at = preferred ?? headings[1];
+  const midIndex = Math.floor(headings.length / 2);
+  const at = preferred ?? headings[midIndex] ?? headings[1];
   if (at === headings[0]) return null;
 
   return [lines.slice(0, at).join('\n'), lines.slice(at).join('\n')];
@@ -205,7 +206,13 @@ function splitHtml(text: string): [string, string] | null {
 
   const candidates = headings.slice(1, -1);
   const preferred = candidates.filter((h) => PREFERRED_SPLIT.test(h.text));
-  for (const h of [...preferred, ...candidates]) {
+
+  // Pick middle heading so Read Also lands in the middle of post content
+  const midIndex = Math.floor(headings.length / 2);
+  const middleHeading = headings[midIndex];
+  const middleCandidates = candidates.filter((h) => h.at === middleHeading?.at);
+
+  for (const h of [...preferred, ...middleCandidates, ...candidates]) {
     if (balanced(h.at)) return [text.slice(0, h.at), text.slice(h.at)];
   }
   return null;

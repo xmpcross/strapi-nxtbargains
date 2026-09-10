@@ -132,7 +132,7 @@ function CouponMiniRow({ coupon }: { coupon: Coupon }) {
   return (
     <div className="grid min-h-[64px] grid-cols-[minmax(0,1fr)_auto] gap-3 p-3">
       <span className="min-w-0">
-        <span className="block line-clamp-2 text-[0.9375rem] font-bold leading-5 text-primary">
+        <span className="line-clamp-2 text-[0.9375rem] font-bold leading-5 text-primary">
           {coupon.title}
         </span>
         <span className="mt-1 block text-[0.72rem] font-semibold text-ink/52">{coupon.discount}</span>

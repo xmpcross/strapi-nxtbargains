@@ -83,7 +83,7 @@ export default function MarketplaceBestSellers({
                   <span className="h-[64px] w-[64px] shrink-0 rounded-[9px] bg-muted" />
                 )}
                 <span className="min-w-0 flex-1">
-                  <span className="home-best-seller-title line-clamp-2 block text-[14px] leading-snug text-ink transition group-hover:text-primary">{it.title}</span>
+                  <span className="home-best-seller-title line-clamp-2 text-[14px] leading-snug text-ink transition group-hover:text-primary">{it.title}</span>
                   <span className="mt-0.5 block text-[0.76rem] text-ink/55">
                     {it.rating ? <span className="font-semibold text-primary">★ {it.rating}</span> : null}
                     {it.rating ? ' · ' : ''}

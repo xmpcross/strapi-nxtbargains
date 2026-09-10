@@ -7,6 +7,7 @@ import {
   bestOffer,
   collectOfferRows,
   formatMoney,
+  merchantCount,
   merchantName,
   numericValue,
   offerPrice,
@@ -30,6 +31,25 @@ export const metadata: Metadata = {
   alternates: { canonical: '/price-drops' },
 };
 
+/**
+ * A product we hold offers for but not yet enough price history to call a drop.
+ *
+ * The page was built to render only confirmed drops, which needs two snapshots
+ * for the same product with the later one lower. Until the daily job has run a
+ * few times that condition is met by almost nothing, so the page stood at one
+ * card while 271 tracked products and 1,580 live offers sat unused. These rows
+ * fill that gap with what is genuinely known today — the best current price and
+ * how far apart the merchants are — and recede as real drops accumulate.
+ */
+type TrackedProduct = {
+  product: CommerceProduct;
+  row: CommerceOfferRow;
+  price: number;
+  merchants: number;
+  spreadPercent: number;
+  highestPrice: number;
+};
+
 type PriceDrop = {
   product: CommerceProduct;
   row: CommerceOfferRow;
@@ -41,9 +61,13 @@ type PriceDrop = {
 };
 
 export default async function PriceDropsPage() {
-  const products = await listCommerceProductsForDeals(120).catch(() => [] as CommerceProduct[]);
+  // 300 covers the whole active catalogue (271 at time of writing) with room to
+  // grow; the old 120 silently excluded more than half of it. Snapshots are
+  // raised in step — one run of the daily job writes one row per offer, so the
+  // ceiling has to clear several days of history for every product.
+  const products = await listCommerceProductsForDeals(300).catch(() => [] as CommerceProduct[]);
   const productIds = products.map((product) => product.documentId).filter(Boolean) as string[];
-  const snapshots = await listCommercePriceSnapshots(productIds, 1200).catch(() => [] as CommercePriceSnapshot[]);
+  const snapshots = await listCommercePriceSnapshots(productIds, 4000).catch(() => [] as CommercePriceSnapshot[]);
   const productsByDocumentId = new Map(products.map((product) => [product.documentId, product]));
   const snapshotsByProduct = groupSnapshotsByProduct(snapshots);
   const drops = Array.from(snapshotsByProduct.entries())
@@ -54,7 +78,19 @@ export default async function PriceDropsPage() {
     })
     .filter((drop): drop is PriceDrop => Boolean(drop))
     .sort((a, b) => b.dropPercent - a.dropPercent || b.dropAmount - a.dropAmount)
-    .slice(0, 36);
+    .slice(0, 60);
+
+  // Anything already shown as a drop is excluded, so the two sections never
+  // repeat a product. Ranked by spread: the widest gap between merchants is
+  // where a reader has most to gain from comparing, which is the same promise
+  // the drop cards make.
+  const droppedIds = new Set(drops.map((drop) => drop.product.documentId));
+  const trackedProducts = products
+    .filter((product) => !droppedIds.has(product.documentId))
+    .map(buildTrackedProduct)
+    .filter((entry): entry is TrackedProduct => Boolean(entry))
+    .sort((a, b) => b.spreadPercent - a.spreadPercent || b.merchants - a.merchants)
+    .slice(0, 96);
 
   const dropCount = drops.length;
   const topDrop = drops[0]?.dropPercent ?? 0;
@@ -96,7 +132,7 @@ export default async function PriceDropsPage() {
       />
 
       {dropCount > 0 ? (
-        <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="featured-drops">
+        <section className="border-b border-ink/10 bg-[#f3f6fa] py-10 sm:py-12" data-testid="featured-drops">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Largest movement"
@@ -132,27 +168,44 @@ export default async function PriceDropsPage() {
           </div>
 
           {dropCount > 0 ? (
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {drops.map((drop) => (
                 <PriceDropCard key={`${drop.product.id}-${drop.row.offer.id}-${drop.checkedAt}`} drop={drop} />
               ))}
             </div>
           ) : (
             <EmptyState
-              title="No price drops yet"
-              body="This page will populate after products have at least two tracked price snapshots with a lower latest price."
+              title="No confirmed drops yet"
+              body="A drop needs two tracked snapshots for the same product with the later one lower. The daily price job is building that history now — everything currently tracked is below."
             />
           )}
         </div>
       </section>
 
-      <section className="border-t border-ink/10 bg-[#f0f2f4] py-10">
+      {trackedProducts.length > 0 ? (
+        <section className="border-t border-ink/10 bg-white py-10 sm:py-14" id="tracked">
+          <div className="mx-auto max-w-[1366px] px-6">
+            <SectionHead
+              eyebrow="Under watch"
+              title="Tracked products, compared right now"
+              subtitle={`${trackedProducts.length} products where at least two merchants are quoting a price. Ranked by how far apart those quotes sit — the widest gaps are where comparing pays most. These become drop cards above once the price history is deep enough.`}
+            />
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {trackedProducts.map((entry) => (
+                <TrackedProductCard key={`tracked-${entry.product.id}`} entry={entry} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="border-t border-ink/10 bg-[#f3f6fa] py-10">
         <div className="mx-auto max-w-[1366px] px-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <BrowseCard href="/best-deals" title="Best deals" subtitle="Highest current merchant discounts" />
             <BrowseCard href="/all-products" title="All products" subtitle="Compare offers across merchants" />
             <BrowseCard href="/coupons" title="Coupons" subtitle="Promo codes and store deals" />
-            <BrowseCard href="/deals" title="Buying guides" subtitle="Editorial deals and roundups" />
+            <BrowseCard href="/buying-guides" title="Buying guides" subtitle="Editorial deals and roundups" />
           </div>
         </div>
       </section>
@@ -258,6 +311,68 @@ function BrowseCard({ href, title, subtitle }: { href: string; title: string; su
   );
 }
 
+function TrackedProductCard({ entry }: { entry: TrackedProduct }) {
+  const { product, row, price, merchants, spreadPercent, highestPrice } = entry;
+  const currency = row.offer.currency ?? 'USD';
+  const image = productImageUrl(product);
+  const logo = mediaUrl(row.offer.merchant?.logo ?? null);
+  const merchant = merchantName(row.offer);
+  const href = productHref(product);
+
+  return (
+    <article className="group flex h-full flex-col border border-ink/10 bg-white transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_18px_32px_-24px_rgba(3,3,3,0.4)]">
+      <Link href={href} className="grid aspect-[4/3] place-items-center border-b border-ink/10 bg-white p-5">
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image}
+            alt={product.primaryImage?.alternativeText || product.name}
+            className="h-full max-h-40 w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <span className="flex h-32 w-full items-center justify-center bg-muted px-4 text-center font-display text-lg font-bold text-ink/25">
+            {product.brandRef?.name ?? product.brand ?? 'NXT'}
+          </span>
+        )}
+      </Link>
+
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-start justify-between gap-2">
+          <span className="inline-flex rounded bg-[#eef2f7] px-2 py-1 text-[11px] font-bold text-ink/65">
+            {merchants} merchants
+          </span>
+          {spreadPercent > 0 ? (
+            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-primary">{spreadPercent}% spread</span>
+          ) : null}
+        </div>
+
+        <Link href={href} className="mt-3 block">
+          <h4 className="line-clamp-2 font-display !text-[0.95rem] font-bold leading-tight text-ink transition group-hover:text-primary">
+            {product.name}
+          </h4>
+        </Link>
+
+        <div className="mt-auto pt-4">
+          <div className="flex items-baseline gap-2">
+            <p className="font-display text-xl font-bold text-ink">{formatMoney(price, currency)}</p>
+            {highestPrice > price ? (
+              <p className="text-xs font-semibold text-ink/35">up to {formatPlainMoney(highestPrice, currency)}</p>
+            ) : null}
+          </div>
+          <div className="mt-2 flex h-5 items-center">
+            {logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logo} alt={`${merchant} logo`} referrerPolicy="no-referrer" className="h-5 max-w-[88px] object-contain object-left" />
+            ) : (
+              <p className="line-clamp-1 text-[11px] font-bold uppercase tracking-[0.12em] text-primary">{merchant}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function PriceDropCard({ drop, featured = false }: { drop: PriceDrop; featured?: boolean }) {
   const product = drop.product;
   const offer = drop.row.offer;
@@ -304,7 +419,7 @@ function PriceDropCard({ drop, featured = false }: { drop: PriceDrop; featured?:
         </Link>
 
         <div className="mt-4">
-          <div className="h-1.5 bg-[#eef0f3]">
+          <div className="h-1.5 bg-[#e4eaf3]">
             <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3">
@@ -342,6 +457,39 @@ function PriceDropCard({ drop, featured = false }: { drop: PriceDrop; featured?:
       </div>
     </article>
   );
+}
+
+/**
+ * Best current offer for a product, plus how widely the merchants disagree.
+ *
+ * Returns null unless at least two merchants have quoted a price: a single
+ * quote has no spread to report, and a card saying "1 merchant, no comparison"
+ * is worse than no card. The spread is measured against the highest quote, so
+ * it reads the same way as a discount even though nothing has actually fallen.
+ */
+function buildTrackedProduct(product: CommerceProduct): TrackedProduct | null {
+  const rows = collectOfferRows(product);
+  const row = bestOffer(rows);
+  if (!row) return null;
+
+  const price = offerPrice(row.offer);
+  if (price === null || price <= 0) return null;
+
+  const prices = rows.map((entry) => offerPrice(entry.offer)).filter((value): value is number => value !== null && value > 0);
+  if (prices.length < 2) return null;
+
+  const highestPrice = Math.max(...prices);
+  const merchants = merchantCount(rows);
+  if (merchants < 2) return null;
+
+  return {
+    product,
+    row,
+    price,
+    merchants,
+    highestPrice,
+    spreadPercent: highestPrice > price ? Math.round(((highestPrice - price) / highestPrice) * 100) : 0,
+  };
 }
 
 function groupSnapshotsByProduct(snapshots: CommercePriceSnapshot[]) {

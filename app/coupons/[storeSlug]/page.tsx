@@ -89,7 +89,7 @@ export default async function StoreCouponsPage({ params }: { params: Promise<{ s
       />
 
       {highlightCoupons.length > 0 ? (
-        <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="featured-store-coupons">
+        <section className="border-b border-ink/10 bg-[#f3f6fa] py-10 sm:py-12" data-testid="featured-store-coupons">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Top picks"
@@ -136,7 +136,7 @@ export default async function StoreCouponsPage({ params }: { params: Promise<{ s
                 ))}
               </div>
             ) : (
-              <div className="mt-6 border border-dashed border-ink/15 bg-[#f0f2f4] p-8 text-center">
+              <div className="mt-6 border border-dashed border-ink/15 bg-[#f3f6fa] p-8 text-center">
                 <p className="font-display text-lg font-bold text-ink">No live coupons right now</p>
                 <p className="mt-2 text-sm leading-6 text-ink/60">
                   This store is in our coupon directory, but the feed has no active offers at the moment.
@@ -203,7 +203,7 @@ export default async function StoreCouponsPage({ params }: { params: Promise<{ s
                     <Link
                       key={related.id}
                       href={`/coupons/${couponStorePublicSlug(related)}`}
-                      className="group flex items-center gap-3 rounded-lg border border-transparent p-1 transition hover:border-ink/10 hover:bg-[#f0f2f4]"
+                      className="group flex items-center gap-3 rounded-lg border border-transparent p-1 transition hover:border-ink/10 hover:bg-[#f3f6fa]"
                     >
                       <StoreLogo name={related.name} logo={storeLogoUrl(related)} className="h-9 w-11" />
                       <span className="min-w-0">
@@ -348,7 +348,7 @@ function NavLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <Link
       href={href}
-      className="flex items-center justify-between border border-ink/8 bg-[#f0f2f4] px-3 py-2.5 text-sm font-semibold text-ink/75 transition hover:border-primary/30 hover:text-primary"
+      className="flex items-center justify-between border border-ink/8 bg-[#f3f6fa] px-3 py-2.5 text-sm font-semibold text-ink/75 transition hover:border-primary/30 hover:text-primary"
     >
       {children}
       <span aria-hidden className="text-primary">→</span>

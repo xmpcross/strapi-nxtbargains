@@ -25,7 +25,7 @@ import AutoCarousel from '@/components/AutoCarousel';
 import Hero from '@/components/Hero';
 import { listCouponPageData } from '@/lib/coupon-data';
 import HomepageCouponsSection from '@/components/HomepageCouponsSection';
-import { listAmazonDailyDeals, type DailyDeal } from '@/lib/best-sellers';
+import { listAmazonDailyDeals, type DailyDeal, listBestDealsRealtime } from '@/lib/best-sellers';
 import { productHref } from '@/lib/product-url';
 
 export const revalidate = 60;
@@ -159,11 +159,13 @@ export default async function HomePage() {
     return { name, logo: match?.logo ?? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` };
   });
   const deals = dealProducts.map(toDeal).filter((d): d is Deal => d !== null);
-  /* Ten, shown five at a time by the auto-advancing carousel below. */
-  let priceDrops = deals.filter((d) => d.pct > 0).sort((a, b) => b.pct - a.pct).slice(0, 10);
-  if (priceDrops.length < 3) {
-    priceDrops = deals.slice(0, 10);
-  }
+  /* The steepest real discounts we hold, from the scraped retailer feed.
+     This was previously computed from Strapi offers, but every one of those
+     carries discountPercent 0 with no originalPrice, so the filter matched
+     nothing and the fallback put ten undiscounted products under a heading
+     promising the biggest drop of the week — the section rendered without a
+     single discount badge on it. */
+  const priceDrops = listBestDealsRealtime(11);
   /* Ten trending products, spread across categories.
      `products` arrives sorted by updatedAt, so slicing the first ten returned
      ten of whatever category was imported last -- the section was showing
@@ -211,20 +213,24 @@ export default async function HomePage() {
       {priceDrops.length >= 3 && (
         <section className="py-14 sm:py-[72px]" data-testid="home-price-drops">
           <div className="mx-auto max-w-[1366px] px-6">
-            <SectionHead eyebrow="● Live now" title="This week's biggest price drop" intro="The steepest discount we're tracking across marketplaces this week." cta={{ href: '/all-products', label: 'All products' }} />
-            <div className="mt-9">
-              <AutoCarousel label="This week's biggest price drops">
-                {priceDrops.map((d) => (
-                  /* The slide width decides how many fit a view: five at xl,
-                     stepping down so a card never gets too narrow to read. */
-                  <div
-                    key={d.product.id}
-                    className="w-[62%] shrink-0 snap-start sm:w-[45%] md:w-[31%] lg:w-[23.5%] xl:w-[calc((100%-4*18px)/5)]"
-                  >
-                    <DealCard deal={d} />
-                  </div>
-                ))}
-              </AutoCarousel>
+            <SectionHead eyebrow="● Live now" title="This week's biggest price drops" intro="The steepest discounts we're tracking across Amazon, eBay, Walmart and Newegg right now." cta={{ href: '/best-deals', label: 'All deals' }} />
+
+            {/* Equal-weight ranking, replacing the hero-plus-column split.
+                The question this section answers is "how far has it fallen",
+                so the discount is the largest thing on each card and the rank
+                bar underneath shows each drop against the steepest one — the
+                comparison the eye was otherwise being asked to do across two
+                different card sizes. Five across matches the Trending grid
+                directly below it, so the two sections now share a rhythm. */}
+            <div className="mt-9 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+              {priceDrops.slice(0, 10).map((deal, index) => (
+                <PriceDropTile
+                  key={`drop-${deal.asin}`}
+                  deal={deal}
+                  rank={index + 1}
+                  topPercent={priceDrops[0].percentOff || 1}
+                />
+              ))}
             </div>
           </div>
         </section>
@@ -234,17 +240,41 @@ export default async function HomePage() {
       {dealTabs.length > 0 && (
         <section className="pb-14 sm:pb-[72px]" data-testid="home-popular-deals">
           <div className="mx-auto max-w-[1366px] px-6">
-            <SectionHead
-              eyebrow="Today only"
-              title="Popular Deals"
-              intro="Today's discounts from Amazon, eBay and Walmart, refreshed every morning."
-              cta={{ href: '/best-deals', label: 'All deals', variant: 'outline' }}
-            />
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between border-b border-ink/10 pb-6 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-[0.72rem] font-extrabold uppercase tracking-wider text-emerald-700">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    Live Price Feeds
+                  </span>
+                  <span className="text-[0.75rem] font-semibold text-ink/45">Updated daily</span>
+                </div>
+                <h2 className="mt-2 font-display text-[clamp(1.75rem,3vw,2.4rem)] font-extrabold leading-tight text-ink">
+                  Popular Deals Across Top Retailers
+                </h2>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/70">
+                  Verified discounts and handpicked price drops from Amazon, eBay, and Walmart.
+                </p>
+              </div>
+              <div className="shrink-0">
+                <Link
+                  href="/best-deals"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-ink/15 bg-white px-5 py-2.5 font-display text-sm font-bold text-ink shadow-sm transition hover:border-primary hover:text-primary hover:shadow"
+                >
+                  Explore All Deals
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
             {/*
-              Radio inputs and CSS, not client state: this page is otherwise a
-              server component, and the filter sidebar and offer accordions are
-              already built this way. Every tab's cards are in the served HTML,
-              so they are indexable and the tabs work with JavaScript off.
+              Radio inputs and CSS tab switcher: pure CSS SSR compatibility
+              Nav element matches CSS .deal-tab-list and prevents nth-of-type offset issues.
             */}
             <div className="deal-tabs mt-6">
               {dealTabs.map((tab, index) => (
@@ -257,10 +287,6 @@ export default async function HomePage() {
                   defaultChecked={index === 0}
                 />
               ))}
-              {/* <nav>, not <div>: the panels below are matched by
-                  nth-of-type, which counts by element type, so a <div> here
-                  would be div #1 and shift every panel index by one — eBay's
-                  input revealed Amazon's panel and Amazon's matched nothing. */}
               <nav className="deal-tab-list" role="tablist" aria-label="Deals by retailer">
                 {dealTabs.map((tab) => (
                   <label
@@ -268,20 +294,38 @@ export default async function HomePage() {
                     htmlFor={`deal-tab-${tab.merchant.toLowerCase()}`}
                     className="deal-tab-label"
                   >
-                    {tab.merchant}
-                    <span className="deal-tab-count">{tab.deals.length}</span>
+                    <span className="flex items-center gap-2">
+                      <span className="capitalize">{tab.merchant}</span>
+                      <span className="deal-tab-count">{tab.deals.length}</span>
+                    </span>
                   </label>
                 ))}
               </nav>
-              {dealTabs.map((tab) => (
-                <div key={`dt-panel-${tab.merchant}`} className="deal-tab-panel">
-                  <div className="grid grid-cols-2 gap-[18px] sm:grid-cols-3 lg:grid-cols-5">
-                    {tab.deals.slice(0, 10).map((deal) => (
-                      <DailyDealCard key={`home-dd-${deal.merchant}-${deal.asin}`} deal={deal} />
-                    ))}
+
+              {dealTabs.map((tab) => {
+                const spotlightDeal = tab.deals[0];
+                // One spotlight on the top row, then two rows of five beneath
+                // it. Ten is the exact fill for those two rows — a partial
+                // third row reads as a truncation rather than a layout.
+                const gridDeals = tab.deals.slice(1, 11);
+
+                return (
+                  <div key={`dt-panel-${tab.merchant}`} className="deal-tab-panel">
+                    <div className="space-y-6">
+                      {spotlightDeal && (
+                        <FeaturedDailyDealCard deal={spotlightDeal} />
+                      )}
+                      {gridDeals.length > 0 && (
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+                          {gridDeals.map((deal) => (
+                            <DailyDealCard key={`home-dd-${deal.merchant}-${deal.asin}`} deal={deal} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
@@ -487,46 +531,255 @@ function DealCard({ deal }: { deal: Deal }) {
 }
 
 /* ------------------------------------------------------------- Daily deal */
-/* Amazon's own discount, not a cross-merchant comparison: these products are
-   not in the catalogue and have no other merchant to compare against, so the
-   card shows the saving and links straight out rather than offering a
-   "Compare N prices" button it could not honour. */
-function DailyDealCard({ deal }: { deal: DailyDeal }) {
+function FeaturedDailyDealCard({ deal }: { deal: DailyDeal }) {
+  const savings = deal.wasPrice && deal.wasPrice > deal.price ? deal.wasPrice - deal.price : null;
+
   return (
     <a
       href={deal.url}
       target="_blank"
       rel="nofollow sponsored noopener noreferrer"
-      className="group flex h-full flex-col overflow-hidden rounded-[8px] border border-ink/10 bg-white transition hover:-translate-y-1.5 hover:shadow-[0_26px_46px_-26px_rgba(13,27,42,0.42)]"
+      className="group relative block overflow-hidden rounded-2xl border-2 border-primary/25 bg-gradient-to-br from-[#f8faf4] via-white to-primary/5 p-5 sm:p-7 shadow-sm transition-all duration-300 hover:border-primary/60 hover:shadow-xl"
+      data-testid={`spotlight-deal-${deal.asin}`}
+    >
+      <div className="absolute right-4 top-4 z-10 hidden sm:flex items-center gap-2">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 font-display text-[0.72rem] font-bold text-primary border border-primary/20">
+          ⚡ Featured Deal
+        </span>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)] items-center">
+        <div className="relative aspect-square w-full max-w-[280px] mx-auto overflow-hidden rounded-xl bg-white p-6 shadow-inner border border-ink/5 flex items-center justify-center">
+          <span className="absolute left-3 top-3 z-10 rounded-lg bg-gradient-to-r from-amber-500 to-rose-500 px-3 py-1 font-display text-xs font-black uppercase text-white shadow-md">
+            🔥 -{deal.percentOff}% OFF
+          </span>
+          {deal.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={deal.image}
+              alt={deal.title}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              className="h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <span className="font-display text-2xl font-bold text-ink/25">NXT</span>
+          )}
+        </div>
+
+        <div className="flex flex-col justify-between space-y-4">
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="rounded-md bg-ink/5 px-2.5 py-1 text-[0.7rem] font-bold uppercase tracking-wider text-ink/70">
+                {deal.merchant ?? 'Amazon'}
+              </span>
+              {deal.badge && (
+                <span className="rounded-md bg-emerald-500/10 px-2.5 py-1 text-[0.7rem] font-bold text-emerald-700 border border-emerald-500/20">
+                  {deal.badge}
+                </span>
+              )}
+            </div>
+            <h3 className="font-display text-lg sm:text-xl lg:text-2xl font-extrabold leading-snug text-ink group-hover:text-primary transition line-clamp-2">
+              {deal.title}
+            </h3>
+          </div>
+
+          <div className="flex flex-wrap items-baseline gap-3 pt-2">
+            <span className="font-display text-2xl sm:text-3xl font-black text-ink">
+              {formatMoney(deal.price, deal.currency)}
+            </span>
+            {deal.wasPrice && (
+              <span className="text-base font-semibold text-ink/40 line-through">
+                {formatMoney(deal.wasPrice, deal.currency)}
+              </span>
+            )}
+            {savings !== null && (
+              <span className="inline-flex items-center rounded-lg bg-emerald-600 px-2.5 py-1 font-display text-xs font-bold text-white shadow-sm">
+                Save {formatMoney(savings, deal.currency)}
+              </span>
+            )}
+          </div>
+
+          <div className="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <span className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-display text-sm font-bold text-white shadow-md transition group-hover:bg-primary/90 group-hover:shadow-lg">
+              Claim Spotlight Deal
+              <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </span>
+            <span className="text-center sm:text-left text-xs font-semibold text-ink/50">
+              Direct checkout link on {deal.merchant ?? 'Amazon'}
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+/**
+ * Money for the deal feed.
+ *
+ * The feed stopped being USD-only when the UK, Australian and European
+ * marketplaces were added, and these prices are not converted — so the symbol
+ * has to follow the number. Rendering a GBP 5.00 deal as $5.00 does not just
+ * look wrong, it understates the price by about a quarter.
+ */
+const DEAL_SYMBOLS: Record<string, string> = { USD: '$', GBP: '\u00a3', EUR: '\u20ac', AUD: 'A$' };
+
+function dealMoney(value: number, currency = 'USD') {
+  const symbol = DEAL_SYMBOLS[currency] ?? '';
+  return `${symbol}${value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+}
+
+/**
+ * One price drop, led by the size of the discount.
+ *
+ * The percentage is the largest element because it is the only figure that is
+ * comparable across the card set — these come from four retailers in four
+ * currencies, so ranking by the price itself would be meaningless. The bar
+ * beneath it is that same percentage measured against the steepest drop in the
+ * row, which turns ten independent numbers into one ordered picture.
+ *
+ * Rank is shown only for the top three. Numbering all ten implies a precision
+ * the data does not have — the gap between ninth and tenth is often a point.
+ */
+function PriceDropTile({ deal, rank, topPercent }: { deal: DailyDeal; rank: number; topPercent: number }) {
+  const depth = Math.max(6, Math.round((deal.percentOff / topPercent) * 100));
+
+  return (
+    <a
+      href={deal.url}
+      target="_blank"
+      rel="sponsored noopener noreferrer"
+      className="group flex h-full flex-col border border-ink/10 bg-white transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[0_18px_32px_-24px_rgba(3,3,3,0.4)]"
+      data-testid="price-drop-tile"
+    >
+      <span className="relative grid aspect-square place-items-center border-b border-ink/10 bg-white p-4">
+        {deal.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={deal.image}
+            alt={deal.title}
+            referrerPolicy="no-referrer"
+            className="h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.04]"
+          />
+        ) : (
+          <span className="font-display text-lg font-bold text-ink/20">{deal.merchant ?? 'Deal'}</span>
+        )}
+        {rank <= 3 ? (
+          <span className="absolute left-0 top-0 bg-ink px-2 py-1 font-display text-[11px] font-bold text-white">
+            #{rank}
+          </span>
+        ) : null}
+      </span>
+
+      <span className="flex flex-1 flex-col p-4">
+        <span className="flex items-baseline gap-1.5">
+          <span className="font-display text-[2rem] font-bold leading-none tracking-tight text-primary">
+            {deal.percentOff}
+          </span>
+          <span className="font-display text-sm font-bold text-primary/70">% off</span>
+        </span>
+
+        <span className="mt-2.5 block h-[3px] w-full bg-[#e4eaf3]">
+          <span className="block h-full bg-primary/70" style={{ width: `${depth}%` }} />
+        </span>
+
+        <span className="mt-3 line-clamp-2 text-[0.8rem] font-semibold leading-snug text-ink transition group-hover:text-primary">
+          {deal.title}
+        </span>
+
+        <span className="mt-auto flex items-end justify-between gap-2 pt-3">
+          <span>
+            <span className="block font-display text-base font-bold text-ink">
+              {dealMoney(deal.price, deal.currency)}
+            </span>
+            {deal.wasPrice ? (
+              <span className="block text-[11px] font-semibold text-ink/35 line-through">
+                {dealMoney(deal.wasPrice, deal.currency)}
+              </span>
+            ) : null}
+          </span>
+          {deal.merchant ? (
+            <span className="max-w-[52%] truncate text-right text-[10px] font-bold uppercase tracking-[0.08em] text-ink/40">
+              {deal.merchant}
+            </span>
+          ) : null}
+        </span>
+      </span>
+    </a>
+  );
+}
+
+function DailyDealCard({ deal }: { deal: DailyDeal }) {
+  const savings = deal.wasPrice && deal.wasPrice > deal.price ? deal.wasPrice - deal.price : null;
+
+  return (
+    <a
+      href={deal.url}
+      target="_blank"
+      rel="nofollow sponsored noopener noreferrer"
+      className="group flex h-full flex-col overflow-hidden rounded-xl border border-ink/10 bg-white transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-[0_20px_40px_-20px_rgba(13,27,42,0.3)]"
       data-testid={`dailydeal-${deal.asin}`}
     >
       <div className="uniform-product-image-box relative grid aspect-square w-full place-items-center overflow-hidden bg-white p-4">
-        <span className="absolute left-2.5 top-2.5 z-10 rounded-[7px] bg-primary px-[9px] py-1 font-display text-[0.74rem] font-bold text-white">
+        <span className="absolute left-2.5 top-2.5 z-10 rounded-lg bg-primary px-2.5 py-1 font-display text-[0.72rem] font-bold text-white shadow-sm">
           -{deal.percentOff}%
         </span>
+        {savings !== null && (
+          <span className="absolute right-2.5 top-2.5 z-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 font-display text-[0.68rem] font-extrabold text-emerald-700">
+            Save {formatMoney(savings, deal.currency)}
+          </span>
+        )}
         {deal.image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={deal.image} alt={deal.title} loading="lazy" referrerPolicy="no-referrer" className="uniform-product-image block h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.04]" />
+          <img
+            src={deal.image}
+            alt={deal.title}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            className="uniform-product-image block h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-105"
+          />
         ) : (
           <span className="font-display text-lg font-bold text-ink/25">NXT</span>
         )}
       </div>
-      <div className="flex flex-1 flex-col px-[15px] pb-4 pt-3.5">
-        <h3 className="product-card-title line-clamp-2 h-[2.6em] leading-[1.3] text-ink transition group-hover:text-primary">{deal.title}</h3>
+
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <span className="text-[0.65rem] font-extrabold uppercase tracking-wider text-ink/50">
+            {deal.merchant ?? 'Amazon'}
+          </span>
+          {deal.badge && (
+            <>
+              <span className="text-[0.65rem] text-ink/30">•</span>
+              <span className="text-[0.65rem] font-bold text-emerald-600 truncate">{deal.badge}</span>
+            </>
+          )}
+        </div>
+
+        <h3 className="product-card-title line-clamp-2 h-[2.6em] font-display text-xs sm:text-sm font-semibold leading-[1.3] text-ink transition group-hover:text-primary">
+          {deal.title}
+        </h3>
+
         <div className="mt-auto pt-3">
-          <div className="flex items-baseline justify-center gap-2">
-            <span className="font-display text-[1.05rem] font-extrabold text-ink">{formatMoney(deal.price, deal.currency)}</span>
-            {deal.wasPrice ? (
-              <span className="text-[0.78rem] font-semibold text-ink/40 line-through">{formatMoney(deal.wasPrice, deal.currency)}</span>
-            ) : null}
+          <div className="flex flex-wrap items-baseline gap-2">
+            <span className="font-display text-base sm:text-lg font-extrabold text-ink">
+              {formatMoney(deal.price, deal.currency)}
+            </span>
+            {deal.wasPrice && (
+              <span className="text-xs font-semibold text-ink/40 line-through">
+                {formatMoney(deal.wasPrice, deal.currency)}
+              </span>
+            )}
           </div>
-          {/* Name the retailer: the section mixes several deals pages, so a
-              badge like "Almost gone" alone leaves it unclear who is selling. */}
-          <p className="mt-1 text-center text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink/40">
-            {deal.merchant ?? 'Amazon'}{deal.badge ? ` · ${deal.badge}` : ''}
-          </p>
-          <span className="mt-2.5 block rounded-[10px] bg-[#2ba24b] px-4 py-2.5 text-center font-display text-[0.85rem] font-bold text-white transition group-hover:bg-[#238a3f]">
+
+          <span className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-ink/5 px-3 py-2 text-center font-display text-xs font-bold text-ink transition duration-300 group-hover:bg-primary group-hover:text-white">
             View deal
+            <svg className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
           </span>
         </div>
       </div>

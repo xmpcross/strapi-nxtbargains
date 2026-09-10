@@ -123,11 +123,11 @@
   --border-style: solid;
   --border-base: 1px solid #c5cbd5;
   --color-bg-white: #fff;
-  --color-bg-light: #f0f2f4;
+  --color-bg-light: #f3f6fa;
   --color-bg-light-gray: #c5cbd5;
   --color-bg-neutral: #90959e;
   --color-bg-dark-gray: #55555a;
-  --color-bg-dark: #1d252c;
+  --color-bg-dark: #07111f;
   --color-bg-black: #000;
   --color-bg-base: #fff;
   --color-bg-form-base: #fff;
@@ -137,13 +137,13 @@
   --color-bg-form-btn-checked-focused: #000;
   --color-bg-form-btn-checked-pressed: #001e73;
   --color-unstable-pure-white: #fff;
-  --color-unstable-background-white: #f0f2f4;
+  --color-unstable-background-white: #f3f6fa;
   --color-unstable-tech-white: #e0e6ef;
   --color-unstable-light-gray: #c5cbd5;
   --color-unstable-tech-gray: #90959e;
   --color-unstable-hint-gray: #70757d;
   --color-unstable-dark-gray: #55555a;
-  --color-unstable-tech-black: #1d252c;
+  --color-unstable-tech-black: #07111f;
   --color-unstable-black-text: #040c13;
   --color-unstable-pure-black: #000;
   --color-unstable-success-green: #318000;
@@ -160,7 +160,7 @@
   --color-sentiment-primary: #0046be;
   --color-sentiment-secondary: #fff200;
   --color-sentiment-success: #318000;
-  --color-sentiment-info: #1d252c;
+  --color-sentiment-info: #07111f;
   --color-sentiment-warning: #ffce00;
   --color-sentiment-error: #bb0628;
   --color-border-unstable-light: #fff;
@@ -174,10 +174,22 @@
   --color-primary-emphasis: #001e73;
 
   /* Tailwind theme tokens (primary/ink/paper/muted/success/...). */
-  --colorBgDefaultHover: #f0f2f4;
+  /* Palette adopted from the pillar page (components/pillar/*.module.css),
+     which was the only surface on the site carrying its own scheme. The brand
+     blues and the yellow were already identical in both — #0046be, #001e73 and
+     #ffe000 — so what actually moves here is the neutral family: the pillar's
+     paper and ink are cooler and bluer than the ones the rest of the site was
+     using, and it carries an explicit rule colour the global set never had. */
+  --pillar-ink: #07111f;
+  --pillar-paper: #f3f6fa;
+  --pillar-rule: #d7deea;
+  --pillar-green: #1f7a3d;
+  --pillar-red: #bb0628;
+
+  --colorBgDefaultHover: var(--pillar-paper);
   --colorBgDefaultPressed: #e0e6ef;
-  --colorBgDefaultMuted: #f0f2f4;
-  --colorBgDefaultMutedHover: #e0e6ef;
+  --colorBgDefaultMuted: var(--pillar-paper);
+  --colorBgDefaultMutedHover: #e4eaf3;
   --colorBgDefaultMutedPressed: #c5cbd5;
   --colorBgPrimary: #f1f8ff;
   --colorBgPrimaryHover: #cfe9fe;
@@ -195,10 +207,10 @@
   --colorBgSuccess: #e5fde5;
   --colorBgSuccessEmphasis: #318000;
   --colorBgSurface: #fff;
-  --colorBgSurfaceMuted: #e0e6ef;
-  --colorBgSurfaceInverse: #1d252c;
+  --colorBgSurfaceMuted: var(--pillar-rule);
+  --colorBgSurfaceInverse: var(--pillar-ink);
   --colorBgSurfaceSecondary: #ffe000;
-  --colorBgSurfaceHover: #f0f2f4;
+  --colorBgSurfaceHover: var(--pillar-paper);
   --colorBgSurfacePressed: #e0e6ef;
 }
 
@@ -482,6 +494,25 @@ main[data-testid^="product-price-"] h2.product-info-section-title {
 
    The background stays: with the inset removed it is what still separates the
    rail from the page. Drop it too if you want the tiles sitting on white. */
+/* Product page right rail: coupons + the Best Buy card, travelling together. */
+.product-side-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .product-side-rail {
+    position: sticky;
+    top: 7rem;
+    align-self: start;
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
 .product-info-sidebar {
   min-width: 0;
   padding: 0;
@@ -1895,18 +1926,18 @@ article[data-testid^="post-"] .post-content table caption {
   caption-side: top;
   text-align: left;
   font-weight: 700;
-  color: #1d252c;
+  color: #07111f;
   padding: 0 0 0.5rem;
   font-size: 0.95rem;
 }
 article[data-testid^="post-"] .post-content th[scope] {
   font-weight: 700;
-  background: #f0f2f4;
+  background: #f3f6fa;
   border-bottom: 2px solid #c5cbd5 !important;
 }
 
 /* ── Light footer, scoped to the Best Sellers index page only ───────────────
-   The global footer is dark (#1d252c). On /best-sellers we recolor it for a
+   The global footer is dark (#07111f). On /best-sellers we recolor it for a
    light background: #f5f6fa footer, #ebedf5 copyright bar, and the white text /
    links / logo flipped to dark equivalents so everything stays readable. */
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] {
@@ -1916,7 +1947,7 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] {
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .bg-black {
   background: #ebedf5 !important;
 }
-body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white { color: #1d252c; }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white { color: #07111f; }
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/85 { color: rgb(29 37 44 / 0.85); }
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/80 { color: rgb(29 37 44 / 0.82); }
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/70 { color: rgb(29 37 44 / 0.72); }
@@ -1924,7 +1955,7 @@ body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-whi
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/60 { color: rgb(29 37 44 / 0.62); }
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/55 { color: rgb(29 37 44 / 0.6); }
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .text-white\/45 { color: rgb(29 37 44 / 0.5); }
-body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .hover\:text-white:hover { color: #1d252c; }
+body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .hover\:text-white:hover { color: #07111f; }
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .border-white\/\[0\.13\] { border-color: rgb(29 37 44 / 0.12); }
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .border-white\/10 { border-color: rgb(29 37 44 / 0.14); }
 body:has([data-page="best-sellers"]) footer[data-testid="site-footer"] .bg-white\/\[0\.07\] { background: rgb(29 37 44 / 0.05); }
@@ -2726,7 +2757,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   width: 72px;
   height: 72px;
   border-radius: 6px;
-  background: #1d252c;
+  background: #07111f;
   font-size: 11px;
   font-weight: 700;
   color: #ffffff;
@@ -2807,7 +2838,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
    Shared title block for the standalone pages: about, contact, coupons,
    stores, brands, best sellers, price drops, sitemap.
 
-   These twelve pages each carried their own copy of a dark #1d252c hero with
+   These twelve pages each carried their own copy of a dark #07111f hero with
    an inline radial-gradient overlay, which meant twelve places to edit and a
    slow drift between them. The markup is still per-page (the blocks differ
    below the description — some carry search boxes, stat strips or aside
@@ -2827,11 +2858,16 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   position: relative;
   overflow: hidden;
   border-bottom: 0;
+  /* The pillar page's header: a 44px blue pinstripe over a white-to-paper
+     gradient. It replaces two radial glows (blue top-right, yellow top-left)
+     whose soft edges read differently on every page depending on how tall the
+     hero happened to be — the grid is scale-independent, so a short breadcrumb
+     header and a tall category header now look like the same site. */
   background:
-    radial-gradient(at 85% 0%, rgba(0, 70, 190, 0.10) 0%, transparent 58%),
-    radial-gradient(at 8% 10%, rgba(255, 224, 0, 0.16) 0%, transparent 55%),
-    linear-gradient(180deg, #f4f7fb 0%, #ffffff 100%);
-  color: #111111;
+    linear-gradient(90deg, rgba(0, 70, 190, 0.08) 1px, transparent 1px),
+    linear-gradient(180deg, #ffffff 0%, var(--pillar-paper) 100%);
+  background-size: 44px 44px, auto;
+  color: var(--pillar-ink);
 }
 
 .page-hero-inner {
@@ -2941,7 +2977,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 .page-hero-btn-secondary:hover { background: rgba(13, 27, 42, 0.09); color: #111111; }
 
 /* Glass stat panels / search boxes that sat inside the old dark hero. They used
-   bg-white/5 over #1d252c with a border-white/15 hairline; on the light hero
+   bg-white/5 over #07111f with a border-white/15 hairline; on the light hero
    that reads as nothing at all. Real border, real surface. */
 .page-hero-panel {
   border: 1px solid rgba(13, 27, 42, 0.12);
@@ -2969,7 +3005,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
 }
 
 /* ── Site footer ──────────────────────────────────────────────────────────
-   Was a solid dark #1d252c slab with white text. Now a flat light grey that
+   Was a solid dark #07111f slab with white text. Now a flat light grey that
    sits just off the white page body, enough to mark the footer as a separate
    band without a hard colour break. */
 .site-footer {
@@ -3525,6 +3561,301 @@ select.filter-field { background: #ffffff; font-weight: 500; }
    Colour-mesh panel under the Spotlight rail. The gradient is layered radial
    stops rather than an image, so it costs nothing to load and scales to any
    card height. */
+/* ── Related Posts closing strip ──────────────────────────────────────────
+   Full-width, four cards per view, auto-advancing. Replaces both the narrow
+   in-body .related-posts card and the .read-next strip that used to close the
+   page; those two showed overlapping suggestions from the same pool. */
+.related-strip {
+  /* Plain white, no top rule: the section already reads as separate from the
+     article because its cards are bordered and its heading sits on its own
+     line. The tinted band plus a rule was two separators doing one job. */
+  background: #ffffff;
+  padding: 3rem 0 3.5rem;
+}
+
+.related-strip-inner {
+  width: 100%;
+  max-width: 1366px;
+  margin: 0 auto;
+  /* 24px, via Tailwind v4's --spacing (0.25rem) declared on :root. Same value
+     as the px-6 every other section on the site uses, so this strip lines up
+     with the content above it instead of running to its own gutter. */
+  padding-inline: calc(var(--spacing) * 6);
+}
+
+.related-strip-heading {
+  margin: 0 0 1.6rem;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em;
+  color: var(--pillar-ink);
+}
+
+.related-strip-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--pillar-rule);
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.related-strip-card:hover {
+  border-color: color-mix(in srgb, var(--colorBgPrimaryHighlight) 35%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 32px -26px rgba(3, 3, 3, 0.45);
+}
+
+/* Fixed ratio so every card in a row lines up regardless of source image. */
+.related-strip-media {
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--pillar-paper);   /* placeholder when a post has no image */
+}
+
+.related-strip-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.related-strip-card:hover .related-strip-media img { transform: scale(1.04); }
+
+.related-strip-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.8rem 0.9rem 0.95rem;
+}
+
+.related-strip-cat { margin: 0; }
+
+.related-strip-cat a {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--colorBgPrimaryHighlight);
+  text-decoration: none;
+}
+
+.related-strip-title {
+  margin: 0;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.4;
+}
+
+.related-strip-title a {
+  color: var(--pillar-ink);
+  text-decoration: none;
+  /* No `display` utility alongside the clamp: -webkit-box has to survive. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.related-strip-title a:hover { color: var(--colorBgPrimaryHighlight); }
+
+.related-strip-excerpt { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .related-strip-card,
+  .related-strip-media img { transition: none; }
+  .related-strip-card:hover { transform: none; }
+  .related-strip-card:hover .related-strip-media img { transform: none; }
+}
+
+/* ── FAQ accordion (post bodies) ──────────────────────────────────────────
+   Built from <details>, so open/close is the browser's and every answer is in
+   the HTML whether or not it is expanded. */
+.faq-accordion {
+  margin: 1.25rem 0 2rem;
+  border-top: 1px solid var(--pillar-rule);
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--pillar-rule);
+}
+
+.faq-question {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--pillar-ink);
+  transition: color 0.15s ease;
+}
+
+/* Safari still paints its own disclosure triangle without this. */
+.faq-question::-webkit-details-marker { display: none; }
+.faq-question::marker { content: ''; }
+.faq-question:hover { color: var(--colorBgPrimaryHighlight); }
+
+.faq-icon {
+  position: relative;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+/* A plus that becomes a minus — drawn rather than an icon font so it inherits
+   colour and needs no extra request. */
+.faq-icon::before,
+.faq-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 13px;
+  height: 2px;
+  background: var(--colorBgPrimaryHighlight);
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.faq-icon::after { transform: translate(-50%, -50%) rotate(90deg); }
+.faq-item[open] .faq-icon::after { transform: translate(-50%, -50%) rotate(0deg); opacity: 0; }
+
+.faq-answer {
+  padding: 0 0 1.15rem;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--ink-soft, #46515f);
+}
+
+.faq-answer > :first-child { margin-top: 0; }
+.faq-answer > :last-child { margin-bottom: 0; }
+.faq-answer p { margin: 0 0 0.85rem; }
+
+.faq-question:focus-visible {
+  outline: 2px solid var(--colorBgPrimaryHighlight);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-icon::before, .faq-icon::after, .faq-question { transition: none; }
+}
+
+/* ── Best Buy promo card (right rail) ─────────────────────────────────────
+   Replaces the purple .trailcard gradient. The four stacked radial gradients
+   there were tuned for a 420px-tall card and banded visibly when the rail was
+   shorter; a single linear ramp holds at any height. Colours are tokens, so
+   this card follows the site palette instead of carrying its own. */
+.bbcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: space-between;
+  min-height: 380px;
+  padding: 1.35rem;
+  border-radius: 14px;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(160deg, var(--colorBgPrimaryHighlight) 0%, #002a80 58%, var(--pillar-ink) 100%);
+  background-size: 34px 34px, auto;
+  color: #ffffff;
+}
+
+/* A thin brand rule along the top edge, the one place the yellow appears at
+   full strength — it reads as Best Buy without turning the card yellow. */
+.bbcard::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: var(--colorBgSurfaceSecondary);
+}
+
+.bbcard-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.35rem 0 0;
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  background: var(--colorBgSurfaceSecondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pillar-ink);
+}
+
+.bbcard-badge svg { flex: none; }
+
+.bbcard-body { margin-top: auto; }
+
+.bbcard-title {
+  margin: 0;
+  font-family: var(--font-heading), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.55rem !important;
+  font-weight: 700 !important;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  text-wrap: balance;
+}
+
+.bbcard-text {
+  margin: 0.7rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.bbcard-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.15rem;
+  padding: 0.7rem 1.15rem;
+  border-radius: 8px;
+  background: var(--colorBgSurfaceSecondary);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--pillar-ink);
+  text-decoration: none;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.bbcard-cta:hover { filter: brightness(0.94); transform: translateY(-1px); }
+.bbcard-cta svg { transition: transform 0.15s ease; }
+.bbcard-cta:hover svg { transform: translateX(2px); }
+
+/* Required disclosure, deliberately legible rather than hidden in the corner. */
+.bbcard-disclosure {
+  margin: 0.75rem 0 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bbcard-cta, .bbcard-cta svg { transition: none; }
+  .bbcard-cta:hover { transform: none; }
+  .bbcard-cta:hover svg { transform: none; }
+}
+
 .trailcard {
   position: relative;
   display: flex;
@@ -4343,7 +4674,7 @@ select.filter-field { background: #ffffff; font-weight: 500; }
   /* Spotlight keeps its natural position and scrolls out of view. */
   .post-side-rail-recap > [data-testid='sidebar-spotlight'] { flex: none; }
 
-  .post-side-rail-recap > .trailcard {
+  .post-side-rail-recap > .bbcard {
     position: sticky;
     top: 7rem;
     flex: none;
@@ -4576,36 +4907,48 @@ img.read-next-avatar {
 .deal-tabs { position: relative; }
 
 .deal-tab-list {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1.25rem;
-  border-bottom: 1px solid rgb(13 27 42 / 0.1);
-  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding: 0.35rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
 }
 
 .deal-tab-label {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   cursor: pointer;
-  border: 1px solid rgb(13 27 42 / 0.12);
+  border: 1px solid transparent;
   border-radius: 10px;
-  padding: 0.5rem 0.9rem;
+  padding: 0.55rem 1rem;
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #0f172a;
-  background: #fff;
-  transition: color 120ms, border-color 120ms, background-color 120ms;
+  color: #475569;
+  background: transparent;
+  transition: all 180ms ease-in-out;
 }
 
-.deal-tab-label:hover { border-color: var(--color-primary, #0046be); color: var(--color-primary, #0046be); }
+.deal-tab-label:hover {
+  color: #0f172a;
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
 
 .deal-tab-count {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: rgb(13 27 42 / 0.45);
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  background: #e2e8f0;
+  color: #475569;
+  transition: all 180ms ease-in-out;
 }
 
 /* Hide every panel, then reveal the one whose input is checked. */
@@ -4613,32 +4956,52 @@ img.read-next-avatar {
 
 .deal-tab-input:nth-of-type(1):checked ~ .deal-tab-panel:nth-of-type(1),
 .deal-tab-input:nth-of-type(2):checked ~ .deal-tab-panel:nth-of-type(2),
-.deal-tab-input:nth-of-type(3):checked ~ .deal-tab-panel:nth-of-type(3) {
+.deal-tab-input:nth-of-type(3):checked ~ .deal-tab-panel:nth-of-type(3),
+.deal-tab-input:nth-of-type(4):checked ~ .deal-tab-panel:nth-of-type(4),
+.deal-tab-input:nth-of-type(5):checked ~ .deal-tab-panel:nth-of-type(5),
+.deal-tab-input:nth-of-type(6):checked ~ .deal-tab-panel:nth-of-type(6),
+.deal-tab-input:nth-of-type(7):checked ~ .deal-tab-panel:nth-of-type(7),
+.deal-tab-input:nth-of-type(8):checked ~ .deal-tab-panel:nth-of-type(8) {
   display: block;
 }
 
-/* The checked tab's label. nth-of-type again, against the labels inside the
-   list, so the highlight follows the same positional mapping. */
+/* The checked tab's label. */
 .deal-tab-input:nth-of-type(1):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(1),
 .deal-tab-input:nth-of-type(2):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(2),
-.deal-tab-input:nth-of-type(3):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(3) {
+.deal-tab-input:nth-of-type(3):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(3),
+.deal-tab-input:nth-of-type(4):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(4),
+.deal-tab-input:nth-of-type(5):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(5),
+.deal-tab-input:nth-of-type(6):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(6),
+.deal-tab-input:nth-of-type(7):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(7),
+.deal-tab-input:nth-of-type(8):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(8) {
   background: var(--color-primary, #0046be);
   border-color: var(--color-primary, #0046be);
-  color: #fff;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 70, 190, 0.25);
 }
 
 .deal-tab-input:nth-of-type(1):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(1) .deal-tab-count,
 .deal-tab-input:nth-of-type(2):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(2) .deal-tab-count,
-.deal-tab-input:nth-of-type(3):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(3) .deal-tab-count {
-  color: rgb(255 255 255 / 0.7);
+.deal-tab-input:nth-of-type(3):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(3) .deal-tab-count,
+.deal-tab-input:nth-of-type(4):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(4) .deal-tab-count,
+.deal-tab-input:nth-of-type(5):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(5) .deal-tab-count,
+.deal-tab-input:nth-of-type(6):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(6) .deal-tab-count,
+.deal-tab-input:nth-of-type(7):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(7) .deal-tab-count,
+.deal-tab-input:nth-of-type(8):checked ~ .deal-tab-list .deal-tab-label:nth-of-type(8) .deal-tab-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
 }
 
-/* Keyboard focus has to be visible: the input itself is sr-only, so the ring
-   goes on its label instead. */
+/* Keyboard focus */
 .deal-tab-input:focus-visible ~ .deal-tab-list .deal-tab-label { outline: none; }
 .deal-tab-input:nth-of-type(1):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(1),
 .deal-tab-input:nth-of-type(2):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(2),
-.deal-tab-input:nth-of-type(3):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(3) {
+.deal-tab-input:nth-of-type(3):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(3),
+.deal-tab-input:nth-of-type(4):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(4),
+.deal-tab-input:nth-of-type(5):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(5),
+.deal-tab-input:nth-of-type(6):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(6),
+.deal-tab-input:nth-of-type(7):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(7),
+.deal-tab-input:nth-of-type(8):focus-visible ~ .deal-tab-list .deal-tab-label:nth-of-type(8) {
   outline: 2px solid var(--color-primary, #0046be);
   outline-offset: 2px;
 }

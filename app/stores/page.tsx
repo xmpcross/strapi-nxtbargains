@@ -157,7 +157,7 @@ export default async function StoresPage({
       <Hero totalStores={cache.stores.length} popularCount={popularStores.length} />
 
       {/* Popular stores — always visible */}
-      <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="popular-stores">
+      <section className="border-b border-ink/10 bg-[#f3f6fa] py-10 sm:py-12" data-testid="popular-stores">
         <div className="mx-auto max-w-[1366px] px-6">
           <SectionHead
             eyebrow="Popular"
@@ -264,7 +264,7 @@ export default async function StoresPage({
             </div>
           </div>
 
-          <div className="mt-6 border border-ink/10 bg-[#f0f2f4] p-4">
+          <div className="mt-6 border border-ink/10 bg-[#f3f6fa] p-4">
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-ink/45">Top countries</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <FilterChip href={filterHref(queryBase, 'country', '')} active={!country}>All</FilterChip>
@@ -280,7 +280,7 @@ export default async function StoresPage({
             </div>
           </div>
 
-          <div className="mt-4 border border-ink/10 bg-[#f0f2f4] p-4">
+          <div className="mt-4 border border-ink/10 bg-[#f3f6fa] p-4">
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-ink/45">Categories</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <FilterChip href={filterHref(queryBase, 'category', '')} active={!category}>All</FilterChip>
@@ -311,7 +311,7 @@ export default async function StoresPage({
               ))}
             </div>
           ) : (
-            <div className="mt-8 border border-dashed border-ink/15 bg-[#f0f2f4] p-10 text-center">
+            <div className="mt-8 border border-dashed border-ink/15 bg-[#f3f6fa] p-10 text-center">
               <p className="font-display text-lg font-bold text-ink">No stores match your filters</p>
               <p className="mt-2 text-sm text-ink/60">Try a different search term or clear the filters.</p>
               <Link href="/stores#all-stores" className="mt-5 inline-flex bg-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-emphasis">

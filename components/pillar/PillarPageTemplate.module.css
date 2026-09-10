@@ -12,8 +12,15 @@
 }
 
 .shell {
-  width: min(1366px, calc(100% - 32px));
+  /* Was min(1366px, 100% - 32px), which left 16px each side and read as flush
+     against the edge on any viewport under about 1400px — worst on the deep
+     blue playbook section, where there is no white margin to soften it.
+     Padding rather than a width calc so the gutter scales with the viewport
+     instead of staying at one fixed value. */
+  width: 100%;
+  max-width: 1366px;
   margin: 0 auto;
+  padding-inline: clamp(20px, 4vw, 56px);
 }
 
 .hero {
@@ -209,7 +216,7 @@
   width: 100%;
   aspect-ratio: 1;
   border-radius: 6px;
-  background: #f7f9fc;
+  background: #f3f6fa;
   padding: 9px;
   object-fit: contain;
 }
@@ -409,29 +416,57 @@
   color: var(--pillar-yellow);
 }
 
+/* These four steps are a method performed in order, so the design says so: a
+   rail runs down through the numbers connecting each to the next. Previously
+   they were four identical translucent cards, which encoded no sequence at all
+   — the numbers were the only thing carrying it, and a reader skimming the
+   right-hand column saw a list of tips rather than a procedure. */
 .steps {
   display: grid;
-  gap: 12px;
+  gap: 0;
 }
 
 .step {
+  position: relative;
   display: grid;
-  grid-template-columns: 62px 1fr;
-  gap: 18px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 18px;
+  grid-template-columns: 46px 1fr;
+  gap: 20px;
+  padding: 20px 0 20px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
 
+.step:first-child { padding-top: 4px; }
+.step:last-child { border-bottom: 0; padding-bottom: 4px; }
+
+/* The rail. Drawn from the badge downward, and stopped on the last step so the
+   sequence visibly ends rather than trailing into the section padding. */
+.step::before {
+  content: "";
+  position: absolute;
+  left: 26px;
+  top: 58px;
+  bottom: -1px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.step:first-child::before { top: 42px; }
+.step:last-child::before { display: none; }
+
 .step > span {
+  position: relative;
+  z-index: 1;
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 38px;
   place-items: center;
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--pillar-yellow);
   color: var(--pillar-ink);
   font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  align-self: start;
 }
 
 .step h3 {
@@ -885,7 +920,7 @@
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(0, 70, 190, 0.14), rgba(255, 224, 0, 0.36)),
-    #f7f9fc;
+    #f3f6fa;
   margin-bottom: 16px;
 }
 

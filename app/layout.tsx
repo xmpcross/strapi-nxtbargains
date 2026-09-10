@@ -6,6 +6,7 @@ import ClientErrorReporter from '@/components/ClientErrorReporter';
 import { CookieConsentProvider } from '@/components/CookieConsentProvider';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import Geniuslink from '@/components/Geniuslink';
+import TakeadsConvertLink from '@/components/TakeadsConvertLink';
 import { SITE } from '@/lib/site';
 import { cmsOrigin } from '@/lib/seo';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonld';
@@ -111,6 +112,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CookieConsentProvider>
           <GoogleAnalytics />
           <Geniuslink />
+          <TakeadsConvertLink />
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />

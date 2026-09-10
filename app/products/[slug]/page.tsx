@@ -32,6 +32,7 @@ import {
   type CommerceReview,
 } from '@/lib/strapi';
 import { buyUrl } from '@/lib/offer-links';
+import BestBuyPromoCard from '@/components/BestBuyPromoCard';
 import { listCouponPageData, type CouponBrandGroup, type Retailer } from '@/lib/coupon-data';
 import { buildCouponStoreLinks, couponRetailersForStoreLinks } from '@/lib/coupon-store-links';
 import StoreLinkTile from '@/components/StoreLinkTile';
@@ -651,7 +652,13 @@ function ProductStoreLinksSidebar({
   const storeLinks = buildCouponStoreLinks(focusedRetailers);
 
   return (
-    <aside className="product-info-sidebar">
+    /* One element, not a fragment: the parent is a two-column grid, and two
+       siblings returned here would have become a third grid child and pushed
+       the layout apart. The rail is also what carries `position: sticky` —
+       putting it on the cards individually would let them stick separately and
+       overlap as the page scrolls. */
+    <div className="product-side-rail">
+      <aside className="product-info-sidebar">
       <p className="product-info-sidebar-eyebrow">Shop by store</p>
       <h3 className="product-info-sidebar-title">Popular Coupons</h3>
       {storeLinks.length > 0 ? (
@@ -668,7 +675,13 @@ function ProductStoreLinksSidebar({
       ) : (
         <p className="product-info-sidebar-empty">Popular store coupon pages will appear here when available.</p>
       )}
-    </aside>
+      </aside>
+      {/* Sits below the coupon tiles rather than above them: a reader on a
+          product page is comparing merchants, and the retailer promo is only
+          useful once they have seen the coupons for the stores they already
+          had in mind. */}
+      <BestBuyPromoCard />
+    </div>
   );
 }
 
@@ -1723,7 +1736,7 @@ function LivePrices({ offers }: { offers: LiveOffer[] }) {
             <span className="h-6 w-6 shrink-0 rounded bg-muted" />
           )}
           <span className="min-w-0 flex-1">
-            <span className="line-clamp-1 block font-display text-sm font-bold text-ink">{o.store}</span>
+            <span className="line-clamp-1 font-display text-sm font-bold text-ink">{o.store}</span>
             {o.condition && o.condition.toLowerCase() !== 'new' ? (
               <span className="text-xs text-ink/45">{o.condition}</span>
             ) : null}

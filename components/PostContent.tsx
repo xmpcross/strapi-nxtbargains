@@ -38,7 +38,7 @@ export default function PostContent({
   midBlock?: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const body = withHtmlHeadingIds(html);
+  const body = withFaqAccordion(withHtmlHeadingIds(html));
   const shouldRenderMarkdown = looksLikeMarkdown(body);
 
   useEffect(() => {
@@ -137,6 +137,67 @@ export default function PostContent({
       data-testid="post-content"
       dangerouslySetInnerHTML={{ __html: body }}
     />
+  );
+}
+
+/**
+ * Turn a trailing FAQ section into an accordion.
+ *
+ * These posts end with an "<h2>Buyer's Guide & Troubleshooting FAQ</h2>"
+ * followed by a flat run of h3/p pairs — a wall of long answers the reader has
+ * to scroll past to reach anything after it. Each pair becomes a <details>
+ * block instead.
+ *
+ * <details> rather than the checkbox-and-label trick used by
+ * QuestionsAnswered, or a client component: the markup stays server-rendered
+ * with every answer present in the HTML, so crawlers and the FAQ structured
+ * data still see the full text, and the open/close behaviour is the browser's
+ * own — keyboard accessible with nothing to wire up.
+ *
+ * The rewrite is anchored on the heading text and stops at the next h2 or the
+ * end of the body, so a post without that section is returned untouched and
+ * FAQ-shaped content elsewhere in the article is left alone.
+ */
+function withFaqAccordion(value: string) {
+  const html = String(value || '');
+  const heading = /<h2\b[^>]*>\s*(?:<[^>]+>\s*)*Buyer(?:&#8217;|&rsquo;|&#39;|['\u2019])?s\s+Guide\s*(?:&amp;|&|and)\s*Troubleshooting[^<]*<\/h2>/i;
+  const start = html.search(heading);
+  if (start === -1) return html;
+
+  const match = html.match(heading);
+  if (!match) return html;
+
+  const afterHeading = start + match[0].length;
+  // The section runs to the next h2, or to the end of the body.
+  const rest = html.slice(afterHeading);
+  const nextH2 = rest.search(/<h2\b/i);
+  const sectionEnd = nextH2 === -1 ? html.length : afterHeading + nextH2;
+  const section = html.slice(afterHeading, sectionEnd);
+
+  // One <details> per h3 and everything up to the next h3.
+  const pairs = [...section.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>([\s\S]*?)(?=<h3\b|$)/gi)];
+  if (pairs.length < 2) return html;   // not a FAQ run; leave it alone
+
+  const items = pairs.map((pair) => {
+    const question = pair[1].replace(/<[^>]+>/g, '').trim();
+    const answer = pair[2].trim();
+    if (!question || !answer) return '';
+    return (
+      `<details class="faq-item">` +
+      `<summary class="faq-question">${question}` +
+      `<span class="faq-icon" aria-hidden="true"></span>` +
+      `</summary>` +
+      `<div class="faq-answer">${answer}</div>` +
+      `</details>`
+    );
+  }).join('');
+
+  if (!items) return html;
+
+  return (
+    html.slice(0, sectionEnd - section.length) +
+    `<div class="faq-accordion">${items}</div>` +
+    html.slice(sectionEnd)
   );
 }
 

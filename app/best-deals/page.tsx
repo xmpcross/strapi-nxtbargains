@@ -44,6 +44,9 @@ type RealTimeBestDeal = {
   favicon: string | null;
   url: string;
   query: string;
+  category?: string | null;
+  region?: string | null;
+  currency?: string | null;
 };
 
 type RealTimeBestDealsCache = {
@@ -91,12 +94,33 @@ export default async function BestDealsPage({
   const retailerQueries = queries.filter((query) => POPULAR_RETAILER_FILTERS.includes(query));
   const selectedCategory = selectedFilter && categoryQueries.includes(selectedFilter) ? selectedFilter : null;
   const selectedRetailer = selectedFilter && retailerQueries.includes(selectedFilter) ? selectedFilter : null;
-  const categoryDeals = realTimeDeals.filter((deal) =>
-    selectedCategory ? deal.query === selectedCategory : categoryQueries.includes(deal.query)
-  ).slice(0, 12);
+  const categoryDeals = realTimeDeals.filter((deal) => {
+    const category = deal.category ?? deal.query;
+    return selectedCategory ? category === selectedCategory : categoryQueries.includes(category);
+  }).slice(0, 12);
   const retailerDeals = realTimeDeals.filter((deal) =>
     selectedRetailer ? deal.query === selectedRetailer : retailerQueries.includes(deal.query)
   ).slice(0, 12);
+
+  /* UK, Australian and European marketplaces, kept in their own section
+     rather than mixed into the lists above. The prices are quoted in their own
+     currencies and are not converted, so ranking a GBP deal against a USD one
+     by percentage is fine but putting them side by side without a heading that
+     says where they come from is not. */
+  const INTERNATIONAL_REGIONS: Array<{ code: string; label: string; blurb: string }> = [
+    { code: 'UK', label: 'United Kingdom', blurb: 'Deals from eBay UK, priced in pounds.' },
+    { code: 'AU', label: 'Australia', blurb: 'Deals from eBay Australia, priced in Australian dollars.' },
+    { code: 'EU', label: 'Europe', blurb: 'Deals from eBay Germany, priced in euros.' },
+  ];
+  const internationalGroups = INTERNATIONAL_REGIONS
+    .map((region) => ({
+      ...region,
+      deals: realTimeDeals
+        .filter((deal) => deal.region === region.code)
+        .sort((a, b) => b.discountPercent - a.discountPercent)
+        .slice(0, 8),
+    }))
+    .filter((group) => group.deals.length > 0);
 
   const pageJsonLd = collectionPageJsonLd({
     name: 'Best Deals',
@@ -112,7 +136,7 @@ export default async function BestDealsPage({
       <Hero />
 
       {dealCount > 0 ? (
-        <section className="border-b border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="featured-deals">
+        <section className="border-b border-ink/10 bg-[#f3f6fa] py-10 sm:py-12" data-testid="featured-deals">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Top picks"
@@ -186,7 +210,7 @@ export default async function BestDealsPage({
         </div>
       </section>
 
-      <section className="border-t border-ink/10 bg-[#f0f2f4] py-10 sm:py-14" id="retailer-deals">
+      <section className="border-t border-ink/10 bg-[#f3f6fa] py-10 sm:py-14" id="retailer-deals">
         <div className="mx-auto max-w-[1366px] px-6">
           <SectionHead
             eyebrow="Shop by store"
@@ -209,13 +233,41 @@ export default async function BestDealsPage({
         </div>
       </section>
 
+      {internationalGroups.length > 0 ? (
+        <section className="border-t border-ink/10 bg-[#f3f6fa] py-10 sm:py-14" data-testid="international-deals">
+          <div className="mx-auto max-w-[1366px] px-6">
+            <SectionHead
+              eyebrow="Beyond the US"
+              title="Popular marketplaces in the UK, Australia and Europe"
+              subtitle="Live discounts from the marketplaces these regions actually shop. Prices are shown in each marketplace's own currency and are not converted, so compare the percentage rather than the number."
+            />
+
+            <div className="mt-8 space-y-10">
+              {internationalGroups.map((group) => (
+                <div key={`intl-${group.code}`}>
+                  <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-ink/10 pb-3">
+                    <h3 className="font-display text-lg font-bold text-ink">{group.label}</h3>
+                    <p className="text-sm text-ink/55">{group.blurb}</p>
+                  </div>
+                  <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    {group.deals.map((deal) => (
+                      <RealTimeDealCard key={`intl-${group.code}-${deal.id}`} deal={deal} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="border-t border-ink/10 bg-white py-10">
         <div className="mx-auto max-w-[1366px] px-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <BrowseCard href="/price-drops" title="Price drops" subtitle="Recently tracked price movements" />
             <BrowseCard href="/all-products" title="All products" subtitle="Compare offers across merchants" />
             <BrowseCard href="/coupons" title="Coupons" subtitle="Promo codes and store deals" />
-            <BrowseCard href="/deals" title="Buying guides" subtitle="Editorial deals and roundups" />
+            <BrowseCard href="/buying-guides" title="Buying guides" subtitle="Editorial deals and roundups" />
           </div>
         </div>
       </section>
@@ -295,8 +347,30 @@ const MERCHANT_SEARCH: Array<[RegExp, (q: string) => string]> = [
   [/amazon/i, (q) => `https://www.amazon.com/s?k=${q}`],
 ];
 
+/**
+ * Retailer hosts whose URLs are already a specific product page.
+ *
+ * The rewriting below exists for the old Google Shopping feed, whose links all
+ * pointed at google.com/search results that had to be swapped for something on
+ * the retailer's own site. The scraped retailer feed does not have that
+ * problem — its links are already /itm/, /dp/ and /ip/ product pages — and
+ * putting those through a search rewrite actively loses information: an
+ * ebay.co.uk/itm/ link matched /\bebay\b/ and came back out as a US
+ * ebay.com search, dropping both the product and the marketplace.
+ */
+const DIRECT_PRODUCT_HOSTS = /(^|\.)(amazon\.[a-z.]+|ebay\.[a-z.]+|walmart\.com|newegg\.com|goto\.walmart\.com)$/i;
+
+function isDirectProductUrl(url: string): boolean {
+  try {
+    return DIRECT_PRODUCT_HOSTS.test(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
+
 function merchantDealUrl(store: string, title: string, fallback: string): string {
   if (isGeniusLinkUrl(fallback)) return fallback;
+  if (isDirectProductUrl(fallback)) return fallback;
   const q = encodeURIComponent(title.trim().slice(0, 150));
   const match = MERCHANT_SEARCH.find(([re]) => re.test(store));
   if (match) return match[1](q);
@@ -485,7 +559,7 @@ function RealTimeDealCard({ deal, featured = false }: { deal: RealTimeBestDeal; 
 
 function EmptyState({ title, body }: { title: string; body: string }) {
   return (
-    <div className="mt-8 border border-dashed border-ink/15 bg-[#f0f2f4] p-10 text-center">
+    <div className="mt-8 border border-dashed border-ink/15 bg-[#f3f6fa] p-10 text-center">
       <h2 className="font-display text-lg font-bold text-ink">{title}</h2>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-ink/60">{body}</p>
     </div>

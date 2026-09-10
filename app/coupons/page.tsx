@@ -284,7 +284,7 @@ export default async function CouponsPage() {
       </section>
 
       {brandGroups.length > 0 ? (
-        <section className="border-t border-ink/10 bg-[#f0f2f4] py-10 sm:py-12" data-testid="brand-feeds">
+        <section className="border-t border-ink/10 bg-[#f3f6fa] py-10 sm:py-12" data-testid="brand-feeds">
           <div className="mx-auto max-w-[1366px] px-6">
             <SectionHead
               eyebrow="Brand feeds"
@@ -618,7 +618,7 @@ function CouponMiniRow({ coupon }: { coupon: Coupon }) {
   return (
     <div className="grid min-h-[64px] grid-cols-[minmax(0,1fr)_auto] gap-3 p-3">
       <span className="min-w-0">
-        <span className="block line-clamp-2 text-[0.9375rem] font-bold leading-5 text-primary">
+        <span className="line-clamp-2 text-[0.9375rem] font-bold leading-5 text-primary">
           {coupon.title}
         </span>
         <span className="mt-1 block text-[0.72rem] font-semibold text-ink/52">{coupon.discount}</span>

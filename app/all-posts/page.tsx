@@ -229,7 +229,7 @@ function BrowseCard({ href, title, subtitle }: { href: string; title: string; su
   return (
     <Link
       href={href}
-      className="group border border-ink/10 bg-[#f0f2f4] p-5 transition hover:-translate-y-0.5 hover:border-primary"
+      className="group border border-ink/10 bg-[#f3f6fa] p-5 transition hover:-translate-y-0.5 hover:border-primary"
     >
       <h3 className="font-display text-lg font-bold text-ink transition group-hover:text-primary">{title}</h3>
       <p className="mt-2 text-sm leading-6 text-ink/55">{subtitle}</p>

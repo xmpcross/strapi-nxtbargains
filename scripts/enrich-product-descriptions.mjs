@@ -46,8 +46,27 @@ loadEnvFile('/opt/strapi-cms-git/backend/ai-writer-cli/.env');
 
 const STRAPI_BASE = (process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'https://cms.fxnstudio.com').replace(/\/$/, '');
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
+/*
+ * Provider selection.
+ *
+ * This script called Anthropic unconditionally, but no ANTHROPIC_API_KEY has
+ * ever been set on this host — so every run silently took the
+ * generateFallbackContent() path below. That function only emits bullets for
+ * CPU/RAM/Storage/Display/Battery/OS keys, which exist on phones, laptops and
+ * TVs and on nothing else, and it is the reason Smart Plugs, Doorbells, Light
+ * Bulbs, Smartwatches, Tablets and Cameras all sit at roughly a quarter the
+ * description length of the categories that happen to have those keys.
+ *
+ * Gemini is what the rest of the estate is configured for
+ * (ai-writer-cli/.env carries AI_PROVIDER=gemini and a working key), so it is
+ * the default here. Anthropic is still used when a key is present, so adding
+ * one is all it takes to switch back.
+ */
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
+const GEMINI_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+const AI_PROVIDER = ANTHROPIC_KEY ? 'anthropic' : GEMINI_KEY ? 'gemini' : 'none';
 
 // 2. Parse CLI Arguments
 const args = process.argv.slice(2);
@@ -70,6 +89,7 @@ console.log('---------------------------------------------------------');
 console.log('  NXT.Bargains — Product Description Rewriter & Enricher');
 console.log('---------------------------------------------------------');
 console.log(` Mode:           ${DRY_RUN ? 'DRY-RUN (no updates saved)' : 'LIVE WRITE'}`);
+console.log(` AI provider:    ${AI_PROVIDER}${AI_PROVIDER === 'gemini' ? ' (' + GEMINI_MODEL + ')' : AI_PROVIDER === 'anthropic' ? ' (' + CLAUDE_MODEL + ')' : ' — WILL USE TEMPLATE FALLBACK'}`);
 console.log(` Force Overwrite:${FORCE ? ' YES (--force active)' : ' NO (skipping enriched)'}`);
 console.log(` Limit:          ${LIMIT} products`);
 if (TARGET_SLUGS) console.log(` Target Slugs:   ${TARGET_SLUGS.join(', ')}`);
@@ -92,6 +112,33 @@ async function strapiApi(endpoint, options = {}) {
 }
 
 // 4. Interactive Category Prompt
+/**
+ * Keys the enrichment pipeline writes into `specs` for its own bookkeeping.
+ *
+ * They are not product data and must never reach the model. Sending them is
+ * what produced the thin categories: a Smart Camera whose specs object holds
+ * nothing but these seven keys arrived at the prompt as
+ *   Specifications: {"titleRewritten":true,"descriptionEnriched":true,...}
+ * so the only real inputs were the product name and its own previous
+ * description. Smart Cameras and Tablets came out at roughly a quarter the
+ * length of Smart Phones, which carry 50+ genuine specs, for this reason
+ * alone.
+ */
+const BOOKKEEPING_SPEC_KEYS = new Set([
+  'metaTitle', 'originalName', 'originalSlug',
+  'titleRewritten', 'titleRewrittenAt',
+  'descriptionEnriched', 'descriptionEnrichedAt',
+  'descriptionRewritten', 'isDescriptionRewritten',
+  'metaTitleRewritten', 'slugRewritten', 'seoRewrittenAt',
+]);
+
+/** Only the genuine product specifications, for the prompt. */
+function realSpecs(specs) {
+  return Object.fromEntries(
+    Object.entries(specs || {}).filter(([key, value]) =>
+      !BOOKKEEPING_SPEC_KEYS.has(key) && value !== null && value !== ''));
+}
+
 async function promptForCategory() {
   if (TARGET_CATEGORY || TARGET_SLUGS) {
     return TARGET_CATEGORY;
@@ -229,20 +276,25 @@ async function generateDescriptionWithAI(product) {
   const category = product.category || product.categories?.[0]?.name || '';
   const rawShortDesc = product.shortDescription || '';
   const rawDesc = product.description || '';
-  const specs = product.specs || {};
+  const specs = realSpecs(product.specs);
 
-  if (!ANTHROPIC_KEY) {
+  if (AI_PROVIDER === 'none') {
     return generateFallbackContent(product);
   }
 
+  /* 500 characters of existing copy was not enough to rewrite from. For the
+     products backfilled with Amazon's own description — 1,200 to 1,950
+     characters of feature-by-feature detail — that window cut off everything
+     after the first two features, which is the material the rewrite most
+     needs. 2,500 covers the longest of them. */
   const prompt = `You are a senior e-commerce copywriter for NXT.Bargains. Write accurate, engaging, and high-converting product descriptions based on the provided product information.
 
 Product Name: "${rawName}"
 Brand: "${brand}"
 Category: "${category}"
 Existing Short Description: "${rawShortDesc}"
-Existing Main Description: "${rawDesc.slice(0, 500)}"
-Specifications: ${JSON.stringify(specs)}
+Existing Main Description: "${rawDesc.slice(0, 2500)}"
+Specifications: ${Object.keys(specs).length ? JSON.stringify(specs) : '(none on file — describe only what the product name, brand and category support, and do not invent measurements, certifications or compatibility claims)'}
 
 Requirements for JSON response:
 1. "shortDescription": 1-2 sentences (~25-45 words) plain text summary of the product and its primary value proposition.
@@ -258,28 +310,48 @@ Return ONLY strict valid JSON object (no comments, no extra text):
 }`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    /* 1200 output tokens capped the richest categories: Smart Door Locks
+       already sit at a 4,246-character median, which is close to the ceiling,
+       so the model was being cut off rather than choosing to stop. 3000 gives
+       the three required sections room without inviting padding. */
+    const request = AI_PROVIDER === 'anthropic'
+      ? {
+        url: 'https://api.anthropic.com/v1/messages',
+        headers: {
+          'x-api-key': ANTHROPIC_KEY,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: { model: CLAUDE_MODEL, max_tokens: 3000, messages: [{ role: 'user', content: prompt }] },
+      }
+      : {
+        url: `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+        headers: { 'x-goog-api-key': GEMINI_KEY, 'content-type': 'application/json' },
+        body: {
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 3000, responseMimeType: 'application/json' },
+        },
+      };
+
+    const res = await fetch(request.url, {
       method: 'POST',
-      headers: {
-        'x-api-key': ANTHROPIC_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: CLAUDE_MODEL,
-        max_tokens: 1200,
-        messages: [{ role: 'user', content: prompt }],
-      }),
+      headers: request.headers,
+      body: JSON.stringify(request.body),
     });
 
     if (!res.ok) {
       const errBody = await res.text().catch(() => '');
-      console.warn(` [AI Warning] HTTP ${res.status}: ${errBody.slice(0, 150)}, using algorithmic fallback.`);
+      console.warn(` [AI Warning] ${AI_PROVIDER} HTTP ${res.status}: ${errBody.slice(0, 150)}, using algorithmic fallback.`);
       return generateFallbackContent(product);
     }
 
     const data = await res.json();
-    const textContent = data.content?.[0]?.text || '';
+    /* Gemini splits a reply across parts, and with thinking enabled the first
+       part can be a thought summary rather than the answer, so the parts are
+       joined instead of taking [0]. */
+    const textContent = AI_PROVIDER === 'anthropic'
+      ? (data.content?.[0]?.text || '')
+      : (data.candidates?.[0]?.content?.parts || []).map((part) => part.text || '').join('');
     const cleanedJsonText = textContent.replace(/^```(?:json)?/i, '').replace(/```$/i, '').trim();
     const parsed = JSON.parse(cleanedJsonText);
 

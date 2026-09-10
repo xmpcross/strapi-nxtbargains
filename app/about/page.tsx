@@ -153,7 +153,7 @@ export default function AboutPage() {
         {/* get in touch — light background */}
         <section className="border-t border-ink/10 py-14 sm:py-16">
           <div className={SHELL}>
-            <div className="overflow-hidden rounded-3xl border border-ink/10 bg-[#f0f2f4] px-6 py-14 text-center sm:px-14">
+            <div className="overflow-hidden rounded-3xl border border-ink/10 bg-[#f3f6fa] px-6 py-14 text-center sm:px-14">
               <span className={EYEBROW}>Get in touch</span>
               <h2 className={`mt-2 ${H2}`}>Questions, feedback, or a product to track?</h2>
               <p className="mx-auto mt-3 max-w-[54ch] text-[1.02rem] leading-[1.6] text-ink/60">

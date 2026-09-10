@@ -43,7 +43,7 @@ export default function SitemapExplorer({
   const shownArticles = articleSub ? articleCats.filter((c) => c.slug === articleSub) : articleCats;
 
   return (
-    <section className="bg-[#f0f2f4] py-10 sm:py-14" id="sitemap-explorer" data-testid="sitemap-explorer">
+    <section className="bg-[#f3f6fa] py-10 sm:py-14" id="sitemap-explorer" data-testid="sitemap-explorer">
       <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
         <div className="grid gap-8 lg:grid-cols-[minmax(240px,1fr)_3fr] lg:items-start lg:gap-12">
           {/* Left sidebar filter */}
@@ -165,7 +165,7 @@ export default function SitemapExplorer({
                 title={articleSub ? shownArticles[0]?.name ?? 'Posts' : 'Categories & posts'}
                 summary={summarize(shownArticles, 'article', 'category', 'categories')}
                 categories={shownArticles}
-                cardBg="bg-[#f0f2f4]"
+                cardBg="bg-[#f3f6fa]"
               />
             ) : null}
             {section === 'coupons' ? (

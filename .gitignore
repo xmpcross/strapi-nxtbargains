@@ -28,5 +28,10 @@ data/openwebninja-usage.json
 .npm-cache/
 
 # Backups of the env file — these hold live secrets and this repo is public.
+# Match any suffix, not just `.bak` and `.bak-`: a `.env.local.bak.101352`
+# written by a `date`-stamped cp matched neither of those and sat untracked-
+# but-unignored, one `git add -A` away from publishing live API keys.
 .env*.bak
 .env*.bak-*
+.env*.bak.*
+.env.local.*

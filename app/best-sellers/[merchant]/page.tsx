@@ -112,7 +112,7 @@ export default async function MarketplaceBestSellersPage({ params }: { params: P
                   className={`inline-flex border px-3.5 py-2 text-xs font-bold uppercase tracking-[0.1em] transition ${
                     option.key === marketplace.key
                       ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-ink/10 bg-[#f0f2f4] text-ink/65 hover:border-primary hover:text-primary'
+                      : 'border-ink/10 bg-[#f3f6fa] text-ink/65 hover:border-primary hover:text-primary'
                   }`}
                 >
                   {option.label}

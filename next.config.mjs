@@ -23,6 +23,18 @@ const nextConfig = {
     return [
       {
         /*
+         * /deals was a listing page for Strapi posts in a "Deals" category
+         * that never had any: it rendered "No Deals articles yet" over 50
+         * words of content while sitting in the sitemap as a daily-changing
+         * page. Sent to /buying-guides, which is the editorial hub the two
+         * cards linking to /deals were already describing as "Buying guides".
+         */
+        source: '/deals',
+        destination: '/buying-guides',
+        permanent: true,
+      },
+      {
+        /*
          * The catalogue listing moved to /all-products. Only the exact path is
          * redirected — /products/:slug is still a real route that middleware
          * rewrites category URLs onto, and must keep working.

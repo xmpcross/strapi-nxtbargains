@@ -527,28 +527,52 @@ export async function listCommercePriceSnapshots(
   const ids = Array.from(new Set(productDocumentIds.filter(Boolean)));
   if (ids.length === 0) return [];
 
-  const res = await strapiFetch<ListResponse<CommercePriceSnapshot>>(
-    'commerce-price-snapshots',
-    {
-      filters: {
-        product: {
-          documentId: ids.length === 1 ? { $eq: ids[0] } : { $in: ids },
+  /* The id list goes into the query string as one filters[...][$in][n]= pair
+     per id, so a whole catalogue does not fit in a URL: 271 ids built a
+     17,310-character request that the server dropped without a response body.
+     The caller's .catch() then turned that into "no snapshots", which is
+     indistinguishable from "no price history" and is why this page silently
+     emptied when the product cap was raised.
+
+     100 ids is ~6.4KB of query string, comfortably inside the 8KB default
+     header limit with room for the populate and sort clauses. */
+  const CHUNK = 100;
+  const chunks: string[][] = [];
+  for (let index = 0; index < ids.length; index += CHUNK) {
+    chunks.push(ids.slice(index, index + CHUNK));
+  }
+
+  const responses = await Promise.all(
+    chunks.map((chunk) =>
+      strapiFetch<ListResponse<CommercePriceSnapshot>>(
+        'commerce-price-snapshots',
+        {
+          filters: {
+            product: {
+              documentId: chunk.length === 1 ? { $eq: chunk[0] } : { $in: chunk },
+            },
+          },
+          populate: {
+            merchant: {
+              fields: ['name', 'slug'],
+            },
+            product: {
+              fields: ['name', 'slug', 'updatedAt'],
+            },
+          },
+          sort: ['checkedAt:asc'],
+          pagination: { pageSize },
         },
-      },
-      populate: {
-        merchant: {
-          fields: ['name', 'slug'],
-        },
-        product: {
-          fields: ['name', 'slug', 'updatedAt'],
-        },
-      },
-      sort: ['checkedAt:asc'],
-      pagination: { pageSize },
-    },
-    300,
+        300,
+      ),
+    ),
   );
-  return res.data;
+
+  // Each chunk is sorted, the concatenation of them is not; callers group by
+  // product and compare adjacent entries, so re-sort before handing it back.
+  return responses
+    .flatMap((res) => res.data)
+    .sort((a, b) => new Date(a.checkedAt ?? 0).getTime() - new Date(b.checkedAt ?? 0).getTime());
 }
 
 export async function listCommerceProductsForDeals(pageSize = 120): Promise<CommerceProduct[]> {

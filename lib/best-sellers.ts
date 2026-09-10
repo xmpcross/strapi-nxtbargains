@@ -218,6 +218,53 @@ export type DailyDeal = {
  * Returns [] rather than throwing when the file is missing or malformed, so a
  * failed fetch costs the homepage a section instead of the whole page.
  */
+/**
+ * Steepest genuine discounts across every retailer we scrape, best first.
+ *
+ * Reads the same cache /best-deals renders, so the homepage and that page can
+ * never disagree about what is discounted. It is a different question from
+ * listAmazonDailyDeals(), which answers "what is each retailer promoting" and
+ * is grouped into tabs; this one ignores the retailer entirely and asks only
+ * how far a price has fallen.
+ *
+ * This exists because the homepage price-drop section was previously computed
+ * from Strapi offers, and every one of those carries discountPercent 0 with no
+ * originalPrice — so the filter matched nothing, the fallback showed ten
+ * undiscounted products, and a section titled "biggest price drop" rendered
+ * without a single discount badge on it.
+ */
+export function listBestDealsRealtime(limit = 12): DailyDeal[] {
+  try {
+    const path = join(process.cwd(), 'data', 'best-deals-realtime.json');
+    if (!existsSync(path)) return [];
+    const parsed = JSON.parse(readFileSync(path, 'utf8')) as {
+      items?: Array<{
+        id?: string; title?: string; store?: string; priceValue?: number | null;
+        originalPriceValue?: number | null; discountPercent?: number; image?: string; url?: string; badge?: string | null;
+        currency?: string | null;
+      }>;
+    };
+    return (parsed.items ?? [])
+      .filter((item) => item.title && item.url && typeof item.priceValue === 'number' && (item.discountPercent ?? 0) > 0)
+      .sort((a, b) => (b.discountPercent ?? 0) - (a.discountPercent ?? 0))
+      .slice(0, limit)
+      .map((item) => ({
+        asin: item.id ?? item.url!,
+        title: item.title!,
+        price: item.priceValue!,
+        wasPrice: item.originalPriceValue ?? null,
+        percentOff: item.discountPercent ?? 0,
+        currency: item.currency || 'USD',
+        image: item.image || null,
+        badge: item.badge ?? null,
+        url: item.url!,
+        merchant: item.store,
+      }));
+  } catch {
+    return [];
+  }
+}
+
 export function listAmazonDailyDeals(): DailyDeal[] {
   try {
     const path = join(process.cwd(), 'data', 'amazon-daily-deals.json');

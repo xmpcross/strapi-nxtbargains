@@ -139,7 +139,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                   className={`inline-flex border px-3 py-1.5 text-xs font-bold transition ${
                     filters.category === category.value
                       ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-ink/10 bg-[#f0f2f4] text-ink/65 hover:border-primary hover:text-primary'
+                      : 'border-ink/10 bg-[#f3f6fa] text-ink/65 hover:border-primary hover:text-primary'
                   }`}
                 >
                   {category.label}
@@ -241,7 +241,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           <BrowseCard href="/best-deals" title="Best deals" subtitle="Highest discounts right now" />
           <BrowseCard href="/price-drops" title="Price drops" subtitle="Recently tracked price movements" />
           <BrowseCard href="/coupons" title="Coupons" subtitle="Promo codes and store deals" />
-          <BrowseCard href="/deals" title="Buying guides" subtitle="Editorial deals and roundups" />
+          <BrowseCard href="/buying-guides" title="Buying guides" subtitle="Editorial deals and roundups" />
         </div>
       </section>
     </main>
@@ -298,7 +298,7 @@ function BrowseCard({ href, title, subtitle }: { href: string; title: string; su
   return (
     <Link
       href={href}
-      className="group border border-ink/10 bg-[#f0f2f4] p-5 transition hover:-translate-y-0.5 hover:border-primary"
+      className="group border border-ink/10 bg-[#f3f6fa] p-5 transition hover:-translate-y-0.5 hover:border-primary"
     >
       <h3 className="font-display text-lg font-bold text-ink transition group-hover:text-primary">{title}</h3>
       <p className="mt-2 text-sm leading-6 text-ink/55">{subtitle}</p>

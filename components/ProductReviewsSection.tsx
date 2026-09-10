@@ -71,7 +71,7 @@ function ReviewCard({ review }: { review: CommerceReview }) {
       <Stars rating={Number(review.rating) || 0} />
 
       {review.title ? (
-        <h3 className="mt-2 line-clamp-1 text-base font-bold leading-snug text-[#1d252c]" title={review.title}>{review.title}</h3>
+        <h3 className="mt-2 line-clamp-1 text-base font-bold leading-snug text-[#07111f]" title={review.title}>{review.title}</h3>
       ) : null}
 
       {/* `source` is deliberately not in this test any more — it moved to the
@@ -196,14 +196,14 @@ export default function ProductReviewsSection({
 
   return (
     <section className="product-reviews-panel p-5 sm:p-6">
-      <h2 className="text-2xl font-bold text-[#1d252c]">Reviews</h2>
+      <h2 className="text-2xl font-bold text-[#07111f]">Reviews</h2>
 
       <div className="mt-5 grid gap-6 sm:grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1.4fr)]">
         {rating ? (
           <div>
             <div className="flex items-center gap-2">
               <span className="text-3xl leading-none text-amber-500" aria-hidden="true">★</span>
-              <span className="text-[2.5rem] font-bold leading-none text-[#1d252c]">
+              <span className="text-[2.5rem] font-bold leading-none text-[#07111f]">
                 {rating.toFixed(1)}
               </span>
             </div>
@@ -216,7 +216,7 @@ export default function ProductReviewsSection({
               /* Deliberately not "would recommend to a friend" — that is a survey
                  question this data does not answer. This is simply the share of
                  imported reviews rated four stars or higher. */
-              <p className="mt-4 flex items-start gap-2 text-sm text-[#1d252c]">
+              <p className="mt-4 flex items-start gap-2 text-sm text-[#07111f]">
                 <span className="text-emerald-600" aria-hidden="true">✓</span>
                 <span>
                   <strong className="font-bold">{stats.positivePct}%</strong> rated this 4 stars or higher
@@ -233,7 +233,7 @@ export default function ProductReviewsSection({
               const pct = stats.rated ? (count / stats.rated) * 100 : 0;
               return (
                 <div key={star} className="flex items-center gap-2 text-xs">
-                  <span className="w-3 shrink-0 text-right text-[#1d252c]">{star}</span>
+                  <span className="w-3 shrink-0 text-right text-[#07111f]">{star}</span>
                   <span className="shrink-0 text-amber-500" aria-hidden="true">★</span>
                   <span className="h-2.5 flex-1 overflow-hidden rounded-sm bg-[#d5d5d5]">
                     <span className="block h-full rounded-sm bg-[#0c5adb]" style={{ width: `${pct}%` }} />
@@ -249,8 +249,8 @@ export default function ProductReviewsSection({
           <div className="sm:col-span-2 lg:col-span-1">
             {summary ? (
               <>
-                <h3 className="text-base font-bold text-[#1d252c]">Customers are saying</h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#1d252c]">{summary}</p>
+                <h3 className="text-base font-bold text-[#07111f]">Customers are saying</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#07111f]">{summary}</p>
                 {topics.length ? (
                   <div className="review-topic-strip mt-3">
                     {topics.map((t) => (
@@ -266,7 +266,7 @@ export default function ProductReviewsSection({
                 </p>
               </>
             ) : null}
-            <h3 className={`text-base font-bold text-[#1d252c]${summary ? ' mt-5' : ''}`}>About these reviews</h3>
+            <h3 className={`text-base font-bold text-[#07111f]${summary ? ' mt-5' : ''}`}>About these reviews</h3>
             <p className="mt-2 text-sm leading-relaxed text-[#55555a]">
               These are customer reviews syndicated from retailer product pages, shown with the
               retailer each one came from. We do not edit them, and we do not write our own reviews
@@ -282,7 +282,7 @@ export default function ProductReviewsSection({
 
       {customerImages.length ? (
         <div className="review-images-divider mt-6 pt-5">
-          <h3 className="text-base font-bold text-[#1d252c]">Customer images</h3>
+          <h3 className="text-base font-bold text-[#07111f]">Customer images</h3>
           <div className="review-image-strip mt-3">
             {customerImages.slice(0, IMAGE_STRIP).map((src) => (
               // eslint-disable-next-line @next/next/no-img-element
