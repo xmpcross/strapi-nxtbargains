@@ -135,7 +135,12 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   // Pull live data; never let a Strapi hiccup break the page.
   const [productsRes, dealProducts, posts, stores, couponPageData] = await Promise.all([
-    listCommerceProducts({ pageSize: 48 }).catch(() => null),
+    /* 300, not 48. The list comes back sorted by updatedAt, so 48 was the 48
+       most recently imported products -- which after a category-by-category
+       import meant three categories, and Trending cycled the same three. The
+       catalogue is ~270 products, so this covers all of them and lets the
+       category spread below actually spread. */
+    listCommerceProducts({ pageSize: 300 }).catch(() => null),
     listCommerceProductsForDeals(120).catch(() => [] as CommerceProduct[]),
     listPosts({ pageSize: 24 }).then((r) => r.data).catch(() => [] as NxtPost[]),
     listStores().catch(() => [] as Store[]),
