@@ -435,8 +435,6 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
         </section>
       )}
 
-      {priceHistorySection}
-
       <section className="pb-6">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <ProductInfoTabs
@@ -454,6 +452,12 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
           />
         </div>
       </section>
+
+      {/* Price history sits directly above the merchant prices: the chart is
+          the context for the table under it — whether today's cheapest offer is
+          actually a good price — and the info tabs in between separated the two
+          halves of the same question. */}
+      {priceHistorySection}
 
       {rows.length > 0 && (
         <section className="border-t border-ink/10 bg-white py-12" data-testid="saved-price-comparison">

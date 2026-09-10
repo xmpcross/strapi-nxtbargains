@@ -6,7 +6,8 @@
  *
  * Purpose:
  *   Generates extended, comprehensive, multi-section product descriptions and
- *   refined short descriptions for products in the "Smart Door Locks" category.
+ *   refined short descriptions for products in the "Smart Door Locks" category,
+ *   with an explicit Read More text link after the overview section (~400px point).
  */
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -53,7 +54,6 @@ async function strapiApi(endpoint, options = {}) {
 
 function formatTitleCase(str) {
   if (!str) return '';
-  // If string is ALL CAPS, convert to Title Case
   if (str === str.toUpperCase() && str.length > 4) {
     return str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
   }
@@ -65,7 +65,6 @@ function getCleanModelTitle(brand, modelName, rawName) {
   let m = (modelName || rawName || '').trim();
   m = formatTitleCase(m);
 
-  // Remove duplicate brand prefix in model name
   if (m.toLowerCase().startsWith(b.toLowerCase() + ' ')) {
     m = m.slice(b.length + 1).trim();
   }
@@ -151,6 +150,8 @@ ${overviewP1}
 
 ${overviewP2}
 
+[Read More ↓](#key-features-access-modes)
+
 ### Key Features & Access Modes
 ${bulletList.join('\n')}
 
@@ -196,26 +197,12 @@ async function main() {
     const slug = p.slug || '';
 
     console.log(`[${i + 1}/${products.length}] Processing product ID: ${docId} ("${slug}")`);
-    console.log(`  Name: "${name}"`);
-
-    // Check if already enriched with extended format unless --force
-    const currentDesc = p.description || '';
-    if (!FORCE && currentDesc.includes('### Product Overview') && currentDesc.includes('### Installation, Fit & Hardware Prep') && currentDesc.length > 1500) {
-      console.log('  ➔ ⏭️  [SKIP] Extended description already present (>1500 chars).\n');
-      skipped++;
-      continue;
-    }
 
     try {
       const generated = buildExtendedSmartLockDescription(p);
 
-      console.log(`  ➔ 📝 Short Description (${generated.shortDescription.length} chars):`);
-      console.log(`     "${generated.shortDescription}"`);
-      console.log(`  ➔ 📄 Main Description (${generated.description.length} chars, 5 sections):`);
-      console.log(generated.description.split('\n').slice(0, 12).map(l => '     ' + l).join('\n') + '\n     ...');
-
       if (DRY_RUN) {
-        console.log('  ➔ 🧪 [DRY-RUN] Skipped saving to Strapi.\n');
+        console.log('  ➔ 🧪 [DRY-RUN] Generated extended description with Read More link.');
         updated++;
       } else {
         const existingSpecs = p.specs && typeof p.specs === 'object' ? p.specs : {};
@@ -225,6 +212,7 @@ async function main() {
           descriptionRewritten: true,
           descriptionEnrichedAt: new Date().toISOString(),
           extendedDescriptionGenerated: true,
+          readMoreLinkInserted: true,
         };
 
         const payload = {
@@ -240,16 +228,16 @@ async function main() {
           body: JSON.stringify(payload),
         });
 
-        console.log('  ➔ ✅ Saved extended description to Strapi successfully!\n');
+        console.log('  ➔ ✅ Saved description with Read More link to Strapi successfully!');
         updated++;
       }
     } catch (err) {
-      console.error(`  ➔ ❌ Error updating product ${docId}:`, err.message, '\n');
+      console.error(`  ➔ ❌ Error updating product ${docId}:`, err.message);
       errors++;
     }
   }
 
-  console.log('---------------------------------------------------------');
+  console.log('\n---------------------------------------------------------');
   console.log(' Execution Summary:');
   console.log(`   Updated: ${updated}`);
   console.log(`   Skipped: ${skipped}`);
