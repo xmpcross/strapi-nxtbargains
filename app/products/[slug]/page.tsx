@@ -439,7 +439,6 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
       <section className="pb-6">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <ProductInfoTabs
-            reviewsContent={reviewsContent}
             product={product}
             productId={product.id}
             productName={product.name}
@@ -459,6 +458,18 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
           actually a good price — and the info tabs in between separated the two
           halves of the same question. */}
       {priceHistorySection}
+
+      {/* Reviews as their own section rather than a panel in the info accordion.
+          Behind a collapsed panel they were reachable only by knowing to open
+          it, and a product carrying thousands of ratings showed no sign of them
+          on the page. */}
+      {reviewsContent && (
+        <section className="border-t border-ink/10 bg-white py-12" data-testid="product-reviews">
+          <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
+            {reviewsContent}
+          </div>
+        </section>
+      )}
 
       {rows.length > 0 && (
         <section className="border-t border-ink/10 bg-white py-12" data-testid="saved-price-comparison">
@@ -515,7 +526,6 @@ export default async function ProductPricePage({ params }: { params: Promise<Par
 }
 
 function ProductInfoTabs({
-  reviewsContent,
   product,
   productId,
   productName,
@@ -528,7 +538,6 @@ function ProductInfoTabs({
   brandGroups,
 }: {
   product: CommerceProduct;
-  reviewsContent?: ReactNode;
   productId: number | string;
   productName: string;
   summary: string;
@@ -616,11 +625,6 @@ function ProductInfoTabs({
                     </>
                   )
                 },
-                ...(reviewsContent ? [{
-                  id: 'reviews',
-                  label: 'Reviews',
-                  content: <div data-testid="product-reviews">{reviewsContent}</div>,
-                }] : []),
               ]}
             />
 
