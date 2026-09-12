@@ -31,6 +31,15 @@ export function isGeniusLinkUrl(url?: string | null): boolean {
 export async function createGeniusLink(destinationUrl: string): Promise<string> {
   if (!destinationUrl || destinationUrl === '#') return '#';
   if (isGeniusLinkUrl(destinationUrl)) return destinationUrl;
+  if (
+    destinationUrl.includes('tatrck.com') ||
+    destinationUrl.includes('goto.walmart.com') ||
+    destinationUrl.includes('linksynergy.com') ||
+    destinationUrl.includes('prf.hn') ||
+    destinationUrl.includes('imp.i')
+  ) {
+    return destinationUrl;
+  }
 
   if (linkCache.has(destinationUrl)) {
     return linkCache.get(destinationUrl)!;
