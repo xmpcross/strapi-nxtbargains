@@ -1,4 +1,4 @@
-import { type PillarPageContent } from '@/components/pillar/PillarPageTemplate';
+import { type PillarPageContent, type PillarSections } from '@/components/pillar/PillarPageTemplate';
 import { type NxtPost } from '@/lib/strapi';
 import { SECTIONS } from '@/lib/site';
 import { clampDescription, postPath, stripHtml } from '@/lib/format';
@@ -29,6 +29,9 @@ type PillarConfig = {
   path: string;
   supportingSlugs?: string[];
   supportingKeywords?: string[];
+  /* Section headings and copy written for this pillar's topic. Anything left
+     unset falls back to the defaults further down. */
+  copy?: PillarCopy;
 };
 
 const PILLAR_PAGES: Record<string, PillarConfig> = {
@@ -45,6 +48,44 @@ const PILLAR_PAGES: Record<string, PillarConfig> = {
        behaviour — an untagged cluster showing nothing is honest, and better
        than one padded with articles that were never chosen for it. */
     supportingKeywords: ['best deals and bargains'],
+
+    /* Headings written for this topic. The rest of the page — metrics, paths,
+       table, playbook, answers — is the shared default, because the defaults
+       were written for exactly this subject and restating them here would
+       only create two copies to keep in step. */
+    copy: {
+      sections: {
+        startHere: {
+          eyebrow: 'Start here',
+          title: 'Four ways into a bargain, depending on what you already know',
+          body: 'A deal is easy to find and hard to judge. Pick the route that matches how far you have narrowed the decision: a category and a budget, one specific model, a retailer you are already tied to, or a price you are waiting out.',
+        },
+        supporting: {
+          eyebrow: 'Supporting articles',
+          title: 'Go deeper on one part of deal hunting',
+          body: 'Longer guides on the individual skills this page only summarises — reading reviews honestly, using deal communities, and timing a purchase around a sale.',
+        },
+        decision: {
+          eyebrow: 'Decision table',
+          title: 'What counts as a real bargain?',
+          body: 'Every listing claims a saving. These rows are what separates a discount that holds up from one that only looks like it does.',
+        },
+        guides: {
+          eyebrow: 'Core routes',
+          title: 'Where to go once you know what you are buying',
+          body: 'Deals, product comparisons, and store pages answer different questions. This is which one to open, and when.',
+        },
+        playbook: {
+          eyebrow: 'Buying playbook',
+          title: 'Four checks before you pay',
+        },
+        faqs: {
+          eyebrow: 'Answers',
+          title: 'Questions worth settling before you buy',
+          body: 'The recurring ones: whether the discount is honest, whether the seller is, and whether waiting would pay.',
+        },
+      },
+    },
   },
 
   'coupon-codes-101-best-deals-and-bargains': {
@@ -89,13 +130,247 @@ export function pillarPathForPost(post: Pick<NxtPost, 'slug'>): string | null {
   return PILLAR_PATHS_BY_SLUG[post.slug] ?? null;
 }
 
+/**
+ * Copy a pillar can override.
+ *
+ * Everything here has a default below. A pillar sets only the parts where its
+ * topic actually differs, so adding a third pillar does not mean restating the
+ * whole page — and so the parts a pillar has NOT written are visibly the
+ * defaults rather than silently wrong topic copy.
+ */
+type PillarCopy = Partial<
+  Pick<
+    PillarPageContent,
+    | 'sections'
+    | 'metrics'
+    | 'signals'
+    | 'paths'
+    | 'guides'
+    | 'matrix'
+    | 'steps'
+    | 'faqs'
+    | 'primaryCta'
+    | 'secondaryCta'
+  >
+>;
+
+/**
+ * Defaults: true of any buying guide on this site, and of no topic in
+ * particular.
+ *
+ * They describe the routes the site actually has rather than the page they
+ * sit on. The previous defaults described the template to the reader — "the
+ * default pillar template includes one scannable table", "FAQ blocks stay
+ * compact and specific" — which was design-brief text shipped as content.
+ */
+const DEFAULT_SECTIONS: PillarSections = {
+  startHere: {
+    eyebrow: 'Start here',
+    title: 'Pick the route that matches what you already know',
+    body: 'Four ways into the same question. Choose by how far you have already narrowed it down — a category, a specific model, a retailer, or a price you are waiting on.',
+  },
+  supporting: {
+    eyebrow: 'Supporting articles',
+    title: 'Guides that go deeper on one part of this',
+    body: 'Longer reads on the individual skills this page only summarises.',
+  },
+  decision: {
+    eyebrow: 'Decision table',
+    title: 'What counts as a real bargain?',
+    body: 'A discount is a claim about a price, not a fact about value. These are the checks that decide whether the claim holds.',
+  },
+  guides: {
+    eyebrow: 'Core routes',
+    title: 'Where to go once you know what you are buying',
+    body: 'Deals, product comparisons, and store pages answer different questions. This is which one to open.',
+  },
+  playbook: {
+    eyebrow: 'Buying playbook',
+    title: 'Four checks before you pay',
+  },
+  faqs: {
+    eyebrow: 'Answers',
+    title: 'Common questions about deal hunting',
+    body: 'Short answers to the questions that decide whether a discount is worth acting on.',
+  },
+};
+
+const DEFAULT_METRICS: PillarPageContent['metrics'] = [
+  {
+    label: 'Compare across',
+    value: '6 retailers',
+    detail: 'Amazon, eBay, Walmart, Best Buy, Target and Newegg — the stores whose offers appear on product pages here.',
+  },
+  {
+    label: 'Best moment',
+    value: 'Before checkout',
+    detail: 'Shipping, coupons, and return terms all move the final number after the headline price.',
+  },
+  {
+    label: 'Biggest trap',
+    value: 'The "was" price',
+    detail: 'A percentage off is only as honest as the list price it is measured against.',
+  },
+  {
+    label: 'Use this for',
+    value: 'One decision',
+    detail: 'Whether the offer in front of you is worth taking now, or worth waiting on.',
+  },
+];
+
+const DEFAULT_SIGNALS: PillarPageContent['signals'] = [
+  { label: 'First move', value: 'Compare', tone: 'neutral' },
+  { label: 'Best tactic', value: 'Stack savings', tone: 'good' },
+  { label: 'Watch for', value: 'Inflated list price', tone: 'hot' },
+];
+
+const DEFAULT_PATHS: PillarPageContent['paths'] = [
+  {
+    label: 'Path A',
+    title: 'Browse what is discounted now',
+    body: 'Current offers from retailer deal feeds, filtered to the categories this site covers.',
+    href: '/best-deals',
+  },
+  {
+    label: 'Path B',
+    title: 'Compare one product across sellers',
+    body: 'Open a product page to see the offers held for it from each retailer, side by side.',
+    href: '/all-products',
+  },
+  {
+    label: 'Path C',
+    title: 'Find a code or cashback route',
+    body: 'Store codes and offers that can beat the visible sale price, listed by retailer.',
+    href: '/coupons',
+  },
+  {
+    label: 'Path D',
+    title: 'See what has actually fallen',
+    body: 'Recent price movement, so a routine markdown can be told apart from a genuine low.',
+    href: '/price-drops',
+  },
+];
+
+const DEFAULT_GUIDES: PillarPageContent['guides'] = [
+  {
+    meta: 'Start from the discount',
+    title: 'Current deals',
+    body: 'Best when you have a budget and a category in mind but not a specific model.',
+    href: '/best-deals',
+  },
+  {
+    meta: 'Start from the product',
+    title: 'Product comparisons',
+    body: 'Best when you know the model and need the cheapest seller you would actually buy from.',
+    href: '/all-products',
+  },
+  {
+    meta: 'Start from the retailer',
+    title: 'Stores and marketplaces',
+    body: 'Best when a gift card, membership, or return policy already ties you to one store.',
+    href: '/stores',
+  },
+];
+
+const DEFAULT_MATRIX: PillarPageContent['matrix'] = [
+  {
+    need: 'The lowest price today',
+    watch: 'Shipping, taxes, and seller reputation on marketplace listings',
+    bestRoute: 'Current deals, then the product page',
+  },
+  {
+    need: 'One specific model',
+    watch: 'Condition — new, open-box, or refurbished — and who honours the warranty',
+    bestRoute: 'Product page, then the store page',
+  },
+  {
+    need: 'A coupon-led saving',
+    watch: 'Minimum spend, category exclusions, and the expiry date',
+    bestRoute: 'Coupons, then the store page',
+  },
+  {
+    need: 'To know whether to wait',
+    watch: 'Whether this price has been seen before, and how recently',
+    bestRoute: 'Price drops, then the product page',
+  },
+];
+
+const DEFAULT_STEPS: PillarPageContent['steps'] = [
+  {
+    title: 'Price the whole order',
+    body: 'Add shipping, taxes, and any required fees before judging the discount. An offer that arrives with paid delivery can lose to a higher price that ships free.',
+  },
+  {
+    title: 'Check what the discount is measured against',
+    body: 'The percentage is calculated from a list price the seller chose. Compare it against what other retailers charge today, not against the strikethrough.',
+  },
+  {
+    title: 'Check the seller, not just the store',
+    body: 'On Amazon, eBay, and Walmart the listing may belong to a third-party seller. Returns, warranty, and delivery are theirs rather than the marketplace’s.',
+  },
+  {
+    title: 'Stack whatever is left',
+    body: 'A store code, cashback route, open-box listing, or loyalty price can still improve the final number after the sale price is fixed.',
+  },
+];
+
+const DEFAULT_FAQS: PillarPageContent['faqs'] = [
+  {
+    question: 'What makes a discount a real bargain?',
+    answer:
+      'That it survives comparison. A real bargain beats what other retailers charge today once shipping, fees, and return terms are counted — not merely the seller’s own "was" price.',
+  },
+  {
+    question: 'Should I trust the discount percentage?',
+    answer:
+      'Treat it as a clue rather than proof. The percentage is measured against a list price the seller sets, which may not be a price anyone recently paid. The checkout total is the number that matters.',
+  },
+  {
+    question: 'Is the cheapest listing always the best buy?',
+    answer:
+      'No. On marketplaces the cheapest listing is often a third-party seller with a shorter return window and no manufacturer warranty. Price that risk alongside the saving.',
+  },
+  {
+    question: 'Can a coupon beat a sale price?',
+    answer:
+      'Often, and sometimes both apply. Store codes, cashback, open-box stock, and loyalty pricing are separate from the headline sale, so they are worth checking after you have found the best sale price.',
+  },
+  {
+    question: 'How do I know whether the price will fall further?',
+    answer:
+      'You cannot know, but you can check whether this price is unusual. Where enough price movement has been recorded for a product, its page shows it; a price matched several times recently is a routine discount rather than a low.',
+  },
+  {
+    question: 'Are sale events like Black Friday or Prime Day actually the lowest prices?',
+    answer:
+      'Sometimes, and not reliably. A large event produces genuine lows on some products and routine discounts dressed as lows on others. The test does not change: compare the checkout total against what other retailers charge, and against what the product has recently sold for.',
+  },
+  {
+    question: 'Is an open-box or refurbished unit worth the saving?',
+    answer:
+      'Often, when the seller states the grade and the warranty in writing. Manufacturer-refurbished stock carrying a full warranty is a different proposition from an unlabelled "open box" from a marketplace seller, even at the same price.',
+  },
+];
+
+/**
+ * Content for the pillar template.
+ *
+ * The article body is no longer a parameter: the template renders a hub, not
+ * an article, and there is no section left to put it in. Removing it from the
+ * signature rather than ignoring it means the caller stops fetching and
+ * enriching HTML that nothing displays.
+ *
+ * Everything except the title, deck, and updated date is editorial copy rather
+ * than CMS data. A pillar overrides what its topic needs through `copy` on its
+ * entry in PILLAR_PAGES and inherits the rest.
+ */
 export function buildPillarContent(
   post: NxtPost,
-  bodyHtml: string,
   category: string,
   supportingArticles: PillarPageContent['supportingArticles'] = [],
 ): PillarPageContent {
   const intro = post.excerpt || clampDescription(stripHtml(post.content), 260);
+  const copy = PILLAR_PAGES[post.slug]?.copy ?? {};
 
   return {
     eyebrow: categoryName(category) || 'Buying guide',
@@ -104,144 +379,17 @@ export function buildPillarContent(
       intro ||
       'A practical NXT.Bargains guide for finding real discounts, comparing sellers, and avoiding weak offers before checkout.',
     updated: recentPostDate(post.updatedAt || post.publishedAt),
-    primaryCta: { href: '/best-deals', label: 'Browse current deals' },
-    secondaryCta: { href: '/all-products', label: 'Compare products' },
-    metrics: [
-      {
-        label: 'Use this for',
-        value: 'Deal checks',
-        detail: 'Quickly decide whether a discount is worth acting on.',
-      },
-      {
-        label: 'Compare across',
-        value: '6+ stores',
-        detail: 'Amazon, eBay, Walmart, Best Buy, Target, Newegg and more.',
-      },
-      {
-        label: 'Best moment',
-        value: 'Before checkout',
-        detail: 'Check price, shipping, coupons, seller quality, and return terms.',
-      },
-      {
-        label: 'Reader goal',
-        value: 'Pay less',
-        detail: 'Find the lowest trustworthy offer without chasing fake markdowns.',
-      },
-    ],
-    signals: [
-      { label: 'Price check', value: 'Compare first', tone: 'neutral' },
-      { label: 'Best tactic', value: 'Stack savings', tone: 'good' },
-      { label: 'Avoid', value: 'Fake sales', tone: 'hot' },
-    ],
-    paths: [
-      {
-        label: 'Path A',
-        title: 'Find the strongest deal now',
-        body: 'Start with current offers and sort by real savings instead of loud sale labels.',
-        href: '/best-deals',
-      },
-      {
-        label: 'Path B',
-        title: 'Compare the product price',
-        body: 'Open product pages to check merchant pricing, availability, and offer history.',
-        href: '/all-products',
-      },
-      {
-        label: 'Path C',
-        title: 'Use a coupon or promo',
-        body: 'Check whether a code, store offer, or cashback route beats the visible sale price.',
-        href: '/coupons',
-      },
-      {
-        label: 'Path D',
-        title: 'Watch recent price drops',
-        body: 'Use tracked price movement to separate a normal discount from a rare low.',
-        href: '/price-drops',
-      },
-    ],
+    primaryCta: copy.primaryCta ?? { href: '/best-deals', label: 'Browse current deals' },
+    secondaryCta: copy.secondaryCta ?? { href: '/all-products', label: 'Compare products' },
+    sections: copy.sections ?? DEFAULT_SECTIONS,
+    metrics: copy.metrics ?? DEFAULT_METRICS,
+    signals: copy.signals ?? DEFAULT_SIGNALS,
+    paths: copy.paths ?? DEFAULT_PATHS,
     supportingArticles,
-    guides: [
-      {
-        meta: 'Deal strategy',
-        title: 'Check the real checkout price',
-        body: 'Shipping, coupons, taxes, and seller terms decide whether the bargain survives checkout.',
-        href: '/best-deals',
-      },
-      {
-        meta: 'Product route',
-        title: 'Compare similar products',
-        body: 'Use product comparisons when the cheapest offer is not necessarily the best buy.',
-        href: '/all-products',
-      },
-      {
-        meta: 'Store route',
-        title: 'Shop by marketplace or retailer',
-        body: 'Move from the guide into stores when the buying intent is retailer-specific.',
-        href: '/stores',
-      },
-    ],
-    matrix: [
-      {
-        need: 'Lowest price now',
-        watch: 'Shipping, seller reputation, coupon exclusions',
-        bestRoute: 'Best deals plus product comparison',
-      },
-      {
-        need: 'Reliable electronics deal',
-        watch: 'Warranty, condition, return window',
-        bestRoute: 'Category guide plus merchant check',
-      },
-      {
-        need: 'Coupon-led saving',
-        watch: 'Minimum spend and expiry date',
-        bestRoute: 'Coupons plus store page',
-      },
-      {
-        need: 'Price-drop timing',
-        watch: 'Whether the sale price has been lower recently',
-        bestRoute: 'Price drops plus product page',
-      },
-    ],
-    steps: [
-      {
-        title: 'Check the visible price',
-        body: 'Start with the current offer, then add shipping and required fees before judging the discount.',
-      },
-      {
-        title: 'Compare a second seller',
-        body: 'A real bargain should still look strong against another major marketplace or retailer.',
-      },
-      {
-        title: 'Stack the saving',
-        body: 'Look for coupons, cashback, open-box offers, or loyalty pricing that can improve the final price.',
-      },
-      {
-        title: 'Buy when the trade-off is clear',
-        body: 'Only act when the page explains why this deal is worth choosing now.',
-      },
-    ],
-    faqs: [
-      {
-        question: 'What makes a deal real?',
-        answer:
-          'A real deal beats comparable current offers after shipping, coupon limits, seller quality, and return terms are considered.',
-      },
-      {
-        question: 'Should I trust the listed discount percentage?',
-        answer:
-          'Treat it as a clue, not proof. Some discounts use inflated list prices, so compare the actual checkout price.',
-      },
-      {
-        question: 'Where should I check first?',
-        answer: 'Start with the current best deals, then open product comparison pages for offers across major merchants.',
-      },
-      {
-        question: 'Can coupons beat sale prices?',
-        answer:
-          'Yes. Store codes, cashback, loyalty pricing, and open-box deals can produce a better final price than a headline sale.',
-      },
-    ],
-    bodyHtml,
+    guides: copy.guides ?? DEFAULT_GUIDES,
+    matrix: copy.matrix ?? DEFAULT_MATRIX,
+    steps: copy.steps ?? DEFAULT_STEPS,
+    faqs: copy.faqs ?? DEFAULT_FAQS,
   };
 }
 
