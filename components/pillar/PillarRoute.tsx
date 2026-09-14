@@ -6,7 +6,6 @@ import { articleJsonLd, breadcrumbJsonLd } from '@/lib/jsonld';
 import { buildPillarContent, buildSupportingArticles, categoryName, pillarPathForPost } from '@/lib/pillar';
 import { getPost, listPosts, mediaUrl, type NxtPost } from '@/lib/strapi';
 import { SITE } from '@/lib/site';
-import { enrichPostCarouselHtml } from '@/lib/enrich-post-carousel';
 import { clampDescription } from '@/lib/format';
 
 /**
@@ -62,12 +61,15 @@ export default async function PillarRoute({
   const post = await getPost(slug).catch(() => null);
   if (!post) notFound();
 
-  const [postContent, supportingPool] = await Promise.all([
-    enrichPostCarouselHtml(post.content),
-    /* The whole library. A hand-picked supporting slug outside the first page
-       of results silently drops out of the cluster. */
-    listPosts({ pageSize: 200 }).then((r) => r.data).catch(() => [] as NxtPost[]),
-  ]);
+  /* The whole library. A hand-picked supporting slug outside the first page of
+     results silently drops out of the cluster.
+     
+     The post body is no longer fetched through enrichPostCarouselHtml: the
+     template renders a hub with no article section, so enriching HTML that
+     nothing displays was pure work. */
+  const supportingPool = await listPosts({ pageSize: 200 })
+    .then((r) => r.data)
+    .catch(() => [] as NxtPost[]);
 
   const path = pillarPathForPost(post) ?? `/${post.slug}`;
   const supportingArticles = buildSupportingArticles(post, supportingPool);
@@ -96,7 +98,7 @@ export default async function PillarRoute({
     <>
       <JsonLd graph={[articleLd, breadcrumbLd]} />
       <PillarPageTemplate
-        content={buildPillarContent(post, postContent, breadcrumbLabel || categoryName(post.categories?.[0]?.slug), supportingArticles)}
+        content={buildPillarContent(post, breadcrumbLabel || categoryName(post.categories?.[0]?.slug), supportingArticles)}
       />
     </>
   );

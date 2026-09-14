@@ -215,16 +215,35 @@ type ListResponse<T> = {
   meta: { pagination: { page: number; pageSize: number; pageCount: number; total: number } };
 };
 
+let tokenRejectedLogged = false;
+
 async function strapiFetch<T>(path: string, params?: Record<string, unknown>, revalidate = 60): Promise<T> {
   const query = params ? '?' + qs.stringify(params, { encodeValuesOnly: true }) : '';
   const url = `${API_BASE}/api/${path}${query}`;
-  const res = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(TOKEN ? { Authorization: `Bearer ${TOKEN}` } : {}),
-    },
-    ...(revalidate <= 0 ? { cache: 'no-store' as const } : { next: { revalidate } }),
-  });
+  const request = (withToken: boolean) =>
+    fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(withToken && TOKEN ? { Authorization: `Bearer ${TOKEN}` } : {}),
+      },
+      ...(revalidate <= 0 ? { cache: 'no-store' as const } : { next: { revalidate } }),
+    });
+  let res = await request(true);
+  /* A token Strapi no longer accepts must not take the catalogue down. Since
+     11 Sep 2026 every API token 401s (they were hashed under a different
+     API_TOKEN_SALT). getCommerceProduct turned that error into null, so every
+     product page rendered notFound(), and ISR cached the 404 each time a page
+     revalidated: pages "kept disappearing" one by one as their 60s windows
+     expired. These are read-only calls to collections the Public role can
+     read, so retry without the token; a collection the Public role cannot
+     read still fails below, as before. */
+  if (res.status === 401 && TOKEN) {
+    if (!tokenRejectedLogged) {
+      tokenRejectedLogged = true;
+      console.warn('[strapi] STRAPI_API_TOKEN rejected with 401; reading as the Public role. Mint a new token in the Strapi admin.');
+    }
+    res = await request(false);
+  }
   if (!res.ok) {
     throw new Error(`Strapi ${res.status} on ${url}: ${await res.text().catch(() => '')}`);
   }

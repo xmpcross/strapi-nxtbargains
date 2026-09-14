@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import PostContent from '@/components/PostContent';
 import styles from './PillarPageTemplate.module.css';
 
 type PillarMetric = {
@@ -44,6 +43,31 @@ type PillarFaq = {
   answer: string;
 };
 
+/**
+ * The heading and standfirst for one section of the page.
+ *
+ * These used to be string literals in the JSX, which meant every pillar
+ * shared them. That was visible: /coupon-codes and /best-deals-and-bargains
+ * rendered the same six headings, and the headings described the template
+ * rather than the topic — readers were told that "pillar pages should pull
+ * readers into the buying system". Section copy is content, so it lives with
+ * the rest of the content and each pillar can write its own.
+ */
+type PillarSectionCopy = {
+  eyebrow: string;
+  title: string;
+  body: string;
+};
+
+export type PillarSections = {
+  startHere: PillarSectionCopy;
+  supporting: PillarSectionCopy;
+  decision: PillarSectionCopy;
+  guides: PillarSectionCopy;
+  playbook: { eyebrow: string; title: string };
+  faqs: PillarSectionCopy;
+};
+
 export type PillarPageContent = {
   eyebrow: string;
   title: string;
@@ -51,6 +75,7 @@ export type PillarPageContent = {
   updated: string;
   primaryCta: { href: string; label: string };
   secondaryCta: { href: string; label: string };
+  sections: PillarSections;
   metrics: PillarMetric[];
   signals: PillarSignal[];
   paths: PillarPath[];
@@ -59,7 +84,6 @@ export type PillarPageContent = {
   matrix: PillarMatrixRow[];
   steps: PillarStep[];
   faqs: PillarFaq[];
-  bodyHtml?: string;
 };
 
 const merchantLogos = [
@@ -71,17 +95,24 @@ const merchantLogos = [
   { name: 'Newegg', domain: 'newegg.com' },
 ];
 
+/**
+ * The pillar page as a hub, not an article.
+ *
+ * These pages no longer carry a body: the prose lives in the cluster, and the
+ * pillar's job is to say what the topic covers and route the reader into it.
+ * Three things follow from that, and they are the whole redesign:
+ *
+ *   The full-guide section is gone. It rendered `bodyHtml` and there is none.
+ *
+ *   The contents rail is gone with it. A sticky table of contents earns its
+ *     column against a long article; against six short sections it was
+ *     furniture, and it cost every section a third of the page width.
+ *
+ *   Supporting articles move up, directly under the paths. On a hub the
+ *     cluster is the destination, not an afterthought below the reading
+ *     material — it was the seventh of eight blocks and is now the third.
+ */
 export default function PillarPageTemplate({ content }: { content: PillarPageContent }) {
-  const tocItems = [
-    { href: '#start-here', label: 'Start here' },
-    { href: '#decision-table', label: 'Decision table' },
-    { href: '#core-guides', label: 'Core guides' },
-    ...(content.supportingArticles?.length ? [{ href: '#supporting-articles', label: 'Supporting articles' }] : []),
-    ...(content.bodyHtml ? [{ href: '#full-guide', label: 'Full guide' }] : []),
-    { href: '#buying-playbook', label: 'Buying playbook' },
-    { href: '#answers', label: 'Answers' },
-  ];
-
   return (
     <main className={styles.pillar} data-testid="pillar-page">
       <section className={styles.hero}>
@@ -125,31 +156,14 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
         </div>
       </section>
 
-      <div className={styles.bodyFrame}>
-        <aside className={styles.tocRail} aria-label="Table of contents">
-          <nav className={styles.tocCard}>
-            <span>Contents</span>
-            {tocItems.map((item) => (
-              <Link href={item.href} key={item.href}>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </aside>
-
-        <div className={styles.bodyStack}>
-          <section className={styles.section} id="start-here">
+      <section className={styles.section} id="start-here">
         <div className={styles.shell}>
-          <SectionHeader
-            eyebrow="Start here"
-            title="Choose the bargain path that matches the job"
-            body="A pillar page should route shoppers fast. These paths become the reusable landing blocks for every future NXT Bargains guide."
-          />
+          <SectionHeader {...content.sections.startHere} />
           <div className={styles.pathGrid}>
             {content.paths.map((path) => (
               <Link className={styles.pathCard} href={path.href} key={path.title}>
                 <span>{path.label}</span>
-                <h2>{path.title}</h2>
+                <h3>{path.title}</h3>
                 <p>{path.body}</p>
                 <b>Open path</b>
               </Link>
@@ -158,13 +172,27 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
         </div>
       </section>
 
+      {content.supportingArticles?.length ? (
+        <section className={styles.sectionAlt} id="supporting-articles">
+          <div className={styles.shell}>
+            <SectionHeader {...content.sections.supporting} />
+            <div className={styles.supportingGrid}>
+              {content.supportingArticles.map((article) => (
+                <Link className={styles.supportingCard} href={article.href} key={article.href}>
+                  <ArticleThumb label={article.meta} />
+                  <span>{article.meta}</span>
+                  <h3>{article.title}</h3>
+                  <p>{article.body}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className={styles.sectionAlt} id="decision-table">
         <div className={styles.shell}>
-          <SectionHeader
-            eyebrow="Decision table"
-            title="What counts as a real bargain?"
-            body="The default pillar template includes one scannable table so the page feels like a buying tool, not a long article wall."
-          />
+          <SectionHeader {...content.sections.decision} />
           <SavingsMeter />
           <div className={styles.matrix}>
             <div className={styles.matrixHead}>
@@ -185,16 +213,12 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
 
       <section className={styles.section} id="core-guides">
         <div className={styles.shell}>
-          <SectionHeader
-            eyebrow="Core guides"
-            title="Pillar pages should pull readers into the buying system"
-            body="These feature cards are reusable slots for child guides, category pages, and high-value comparisons."
-          />
+          <SectionHeader {...content.sections.guides} />
           <div className={styles.guideGrid}>
             {content.guides.map((guide) => (
               <Link className={styles.guideCard} href={guide.href} key={guide.title}>
                 <span>{guide.meta}</span>
-                <h2>{guide.title}</h2>
+                <h3>{guide.title}</h3>
                 <p>{guide.body}</p>
               </Link>
             ))}
@@ -202,56 +226,19 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
         </div>
       </section>
 
-      {content.supportingArticles?.length ? (
-        <section className={styles.sectionAlt} id="supporting-articles">
-          <div className={styles.shell}>
-            <SectionHeader
-              eyebrow="Supporting articles"
-              title="Keep reading around this topic"
-              body="Articles tagged to this guide's topic, hand-picked first and then by keyword."
-            />
-            <div className={styles.supportingGrid}>
-              {content.supportingArticles.map((article) => (
-                <Link className={styles.supportingCard} href={article.href} key={article.href}>
-                  <ArticleThumb label={article.meta} />
-                  <span>{article.meta}</span>
-                  <h2>{article.title}</h2>
-                  <p>{article.body}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      {content.bodyHtml ? (
-        <section className={styles.articleSection} id="full-guide">
-          <div className={styles.shell}>
-            <SectionHeader
-              eyebrow="Full guide"
-              title="Read the complete pillar guide"
-              body="The reusable pillar layout keeps the original article content in a focused reading section below the decision tools."
-            />
-            <div className={styles.articleBody}>
-              <PostContent html={content.bodyHtml} />
-            </div>
-          </div>
-        </section>
-      ) : null}
-
       <section className={styles.playbookSection} id="buying-playbook">
         <div className={styles.shell}>
           <div className={styles.playbookGrid}>
             <div>
-              <p className={styles.eyebrow}>Buying playbook</p>
-              <h2 className={styles.sectionTitle}>The default method every pillar page can teach</h2>
+              <p className={styles.eyebrow}>{content.sections.playbook.eyebrow}</p>
+              <h2 className={styles.sectionTitle}>{content.sections.playbook.title}</h2>
             </div>
             <div className={styles.steps}>
               {content.steps.map((step, index) => (
                 <article className={styles.step} key={step.title}>
                   <span>{String(index + 1).padStart(2, '0')}</span>
                   <div>
-                    <h3>{step.title}</h3>
+                    <h4>{step.title}</h4>
                     <p>{step.body}</p>
                   </div>
                 </article>
@@ -263,11 +250,7 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
 
       <section className={styles.section} id="answers">
         <div className={styles.shell}>
-          <SectionHeader
-            eyebrow="Answers"
-            title="Questions this pillar should settle"
-            body="FAQ blocks stay compact and specific, giving future pillar pages a consistent finish without feeling padded."
-          />
+          <SectionHeader {...content.sections.faqs} />
           <div className={styles.faqGrid}>
             {content.faqs.map((faq) => (
               <details className={styles.faq} key={faq.question}>
@@ -278,8 +261,6 @@ export default function PillarPageTemplate({ content }: { content: PillarPageCon
           </div>
         </div>
       </section>
-        </div>
-      </div>
     </main>
   );
 }
