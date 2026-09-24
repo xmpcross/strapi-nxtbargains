@@ -27,9 +27,9 @@ for a in "$@"; do
   esac
 done
 
-export NVM_DIR=/root/.nvm
-# shellcheck disable=SC1091
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm use 22 >/dev/null
+# System-wide Node 24 (/usr/local/lib/nodejs/current), the same runtime the
+# systemd unit starts the site with.
+export PATH=/usr/local/lib/nodejs/current/bin:$PATH
 export NODE_OPTIONS=--max-old-space-size=2048
 
 [ "$PULL" = 1 ] && git pull --ff-only
