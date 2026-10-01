@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import DealProductCard from '@/components/DealProductCard';
 import { SITE } from '@/lib/site';
-import { bestOffer, collectOfferRows, isGeniusLinkUrl, numericValue, offerPrice, type CommerceOfferRow } from '@/lib/commerce';
+import { bestOffer, collectOfferRows, isGeniusLinkUrl, merchantDealUrl, numericValue, offerPrice, type CommerceOfferRow } from '@/lib/commerce';
 import { monetizeUrl } from '@/lib/coupon-data';
 import { listCommerceProductsForDeals, type CommerceProduct } from '@/lib/strapi';
 import { collectionPageJsonLd } from '@/lib/jsonld';
@@ -327,58 +327,7 @@ function BrowseCard({ href, title, subtitle }: { href: string; title: string; su
   );
 }
 
-// The realtime feed links to Google Shopping. Turn a deal into the merchant's
-// own product-search URL (store + title) so the affiliate wrapper sends users to
-// the actual retailer, not a Google Shopping results page.
-const MERCHANT_SEARCH: Array<[RegExp, (q: string) => string]> = [
-  [/wal.?mart/i, (q) => `https://www.walmart.com/search?q=${q}`],
-  [/best.?buy/i, (q) => `https://www.bestbuy.com/site/searchpage.jsp?st=${q}`],
-  [/target/i, (q) => `https://www.target.com/s?searchTerm=${q}`],
-  [/newegg/i, (q) => `https://www.newegg.com/p/pl?d=${q}`],
-  [/\bdell\b/i, (q) => `https://www.dell.com/en-us/search/${q}`],
-  [/\bhp\b/i, (q) => `https://www.hp.com/us-en/shop/SiteSearch?keyword=${q}`],
-  [/lenovo/i, (q) => `https://www.lenovo.com/us/en/search?text=${q}`],
-  [/samsung/i, (q) => `https://www.samsung.com/us/search/searchMain/?listType=g&searchTerm=${q}`],
-  [/\bsony\b/i, (q) => `https://electronics.sony.com/search?text=${q}`],
-  [/staples/i, (q) => `https://www.staples.com/search?query=${q}`],
-  [/\bbj'?s\b/i, (q) => `https://www.bjs.com/search/${q}`],
-  [/instacart/i, (q) => `https://www.instacart.com/store/s?k=${q}`],
-  [/\bebay\b/i, (q) => `https://www.ebay.com/sch/i.html?_nkw=${q}`],
-  [/amazon/i, (q) => `https://www.amazon.com/s?k=${q}`],
-];
 
-/**
- * Retailer hosts whose URLs are already a specific product page.
- *
- * The rewriting below exists for the old Google Shopping feed, whose links all
- * pointed at google.com/search results that had to be swapped for something on
- * the retailer's own site. The scraped retailer feed does not have that
- * problem — its links are already /itm/, /dp/ and /ip/ product pages — and
- * putting those through a search rewrite actively loses information: an
- * ebay.co.uk/itm/ link matched /\bebay\b/ and came back out as a US
- * ebay.com search, dropping both the product and the marketplace.
- */
-const DIRECT_PRODUCT_HOSTS = /(^|\.)(amazon\.[a-z.]+|ebay\.[a-z.]+|walmart\.com|newegg\.com|goto\.walmart\.com)$/i;
-
-function isDirectProductUrl(url: string): boolean {
-  try {
-    return DIRECT_PRODUCT_HOSTS.test(new URL(url).hostname);
-  } catch {
-    return false;
-  }
-}
-
-function merchantDealUrl(store: string, title: string, fallback: string): string {
-  if (isGeniusLinkUrl(fallback)) return fallback;
-  if (isDirectProductUrl(fallback)) return fallback;
-  const q = encodeURIComponent(title.trim().slice(0, 150));
-  const match = MERCHANT_SEARCH.find(([re]) => re.test(store));
-  if (match) return match[1](q);
-  // Unknown single-word merchant: guess its .com; else keep the original link.
-  const slug = store.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-  if (slug && !/\s/.test(store.trim())) return `https://www.${slug}.com/`;
-  return fallback;
-}
 
 async function loadRealTimeBestDeals() {
   try {

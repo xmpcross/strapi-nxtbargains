@@ -324,3 +324,42 @@ function isAccessoryProduct(product: CommerceProduct): boolean {
 
   return ACCESSORY_TERMS.some((term) => text.includes(term));
 }
+
+const MERCHANT_SEARCH: Array<[RegExp, (q: string) => string]> = [
+  [/wal.?mart/i, (q) => `https://www.walmart.com/search?q=${q}`],
+  [/best.?buy/i, (q) => `https://www.bestbuy.com/site/searchpage.jsp?st=${q}`],
+  [/target/i, (q) => `https://www.target.com/s?searchTerm=${q}`],
+  [/newegg/i, (q) => `https://www.newegg.com/p/pl?d=${q}`],
+  [/\bdell\b/i, (q) => `https://www.dell.com/en-us/search/${q}`],
+  [/\bhp\b/i, (q) => `https://www.hp.com/us-en/shop/SiteSearch?keyword=${q}`],
+  [/lenovo/i, (q) => `https://www.lenovo.com/us/en/search?text=${q}`],
+  [/samsung/i, (q) => `https://www.samsung.com/us/search/searchMain/?listType=g&searchTerm=${q}`],
+  [/\bsony\b/i, (q) => `https://electronics.sony.com/search?text=${q}`],
+  [/staples/i, (q) => `https://www.staples.com/search?query=${q}`],
+  [/\bbj'?s\b/i, (q) => `https://www.bjs.com/search/${q}`],
+  [/instacart/i, (q) => `https://www.instacart.com/store/s?k=${q}`],
+  [/\bebay\b/i, (q) => `https://www.ebay.com/sch/i.html?_nkw=${q}`],
+  [/amazon/i, (q) => `https://www.amazon.com/s?k=${q}`],
+];
+
+const DIRECT_PRODUCT_HOSTS = /(^|\.)(amazon\.[a-z.]+|ebay\.[a-z.]+|walmart\.com|newegg\.com|goto\.walmart\.com)$/i;
+
+export function isDirectProductUrl(url: string): boolean {
+  try {
+    return DIRECT_PRODUCT_HOSTS.test(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
+
+export function merchantDealUrl(store: string, title: string, fallback: string): string {
+  if (isGeniusLinkUrl(fallback)) return fallback;
+  if (isDirectProductUrl(fallback)) return fallback;
+  const q = encodeURIComponent(title.trim().slice(0, 150));
+  const match = MERCHANT_SEARCH.find(([re]) => re.test(store));
+  if (match) return match[1](q);
+  const slug = store.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (slug && !/\s/.test(store.trim())) return `https://www.${slug}.com/`;
+  return fallback;
+}
+

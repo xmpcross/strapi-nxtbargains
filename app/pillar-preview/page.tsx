@@ -14,6 +14,39 @@ const previewContent: PillarPageContent = {
   updated: 'August 2026',
   primaryCta: { href: '/best-deals', label: 'Browse current deals' },
   secondaryCta: { href: '/all-products', label: 'Compare products' },
+  /* This page previews the layout, so its section copy is allowed to describe
+     the layout. Live pillars write theirs in lib/pillar.ts. */
+  sections: {
+    startHere: {
+      eyebrow: 'Start here',
+      title: 'Choose the bargain path that matches the job',
+      body: 'Four path cards route shoppers by intent. On a live pillar these carry topic copy.',
+    },
+    supporting: {
+      eyebrow: 'Supporting articles',
+      title: 'Keep reading around this topic',
+      body: 'The cluster: articles tagged to this pillar in the CMS.',
+    },
+    decision: {
+      eyebrow: 'Decision table',
+      title: 'What counts as a real bargain?',
+      body: 'One scannable table so the page reads as a buying tool, not an article wall.',
+    },
+    guides: {
+      eyebrow: 'Core routes',
+      title: 'Feature cards for child guides and comparisons',
+      body: 'Three reusable slots for the routes a topic most needs.',
+    },
+    playbook: {
+      eyebrow: 'Buying playbook',
+      title: 'The numbered method the pillar teaches',
+    },
+    faqs: {
+      eyebrow: 'Answers',
+      title: 'Questions the pillar settles',
+      body: 'Compact FAQ accordions, server-rendered so the answers stay in the HTML.',
+    },
+  },
   metrics: [
     { label: 'Best for', value: 'Deal research', detail: 'Top-level guides that need to route readers into products, retailers, and child articles.' },
     { label: 'Page shape', value: '7 blocks', detail: 'Hero, signal strip, paths, decision table, guide cards, playbook, FAQ.' },
