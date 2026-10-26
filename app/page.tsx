@@ -16,6 +16,7 @@ import {
   bestOffer,
   collectOfferRows,
   formatMoney,
+  merchantDealUrl,
   merchantName,
   numericValue,
   offerPrice,
@@ -23,7 +24,7 @@ import {
 } from '@/lib/commerce';
 import AutoCarousel from '@/components/AutoCarousel';
 import Hero from '@/components/Hero';
-import { listCouponPageData } from '@/lib/coupon-data';
+import { listCouponPageData, monetizeUrl } from '@/lib/coupon-data';
 import HomepageCouponsSection from '@/components/HomepageCouponsSection';
 import { listAmazonDailyDeals, type DailyDeal, listBestDealsRealtime } from '@/lib/best-sellers';
 import { productHref } from '@/lib/product-url';
@@ -165,7 +166,14 @@ export default async function HomePage() {
      nothing and the fallback put ten undiscounted products under a heading
      promising the biggest drop of the week — the section rendered without a
      single discount badge on it. */
-  const priceDrops = listBestDealsRealtime(11);
+  const rawPriceDrops = listBestDealsRealtime(11);
+  const priceDrops = await Promise.all(
+    rawPriceDrops.map(async (deal) => {
+      const merchantUrl = merchantDealUrl(deal.merchant || '', deal.title, deal.url);
+      const url = await monetizeUrl(merchantUrl);
+      return { ...deal, url };
+    })
+  );
   /* Ten trending products, spread across categories.
      `products` arrives sorted by updatedAt, so slicing the first ten returned
      ten of whatever category was imported last -- the section was showing
@@ -184,7 +192,14 @@ export default async function HomePage() {
      categories — a general deals page yields only a handful of electronics, so
      Amazon and Walmart routinely come back with one or two. */
   const DEALS_PER_TAB = 6;
-  const dailyDeals = listAmazonDailyDeals();
+  const rawDailyDeals = listAmazonDailyDeals();
+  const dailyDeals = await Promise.all(
+    rawDailyDeals.map(async (deal) => {
+      const merchantUrl = merchantDealUrl(deal.merchant || 'Amazon', deal.title, deal.url);
+      const url = await monetizeUrl(merchantUrl);
+      return { ...deal, url };
+    })
+  );
   const dealTabs = ['Amazon', 'eBay', 'Walmart']
     .map((merchant) => ({ merchant, deals: dailyDeals.filter((d) => (d.merchant ?? 'Amazon') === merchant) }))
     .filter((tab) => tab.deals.length >= DEALS_PER_TAB);
@@ -674,14 +689,14 @@ function PriceDropTile({ deal, rank, topPercent }: { deal: DailyDeal; rank: numb
       className="group flex h-full flex-col border border-ink/10 bg-white transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[0_18px_32px_-24px_rgba(3,3,3,0.4)]"
       data-testid="price-drop-tile"
     >
-      <span className="relative grid aspect-square place-items-center border-b border-ink/10 bg-white p-4">
+      <span className="price-drop-image-box uniform-product-image-box relative grid aspect-square w-full place-items-center overflow-hidden border-b border-ink/10 bg-white p-4">
         {deal.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={deal.image}
             alt={deal.title}
             referrerPolicy="no-referrer"
-            className="h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.04]"
+            className="price-drop-image uniform-product-image block h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-[1.04]"
           />
         ) : (
           <span className="font-display text-lg font-bold text-ink/20">{deal.merchant ?? 'Deal'}</span>
